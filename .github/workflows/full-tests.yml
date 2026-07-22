@@ -40,6 +40,7 @@ env:
   CONFIGURATION: Debug
   DERIVED_DATA: DerivedData/FullTestValidation
   BUILD_DESTINATION: platform=iOS Simulator,name=iPhone 17,OS=26.5
+  UI_SHARD_TIMEOUT_SECONDS: 1800
 
 jobs:
   full-test-suite:
@@ -192,10 +193,10 @@ jobs:
         run: ruby .github/scripts/full_test_validation.rb summarize TestResults
 
       - name: Print failed UI shard diagnostics
-        if: always() && (steps.ui-shards.outputs.shard_a_status == 'failure' || steps.ui-shards.outputs.shard_b_status == 'failure')
+        if: always() && (steps.ui-shards.outputs.shard_a_status == 'failure' || steps.ui-shards.outputs.shard_a_status == 'timeout' || steps.ui-shards.outputs.shard_b_status == 'failure' || steps.ui-shards.outputs.shard_b_status == 'timeout')
         run: |
           for shard in A B; do
-            if [[ "${{ steps.ui-shards.outputs.shard_a_status }}" == "failure" && "$shard" == "A" || "${{ steps.ui-shards.outputs.shard_b_status }}" == "failure" && "$shard" == "B" ]]; then
+            if [[ ("${{ steps.ui-shards.outputs.shard_a_status }}" == "failure" || "${{ steps.ui-shards.outputs.shard_a_status }}" == "timeout") && "$shard" == "A" || ("${{ steps.ui-shards.outputs.shard_b_status }}" == "failure" || "${{ steps.ui-shards.outputs.shard_b_status }}" == "timeout") && "$shard" == "B" ]]; then
               echo "::group::UI shard $shard log"
               rg -n -i -C 20 "assertion failure|xctassert|test case.*failed|\*\* test execute failed \*\*" "TestResults/UIShard${shard}.log" || true
               tail -n 250 "TestResults/UIShard${shard}.log" || true
@@ -206,7 +207,7 @@ jobs:
       - name: Fail when unit or either UI shard failed
         if: always()
         run: |
-          if [[ "${{ steps.unit-tests.outcome }}" != "success" || "${{ steps.unit-result.outcome }}" != "success" || "${{ steps.ui-shards.outputs.shard_a_status }}" == "failure" || "${{ steps.ui-shards.outputs.shard_b_status }}" == "failure" ]]; then
+          if [[ "${{ steps.unit-tests.outcome }}" != "success" || "${{ steps.unit-result.outcome }}" != "success" || "${{ steps.ui-shards.outputs.shard_a_status }}" != "success" || "${{ steps.ui-shards.outputs.shard_b_status }}" != "success" ]]; then
             exit 1
           fi
 
@@ -229,7 +230,7 @@ jobs:
 
       - name: Upload failed UI shard A diagnostics
         id: shard-a-failure-diagnostics
-        if: failure() && steps.ui-shards.outputs.shard_a_status == 'failure'
+        if: failure() && (steps.ui-shards.outputs.shard_a_status == 'failure' || steps.ui-shards.outputs.shard_a_status == 'timeout')
         continue-on-error: true
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -242,7 +243,7 @@ jobs:
 
       - name: Upload failed UI shard B diagnostics
         id: shard-b-failure-diagnostics
-        if: failure() && steps.ui-shards.outputs.shard_b_status == 'failure'
+        if: failure() && (steps.ui-shards.outputs.shard_b_status == 'failure' || steps.ui-shards.outputs.shard_b_status == 'timeout')
         continue-on-error: true
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:

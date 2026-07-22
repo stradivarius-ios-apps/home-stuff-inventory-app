@@ -38,11 +38,13 @@ is a procedure template, not evidence by itself.
       compulsory sign-off for web-based commits, observe the exact check name/source
       app on a signed and unsigned test pull request, then add that exact check to the
       `main` ruleset. No convenience override is used.
-- [ ] `Classify changed files`, `CI workflow validation`, and the security check
-      `Public candidate boundary` are observed as unconditional candidates. `Build and
-      test`, `Code coverage`, and `Full Test Suite` remain outside the global required
-      set unless their conditional/event semantics are supported and tested by the
-      selected ruleset mechanism.
+- [ ] `Classify changed files` and `CI workflow validation` are observed as
+      unconditional candidates. `Classify changed files` owns the tracked-public-
+      surface check, exact candidate preparation, trusted Gitleaks boundary, and
+      candidate scan; there is no separate `Public candidate boundary` check.
+      `Build and test`, `Code coverage`, and `Full Test Suite` remain outside the
+      global required set unless their conditional/event semantics are supported and
+      tested by the selected ruleset mechanism.
 - [ ] Default Actions permissions are read-only, reviewed actions are full-SHA pinned,
       and only explicitly reviewed jobs receive scoped writes.
 - [ ] The exact `main` and `v*` ruleset configuration is reviewed and ready to apply

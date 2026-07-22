@@ -110,6 +110,23 @@ class PublicGovernanceTest < Minitest::Test
     assert_includes error.message, "DCO provider check"
   end
 
+  def test_absent_public_candidate_check_cannot_be_reintroduced
+    path = file("docs/security/public-repository-settings-plan.json")
+    plan = JSON.parse(File.read(path))
+    plan.dig("required_checks", "global_candidates_not_authorized_for_rulesets") << "Public candidate boundary"
+    File.write(path, JSON.pretty_generate(plan))
+
+    error = assert_raises(ArgumentError) { validate }
+    assert_includes error.message, "global check candidates"
+  end
+
+  def test_classification_check_must_retain_the_embedded_public_boundary
+    replace(".github/workflows/validation.yml", "      - name: Scan tracked candidate with pinned Gitleaks\n", "")
+
+    error = assert_raises(ArgumentError) { validate }
+    assert_includes error.message, "unconditional public boundary step"
+  end
+
   def test_blank_public_issues_are_rejected
     replace(".github/ISSUE_TEMPLATE/config.yml", "blank_issues_enabled: false", "blank_issues_enabled: true")
 

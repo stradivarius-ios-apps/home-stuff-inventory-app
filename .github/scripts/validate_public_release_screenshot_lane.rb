@@ -26,13 +26,34 @@ text = File.read(path)
 helper = File.read(HELPER)
 events = workflow["on"] || workflow[true] || {}
 
-fail_lane("workflow must remain reusable-only") unless events.keys.map(&:to_s) == ["workflow_call"]
-fail_lane("reusable release_ref must be required") unless events.dig("workflow_call", "inputs", "release_ref", "required") == true
+fail_lane("workflow must support only manual and reusable dispatch") unless events.keys.map(&:to_s).sort == %w[workflow_call workflow_dispatch]
+%w[workflow_call workflow_dispatch].each do |event|
+  input = events.dig(event, "inputs", "release_ref")
+  fail_lane("#{event} release_ref must be a required string") unless
+    input.is_a?(Hash) && input["required"] == true && input["type"] == "string"
+  fail_lane("#{event} must describe the strict release identity") unless
+    input["description"].to_s.include?("vMAJOR.MINOR.PATCH") && input["description"].to_s.include?("full commit SHA")
+end
 
 job = workflow.dig("jobs", "release-app-store-screenshots")
 fail_lane("missing canonical release screenshot job") unless job.is_a?(Hash)
 fail_lane("canonical release screenshot job must use GitHub-hosted macOS") unless job["runs-on"] == "macos-26-intel"
 fail_lane("canonical release screenshot job must not have a private-control-plane condition") if job.key?("if")
+fail_lane("canonical release screenshot workflow must remain secretless") if text.match?(/\$\{\{\s*secrets\./)
+fail_lane("canonical release screenshot workflow must not use a self-hosted runner") if text.include?("self-hosted")
+fail_lane("canonical release screenshot workflow must keep read-only permissions") unless workflow["permissions"] == { "contents" => "read" }
+fail_lane("release ref validation must use the shared resolver") unless text.include?("resolve_release_screenshot_ref.rb")
+fail_lane("release tags must be checked out through a qualified tag ref") unless
+  File.read(".github/scripts/resolve_release_screenshot_ref.rb").include?('return "refs/tags/#{ReleaseContract.tag_for(version)}"')
+
+source_step = Array(job["steps"]).find { |step| step["name"] == "Summarize resolved release source" }
+fail_lane("release source summary must receive the canonical resolved ref") unless
+  source_step&.dig("env", "RESOLVED_REF") == "${{ steps.requested.outputs.ref }}"
+source_script = source_step.fetch("run", "")
+fail_lane("release tag must be dereferenced to a commit after checkout") unless
+  source_script.include?('git rev-parse "${RESOLVED_REF}^{commit}"')
+fail_lane("release tag commit must match checked-out HEAD") unless
+  source_script.include?('[[ "$tag_sha" != "$source_sha" ]]')
 
 CANONICAL_ENV.each do |key, value|
   fail_lane("workflow must configure #{key}") unless workflow.dig("env", key).to_s == value

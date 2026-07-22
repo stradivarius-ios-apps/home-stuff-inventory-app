@@ -46,6 +46,11 @@ Validation remains path-aware:
   launches both ordinary UI shards concurrently on distinct ephemeral simulators;
 - PR UI Screenshots captures synthetic repository-owned EN/UK light/dark fixtures.
 
+`Classify changed files` is also the unconditional public boundary check: it validates
+the tracked public surface, prepares the exact candidate, verifies the trusted Gitleaks
+configuration, and scans that candidate. There is no separate `Public candidate
+boundary` check in the clean public repository.
+
 No timeout, unavailable runtime, large workload, or hosted failure may reroute to a
 self-hosted runner. Public workflows must not mirror branches, copy source artifacts,
 or push commits to the historical private repository.
@@ -84,6 +89,11 @@ exercise this path in the clean staging repository and record public check metad
 
 Tag protection and the private verifier's required-check configuration remain provider
 and SEC-PUB-03 responsibilities; this public workflow does not set either policy.
+
+Release App Store Screenshots supports both manual and reusable dispatch. Both paths
+require either a protected strict `vMAJOR.MINOR.PATCH` tag or an exact full commit SHA;
+branch names and other mutable refs fail before checkout. The lane remains hosted,
+read-only, non-signing, and secretless.
 
 ## Failure diagnostics and cleanup
 

@@ -70,10 +70,11 @@ Optional seventh screenshot:
 
 ## Recapture
 
-Dispatch `Release App Store Screenshots` with the exact release branch, tag, or full
-commit SHA to validate or diagnose capture on GitHub-hosted infrastructure. This
-workflow does not sign an app, use release credentials, or publish to App Store
-Connect. Do not copy generated files into this repository.
+Dispatch `Release App Store Screenshots` with a protected strict
+`vMAJOR.MINOR.PATCH` release tag or exact full commit SHA to validate or diagnose
+capture on GitHub-hosted infrastructure. Branch names and other mutable refs are not
+accepted. This workflow does not sign an app, use release credentials, or publish to
+App Store Connect. Do not copy generated files into this repository.
 
 ## Final Review Checklist
 

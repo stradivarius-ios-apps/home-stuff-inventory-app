@@ -21,9 +21,18 @@
     "state": "blocked-until-integrated-staging-evidence-and-handoff-verifier-fixes",
     "global_candidates_not_authorized_for_rulesets": [
       "Classify changed files",
-      "CI workflow validation",
-      "Public candidate boundary"
+      "CI workflow validation"
     ],
+    "boundary_coverage": {
+      "check": "Classify changed files",
+      "unconditional_steps": [
+        "Validate tracked public surface",
+        "Prepare exact tracked candidate",
+        "Verify trusted Gitleaks boundary",
+        "Scan tracked candidate with pinned Gitleaks"
+      ],
+      "separate_check": "not-present-and-not-required"
+    },
     "conditional_not_global": {
       "Build and test": "runs only when Classify changed files marks app validation required",
       "Code coverage": "runs only when Classify changed files marks app validation required",
@@ -32,7 +41,7 @@
     "blockers": [
       "Full Test Suite needs a release-SHA trigger and exact-source proof before it can protect a release handoff",
       "the private verifier must bind successful checks to the expected GitHub Actions source app",
-      "the integrated candidate must prove the public-hosted and private-self-hosted workflow split",
+      "the unconditional Classify changed files check must retain its public-surface, candidate, and credential-scan boundary steps",
       "exact required names must be observed on the clean staging repository before any ruleset is applied"
     ],
     "dco": {

@@ -128,17 +128,19 @@ def run_shard(name, test_run, destination, result_directory, timeout_seconds)
   }
 end
 
-def positive_number_environment(name, default)
+def positive_number_environment(name, default, maximum: nil)
   value = Float(ENV.fetch(name, default.to_s))
-  abort_with("#{name} must be a positive number") unless value.positive?
+  valid = value.finite? && value.positive? && (maximum.nil? || value <= maximum)
+  range = maximum ? " no greater than #{maximum}" : ""
+  abort_with("#{name} must be a finite positive number#{range}") unless valid
 
   value
 rescue ArgumentError
-  abort_with("#{name} must be a positive number")
+  abort_with("#{name} must be a finite positive number")
 end
 
 def ui_shard_timeout_seconds
-  positive_number_environment("UI_SHARD_TIMEOUT_SECONDS", DEFAULT_UI_SHARD_TIMEOUT_SECONDS)
+  positive_number_environment("UI_SHARD_TIMEOUT_SECONDS", DEFAULT_UI_SHARD_TIMEOUT_SECONDS, maximum: DEFAULT_UI_SHARD_TIMEOUT_SECONDS)
 end
 
 def process_termination_grace_seconds

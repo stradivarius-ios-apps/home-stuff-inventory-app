@@ -110,14 +110,17 @@ Dir.mktmpdir("full-test-validation-invalid-timeout") do |directory|
   spawn_marker = File.join(directory, "spawned")
   File.write(File.join(fake_bin, "xcodebuild"), "#!/bin/sh\ntouch \"$SPAWN_MARKER\"\n")
   FileUtils.chmod("u+x", File.join(fake_bin, "xcodebuild"))
-  environment = {
-    "PATH" => "#{fake_bin}:#{ENV.fetch("PATH")}",
-    "SPAWN_MARKER" => spawn_marker,
-    "UI_SHARD_TIMEOUT_SECONDS" => "0"
-  }
-  output, status = Open3.capture2e(environment, "ruby", SCRIPT, "run-ui-shards", "shared.xctestrun", "platform=iOS Simulator,id=shard-a", "platform=iOS Simulator,id=shard-b", File.join(directory, "results"))
-  assert(!status.success?, "invalid timeout configuration must fail: #{output}")
-  assert(!File.exist?(spawn_marker), "invalid timeout configuration spawned a shard before validation")
+  ["0", "1e999", "NaN", "1800.1"].each do |invalid_timeout|
+    FileUtils.rm_f(spawn_marker)
+    environment = {
+      "PATH" => "#{fake_bin}:#{ENV.fetch("PATH")}",
+      "SPAWN_MARKER" => spawn_marker,
+      "UI_SHARD_TIMEOUT_SECONDS" => invalid_timeout
+    }
+    output, status = Open3.capture2e(environment, "ruby", SCRIPT, "run-ui-shards", "shared.xctestrun", "platform=iOS Simulator,id=shard-a", "platform=iOS Simulator,id=shard-b", File.join(directory, "results-#{invalid_timeout.tr("^0-9A-Za-z", "-")}"))
+    assert(!status.success?, "invalid timeout #{invalid_timeout.inspect} must fail: #{output}")
+    assert(!File.exist?(spawn_marker), "invalid timeout #{invalid_timeout.inspect} spawned a shard before validation")
+  end
 end
 
 Dir.mktmpdir("full-test-validation-partial-startup") do |directory|

@@ -155,7 +155,8 @@ simulator_step = step!(full_test_steps, "Create isolated full-test simulators")[
 fail_contract("Full Test Validation must create two distinct iPhone 17 simulators") unless simulator_step.scan("simctl create").length == 2 && simulator_step.include?("simulator_a") && simulator_step.include?("simulator_b")
 shard_step = step!(full_test_steps, "Run concurrent UI shards without rebuilding")["run"].to_s
 fail_contract("Full Test Validation must run both UI shards from one shared test run") unless shard_step.include?("run-ui-shards") && shard_step.scan("platform=iOS Simulator,id=").length == 2
-fail_contract("Full Test Validation must reserve time for diagnostics after independently bounded UI shards") unless full_test_job.fetch("env", {}).fetch("UI_SHARD_TIMEOUT_SECONDS", nil).to_i.between?(1, 1800) || full_test_workflow.fetch("env", {}).fetch("UI_SHARD_TIMEOUT_SECONDS", nil).to_i.between?(1, 1800)
+configured_shard_timeout = full_test_job.fetch("env", {}).fetch("UI_SHARD_TIMEOUT_SECONDS", nil) || full_test_workflow.fetch("env", {}).fetch("UI_SHARD_TIMEOUT_SECONDS", nil)
+fail_contract("Full Test Validation must reserve time for diagnostics after independently bounded UI shards") unless configured_shard_timeout.is_a?(Integer) && configured_shard_timeout.between?(1, 1800)
 cleanup_step = step!(full_test_steps, "Delete isolated full-test simulators")
 fail_contract("Full Test Validation simulator cleanup must always run") unless cleanup_step["if"] == "always()"
 fail_contract("Full Test Validation cleanup must delete both simulators") unless cleanup_step["run"].to_s.include?("udid_a") && cleanup_step["run"].to_s.include?("udid_b")

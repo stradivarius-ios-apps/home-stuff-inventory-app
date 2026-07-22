@@ -20,6 +20,7 @@ class PublicGovernanceValidator
     CONTRIBUTING.md
     .github/CODEOWNERS
     .github/pull_request_template.md
+    .github/workflows/validation.yml
     .github/ISSUE_TEMPLATE/config.yml
     .github/ISSUE_TEMPLATE/bug_report.yml
     .github/ISSUE_TEMPLATE/feature_request.yml
@@ -50,8 +51,13 @@ class PublicGovernanceValidator
   ].freeze
   REQUIRED_GLOBAL_CHECK_CANDIDATES = [
     "Classify changed files",
-    "CI workflow validation",
-    "Public candidate boundary"
+    "CI workflow validation"
+  ].freeze
+  REQUIRED_BOUNDARY_STEPS = [
+    "Validate tracked public surface",
+    "Prepare exact tracked candidate",
+    "Verify trusted Gitleaks boundary",
+    "Scan tracked candidate with pinned Gitleaks"
   ].freeze
   CONDITIONAL_CHECK_CANDIDATES = [
     "Build and test",
@@ -234,6 +240,23 @@ class PublicGovernanceValidator
     checks = plan.dig("required_checks", "global_candidates_not_authorized_for_rulesets")
     fail_validation("the recorded global check candidates changed without coordinated review") unless
       checks == REQUIRED_GLOBAL_CHECK_CANDIDATES
+    boundary = plan.dig("required_checks", "boundary_coverage")
+    expected_boundary = {
+      "check" => "Classify changed files",
+      "unconditional_steps" => REQUIRED_BOUNDARY_STEPS,
+      "separate_check" => "not-present-and-not-required"
+    }
+    fail_validation("the unconditional public boundary ownership changed without coordinated review") unless
+      boundary == expected_boundary
+
+    validation = yaml(".github/workflows/validation.yml")
+    classify = validation.dig("jobs", "classify-changes")
+    fail_validation("Classify changed files must remain an unconditional job") unless
+      classify.is_a?(Hash) && !classify.key?("if") && classify["name"] == "Classify changed files"
+    step_names = Array(classify["steps"]).map { |step| step["name"] }
+    missing_boundary_steps = REQUIRED_BOUNDARY_STEPS - step_names
+    fail_validation("Classify changed files lost an unconditional public boundary step") unless
+      missing_boundary_steps.empty?
     conditional = plan.dig("required_checks", "conditional_not_global")
     fail_validation("conditional checks must remain outside the global required set") unless
       conditional.is_a?(Hash) && conditional.keys == CONDITIONAL_CHECK_CANDIDATES

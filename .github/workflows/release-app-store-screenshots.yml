@@ -1,10 +1,16 @@
 name: Release App Store Screenshots
 
 on:
+  workflow_dispatch:
+    inputs:
+      release_ref:
+        description: Exact protected vMAJOR.MINOR.PATCH tag or full commit SHA to capture.
+        type: string
+        required: true
   workflow_call:
     inputs:
       release_ref:
-        description: Exact release tag or full commit SHA to capture.
+        description: Exact protected vMAJOR.MINOR.PATCH tag or full commit SHA to capture.
         type: string
         required: true
 

@@ -10,14 +10,14 @@ require_relative "export_release_app_store_screenshots"
 require_relative "resolve_release_screenshot_ref"
 
 class ReleaseScreenshotRefTest < Minitest::Test
-  def test_accepts_release_refs_and_sha
+  def test_accepts_strict_release_tags_and_sha
     assert_equal "v1.2.3", ReleaseScreenshotRef.resolve("v1.2.3")
-    assert_equal "refs/tags/v1.2.3", ReleaseScreenshotRef.resolve("refs/tags/v1.2.3")
+    assert_equal "v1.2.3", ReleaseScreenshotRef.resolve("refs/tags/v1.2.3")
     assert_equal "a" * 40, ReleaseScreenshotRef.resolve("A" * 40)
   end
 
-  def test_rejects_missing_and_unsafe_refs
-    ["", "../main", "release//bad", "main;echo bad"].each do |value|
+  def test_rejects_branches_mutable_refs_and_invalid_tags
+    ["", "main", "refs/heads/main", "release/1.2.3", "v1.2", "v01.2.3", "../main", "main;echo bad"].each do |value|
       assert_raises(ArgumentError) { ReleaseScreenshotRef.resolve(value) }
     end
   end

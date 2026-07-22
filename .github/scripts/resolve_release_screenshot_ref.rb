@@ -1,20 +1,21 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require_relative "support/release_contract"
+
 module ReleaseScreenshotRef
   module_function
 
   def resolve(input)
     value = input.to_s.strip
-    raise ArgumentError, "An explicit release branch, tag, or full commit SHA is required." if value.empty?
-    return value.downcase if value.match?(/\A[0-9a-fA-F]{40}\z/)
+    raise ArgumentError, "An exact release tag or full commit SHA is required." if value.empty?
+    return ReleaseContract.strict_sha!(value, label: "release_ref") if value.match?(ReleaseContract::SHA)
 
-    allowed = value.match?(%r{\A(?:refs/(?:heads|tags)/)?[A-Za-z0-9][A-Za-z0-9._/-]*\z})
-    safe = !value.include?("..") && !value.include?("@{") && !value.include?("//") &&
-      !value.end_with?("/", ".", ".lock") && value.split("/").none? { |part| part.start_with?(".") }
-    return value if allowed && safe
+    tag = value.delete_prefix("refs/tags/")
+    version = ReleaseContract.tag_version(tag)
+    return ReleaseContract.tag_for(version) if version
 
-    raise ArgumentError, "Unsupported or unsafe release ref: #{value.inspect}"
+    raise ArgumentError, "release_ref must be a strict vMAJOR.MINOR.PATCH tag or exact 40-character SHA."
   end
 end
 

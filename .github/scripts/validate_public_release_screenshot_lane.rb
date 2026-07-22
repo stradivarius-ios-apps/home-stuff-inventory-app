@@ -43,6 +43,17 @@ fail_lane("canonical release screenshot workflow must remain secretless") if tex
 fail_lane("canonical release screenshot workflow must not use a self-hosted runner") if text.include?("self-hosted")
 fail_lane("canonical release screenshot workflow must keep read-only permissions") unless workflow["permissions"] == { "contents" => "read" }
 fail_lane("release ref validation must use the shared resolver") unless text.include?("resolve_release_screenshot_ref.rb")
+fail_lane("release tags must be checked out through a qualified tag ref") unless
+  File.read(".github/scripts/resolve_release_screenshot_ref.rb").include?('return "refs/tags/#{ReleaseContract.tag_for(version)}"')
+
+source_step = Array(job["steps"]).find { |step| step["name"] == "Summarize resolved release source" }
+fail_lane("release source summary must receive the canonical resolved ref") unless
+  source_step&.dig("env", "RESOLVED_REF") == "${{ steps.requested.outputs.ref }}"
+source_script = source_step.fetch("run", "")
+fail_lane("release tag must be dereferenced to a commit after checkout") unless
+  source_script.include?('git rev-parse "${RESOLVED_REF}^{commit}"')
+fail_lane("release tag commit must match checked-out HEAD") unless
+  source_script.include?('[[ "$tag_sha" != "$source_sha" ]]')
 
 CANONICAL_ENV.each do |key, value|
   fail_lane("workflow must configure #{key}") unless workflow.dig("env", key).to_s == value

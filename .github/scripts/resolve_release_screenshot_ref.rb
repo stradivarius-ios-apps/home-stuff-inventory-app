@@ -13,7 +13,7 @@ module ReleaseScreenshotRef
 
     tag = value.delete_prefix("refs/tags/")
     version = ReleaseContract.tag_version(tag)
-    return ReleaseContract.tag_for(version) if version
+    return "refs/tags/#{ReleaseContract.tag_for(version)}" if version
 
     raise ArgumentError, "release_ref must be a strict vMAJOR.MINOR.PATCH tag or exact 40-character SHA."
   end

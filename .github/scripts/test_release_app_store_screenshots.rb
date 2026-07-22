@@ -6,13 +6,14 @@ require "json"
 require "minitest/autorun"
 require "open3"
 require "tmpdir"
+require "yaml"
 require_relative "export_release_app_store_screenshots"
 require_relative "resolve_release_screenshot_ref"
 
 class ReleaseScreenshotRefTest < Minitest::Test
   def test_accepts_strict_release_tags_and_sha
-    assert_equal "v1.2.3", ReleaseScreenshotRef.resolve("v1.2.3")
-    assert_equal "v1.2.3", ReleaseScreenshotRef.resolve("refs/tags/v1.2.3")
+    assert_equal "refs/tags/v1.2.3", ReleaseScreenshotRef.resolve("v1.2.3")
+    assert_equal "refs/tags/v1.2.3", ReleaseScreenshotRef.resolve("refs/tags/v1.2.3")
     assert_equal "a" * 40, ReleaseScreenshotRef.resolve("A" * 40)
   end
 
@@ -20,6 +21,20 @@ class ReleaseScreenshotRefTest < Minitest::Test
     ["", "main", "refs/heads/main", "release/1.2.3", "v1.2", "v01.2.3", "../main", "main;echo bad"].each do |value|
       assert_raises(ArgumentError) { ReleaseScreenshotRef.resolve(value) }
     end
+  end
+end
+
+class ReleaseScreenshotWorkflowRefTest < Minitest::Test
+  def test_same_name_branch_cannot_shadow_the_qualified_release_tag
+    workflow = YAML.load_file(".github/workflows/release-app-store-screenshots.yml")
+    steps = workflow.dig("jobs", "release-app-store-screenshots", "steps")
+    checkout = steps.find { |step| step["name"] == "Check out exact release source" }
+    source = steps.find { |step| step["name"] == "Summarize resolved release source" }
+
+    assert_equal "${{ steps.requested.outputs.ref }}", checkout.dig("with", "ref")
+    assert_equal "${{ steps.requested.outputs.ref }}", source.dig("env", "RESOLVED_REF")
+    assert_includes source.fetch("run"), 'git rev-parse "${RESOLVED_REF}^{commit}"'
+    assert_includes source.fetch("run"), '[[ "$tag_sha" != "$source_sha" ]]'
   end
 end
 

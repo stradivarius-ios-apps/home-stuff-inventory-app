@@ -1,0 +1,30 @@
+# The maintainer account must retain write access for these rules to take effect.
+* @Stradivarius23
+
+# Governance and GitHub execution
+/.github/CODEOWNERS @Stradivarius23
+/.github/ISSUE_TEMPLATE/** @Stradivarius23
+/.github/pull_request_template.md @Stradivarius23
+/.github/workflows/** @Stradivarius23
+/.github/scripts/** @Stradivarius23
+/scripts/ci/** @Stradivarius23
+/SECURITY.md @Stradivarius23
+/CONTRIBUTING.md @Stradivarius23
+/LICENSE* @Stradivarius23
+/BRAND.md @Stradivarius23
+/DCO @Stradivarius23
+/docs/security/** @Stradivarius23
+/docs/privacy/** @Stradivarius23
+
+# Build, versioning, release preparation, and public handoff contracts
+/HomeStuffInventoryApp.xcodeproj/** @Stradivarius23
+/Gemfile @Stradivarius23
+/Gemfile.lock @Stradivarius23
+/fastlane/** @Stradivarius23
+/CHANGELOG.md @Stradivarius23
+
+# Portability, restore, recovery, and privacy controls
+/HomeStuffInventoryApp/InventoryLogic/InventoryBackup* @Stradivarius23
+/HomeStuffInventoryApp/Views/Settings/InventoryBackup* @Stradivarius23
+/HomeStuffInventoryApp/Resources/PrivacyInfo.xcprivacy @Stradivarius23
+/docs/data/** @Stradivarius23

@@ -1,0 +1,42 @@
+.DS_Store
+.audit-private/
+.env
+.env.*
+.secrets/
+.credentials/
+DerivedData/
+TestResults/
+pr-ui-screenshots/
+release-app-store-screenshots/
+*.xcresult
+*.xcuserstate
+xcuserdata/
+*.xcscmblueprint
+
+# Build and release artifacts
+build/
+*.ipa
+*.xcarchive
+*.dSYM
+*.p8
+*.p12
+*.pem
+*.key
+*.cer
+*.mobileprovision
+*.secret.xcconfig
+Secrets.xcconfig
+
+# Private runner state and user-created inventory files
+actions-runner/
+_work/
+_diag/
+home-stuff-inventory-backup-*
+home-stuff-inventory-readable-export-*
+
+# Generated App Store publication inputs
+vendor/bundle/
+fastlane/screenshots/
+fastlane/screenshots-summary.md
+fastlane/metadata/**/release_notes.txt
+release-app-store-screenshots/

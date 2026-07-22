@@ -1,0 +1,16 @@
+Home Stuff Inventory helps you remember where household items are stored, from the room or closet down to the exact drawer, shelf, box, cabinet, or organizer.
+
+Use Locations and Places to build a simple map of your home storage. Add an item with a name, category, quantity, condition, tags, and notes, then record the Location and exact Place where it lives. When you need something later, browse by Location, open a Place, or search across your household inventory.
+
+The app is built for personal home organization:
+
+- Browse Locations as your main storage overview.
+- Drill into a Location to see its Places, categories, and recent items.
+- Open a Place to review the items stored there.
+- Search item names, categories, Locations, Places, tags, and notes.
+- Keep unlimited personal items and narrow the Inventory with Category and Location filters.
+- Add items quickly, with Location and Place context encouraged when known.
+- Create a readable JSON export, save a complete manual backup, and restore a compatible backup from Settings.
+- Keep inventory data local to your device.
+
+Home Stuff Inventory is private and local-first by design. Export, backup, and restore use files you choose and do not require an account or network connection. The current release does not use accounts, ads, analytics, tracking, cloud sync, or a backend service.

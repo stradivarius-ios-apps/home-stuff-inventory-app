@@ -1,0 +1,38 @@
+name: Feature request
+description: Propose a non-sensitive improvement to personal household inventory.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Keep proposals focused on the local-first household inventory product. Do not
+        include vulnerabilities, credentials, private release details, or real user data.
+  - type: textarea
+    id: need
+    attributes:
+      label: User need
+      description: What household-inventory problem should this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Describe the smallest useful native iOS behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: false
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Public-data confirmation
+      options:
+        - label: This request contains no real household inventory or sensitive information.
+          required: true

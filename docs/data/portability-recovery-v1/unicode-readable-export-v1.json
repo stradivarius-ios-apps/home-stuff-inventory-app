@@ -1,0 +1,58 @@
+{
+  "formatIdentifier": "com.stradivarius23.home-stuff-inventory.portability",
+  "artifactType": "readableExport",
+  "schemaVersion": 1,
+  "integrity": {
+    "algorithm": "SHA-256",
+    "canonicalization": "RFC8785",
+    "digest": "b2248d1580fea63f2af9dde99c1706b14af537e0a4a5f2b873068938a5410e22"
+  },
+  "metadata": {
+    "createdAt": "2026-07-14T10:00:00.000Z",
+    "appVersion": "1.0.0",
+    "appBuild": "100",
+    "platform": "iOS"
+  },
+  "inventory": {
+    "locations": [
+      {
+        "id": "11000000-0000-0000-0000-000000000001",
+        "name": "Квартира 🏠",
+        "iconID": "building.2",
+        "notes": "Kyiv / Київ",
+        "createdAt": "2026-07-04T07:15:30.125Z",
+        "updatedAt": "2026-07-05T18:45:10.500Z"
+      }
+    ],
+    "customCategories": [
+      {
+        "id": "21000000-0000-0000-0000-000000000001",
+        "name": "Кава & café",
+        "createdAt": "2026-07-04T07:15:30.125Z",
+        "updatedAt": "2026-07-04T07:15:30.125Z"
+      }
+    ],
+    "items": [
+      {
+        "id": "31000000-0000-0000-0000-000000000001",
+        "name": "Горнятко “Дім” ☕️",
+        "categoryStorageValue": "Кава & café",
+        "customCategoryID": "21000000-0000-0000-0000-000000000001",
+        "locationName": "Квартира 🏠",
+        "locationID": "11000000-0000-0000-0000-000000000001",
+        "placeName": "Кухня — верхня полиця",
+        "iconID": null,
+        "quantity": 2,
+        "conditionStorageValue": "good",
+        "tags": [
+          "подарунок",
+          "café",
+          "EN + УКР"
+        ],
+        "notes": "Ручна робота\nHandle with care. Символи: \\ / \"quotes\".",
+        "createdAt": "2026-07-04T07:15:30.125Z",
+        "updatedAt": "2026-07-05T18:45:10.500Z"
+      }
+    ]
+  }
+}

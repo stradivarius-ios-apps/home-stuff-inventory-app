@@ -1,0 +1,41 @@
+default_platform(:ios)
+
+require_relative "../.github/scripts/support/release_contract"
+require_relative "app_store_connect_screenshot_upload_guard"
+
+def validate_app_store_version!
+  version = ENV.fetch("APP_STORE_VERSION") do
+    UI.user_error!("APP_STORE_VERSION is required.")
+  end.strip
+  ReleaseContract.strict_version!(version, label: "APP_STORE_VERSION")
+rescue RuntimeError
+  UI.user_error!("APP_STORE_VERSION must use strict MAJOR.MINOR.PATCH.")
+end
+
+platform :ios do
+  desc "Publish reviewed metadata and canonical screenshots without uploading a binary or submitting for review."
+  lane :publish_app_store_connect do
+    version = validate_app_store_version!
+    AppStoreConnectScreenshotUploadGuard.install!
+    api_key = app_store_connect_api_key(
+      key_id: ENV.fetch("APP_STORE_CONNECT_API_KEY_ID"),
+      issuer_id: ENV.fetch("APP_STORE_CONNECT_API_ISSUER_ID"),
+      key_content: ENV.fetch("APP_STORE_CONNECT_API_PRIVATE_KEY"),
+      is_key_content_base64: false
+    )
+
+    deliver(
+      api_key: api_key,
+      app_identifier: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+      app_version: version,
+      metadata_path: "fastlane/metadata",
+      screenshots_path: "fastlane/screenshots",
+      force: true,
+      overwrite_screenshots: true,
+      skip_binary_upload: true,
+      submit_for_review: false,
+      automatic_release: false,
+      run_precheck_before_submit: false
+    )
+  end
+end

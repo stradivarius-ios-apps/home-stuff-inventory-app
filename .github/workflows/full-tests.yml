@@ -1,0 +1,269 @@
+name: Full Test Validation
+
+run-name: Full Test Validation / ${{ inputs.source_ref || github.ref_name }}
+
+on:
+  pull_request:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: Branch, tag, or exact SHA to validate. Leave blank to use the selected workflow ref.
+        type: string
+        required: false
+  workflow_call:
+    inputs:
+      source_ref:
+        description: Branch, tag, or exact SHA to validate.
+        type: string
+        required: true
+    outputs:
+      validated_commit:
+        description: Exact commit validated by the full test suite.
+        value: ${{ jobs.full-test-suite.outputs.validated_commit }}
+      validation_status:
+        description: Successful reusable validation result.
+        value: ${{ jobs.full-test-suite.outputs.validation_status }}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: full-test-validation-${{ inputs.source_ref || github.ref }}
+  cancel-in-progress: false
+
+env:
+  PROJECT: HomeStuffInventoryApp.xcodeproj
+  SCHEME: HomeStuffInventoryApp
+  CONFIGURATION: Debug
+  DERIVED_DATA: DerivedData/FullTestValidation
+  BUILD_DESTINATION: platform=iOS Simulator,name=iPhone 17,OS=26.5
+
+jobs:
+  full-test-suite:
+    name: Full Test Suite
+    runs-on: macos-26-intel
+    timeout-minutes: 90
+    outputs:
+      validated_commit: ${{ steps.source.outputs.sha }}
+      validation_status: ${{ steps.result.outputs.status }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ github.event_name == 'push' && github.sha || inputs.source_ref || github.sha }}
+          persist-credentials: false
+
+      - name: Record exact validated source
+        id: source
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_REF: ${{ github.ref }}
+          EVENT_SHA: ${{ github.sha }}
+          SOURCE_REF: ${{ inputs.source_ref }}
+        run: |
+          set -euo pipefail
+          sha="$(git rev-parse HEAD)"
+          if [[ "$EVENT_NAME" == "push" ]]; then
+            if [[ "$EVENT_REF" != refs/tags/v* ]]; then
+              echo "Push execution is restricted to release tags matching v*."
+              exit 1
+            fi
+            if [[ -n "$SOURCE_REF" ]]; then
+              echo "Push/tag execution must not accept a source_ref override."
+              exit 1
+            fi
+            if [[ "$sha" != "$EVENT_SHA" ]]; then
+              echo "Release tag expected exact workflow SHA $EVENT_SHA, checked out $sha."
+              exit 1
+            fi
+          elif [[ -z "$SOURCE_REF" && "$sha" != "$EVENT_SHA" ]]; then
+            echo "Expected workflow SHA $EVENT_SHA, checked out $sha."
+            exit 1
+          fi
+          if [[ "$SOURCE_REF" =~ ^[0-9a-fA-F]{40}$ ]]; then
+            requested_sha="$(ruby -r./.github/scripts/support/release_contract -e 'print ReleaseContract.strict_sha!(ARGV.fetch(0), label: "source_ref")' "$SOURCE_REF")"
+            if [[ "$requested_sha" != "$sha" ]]; then
+              echo "Requested SHA $SOURCE_REF resolved to unexpected commit $sha."
+              exit 1
+            fi
+          fi
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "VALIDATED_SHA=$sha" >> "$GITHUB_ENV"
+          echo "WORKFLOW_STARTED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+
+      - name: Show Xcode environment
+        run: bash .github/scripts/configure_hosted_xcode.sh
+
+      - name: Show hosted simulator environment
+        run: |
+          xcodebuild -version
+          xcode-select -p
+          xcrun simctl list devices available
+
+      - name: Prepare shared test products and result directory
+        run: |
+          rm -rf "$DERIVED_DATA" TestResults
+          mkdir -p TestResults
+
+      - name: Build test products once
+        id: build-for-testing
+        run: |
+          set -euo pipefail
+          started_at=$(date +%s)
+          xcodebuild build-for-testing \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -configuration "$CONFIGURATION" \
+            -destination "$BUILD_DESTINATION" \
+            -derivedDataPath "$DERIVED_DATA"
+          echo "duration_seconds=$(( $(date +%s) - started_at ))" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve shared test run file
+        id: test-run
+        run: |
+          set -euo pipefail
+          test_run_count="$(find "$DERIVED_DATA/Build/Products" -name '*.xctestrun' -type f | wc -l | tr -d ' ')"
+          if [[ "$test_run_count" != "1" ]]; then
+            echo "Expected exactly one generated .xctestrun file; found $test_run_count."
+            find "$DERIVED_DATA/Build/Products" -name '*.xctestrun' -type f | sort
+            exit 1
+          fi
+          test_run="$(find "$DERIVED_DATA/Build/Products" -name '*.xctestrun' -type f -print -quit)"
+          echo "path=$test_run" >> "$GITHUB_OUTPUT"
+
+      - name: Validate explicit UI shard manifest
+        run: ruby .github/scripts/full_test_validation.rb validate-manifest
+
+      - name: Run full unit and localization tests without rebuilding
+        id: unit-tests
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          started_at=$(date +%s)
+          xcodebuild test-without-building \
+            -xctestrun "${{ steps.test-run.outputs.path }}" \
+            -destination "$BUILD_DESTINATION" \
+            -only-testing:HomeStuffInventoryAppTests \
+            -resultBundlePath TestResults/UnitTests.xcresult 2>&1 | tee TestResults/UnitTests.log
+          status=${PIPESTATUS[0]}
+          echo "duration_seconds=$(( $(date +%s) - started_at ))" >> "$GITHUB_OUTPUT"
+          exit "$status"
+
+      - name: Reject empty successful unit results
+        id: unit-result
+        if: steps.unit-tests.outcome == 'success'
+        run: ruby .github/scripts/full_test_validation.rb validate-unit-result TestResults
+
+      - name: Create isolated full-test simulators
+        id: simulators
+        if: steps.unit-tests.outcome == 'success'
+        run: |
+          set -euo pipefail
+          suffix="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          simulator_a="$(xcrun simctl create "HSI Full Tests A $suffix" "iPhone 17" "com.apple.CoreSimulator.SimRuntime.iOS-26-5")"
+          simulator_b="$(xcrun simctl create "HSI Full Tests B $suffix" "iPhone 17" "com.apple.CoreSimulator.SimRuntime.iOS-26-5")"
+          echo "udid_a=$simulator_a" >> "$GITHUB_OUTPUT"
+          echo "udid_b=$simulator_b" >> "$GITHUB_OUTPUT"
+          xcrun simctl boot "$simulator_a"
+          xcrun simctl boot "$simulator_b"
+          xcrun simctl bootstatus "$simulator_a" -b
+          xcrun simctl bootstatus "$simulator_b" -b
+
+      - name: Run concurrent UI shards without rebuilding
+        id: ui-shards
+        if: steps.unit-tests.outcome == 'success'
+        continue-on-error: true
+        run: |
+          ruby .github/scripts/full_test_validation.rb run-ui-shards \
+            "${{ steps.test-run.outputs.path }}" \
+            "platform=iOS Simulator,id=${{ steps.simulators.outputs.udid_a }}" \
+            "platform=iOS Simulator,id=${{ steps.simulators.outputs.udid_b }}" \
+            TestResults
+
+      - name: Report Full Test Validation timing
+        if: always()
+        env:
+          BUILD_DURATION_SECONDS: ${{ steps.build-for-testing.outputs.duration_seconds }}
+          UNIT_DURATION_SECONDS: ${{ steps.unit-tests.outputs.duration_seconds }}
+        run: ruby .github/scripts/full_test_validation.rb summarize TestResults
+
+      - name: Print failed UI shard diagnostics
+        if: always() && (steps.ui-shards.outputs.shard_a_status == 'failure' || steps.ui-shards.outputs.shard_b_status == 'failure')
+        run: |
+          for shard in A B; do
+            if [[ "${{ steps.ui-shards.outputs.shard_a_status }}" == "failure" && "$shard" == "A" || "${{ steps.ui-shards.outputs.shard_b_status }}" == "failure" && "$shard" == "B" ]]; then
+              echo "::group::UI shard $shard log"
+              rg -n -i -C 20 "assertion failure|xctassert|test case.*failed|\*\* test execute failed \*\*" "TestResults/UIShard${shard}.log" || true
+              tail -n 250 "TestResults/UIShard${shard}.log" || true
+              echo "::endgroup::"
+            fi
+          done
+
+      - name: Fail when unit or either UI shard failed
+        if: always()
+        run: |
+          if [[ "${{ steps.unit-tests.outcome }}" != "success" || "${{ steps.unit-result.outcome }}" != "success" || "${{ steps.ui-shards.outputs.shard_a_status }}" == "failure" || "${{ steps.ui-shards.outputs.shard_b_status }}" == "failure" ]]; then
+            exit 1
+          fi
+
+      - name: Record successful full validation
+        id: result
+        run: echo "status=success" >> "$GITHUB_OUTPUT"
+
+      - name: Upload failed unit diagnostics
+        id: unit-failure-diagnostics
+        if: failure() && (steps.unit-tests.outcome == 'failure' || steps.unit-result.outcome == 'failure')
+        continue-on-error: true
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: full-test-unit-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            TestResults/UnitTests.xcresult
+            TestResults/UnitTests.log
+          if-no-files-found: ignore
+          retention-days: 3
+
+      - name: Upload failed UI shard A diagnostics
+        id: shard-a-failure-diagnostics
+        if: failure() && steps.ui-shards.outputs.shard_a_status == 'failure'
+        continue-on-error: true
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: full-test-ui-shard-a-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            TestResults/UIShardA.xcresult
+            TestResults/UIShardA.log
+          if-no-files-found: ignore
+          retention-days: 3
+
+      - name: Upload failed UI shard B diagnostics
+        id: shard-b-failure-diagnostics
+        if: failure() && steps.ui-shards.outputs.shard_b_status == 'failure'
+        continue-on-error: true
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: full-test-ui-shard-b-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            TestResults/UIShardB.xcresult
+            TestResults/UIShardB.log
+          if-no-files-found: ignore
+          retention-days: 3
+
+      - name: Report unavailable failure diagnostics
+        if: failure() && (steps.unit-failure-diagnostics.outcome == 'failure' || steps.shard-a-failure-diagnostics.outcome == 'failure' || steps.shard-b-failure-diagnostics.outcome == 'failure')
+        run: |
+          echo ":warning: Full Validation failed, and some diagnostic artifacts could not be uploaded. Check the repository Actions artifact quota." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Delete isolated full-test simulators
+        if: always()
+        run: |
+          for simulator_udid in "${{ steps.simulators.outputs.udid_a }}" "${{ steps.simulators.outputs.udid_b }}"; do
+            if [[ -n "$simulator_udid" ]]; then
+              xcrun simctl shutdown "$simulator_udid" || true
+              xcrun simctl delete "$simulator_udid" || true
+            fi
+          done

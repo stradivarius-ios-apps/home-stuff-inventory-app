@@ -1,0 +1,56 @@
+{
+  "formatIdentifier": "com.stradivarius23.home-stuff-inventory.portability",
+  "artifactType": "completeBackup",
+  "schemaVersion": 0,
+  "metadata": {
+    "createdAt": "2026-07-10T12:00:00.000Z",
+    "appVersion": "0.9.0",
+    "appBuild": "90",
+    "platform": "iOS"
+  },
+  "inventory": {
+    "locations": [
+      {
+        "id": "12000000-0000-0000-0000-000000000001",
+        "name": "Garage",
+        "iconID": null,
+        "notes": "",
+        "createdAt": "2026-06-01T08:00:00.000Z",
+        "updatedAt": "2026-06-01T08:00:00.000Z"
+      }
+    ],
+    "customCategories": [],
+    "items": [
+      {
+        "id": "32000000-0000-0000-0000-000000000001",
+        "name": "Legacy drill",
+        "category": "Tools",
+        "locationName": "Garage",
+        "containerName": "Tool cabinet",
+        "iconID": null,
+        "quantity": 1,
+        "condition": "Good",
+        "tags": [
+          "legacy"
+        ],
+        "notes": "Preserve current storage compatibility",
+        "createdAt": "2026-06-01T08:00:00.000Z",
+        "updatedAt": "2026-06-02T08:00:00.000Z"
+      },
+      {
+        "id": "32000000-0000-0000-0000-000000000002",
+        "name": "Legacy unlabeled place",
+        "category": "miscellaneous",
+        "locationName": "Garage",
+        "containerName": "   ",
+        "iconID": null,
+        "quantity": 1,
+        "condition": "unknown",
+        "tags": [],
+        "notes": "Whitespace-only persisted Place must round-trip through a complete backup",
+        "createdAt": "2026-06-03T08:00:00.000Z",
+        "updatedAt": "2026-06-03T08:00:00.000Z"
+      }
+    ]
+  }
+}

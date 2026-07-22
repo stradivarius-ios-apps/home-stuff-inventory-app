@@ -1,0 +1,1392 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10000000000000000000240 /* InventoryItemPlaceLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000241 /* InventoryItemPlaceLink.swift */; };
+		A10000000000000000000242 /* InventoryItemPlaceSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000243 /* InventoryItemPlaceSelectionView.swift */; };
+		A10000000000000000000250 /* InventoryPlaceDirectoryPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000251 /* InventoryPlaceDirectoryPresentation.swift */; };
+		A10000000000000000000252 /* PlaceManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000253 /* PlaceManagementView.swift */; };
+		A10000000000000000000200 /* InventoryPortabilityResourceValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000201 /* InventoryPortabilityResourceValidation.swift */; };
+		A10000000000000000000202 /* InventoryPortabilitySchemaValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000203 /* InventoryPortabilitySchemaValidation.swift */; };
+		A10000000000000000000204 /* InventoryRFC8785Canonicalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000205 /* InventoryRFC8785Canonicalizer.swift */; };
+		A10000000000000000000206 /* InventoryBackupFileReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000207 /* InventoryBackupFileReader.swift */; };
+		A10000000000000000000208 /* InventoryBackupRestorePlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000209 /* InventoryBackupRestorePlanner.swift */; };
+		A1000000000000000000020A /* InventoryBackupRestoreService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000020B /* InventoryBackupRestoreService.swift */; };
+		A1000000000000000000020C /* InventoryBrowseSummaryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000020D /* InventoryBrowseSummaryModels.swift */; };
+		A1000000000000000000020E /* InventoryBrowseSummaryPreviews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000020F /* InventoryBrowseSummaryPreviews.swift */; };
+		A1000000000000000000018F /* InventoryPortabilityCodecTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000190 /* InventoryPortabilityCodecTests.swift */; };
+		A1000000000000000000018D /* InventoryReadableExportServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000018E /* InventoryReadableExportServiceTests.swift */; };
+		A10000000000000000000189 /* InventoryReadableExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000018A /* InventoryReadableExportService.swift */; };
+		A1000000000000000000018B /* InventoryActivityShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000018C /* InventoryActivityShareView.swift */; };
+		A10000000000000000000185 /* InventoryPortabilityModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000186 /* InventoryPortabilityModels.swift */; };
+		A10000000000000000000187 /* InventoryPortabilityIntegrity.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000188 /* InventoryPortabilityIntegrity.swift */; };
+		A10000000000000000000191 /* InventoryBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000192 /* InventoryBackup.swift */; };
+		A10000000000000000000193 /* InventoryBackupDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000194 /* InventoryBackupDocument.swift */; };
+		A10000000000000000000195 /* InventoryBackupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000196 /* InventoryBackupTests.swift */; };
+		A10000000000000000000197 /* InventoryBackupRestore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000198 /* InventoryBackupRestore.swift */; };
+		A10000000000000000000199 /* InventoryBackupRestorePreflightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000019A /* InventoryBackupRestorePreflightView.swift */; };
+		A1000000000000000000019B /* InventoryBackupRestoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000019C /* InventoryBackupRestoreTests.swift */; };
+		A1000000000000000000019D /* InventoryBackupLegacyMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000019E /* InventoryBackupLegacyMigration.swift */; };
+		A1000000000000000000019F /* InventoryBackupRecoveryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001A0 /* InventoryBackupRecoveryStore.swift */; };
+		A10000000000000000000180 /* InventoryFreeAccessPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000181 /* InventoryFreeAccessPolicy.swift */; };
+		A10000000000000000000182 /* InventoryFreeAccessPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000183 /* InventoryFreeAccessPolicyTests.swift */; };
+		A100000000000000000001A2 /* PremiumAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001A3 /* PremiumAccess.swift */; };
+		A100000000000000000001A4 /* PremiumAccessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001A5 /* PremiumAccessTests.swift */; };
+		A100000000000000000001A6 /* InventoryFreeDowngradeRegressionGateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001A7 /* InventoryFreeDowngradeRegressionGateTests.swift */; };
+		A100000000000000000001A8 /* PrivacyManifestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001A9 /* PrivacyManifestTests.swift */; };
+		A10000000000000000000020 /* HomeStuffInventoryApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000010 /* HomeStuffInventoryApp.swift */; };
+		A10000000000000000000021 /* InventoryItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000011 /* InventoryItem.swift */; };
+		A10000000000000000000109 /* InventoryItemViewEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000108 /* InventoryItemViewEvent.swift */; };
+		A10000000000000000000221 /* InventoryPlaceOpenRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000220 /* InventoryPlaceOpenRecord.swift */; };
+		A10000000000000000000231 /* InventoryPlace.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000230 /* InventoryPlace.swift */; };
+		A10000000000000000000233 /* PlaceIconOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000232 /* PlaceIconOption.swift */; };
+		A10000000000000000000235 /* InventoryPlaceReconciler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000234 /* InventoryPlaceReconciler.swift */; };
+		A10000000000000000000237 /* InventoryPlaceReconcilerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000236 /* InventoryPlaceReconcilerTests.swift */; };
+		A100000000000000000000B7 /* ItemIconOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000B8 /* ItemIconOption.swift */; };
+		A100000000000000000000B5 /* LocationIconOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000B6 /* LocationIconOption.swift */; };
+		A10000000000000000000022 /* StorageLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000012 /* StorageLocation.swift */; };
+		A100000000000000000000A6 /* InventoryCustomCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000A5 /* InventoryCustomCategory.swift */; };
+		A10000000000000000000023 /* InventoryOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000013 /* InventoryOverview.swift */; };
+		A10000000000000000000024 /* InventoryEmptyStateViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000014 /* InventoryEmptyStateViewModel.swift */; };
+		A10000000000000000000025 /* InventoryModelContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000015 /* InventoryModelContainer.swift */; };
+		A10000000000000000000026 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000016 /* RootView.swift */; };
+		A10000000000000000000027 /* InventoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000017 /* InventoryListView.swift */; };
+		A10000000000000000000028 /* InventoryEmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000018 /* InventoryEmptyStateView.swift */; };
+		A10000000000000000000029 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000019 /* Assets.xcassets */; };
+		A1000000000000000000012B /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000012A /* PrivacyInfo.xcprivacy */; };
+		A10000000000000000000051 /* InventoryItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000050 /* InventoryItemTests.swift */; };
+		A10000000000000000000070 /* InventorySampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000068 /* InventorySampleData.swift */; };
+		A10000000000000000000071 /* InventorySampleDataSeeder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000069 /* InventorySampleDataSeeder.swift */; };
+		A10000000000000000000073 /* InventorySampleDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000072 /* InventorySampleDataTests.swift */; };
+		A55000000000000000000001 /* InventoryAppStoreDemoData.swift in Sources */ = {isa = PBXBuildFile; fileRef = A55000000000000000000002 /* InventoryAppStoreDemoData.swift */; };
+		A55000000000000000000003 /* InventoryAppStoreDemoDataSeeder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A55000000000000000000004 /* InventoryAppStoreDemoDataSeeder.swift */; };
+		A55000000000000000000005 /* InventoryAppStoreDemoDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A55000000000000000000006 /* InventoryAppStoreDemoDataTests.swift */; };
+		A10000000000000000000075 /* InventoryItemDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000074 /* InventoryItemDetailViewModel.swift */; };
+		A10000000000000000000077 /* InventoryItemDetailViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000076 /* InventoryItemDetailViewModelTests.swift */; };
+		A1000000000000000000012D /* InventoryHeroNavigationTitleMetricsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000012C /* InventoryHeroNavigationTitleMetricsTests.swift */; };
+		A10000000000000000000136 /* InventoryAppearanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000137 /* InventoryAppearanceTests.swift */; };
+		A10000000000000000000079 /* InventoryItemDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000078 /* InventoryItemDraft.swift */; };
+		A10000000000000000000081 /* InventoryItemFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000080 /* InventoryItemFormView.swift */; };
+		A100000000000000000000F0 /* InventoryFormFocusBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000F5 /* InventoryFormFocusBehavior.swift */; };
+		A100000000000000000000F1 /* InventoryItemIconSelectionLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000F6 /* InventoryItemIconSelectionLabel.swift */; };
+		A100000000000000000000F2 /* InventoryItemIconPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000F7 /* InventoryItemIconPickerView.swift */; };
+		A100000000000000000000F3 /* InventoryStandardizedValueSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000F8 /* InventoryStandardizedValueSelectionView.swift */; };
+		A100000000000000000000F4 /* InventoryStandardizedValueCreationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000F9 /* InventoryStandardizedValueCreationView.swift */; };
+		A10000000000000000000083 /* InventoryItemDraftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000082 /* InventoryItemDraftTests.swift */; };
+		A10000000000000000000085 /* InventorySearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000084 /* InventorySearch.swift */; };
+		A100000000000000000000EB /* InventoryNormalizedName.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000EA /* InventoryNormalizedName.swift */; };
+		A100000000000000000000ED /* InventoryBrowseSummaries.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000EC /* InventoryBrowseSummaries.swift */; };
+		A10000000000000000000111 /* InventoryRecentItemViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000110 /* InventoryRecentItemViews.swift */; };
+		A10000000000000000000223 /* InventoryPlaceIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000222 /* InventoryPlaceIdentity.swift */; };
+		A10000000000000000000225 /* InventoryPlaceOpenPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000224 /* InventoryPlaceOpenPersistence.swift */; };
+		A10000000000000000000227 /* InventoryPlaceIdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000226 /* InventoryPlaceIdentityTests.swift */; };
+		A10000000000000000000229 /* InventoryPlaceOpenPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000228 /* InventoryPlaceOpenPersistenceTests.swift */; };
+		A1000000000000000000013B /* InventoryLocationReconciler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000013A /* InventoryLocationReconciler.swift */; };
+		A1000000000000000000013F /* InventoryCategoryReconciler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000013E /* InventoryCategoryReconciler.swift */; };
+		A1000000000000000000013D /* InventoryLocationReconcilerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000013C /* InventoryLocationReconcilerTests.swift */; };
+		A10000000000000000000087 /* InventorySearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000086 /* InventorySearchTests.swift */; };
+		A100000000000000000001AA /* InventoryBrowseSummariesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001AB /* InventoryBrowseSummariesTests.swift */; };
+		A100000000000000000001AC /* InventoryBackupFileReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001AD /* InventoryBackupFileReaderTests.swift */; };
+		A100000000000000000001AE /* InventoryBackupRestorePlannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001AF /* InventoryBackupRestorePlannerTests.swift */; };
+		A100000000000000000001B0 /* InventoryBackupRestoreServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001B1 /* InventoryBackupRestoreServiceTests.swift */; };
+		A100000000000000000001B2 /* InventoryBackupRecoveryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001B3 /* InventoryBackupRecoveryTests.swift */; };
+		A100000000000000000001B4 /* InventoryBackupRecoveryArtifactProtectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001B5 /* InventoryBackupRecoveryArtifactProtectionTests.swift */; };
+		A100000000000000000001B6 /* InventoryBackupLegacyMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001B7 /* InventoryBackupLegacyMigrationTests.swift */; };
+		A10000000000000000000089 /* InventoryLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000088 /* InventoryLocalization.swift */; };
+		A100000000000000000001E0 /* InventoryDataTransferWorkflow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001E1 /* InventoryDataTransferWorkflow.swift */; };
+		A100000000000000000001E2 /* InventoryItemFormWorkflow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001E3 /* InventoryItemFormWorkflow.swift */; };
+		A100000000000000000001E4 /* InventoryItemFormPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001E5 /* InventoryItemFormPersistence.swift */; };
+		A10000000000000000000212 /* InventoryListManagementPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000213 /* InventoryListManagementPersistence.swift */; };
+		A10000000000000000000214 /* InventoryItemMutationPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000215 /* InventoryItemMutationPersistence.swift */; };
+		A100000000000000000001E6 /* InventorySelectionValueStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001E7 /* InventorySelectionValueStore.swift */; };
+		A100000000000000000001E8 /* InventoryItemFormPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001E9 /* InventoryItemFormPersistenceTests.swift */; };
+		A10000000000000000000216 /* InventoryListManagementPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000217 /* InventoryListManagementPersistenceTests.swift */; };
+		A10000000000000000000218 /* InventoryItemMutationPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000219 /* InventoryItemMutationPersistenceTests.swift */; };
+		A100000000000000000001F0 /* InventoryFilterContextHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001F1 /* InventoryFilterContextHeader.swift */; };
+		A100000000000000000001F2 /* InventoryItemDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001F3 /* InventoryItemDetailView.swift */; };
+		A100000000000000000001F4 /* InventoryItemMutationFailure.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001F5 /* InventoryItemMutationFailure.swift */; };
+		A100000000000000000001F6 /* InventoryBrowsePreviews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001F7 /* InventoryBrowsePreviews.swift */; };
+		A100000000000000000001F8 /* InventoryBrowsePreviewFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001F9 /* InventoryBrowsePreviewFixtures.swift */; };
+		A10000000000000000000210 /* InventoryDetailPreviewSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000211 /* InventoryDetailPreviewSupport.swift */; };
+		A100000000000000000001FA /* InventoryItemMutationFailureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001FB /* InventoryItemMutationFailureTests.swift */; };
+		A10000000000000000000091 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000090 /* Localizable.xcstrings */; };
+		A100000000000000000001C1 /* LocalizationCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001C0 /* LocalizationCatalogTests.swift */; };
+		A100000000000000000001C3 /* LocalizationTestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001C2 /* LocalizationTestSupport.swift */; };
+		A100000000000000000001C5 /* InventoryDataFileDisclosureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001C4 /* InventoryDataFileDisclosureTests.swift */; };
+		A100000000000000000001C7 /* InventoryItemIconLocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001C6 /* InventoryItemIconLocalizationTests.swift */; };
+		A100000000000000000001C9 /* InventoryListManagementLocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001C8 /* InventoryListManagementLocalizationTests.swift */; };
+		A100000000000000000001CB /* InventoryLocalizationFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001CA /* InventoryLocalizationFormattingTests.swift */; };
+		A100000000000000000001CD /* InventoryStorageCompatibilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001CC /* InventoryStorageCompatibilityTests.swift */; };
+		A10000000000000000000094 /* InventorySmokeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000095 /* InventorySmokeUITests.swift */; };
+		A100000000000000000001D0 /* InventoryUITestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001D1 /* InventoryUITestCase.swift */; };
+		A100000000000000000001D2 /* InventoryStartupRecoveryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001D3 /* InventoryStartupRecoveryUITests.swift */; };
+		A100000000000000000001D4 /* InventorySettingsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001D5 /* InventorySettingsUITests.swift */; };
+		A100000000000000000001D6 /* InventoryItemFormUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001D7 /* InventoryItemFormUITests.swift */; };
+		A100000000000000000001D8 /* InventoryBrowseDetailUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000001D9 /* InventoryBrowseDetailUITests.swift */; };
+		A10000000000000000000155 /* InventoryManagedValueRowUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000154 /* InventoryManagedValueRowUITests.swift */; };
+		A10000000000000000000130 /* InventoryScreenshotCaptureUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000131 /* InventoryScreenshotCaptureUITests.swift */; };
+		A1000000000000000000016A /* PlaceSummaryRowUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000016B /* PlaceSummaryRowUITests.swift */; };
+		A10000000000000000000132 /* InventoryReleaseScreenshotUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000133 /* InventoryReleaseScreenshotUITests.swift */; };
+		A10000000000000000000134 /* InventoryScreenshotUITestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000135 /* InventoryScreenshotUITestCase.swift */; };
+		A1000000000000000000015A /* RecentItemsTileLayoutUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000015B /* RecentItemsTileLayoutUITests.swift */; };
+		A100000000000000000000A2 /* InventorySelectionOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000A1 /* InventorySelectionOptions.swift */; };
+		A100000000000000000000A4 /* InventorySelectionOptionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000A3 /* InventorySelectionOptionsTests.swift */; };
+		A100000000000000000000A8 /* InventoryListManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000A7 /* InventoryListManagement.swift */; };
+		A100000000000000000000AA /* InventoryListManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000A9 /* InventoryListManagementView.swift */; };
+		A10000000000000000000101 /* InventoryListManagementState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000100 /* InventoryListManagementState.swift */; };
+		A10000000000000000000103 /* InventoryManagedValueRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000102 /* InventoryManagedValueRow.swift */; };
+		A10000000000000000000105 /* InventoryManagedValueEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000104 /* InventoryManagedValueEditor.swift */; };
+		A10000000000000000000107 /* LocationIconPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000106 /* LocationIconPickerView.swift */; };
+		A100000000000000000000AC /* InventoryListManagementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000AB /* InventoryListManagementTests.swift */; };
+		A100000000000000000000AD /* InventoryDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000AE /* InventoryDesign.swift */; };
+		A10000000000000000000127 /* InventoryTagStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000126 /* InventoryTagStyle.swift */; };
+		A100000000000000000000AF /* InventorySharedViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000B0 /* InventorySharedViews.swift */; };
+		A100000000000000000000C0 /* InventoryCardPrimitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000C9 /* InventoryCardPrimitives.swift */; };
+		A100000000000000000000C1 /* InventoryHeroPrimitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000CA /* InventoryHeroPrimitives.swift */; };
+		A100000000000000000000C2 /* InventoryIconPrimitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000CB /* InventoryIconPrimitives.swift */; };
+		A100000000000000000000C3 /* InventoryBadgePrimitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000CC /* InventoryBadgePrimitives.swift */; };
+		A100000000000000000000C4 /* InventoryRowPrimitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000CD /* InventoryRowPrimitives.swift */; };
+		A100000000000000000000C5 /* InventoryFormPrimitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000CE /* InventoryFormPrimitives.swift */; };
+		A100000000000000000000C6 /* InventoryEmptyStatePrimitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000CF /* InventoryEmptyStatePrimitives.swift */; };
+		A100000000000000000000C7 /* InventoryGlassSurfaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000D0 /* InventoryGlassSurfaces.swift */; };
+		A100000000000000000000C8 /* InventoryPrimitivePreviews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000D1 /* InventoryPrimitivePreviews.swift */; };
+		A1000000000000000000017A /* InventoryScrollContentClearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000017B /* InventoryScrollContentClearance.swift */; };
+		A10000000000000000000120 /* InventoryPreviewGroupPrimitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000121 /* InventoryPreviewGroupPrimitives.swift */; };
+		A10000000000000000000150 /* InventoryAppBootstrapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000151 /* InventoryAppBootstrapView.swift */; };
+		A10000000000000000000152 /* InventoryAppBootstrapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000153 /* InventoryAppBootstrapTests.swift */; };
+		A1000000000000000000017D /* InventoryCompactItemCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000017C /* InventoryCompactItemCard.swift */; };
+		A100000000000000000000DE /* ScopedInventoryItemsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000D6 /* ScopedInventoryItemsListView.swift */; };
+		A100000000000000000000DF /* InventoryItemRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000D7 /* InventoryItemRowView.swift */; };
+		A10000000000000000000139 /* InventoryItemDetailSurfaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000138 /* InventoryItemDetailSurfaces.swift */; };
+		A10000000000000000000141 /* InventoryNotesEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000140 /* InventoryNotesEditorView.swift */; };
+		A10000000000000000000143 /* InventoryNotesEditorState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000142 /* InventoryNotesEditorState.swift */; };
+		A10000000000000000000145 /* InventoryNotesEditorStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000144 /* InventoryNotesEditorStateTests.swift */; };
+		A100000000000000000000E7 /* InventoryItemNavigationCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000E6 /* InventoryItemNavigationCard.swift */; };
+		A100000000000000000000E0 /* LocationsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000D8 /* LocationsListView.swift */; };
+		A100000000000000000000E1 /* LocationPlacesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000D9 /* LocationPlacesListView.swift */; };
+		A10000000000000000000123 /* LocationDetailHeroCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000122 /* LocationDetailHeroCard.swift */; };
+		A10000000000000000000125 /* LocationRecentItemsCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000124 /* LocationRecentItemsCard.swift */; };
+		A100000000000000000000E2 /* LocationAllItemsRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000DA /* LocationAllItemsRowView.swift */; };
+		A100000000000000000000E3 /* PlaceSummaryRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000DB /* PlaceSummaryRowView.swift */; };
+		A100000000000000000000E4 /* LocationSummaryRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000DC /* LocationSummaryRowView.swift */; };
+		A100000000000000000000E5 /* LocationScopedItemsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000DD /* LocationScopedItemsListView.swift */; };
+		A100000000000000000000B1 /* InventoryFilterContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000B2 /* InventoryFilterContext.swift */; };
+		A100000000000000000000B3 /* InventoryFilterContextTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000B4 /* InventoryFilterContextTests.swift */; };
+		A100000000000000000000B9 /* LocationPlaceSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000BA /* LocationPlaceSummary.swift */; };
+		A100000000000000000000BB /* LocationPlaceSummaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000BC /* LocationPlaceSummaryTests.swift */; };
+		A10000000000000000000113 /* InventoryRecentItemViewsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000112 /* InventoryRecentItemViewsTests.swift */; };
+		A10000000000000000000129 /* InventoryTagStyleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000128 /* InventoryTagStyleTests.swift */; };
+		A100000000000000000000BD /* SettingsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000BE /* SettingsHomeView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A10000000000000000000062 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A10000000000000000000000 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A10000000000000000000002;
+			remoteInfo = HomeStuffInventoryApp;
+		};
+		A1000000000000000000009C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A10000000000000000000000 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A10000000000000000000002;
+			remoteInfo = HomeStuffInventoryApp;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		A10000000000000000000241 /* InventoryItemPlaceLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemPlaceLink.swift; sourceTree = "<group>"; };
+		A10000000000000000000243 /* InventoryItemPlaceSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemPlaceSelectionView.swift; sourceTree = "<group>"; };
+		A10000000000000000000201 /* InventoryPortabilityResourceValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPortabilityResourceValidation.swift; sourceTree = "<group>"; };
+		A10000000000000000000203 /* InventoryPortabilitySchemaValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPortabilitySchemaValidation.swift; sourceTree = "<group>"; };
+		A10000000000000000000205 /* InventoryRFC8785Canonicalizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryRFC8785Canonicalizer.swift; sourceTree = "<group>"; };
+		A10000000000000000000207 /* InventoryBackupFileReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBackupFileReader.swift; sourceTree = "<group>"; };
+		A10000000000000000000209 /* InventoryBackupRestorePlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBackupRestorePlanner.swift; sourceTree = "<group>"; };
+		A1000000000000000000020B /* InventoryBackupRestoreService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBackupRestoreService.swift; sourceTree = "<group>"; };
+		A1000000000000000000020D /* InventoryBrowseSummaryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBrowseSummaryModels.swift; sourceTree = "<group>"; };
+		A1000000000000000000020F /* InventoryBrowseSummaryPreviews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBrowseSummaryPreviews.swift; sourceTree = "<group>"; };
+		A10000000000000000000190 /* InventoryPortabilityCodecTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPortabilityCodecTests.swift; sourceTree = "<group>"; };
+		A1000000000000000000018E /* InventoryReadableExportServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryReadableExportServiceTests.swift; sourceTree = "<group>"; };
+		A1000000000000000000018A /* InventoryReadableExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryReadableExportService.swift; sourceTree = "<group>"; };
+		A1000000000000000000018C /* InventoryActivityShareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryActivityShareView.swift; sourceTree = "<group>"; };
+		A10000000000000000000186 /* InventoryPortabilityModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPortabilityModels.swift; sourceTree = "<group>"; };
+		A10000000000000000000188 /* InventoryPortabilityIntegrity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPortabilityIntegrity.swift; sourceTree = "<group>"; };
+		A10000000000000000000192 /* InventoryBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBackup.swift; sourceTree = "<group>"; };
+		A10000000000000000000194 /* InventoryBackupDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBackupDocument.swift; sourceTree = "<group>"; };
+		A10000000000000000000196 /* InventoryBackupTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBackupTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000198 /* InventoryBackupRestore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBackupRestore.swift; sourceTree = "<group>"; };
+		A1000000000000000000019A /* InventoryBackupRestorePreflightView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBackupRestorePreflightView.swift; sourceTree = "<group>"; };
+		A1000000000000000000019C /* InventoryBackupRestoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBackupRestoreTests.swift; sourceTree = "<group>"; };
+		A1000000000000000000019E /* InventoryBackupLegacyMigration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBackupLegacyMigration.swift; sourceTree = "<group>"; };
+		A100000000000000000001A0 /* InventoryBackupRecoveryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBackupRecoveryStore.swift; sourceTree = "<group>"; };
+		A10000000000000000000181 /* InventoryFreeAccessPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryFreeAccessPolicy.swift; sourceTree = "<group>"; };
+		A10000000000000000000183 /* InventoryFreeAccessPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryFreeAccessPolicyTests.swift; sourceTree = "<group>"; };
+		A100000000000000000001A3 /* PremiumAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumAccess.swift; sourceTree = "<group>"; };
+		A100000000000000000001A5 /* PremiumAccessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumAccessTests.swift; sourceTree = "<group>"; };
+		A100000000000000000001A7 /* InventoryFreeDowngradeRegressionGateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryFreeDowngradeRegressionGateTests.swift; sourceTree = "<group>"; };
+		A100000000000000000001A9 /* PrivacyManifestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyManifestTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000003 /* HomeStuffInventoryApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HomeStuffInventoryApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000010 /* HomeStuffInventoryApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeStuffInventoryApp.swift; sourceTree = "<group>"; };
+		A10000000000000000000011 /* InventoryItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItem.swift; sourceTree = "<group>"; };
+		A10000000000000000000108 /* InventoryItemViewEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemViewEvent.swift; sourceTree = "<group>"; };
+		A10000000000000000000220 /* InventoryPlaceOpenRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPlaceOpenRecord.swift; sourceTree = "<group>"; };
+		A10000000000000000000230 /* InventoryPlace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPlace.swift; sourceTree = "<group>"; };
+		A10000000000000000000232 /* PlaceIconOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceIconOption.swift; sourceTree = "<group>"; };
+		A10000000000000000000234 /* InventoryPlaceReconciler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPlaceReconciler.swift; sourceTree = "<group>"; };
+		A10000000000000000000236 /* InventoryPlaceReconcilerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPlaceReconcilerTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000222 /* InventoryPlaceIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPlaceIdentity.swift; sourceTree = "<group>"; };
+		A10000000000000000000224 /* InventoryPlaceOpenPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPlaceOpenPersistence.swift; sourceTree = "<group>"; };
+		A10000000000000000000226 /* InventoryPlaceIdentityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPlaceIdentityTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000228 /* InventoryPlaceOpenPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPlaceOpenPersistenceTests.swift; sourceTree = "<group>"; };
+		A100000000000000000000B8 /* ItemIconOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemIconOption.swift; sourceTree = "<group>"; };
+		A100000000000000000000B6 /* LocationIconOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationIconOption.swift; sourceTree = "<group>"; };
+		A10000000000000000000012 /* StorageLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageLocation.swift; sourceTree = "<group>"; };
+		A100000000000000000000A5 /* InventoryCustomCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryCustomCategory.swift; sourceTree = "<group>"; };
+		A10000000000000000000013 /* InventoryOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryOverview.swift; sourceTree = "<group>"; };
+		A10000000000000000000014 /* InventoryEmptyStateViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryEmptyStateViewModel.swift; sourceTree = "<group>"; };
+		A10000000000000000000015 /* InventoryModelContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryModelContainer.swift; sourceTree = "<group>"; };
+		A10000000000000000000016 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		A10000000000000000000017 /* InventoryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryListView.swift; sourceTree = "<group>"; };
+		A10000000000000000000018 /* InventoryEmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryEmptyStateView.swift; sourceTree = "<group>"; };
+		A10000000000000000000019 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A1000000000000000000012A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		A10000000000000000000050 /* InventoryItemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000052 /* HomeStuffInventoryAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HomeStuffInventoryAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000068 /* InventorySampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventorySampleData.swift; sourceTree = "<group>"; };
+		A10000000000000000000069 /* InventorySampleDataSeeder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventorySampleDataSeeder.swift; sourceTree = "<group>"; };
+		A10000000000000000000072 /* InventorySampleDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventorySampleDataTests.swift; sourceTree = "<group>"; };
+		A55000000000000000000002 /* InventoryAppStoreDemoData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryAppStoreDemoData.swift; sourceTree = "<group>"; };
+		A55000000000000000000004 /* InventoryAppStoreDemoDataSeeder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryAppStoreDemoDataSeeder.swift; sourceTree = "<group>"; };
+		A55000000000000000000006 /* InventoryAppStoreDemoDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryAppStoreDemoDataTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000074 /* InventoryItemDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemDetailViewModel.swift; sourceTree = "<group>"; };
+		A10000000000000000000076 /* InventoryItemDetailViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemDetailViewModelTests.swift; sourceTree = "<group>"; };
+		A1000000000000000000012C /* InventoryHeroNavigationTitleMetricsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryHeroNavigationTitleMetricsTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000078 /* InventoryItemDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemDraft.swift; sourceTree = "<group>"; };
+		A10000000000000000000080 /* InventoryItemFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemFormView.swift; sourceTree = "<group>"; };
+		A100000000000000000000F5 /* InventoryFormFocusBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryFormFocusBehavior.swift; sourceTree = "<group>"; };
+		A100000000000000000000F6 /* InventoryItemIconSelectionLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemIconSelectionLabel.swift; sourceTree = "<group>"; };
+		A100000000000000000000F7 /* InventoryItemIconPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemIconPickerView.swift; sourceTree = "<group>"; };
+		A100000000000000000000F8 /* InventoryStandardizedValueSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryStandardizedValueSelectionView.swift; sourceTree = "<group>"; };
+		A100000000000000000000F9 /* InventoryStandardizedValueCreationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryStandardizedValueCreationView.swift; sourceTree = "<group>"; };
+		A10000000000000000000082 /* InventoryItemDraftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemDraftTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000084 /* InventorySearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventorySearch.swift; sourceTree = "<group>"; };
+		A100000000000000000000EA /* InventoryNormalizedName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryNormalizedName.swift; sourceTree = "<group>"; };
+		A100000000000000000000EC /* InventoryBrowseSummaries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBrowseSummaries.swift; sourceTree = "<group>"; };
+		A10000000000000000000110 /* InventoryRecentItemViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryRecentItemViews.swift; sourceTree = "<group>"; };
+		A1000000000000000000013A /* InventoryLocationReconciler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryLocationReconciler.swift; sourceTree = "<group>"; };
+		A1000000000000000000013E /* InventoryCategoryReconciler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryCategoryReconciler.swift; sourceTree = "<group>"; };
+		A1000000000000000000013C /* InventoryLocationReconcilerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryLocationReconcilerTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000086 /* InventorySearchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventorySearchTests.swift; sourceTree = "<group>"; };
+		A100000000000000000001AB /* InventoryBrowseSummariesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBrowseSummariesTests.swift; sourceTree = "<group>"; };
+		A100000000000000000001AD /* InventoryBackupFileReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBackupFileReaderTests.swift; sourceTree = "<group>"; };
+		A100000000000000000001AF /* InventoryBackupRestorePlannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBackupRestorePlannerTests.swift; sourceTree = "<group>"; };
+		A100000000000000000001B1 /* InventoryBackupRestoreServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBackupRestoreServiceTests.swift; sourceTree = "<group>"; };
+		A100000000000000000001B3 /* InventoryBackupRecoveryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBackupRecoveryTests.swift; sourceTree = "<group>"; };
+		A100000000000000000001B5 /* InventoryBackupRecoveryArtifactProtectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBackupRecoveryArtifactProtectionTests.swift; sourceTree = "<group>"; };
+		A100000000000000000001B7 /* InventoryBackupLegacyMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBackupLegacyMigrationTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000088 /* InventoryLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryLocalization.swift; sourceTree = "<group>"; };
+		A10000000000000000000090 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		A100000000000000000001C0 /* LocalizationCatalogTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationCatalogTests.swift; sourceTree = "<group>"; };
+		A100000000000000000001C2 /* LocalizationTestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationTestSupport.swift; sourceTree = "<group>"; };
+		A100000000000000000001C4 /* InventoryDataFileDisclosureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryDataFileDisclosureTests.swift; sourceTree = "<group>"; };
+		A100000000000000000001C6 /* InventoryItemIconLocalizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemIconLocalizationTests.swift; sourceTree = "<group>"; };
+		A100000000000000000001C8 /* InventoryListManagementLocalizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryListManagementLocalizationTests.swift; sourceTree = "<group>"; };
+		A100000000000000000001CA /* InventoryLocalizationFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryLocalizationFormattingTests.swift; sourceTree = "<group>"; };
+		A100000000000000000001CC /* InventoryStorageCompatibilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryStorageCompatibilityTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000095 /* InventorySmokeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventorySmokeUITests.swift; sourceTree = "<group>"; };
+		A100000000000000000001D1 /* InventoryUITestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryUITestCase.swift; sourceTree = "<group>"; };
+		A100000000000000000001D3 /* InventoryStartupRecoveryUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryStartupRecoveryUITests.swift; sourceTree = "<group>"; };
+		A100000000000000000001D5 /* InventorySettingsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventorySettingsUITests.swift; sourceTree = "<group>"; };
+		A100000000000000000001D7 /* InventoryItemFormUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemFormUITests.swift; sourceTree = "<group>"; };
+		A100000000000000000001D9 /* InventoryBrowseDetailUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBrowseDetailUITests.swift; sourceTree = "<group>"; };
+		A10000000000000000000154 /* InventoryManagedValueRowUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryManagedValueRowUITests.swift; sourceTree = "<group>"; };
+		A10000000000000000000131 /* InventoryScreenshotCaptureUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryScreenshotCaptureUITests.swift; sourceTree = "<group>"; };
+		A1000000000000000000016B /* PlaceSummaryRowUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceSummaryRowUITests.swift; sourceTree = "<group>"; };
+		A10000000000000000000133 /* InventoryReleaseScreenshotUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryReleaseScreenshotUITests.swift; sourceTree = "<group>"; };
+		A10000000000000000000135 /* InventoryScreenshotUITestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryScreenshotUITestCase.swift; sourceTree = "<group>"; };
+		A1000000000000000000015B /* RecentItemsTileLayoutUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentItemsTileLayoutUITests.swift; sourceTree = "<group>"; };
+		A10000000000000000000096 /* HomeStuffInventoryAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HomeStuffInventoryAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A100000000000000000000A1 /* InventorySelectionOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventorySelectionOptions.swift; sourceTree = "<group>"; };
+		A100000000000000000000A3 /* InventorySelectionOptionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventorySelectionOptionsTests.swift; sourceTree = "<group>"; };
+		A100000000000000000000A7 /* InventoryListManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryListManagement.swift; sourceTree = "<group>"; };
+		A100000000000000000000A9 /* InventoryListManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryListManagementView.swift; sourceTree = "<group>"; };
+		A10000000000000000000100 /* InventoryListManagementState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryListManagementState.swift; sourceTree = "<group>"; };
+		A10000000000000000000102 /* InventoryManagedValueRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryManagedValueRow.swift; sourceTree = "<group>"; };
+		A10000000000000000000104 /* InventoryManagedValueEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryManagedValueEditor.swift; sourceTree = "<group>"; };
+		A10000000000000000000106 /* LocationIconPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationIconPickerView.swift; sourceTree = "<group>"; };
+		A100000000000000000000AB /* InventoryListManagementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryListManagementTests.swift; sourceTree = "<group>"; };
+		A100000000000000000000AE /* InventoryDesign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryDesign.swift; sourceTree = "<group>"; };
+		A10000000000000000000126 /* InventoryTagStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryTagStyle.swift; sourceTree = "<group>"; };
+		A100000000000000000001E1 /* InventoryDataTransferWorkflow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryDataTransferWorkflow.swift; sourceTree = "<group>"; };
+		A100000000000000000001E3 /* InventoryItemFormWorkflow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemFormWorkflow.swift; sourceTree = "<group>"; };
+		A100000000000000000001E5 /* InventoryItemFormPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemFormPersistence.swift; sourceTree = "<group>"; };
+		A10000000000000000000213 /* InventoryListManagementPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryListManagementPersistence.swift; sourceTree = "<group>"; };
+		A10000000000000000000215 /* InventoryItemMutationPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemMutationPersistence.swift; sourceTree = "<group>"; };
+		A100000000000000000001E7 /* InventorySelectionValueStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventorySelectionValueStore.swift; sourceTree = "<group>"; };
+		A100000000000000000001E9 /* InventoryItemFormPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemFormPersistenceTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000217 /* InventoryListManagementPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryListManagementPersistenceTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000219 /* InventoryItemMutationPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemMutationPersistenceTests.swift; sourceTree = "<group>"; };
+		A100000000000000000001F1 /* InventoryFilterContextHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryFilterContextHeader.swift; sourceTree = "<group>"; };
+		A100000000000000000001F3 /* InventoryItemDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemDetailView.swift; sourceTree = "<group>"; };
+		A100000000000000000001F5 /* InventoryItemMutationFailure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemMutationFailure.swift; sourceTree = "<group>"; };
+		A100000000000000000001F7 /* InventoryBrowsePreviews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBrowsePreviews.swift; sourceTree = "<group>"; };
+		A100000000000000000001F9 /* InventoryBrowsePreviewFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBrowsePreviewFixtures.swift; sourceTree = "<group>"; };
+		A10000000000000000000211 /* InventoryDetailPreviewSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryDetailPreviewSupport.swift; sourceTree = "<group>"; };
+		A100000000000000000001FB /* InventoryItemMutationFailureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemMutationFailureTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000137 /* InventoryAppearanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryAppearanceTests.swift; sourceTree = "<group>"; };
+		A100000000000000000000B0 /* InventorySharedViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventorySharedViews.swift; sourceTree = "<group>"; };
+		A100000000000000000000C9 /* InventoryCardPrimitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryCardPrimitives.swift; sourceTree = "<group>"; };
+		A100000000000000000000CA /* InventoryHeroPrimitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryHeroPrimitives.swift; sourceTree = "<group>"; };
+		A100000000000000000000CB /* InventoryIconPrimitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryIconPrimitives.swift; sourceTree = "<group>"; };
+		A100000000000000000000CC /* InventoryBadgePrimitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBadgePrimitives.swift; sourceTree = "<group>"; };
+		A100000000000000000000CD /* InventoryRowPrimitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryRowPrimitives.swift; sourceTree = "<group>"; };
+		A100000000000000000000CE /* InventoryFormPrimitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryFormPrimitives.swift; sourceTree = "<group>"; };
+		A100000000000000000000CF /* InventoryEmptyStatePrimitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryEmptyStatePrimitives.swift; sourceTree = "<group>"; };
+		A100000000000000000000D0 /* InventoryGlassSurfaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryGlassSurfaces.swift; sourceTree = "<group>"; };
+		A100000000000000000000D1 /* InventoryPrimitivePreviews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPrimitivePreviews.swift; sourceTree = "<group>"; };
+		A1000000000000000000017B /* InventoryScrollContentClearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryScrollContentClearance.swift; sourceTree = "<group>"; };
+		A10000000000000000000121 /* InventoryPreviewGroupPrimitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPreviewGroupPrimitives.swift; sourceTree = "<group>"; };
+		A10000000000000000000151 /* InventoryAppBootstrapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryAppBootstrapView.swift; sourceTree = "<group>"; };
+		A10000000000000000000153 /* InventoryAppBootstrapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryAppBootstrapTests.swift; sourceTree = "<group>"; };
+		A1000000000000000000017C /* InventoryCompactItemCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryCompactItemCard.swift; sourceTree = "<group>"; };
+		A100000000000000000000D6 /* ScopedInventoryItemsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopedInventoryItemsListView.swift; sourceTree = "<group>"; };
+		A100000000000000000000D7 /* InventoryItemRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemRowView.swift; sourceTree = "<group>"; };
+		A10000000000000000000138 /* InventoryItemDetailSurfaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemDetailSurfaces.swift; sourceTree = "<group>"; };
+		A10000000000000000000140 /* InventoryNotesEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryNotesEditorView.swift; sourceTree = "<group>"; };
+		A10000000000000000000142 /* InventoryNotesEditorState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryNotesEditorState.swift; sourceTree = "<group>"; };
+		A10000000000000000000144 /* InventoryNotesEditorStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryNotesEditorStateTests.swift; sourceTree = "<group>"; };
+		A100000000000000000000E6 /* InventoryItemNavigationCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemNavigationCard.swift; sourceTree = "<group>"; };
+		A100000000000000000000D8 /* LocationsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationsListView.swift; sourceTree = "<group>"; };
+		A100000000000000000000D9 /* LocationPlacesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPlacesListView.swift; sourceTree = "<group>"; };
+		A10000000000000000000122 /* LocationDetailHeroCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationDetailHeroCard.swift; sourceTree = "<group>"; };
+		A10000000000000000000124 /* LocationRecentItemsCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationRecentItemsCard.swift; sourceTree = "<group>"; };
+		A100000000000000000000DA /* LocationAllItemsRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationAllItemsRowView.swift; sourceTree = "<group>"; };
+		A100000000000000000000DB /* PlaceSummaryRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceSummaryRowView.swift; sourceTree = "<group>"; };
+		A100000000000000000000DC /* LocationSummaryRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSummaryRowView.swift; sourceTree = "<group>"; };
+		A100000000000000000000DD /* LocationScopedItemsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationScopedItemsListView.swift; sourceTree = "<group>"; };
+		A100000000000000000000B2 /* InventoryFilterContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryFilterContext.swift; sourceTree = "<group>"; };
+		A100000000000000000000B4 /* InventoryFilterContextTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryFilterContextTests.swift; sourceTree = "<group>"; };
+		A100000000000000000000BA /* LocationPlaceSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPlaceSummary.swift; sourceTree = "<group>"; };
+		A100000000000000000000BC /* LocationPlaceSummaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPlaceSummaryTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000112 /* InventoryRecentItemViewsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryRecentItemViewsTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000128 /* InventoryTagStyleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryTagStyleTests.swift; sourceTree = "<group>"; };
+		A100000000000000000000BE /* SettingsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsHomeView.swift; sourceTree = "<group>"; };
+		A10000000000000000000251 /* InventoryPlaceDirectoryPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPlaceDirectoryPresentation.swift; sourceTree = "<group>"; };
+		A10000000000000000000253 /* PlaceManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceManagementView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A10000000000000000000006 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000000000000000000056 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000000000000000000097 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A10000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000008 /* HomeStuffInventoryApp */,
+				A10000000000000000000053 /* HomeStuffInventoryAppTests */,
+				A1000000000000000000009A /* HomeStuffInventoryAppUITests */,
+				A10000000000000000000004 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A10000000000000000000004 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000003 /* HomeStuffInventoryApp.app */,
+				A10000000000000000000052 /* HomeStuffInventoryAppTests.xctest */,
+				A10000000000000000000096 /* HomeStuffInventoryAppUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000008 /* HomeStuffInventoryApp */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000010 /* HomeStuffInventoryApp.swift */,
+				A10000000000000000000184 /* Monetization */,
+				A10000000000000000000030 /* InventoryData */,
+				A10000000000000000000031 /* InventoryLogic */,
+				A10000000000000000000032 /* InventoryPresentation */,
+				A10000000000000000000033 /* Views */,
+				A10000000000000000000034 /* Persistence */,
+				A10000000000000000000035 /* Resources */,
+			);
+			path = HomeStuffInventoryApp;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000184 /* Monetization */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000181 /* InventoryFreeAccessPolicy.swift */,
+				A100000000000000000001A3 /* PremiumAccess.swift */,
+			);
+			path = Monetization;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000030 /* InventoryData */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000186 /* InventoryPortabilityModels.swift */,
+				A10000000000000000000011 /* InventoryItem.swift */,
+				A10000000000000000000108 /* InventoryItemViewEvent.swift */,
+				A55000000000000000000002 /* InventoryAppStoreDemoData.swift */,
+				A10000000000000000000220 /* InventoryPlaceOpenRecord.swift */,
+				A10000000000000000000230 /* InventoryPlace.swift */,
+				A10000000000000000000232 /* PlaceIconOption.swift */,
+				A100000000000000000000B8 /* ItemIconOption.swift */,
+				A10000000000000000000068 /* InventorySampleData.swift */,
+				A100000000000000000000A5 /* InventoryCustomCategory.swift */,
+				A100000000000000000000B6 /* LocationIconOption.swift */,
+				A10000000000000000000012 /* StorageLocation.swift */,
+			);
+			path = InventoryData;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000031 /* InventoryLogic */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000241 /* InventoryItemPlaceLink.swift */,
+				A1000000000000000000018A /* InventoryReadableExportService.swift */,
+				A10000000000000000000192 /* InventoryBackup.swift */,
+				A10000000000000000000207 /* InventoryBackupFileReader.swift */,
+				A10000000000000000000198 /* InventoryBackupRestore.swift */,
+				A10000000000000000000209 /* InventoryBackupRestorePlanner.swift */,
+				A1000000000000000000020B /* InventoryBackupRestoreService.swift */,
+				A1000000000000000000019E /* InventoryBackupLegacyMigration.swift */,
+				A100000000000000000001A0 /* InventoryBackupRecoveryStore.swift */,
+				A10000000000000000000188 /* InventoryPortabilityIntegrity.swift */,
+				A10000000000000000000201 /* InventoryPortabilityResourceValidation.swift */,
+				A10000000000000000000203 /* InventoryPortabilitySchemaValidation.swift */,
+				A10000000000000000000205 /* InventoryRFC8785Canonicalizer.swift */,
+				A10000000000000000000013 /* InventoryOverview.swift */,
+				A100000000000000000000A7 /* InventoryListManagement.swift */,
+				A100000000000000000000EC /* InventoryBrowseSummaries.swift */,
+				A1000000000000000000020D /* InventoryBrowseSummaryModels.swift */,
+				A1000000000000000000020F /* InventoryBrowseSummaryPreviews.swift */,
+				A100000000000000000000EA /* InventoryNormalizedName.swift */,
+				A10000000000000000000110 /* InventoryRecentItemViews.swift */,
+				A10000000000000000000222 /* InventoryPlaceIdentity.swift */,
+				A10000000000000000000224 /* InventoryPlaceOpenPersistence.swift */,
+				A10000000000000000000234 /* InventoryPlaceReconciler.swift */,
+				A1000000000000000000013A /* InventoryLocationReconciler.swift */,
+				A1000000000000000000013E /* InventoryCategoryReconciler.swift */,
+				A10000000000000000000084 /* InventorySearch.swift */,
+			);
+			path = InventoryLogic;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000032 /* InventoryPresentation */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000014 /* InventoryEmptyStateViewModel.swift */,
+				A10000000000000000000078 /* InventoryItemDraft.swift */,
+				A10000000000000000000074 /* InventoryItemDetailViewModel.swift */,
+				A10000000000000000000142 /* InventoryNotesEditorState.swift */,
+				A100000000000000000000B2 /* InventoryFilterContext.swift */,
+				A10000000000000000000088 /* InventoryLocalization.swift */,
+				A100000000000000000000A1 /* InventorySelectionOptions.swift */,
+				A100000000000000000000BA /* LocationPlaceSummary.swift */,
+				A100000000000000000000AE /* InventoryDesign.swift */,
+				A10000000000000000000126 /* InventoryTagStyle.swift */,
+				A100000000000000000001E1 /* InventoryDataTransferWorkflow.swift */,
+				A100000000000000000001E3 /* InventoryItemFormWorkflow.swift */,
+				A100000000000000000001F5 /* InventoryItemMutationFailure.swift */,
+				A10000000000000000000251 /* InventoryPlaceDirectoryPresentation.swift */,
+			);
+			path = InventoryPresentation;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000033 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000016 /* RootView.swift */,
+				A10000000000000000000017 /* InventoryListView.swift */,
+				A100000000000000000000D4 /* Inventory */,
+				A100000000000000000000D5 /* Locations */,
+				A10000000000000000000080 /* InventoryItemFormView.swift */,
+				A100000000000000000000A9 /* InventoryListManagementView.swift */,
+				A10000000000000000000100 /* InventoryListManagementState.swift */,
+				A10000000000000000000102 /* InventoryManagedValueRow.swift */,
+				A10000000000000000000104 /* InventoryManagedValueEditor.swift */,
+				A10000000000000000000106 /* LocationIconPickerView.swift */,
+				A100000000000000000000BF /* Settings */,
+				A100000000000000000000D2 /* Shared */,
+				A100000000000000000000D3 /* PreviewSupport */,
+				A10000000000000000000018 /* InventoryEmptyStateView.swift */,
+				A100000000000000000000B0 /* InventorySharedViews.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A100000000000000000000D4 /* Inventory */ = {
+			isa = PBXGroup;
+			children = (
+				A100000000000000000000FA /* Form */,
+				A1000000000000000000017C /* InventoryCompactItemCard.swift */,
+				A100000000000000000000D6 /* ScopedInventoryItemsListView.swift */,
+				A100000000000000000000E6 /* InventoryItemNavigationCard.swift */,
+				A10000000000000000000138 /* InventoryItemDetailSurfaces.swift */,
+				A10000000000000000000140 /* InventoryNotesEditorView.swift */,
+				A100000000000000000001F1 /* InventoryFilterContextHeader.swift */,
+				A100000000000000000001F3 /* InventoryItemDetailView.swift */,
+				A100000000000000000000D7 /* InventoryItemRowView.swift */,
+			);
+			path = Inventory;
+			sourceTree = "<group>";
+		};
+		A100000000000000000000FA /* Form */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000243 /* InventoryItemPlaceSelectionView.swift */,
+				A100000000000000000000F5 /* InventoryFormFocusBehavior.swift */,
+				A100000000000000000000F6 /* InventoryItemIconSelectionLabel.swift */,
+				A100000000000000000000F7 /* InventoryItemIconPickerView.swift */,
+				A100000000000000000000F9 /* InventoryStandardizedValueCreationView.swift */,
+				A100000000000000000000F8 /* InventoryStandardizedValueSelectionView.swift */,
+			);
+			path = Form;
+			sourceTree = "<group>";
+		};
+		A100000000000000000000D5 /* Locations */ = {
+			isa = PBXGroup;
+			children = (
+				A100000000000000000000D8 /* LocationsListView.swift */,
+				A100000000000000000000D9 /* LocationPlacesListView.swift */,
+				A10000000000000000000122 /* LocationDetailHeroCard.swift */,
+				A10000000000000000000124 /* LocationRecentItemsCard.swift */,
+				A100000000000000000000DA /* LocationAllItemsRowView.swift */,
+				A100000000000000000000DC /* LocationSummaryRowView.swift */,
+				A100000000000000000000DB /* PlaceSummaryRowView.swift */,
+				A100000000000000000000DD /* LocationScopedItemsListView.swift */,
+			);
+			path = Locations;
+			sourceTree = "<group>";
+		};
+		A100000000000000000000D2 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				A100000000000000000000CC /* InventoryBadgePrimitives.swift */,
+				A100000000000000000000C9 /* InventoryCardPrimitives.swift */,
+				A100000000000000000000CF /* InventoryEmptyStatePrimitives.swift */,
+				A100000000000000000000CE /* InventoryFormPrimitives.swift */,
+				A100000000000000000000D0 /* InventoryGlassSurfaces.swift */,
+				A100000000000000000000CA /* InventoryHeroPrimitives.swift */,
+				A100000000000000000000CB /* InventoryIconPrimitives.swift */,
+				A10000000000000000000151 /* InventoryAppBootstrapView.swift */,
+				A10000000000000000000121 /* InventoryPreviewGroupPrimitives.swift */,
+				A100000000000000000000CD /* InventoryRowPrimitives.swift */,
+				A1000000000000000000017B /* InventoryScrollContentClearance.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		A100000000000000000000D3 /* PreviewSupport */ = {
+			isa = PBXGroup;
+			children = (
+				A100000000000000000000D1 /* InventoryPrimitivePreviews.swift */,
+				A100000000000000000001F7 /* InventoryBrowsePreviews.swift */,
+				A100000000000000000001F9 /* InventoryBrowsePreviewFixtures.swift */,
+				A10000000000000000000211 /* InventoryDetailPreviewSupport.swift */,
+			);
+			path = PreviewSupport;
+			sourceTree = "<group>";
+		};
+		A100000000000000000000BF /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				A1000000000000000000018C /* InventoryActivityShareView.swift */,
+				A10000000000000000000194 /* InventoryBackupDocument.swift */,
+				A1000000000000000000019A /* InventoryBackupRestorePreflightView.swift */,
+				A100000000000000000000BE /* SettingsHomeView.swift */,
+				A10000000000000000000253 /* PlaceManagementView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000034 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000015 /* InventoryModelContainer.swift */,
+				A10000000000000000000069 /* InventorySampleDataSeeder.swift */,
+				A55000000000000000000004 /* InventoryAppStoreDemoDataSeeder.swift */,
+				A100000000000000000001E5 /* InventoryItemFormPersistence.swift */,
+				A10000000000000000000215 /* InventoryItemMutationPersistence.swift */,
+				A10000000000000000000213 /* InventoryListManagementPersistence.swift */,
+				A100000000000000000001E7 /* InventorySelectionValueStore.swift */,
+			);
+			path = Persistence;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000035 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000019 /* Assets.xcassets */,
+				A10000000000000000000090 /* Localizable.xcstrings */,
+				A1000000000000000000012A /* PrivacyInfo.xcprivacy */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000053 /* HomeStuffInventoryAppTests */ = {
+			isa = PBXGroup;
+			children = (
+				A100000000000000000001A9 /* PrivacyManifestTests.swift */,
+				A100000000000000000001A7 /* InventoryFreeDowngradeRegressionGateTests.swift */,
+				A100000000000000000001A5 /* PremiumAccessTests.swift */,
+				A10000000000000000000190 /* InventoryPortabilityCodecTests.swift */,
+				A1000000000000000000018E /* InventoryReadableExportServiceTests.swift */,
+				A10000000000000000000196 /* InventoryBackupTests.swift */,
+				A1000000000000000000019C /* InventoryBackupRestoreTests.swift */,
+				A100000000000000000001AD /* InventoryBackupFileReaderTests.swift */,
+				A100000000000000000001AF /* InventoryBackupRestorePlannerTests.swift */,
+				A100000000000000000001B1 /* InventoryBackupRestoreServiceTests.swift */,
+				A100000000000000000001B3 /* InventoryBackupRecoveryTests.swift */,
+				A100000000000000000001B5 /* InventoryBackupRecoveryArtifactProtectionTests.swift */,
+				A100000000000000000001B7 /* InventoryBackupLegacyMigrationTests.swift */,
+				A10000000000000000000183 /* InventoryFreeAccessPolicyTests.swift */,
+				A10000000000000000000050 /* InventoryItemTests.swift */,
+				A10000000000000000000072 /* InventorySampleDataTests.swift */,
+				A55000000000000000000006 /* InventoryAppStoreDemoDataTests.swift */,
+				A10000000000000000000082 /* InventoryItemDraftTests.swift */,
+				A100000000000000000001E9 /* InventoryItemFormPersistenceTests.swift */,
+				A10000000000000000000219 /* InventoryItemMutationPersistenceTests.swift */,
+				A100000000000000000001FB /* InventoryItemMutationFailureTests.swift */,
+				A10000000000000000000086 /* InventorySearchTests.swift */,
+				A100000000000000000001AB /* InventoryBrowseSummariesTests.swift */,
+				A1000000000000000000013C /* InventoryLocationReconcilerTests.swift */,
+				A10000000000000000000076 /* InventoryItemDetailViewModelTests.swift */,
+				A1000000000000000000012C /* InventoryHeroNavigationTitleMetricsTests.swift */,
+				A100000000000000000000A3 /* InventorySelectionOptionsTests.swift */,
+				A100000000000000000000AB /* InventoryListManagementTests.swift */,
+				A10000000000000000000217 /* InventoryListManagementPersistenceTests.swift */,
+				A100000000000000000000B4 /* InventoryFilterContextTests.swift */,
+				A100000000000000000001C0 /* LocalizationCatalogTests.swift */,
+				A100000000000000000001C2 /* LocalizationTestSupport.swift */,
+				A100000000000000000001C4 /* InventoryDataFileDisclosureTests.swift */,
+				A100000000000000000001C6 /* InventoryItemIconLocalizationTests.swift */,
+				A100000000000000000001C8 /* InventoryListManagementLocalizationTests.swift */,
+				A100000000000000000001CA /* InventoryLocalizationFormattingTests.swift */,
+				A100000000000000000001CC /* InventoryStorageCompatibilityTests.swift */,
+				A100000000000000000000BC /* LocationPlaceSummaryTests.swift */,
+				A10000000000000000000112 /* InventoryRecentItemViewsTests.swift */,
+				A10000000000000000000226 /* InventoryPlaceIdentityTests.swift */,
+				A10000000000000000000228 /* InventoryPlaceOpenPersistenceTests.swift */,
+				A10000000000000000000236 /* InventoryPlaceReconcilerTests.swift */,
+				A10000000000000000000128 /* InventoryTagStyleTests.swift */,
+				A10000000000000000000137 /* InventoryAppearanceTests.swift */,
+				A10000000000000000000153 /* InventoryAppBootstrapTests.swift */,
+				A10000000000000000000144 /* InventoryNotesEditorStateTests.swift */,
+			);
+			path = HomeStuffInventoryAppTests;
+			sourceTree = "<group>";
+		};
+		A1000000000000000000009A /* HomeStuffInventoryAppUITests */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000095 /* InventorySmokeUITests.swift */,
+				A100000000000000000001D1 /* InventoryUITestCase.swift */,
+				A100000000000000000001D3 /* InventoryStartupRecoveryUITests.swift */,
+				A100000000000000000001D5 /* InventorySettingsUITests.swift */,
+				A100000000000000000001D7 /* InventoryItemFormUITests.swift */,
+				A100000000000000000001D9 /* InventoryBrowseDetailUITests.swift */,
+				A10000000000000000000154 /* InventoryManagedValueRowUITests.swift */,
+				A10000000000000000000131 /* InventoryScreenshotCaptureUITests.swift */,
+				A10000000000000000000133 /* InventoryReleaseScreenshotUITests.swift */,
+				A10000000000000000000135 /* InventoryScreenshotUITestCase.swift */,
+				A1000000000000000000015B /* RecentItemsTileLayoutUITests.swift */,
+				A1000000000000000000016B /* PlaceSummaryRowUITests.swift */,
+			);
+			path = HomeStuffInventoryAppUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A10000000000000000000002 /* HomeStuffInventoryApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A10000000000000000000040 /* Build configuration list for PBXNativeTarget "HomeStuffInventoryApp" */;
+			buildPhases = (
+				A10000000000000000000005 /* Sources */,
+				A10000000000000000000006 /* Frameworks */,
+				A10000000000000000000007 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HomeStuffInventoryApp;
+			packageProductDependencies = (
+			);
+			productName = HomeStuffInventoryApp;
+			productReference = A10000000000000000000003 /* HomeStuffInventoryApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A10000000000000000000054 /* HomeStuffInventoryAppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A10000000000000000000065 /* Build configuration list for PBXNativeTarget "HomeStuffInventoryAppTests" */;
+			buildPhases = (
+				A10000000000000000000055 /* Sources */,
+				A10000000000000000000056 /* Frameworks */,
+				A10000000000000000000057 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A10000000000000000000063 /* PBXTargetDependency */,
+			);
+			name = HomeStuffInventoryAppTests;
+			packageProductDependencies = (
+			);
+			productName = HomeStuffInventoryAppTests;
+			productReference = A10000000000000000000052 /* HomeStuffInventoryAppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		A1000000000000000000009B /* HomeStuffInventoryAppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A100000000000000000000A0 /* Build configuration list for PBXNativeTarget "HomeStuffInventoryAppUITests" */;
+			buildPhases = (
+				A10000000000000000000099 /* Sources */,
+				A10000000000000000000097 /* Frameworks */,
+				A10000000000000000000098 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A1000000000000000000009D /* PBXTargetDependency */,
+			);
+			name = HomeStuffInventoryAppUITests;
+			packageProductDependencies = (
+			);
+			productName = HomeStuffInventoryAppUITests;
+			productReference = A10000000000000000000096 /* HomeStuffInventoryAppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A10000000000000000000000 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2650;
+				LastUpgradeCheck = 2650;
+				TargetAttributes = {
+					A10000000000000000000002 = {
+						CreatedOnToolsVersion = 26.5;
+					};
+					A10000000000000000000054 = {
+						CreatedOnToolsVersion = 26.5;
+						TestTargetID = A10000000000000000000002;
+					};
+					A1000000000000000000009B = {
+						CreatedOnToolsVersion = 26.5;
+						TestTargetID = A10000000000000000000002;
+					};
+				};
+			};
+			buildConfigurationList = A10000000000000000000041 /* Build configuration list for PBXProject "HomeStuffInventoryApp" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				uk,
+			);
+			mainGroup = A10000000000000000000001;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = A10000000000000000000004 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A10000000000000000000002 /* HomeStuffInventoryApp */,
+				A10000000000000000000054 /* HomeStuffInventoryAppTests */,
+				A1000000000000000000009B /* HomeStuffInventoryAppUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A10000000000000000000007 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000029 /* Assets.xcassets in Resources */,
+				A10000000000000000000091 /* Localizable.xcstrings in Resources */,
+				A1000000000000000000012B /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000000000000000000057 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000000000000000000098 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A10000000000000000000005 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000200 /* InventoryPortabilityResourceValidation.swift in Sources */,
+				A10000000000000000000202 /* InventoryPortabilitySchemaValidation.swift in Sources */,
+				A10000000000000000000204 /* InventoryRFC8785Canonicalizer.swift in Sources */,
+				A10000000000000000000206 /* InventoryBackupFileReader.swift in Sources */,
+				A10000000000000000000208 /* InventoryBackupRestorePlanner.swift in Sources */,
+				A1000000000000000000020A /* InventoryBackupRestoreService.swift in Sources */,
+				A1000000000000000000020C /* InventoryBrowseSummaryModels.swift in Sources */,
+				A1000000000000000000020E /* InventoryBrowseSummaryPreviews.swift in Sources */,
+				A100000000000000000001A2 /* PremiumAccess.swift in Sources */,
+				A10000000000000000000189 /* InventoryReadableExportService.swift in Sources */,
+				A1000000000000000000018B /* InventoryActivityShareView.swift in Sources */,
+				A10000000000000000000191 /* InventoryBackup.swift in Sources */,
+				A10000000000000000000197 /* InventoryBackupRestore.swift in Sources */,
+				A1000000000000000000019D /* InventoryBackupLegacyMigration.swift in Sources */,
+				A1000000000000000000019F /* InventoryBackupRecoveryStore.swift in Sources */,
+				A10000000000000000000193 /* InventoryBackupDocument.swift in Sources */,
+				A10000000000000000000199 /* InventoryBackupRestorePreflightView.swift in Sources */,
+				A10000000000000000000185 /* InventoryPortabilityModels.swift in Sources */,
+				A10000000000000000000187 /* InventoryPortabilityIntegrity.swift in Sources */,
+				A10000000000000000000180 /* InventoryFreeAccessPolicy.swift in Sources */,
+				A10000000000000000000020 /* HomeStuffInventoryApp.swift in Sources */,
+				A10000000000000000000021 /* InventoryItem.swift in Sources */,
+				A10000000000000000000109 /* InventoryItemViewEvent.swift in Sources */,
+				A10000000000000000000221 /* InventoryPlaceOpenRecord.swift in Sources */,
+				A10000000000000000000231 /* InventoryPlace.swift in Sources */,
+				A10000000000000000000233 /* PlaceIconOption.swift in Sources */,
+				A100000000000000000000B7 /* ItemIconOption.swift in Sources */,
+				A100000000000000000000B5 /* LocationIconOption.swift in Sources */,
+				A10000000000000000000022 /* StorageLocation.swift in Sources */,
+				A100000000000000000000A6 /* InventoryCustomCategory.swift in Sources */,
+				A10000000000000000000070 /* InventorySampleData.swift in Sources */,
+				A55000000000000000000001 /* InventoryAppStoreDemoData.swift in Sources */,
+				A10000000000000000000023 /* InventoryOverview.swift in Sources */,
+				A100000000000000000000A8 /* InventoryListManagement.swift in Sources */,
+				A100000000000000000000ED /* InventoryBrowseSummaries.swift in Sources */,
+				A100000000000000000000EB /* InventoryNormalizedName.swift in Sources */,
+				A10000000000000000000111 /* InventoryRecentItemViews.swift in Sources */,
+				A10000000000000000000223 /* InventoryPlaceIdentity.swift in Sources */,
+				A10000000000000000000225 /* InventoryPlaceOpenPersistence.swift in Sources */,
+				A10000000000000000000235 /* InventoryPlaceReconciler.swift in Sources */,
+				A10000000000000000000240 /* InventoryItemPlaceLink.swift in Sources */,
+				A1000000000000000000013B /* InventoryLocationReconciler.swift in Sources */,
+				A1000000000000000000013F /* InventoryCategoryReconciler.swift in Sources */,
+				A10000000000000000000085 /* InventorySearch.swift in Sources */,
+				A10000000000000000000024 /* InventoryEmptyStateViewModel.swift in Sources */,
+				A10000000000000000000079 /* InventoryItemDraft.swift in Sources */,
+				A10000000000000000000075 /* InventoryItemDetailViewModel.swift in Sources */,
+				A10000000000000000000143 /* InventoryNotesEditorState.swift in Sources */,
+				A100000000000000000000B1 /* InventoryFilterContext.swift in Sources */,
+				A10000000000000000000089 /* InventoryLocalization.swift in Sources */,
+				A100000000000000000001E0 /* InventoryDataTransferWorkflow.swift in Sources */,
+				A100000000000000000001E2 /* InventoryItemFormWorkflow.swift in Sources */,
+				A100000000000000000001F4 /* InventoryItemMutationFailure.swift in Sources */,
+				A100000000000000000000A2 /* InventorySelectionOptions.swift in Sources */,
+				A100000000000000000000B9 /* LocationPlaceSummary.swift in Sources */,
+				A100000000000000000000AD /* InventoryDesign.swift in Sources */,
+				A10000000000000000000127 /* InventoryTagStyle.swift in Sources */,
+				A10000000000000000000025 /* InventoryModelContainer.swift in Sources */,
+				A10000000000000000000071 /* InventorySampleDataSeeder.swift in Sources */,
+				A55000000000000000000003 /* InventoryAppStoreDemoDataSeeder.swift in Sources */,
+				A100000000000000000001E4 /* InventoryItemFormPersistence.swift in Sources */,
+				A10000000000000000000214 /* InventoryItemMutationPersistence.swift in Sources */,
+				A10000000000000000000212 /* InventoryListManagementPersistence.swift in Sources */,
+				A100000000000000000001E6 /* InventorySelectionValueStore.swift in Sources */,
+				A10000000000000000000026 /* RootView.swift in Sources */,
+				A10000000000000000000027 /* InventoryListView.swift in Sources */,
+				A100000000000000000001F0 /* InventoryFilterContextHeader.swift in Sources */,
+				A100000000000000000001F2 /* InventoryItemDetailView.swift in Sources */,
+				A10000000000000000000081 /* InventoryItemFormView.swift in Sources */,
+				A100000000000000000000F0 /* InventoryFormFocusBehavior.swift in Sources */,
+				A100000000000000000000F1 /* InventoryItemIconSelectionLabel.swift in Sources */,
+				A100000000000000000000F2 /* InventoryItemIconPickerView.swift in Sources */,
+				A100000000000000000000F3 /* InventoryStandardizedValueSelectionView.swift in Sources */,
+				A100000000000000000000F4 /* InventoryStandardizedValueCreationView.swift in Sources */,
+				A10000000000000000000242 /* InventoryItemPlaceSelectionView.swift in Sources */,
+				A100000000000000000000AA /* InventoryListManagementView.swift in Sources */,
+				A10000000000000000000101 /* InventoryListManagementState.swift in Sources */,
+				A10000000000000000000103 /* InventoryManagedValueRow.swift in Sources */,
+				A10000000000000000000105 /* InventoryManagedValueEditor.swift in Sources */,
+				A10000000000000000000107 /* LocationIconPickerView.swift in Sources */,
+				A100000000000000000000BD /* SettingsHomeView.swift in Sources */,
+				A10000000000000000000250 /* InventoryPlaceDirectoryPresentation.swift in Sources */,
+				A10000000000000000000252 /* PlaceManagementView.swift in Sources */,
+				A10000000000000000000028 /* InventoryEmptyStateView.swift in Sources */,
+				A100000000000000000000AF /* InventorySharedViews.swift in Sources */,
+				A100000000000000000000C0 /* InventoryCardPrimitives.swift in Sources */,
+				A100000000000000000000C1 /* InventoryHeroPrimitives.swift in Sources */,
+				A100000000000000000000C2 /* InventoryIconPrimitives.swift in Sources */,
+				A100000000000000000000C3 /* InventoryBadgePrimitives.swift in Sources */,
+				A100000000000000000000C4 /* InventoryRowPrimitives.swift in Sources */,
+				A100000000000000000000C5 /* InventoryFormPrimitives.swift in Sources */,
+				A100000000000000000000C6 /* InventoryEmptyStatePrimitives.swift in Sources */,
+				A100000000000000000000C7 /* InventoryGlassSurfaces.swift in Sources */,
+				A100000000000000000000C8 /* InventoryPrimitivePreviews.swift in Sources */,
+				A100000000000000000001F6 /* InventoryBrowsePreviews.swift in Sources */,
+				A100000000000000000001F8 /* InventoryBrowsePreviewFixtures.swift in Sources */,
+				A10000000000000000000210 /* InventoryDetailPreviewSupport.swift in Sources */,
+				A1000000000000000000017A /* InventoryScrollContentClearance.swift in Sources */,
+				A10000000000000000000120 /* InventoryPreviewGroupPrimitives.swift in Sources */,
+				A10000000000000000000150 /* InventoryAppBootstrapView.swift in Sources */,
+				A1000000000000000000017D /* InventoryCompactItemCard.swift in Sources */,
+				A100000000000000000000DE /* ScopedInventoryItemsListView.swift in Sources */,
+				A100000000000000000000E7 /* InventoryItemNavigationCard.swift in Sources */,
+				A100000000000000000000DF /* InventoryItemRowView.swift in Sources */,
+				A10000000000000000000139 /* InventoryItemDetailSurfaces.swift in Sources */,
+				A10000000000000000000141 /* InventoryNotesEditorView.swift in Sources */,
+				A100000000000000000000E0 /* LocationsListView.swift in Sources */,
+				A100000000000000000000E1 /* LocationPlacesListView.swift in Sources */,
+				A10000000000000000000123 /* LocationDetailHeroCard.swift in Sources */,
+				A10000000000000000000125 /* LocationRecentItemsCard.swift in Sources */,
+				A100000000000000000000E2 /* LocationAllItemsRowView.swift in Sources */,
+				A100000000000000000000E3 /* PlaceSummaryRowView.swift in Sources */,
+				A100000000000000000000E4 /* LocationSummaryRowView.swift in Sources */,
+				A100000000000000000000E5 /* LocationScopedItemsListView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000000000000000000055 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A100000000000000000001A8 /* PrivacyManifestTests.swift in Sources */,
+				A100000000000000000001A6 /* InventoryFreeDowngradeRegressionGateTests.swift in Sources */,
+				A100000000000000000001A4 /* PremiumAccessTests.swift in Sources */,
+				A1000000000000000000018F /* InventoryPortabilityCodecTests.swift in Sources */,
+				A1000000000000000000018D /* InventoryReadableExportServiceTests.swift in Sources */,
+				A10000000000000000000195 /* InventoryBackupTests.swift in Sources */,
+				A1000000000000000000019B /* InventoryBackupRestoreTests.swift in Sources */,
+				A100000000000000000001AC /* InventoryBackupFileReaderTests.swift in Sources */,
+				A100000000000000000001AE /* InventoryBackupRestorePlannerTests.swift in Sources */,
+				A100000000000000000001B0 /* InventoryBackupRestoreServiceTests.swift in Sources */,
+				A100000000000000000001B2 /* InventoryBackupRecoveryTests.swift in Sources */,
+				A100000000000000000001B4 /* InventoryBackupRecoveryArtifactProtectionTests.swift in Sources */,
+				A100000000000000000001B6 /* InventoryBackupLegacyMigrationTests.swift in Sources */,
+				A10000000000000000000182 /* InventoryFreeAccessPolicyTests.swift in Sources */,
+				A10000000000000000000051 /* InventoryItemTests.swift in Sources */,
+				A10000000000000000000073 /* InventorySampleDataTests.swift in Sources */,
+				A55000000000000000000005 /* InventoryAppStoreDemoDataTests.swift in Sources */,
+				A10000000000000000000083 /* InventoryItemDraftTests.swift in Sources */,
+				A100000000000000000001E8 /* InventoryItemFormPersistenceTests.swift in Sources */,
+				A10000000000000000000218 /* InventoryItemMutationPersistenceTests.swift in Sources */,
+				A100000000000000000001FA /* InventoryItemMutationFailureTests.swift in Sources */,
+				A10000000000000000000087 /* InventorySearchTests.swift in Sources */,
+				A100000000000000000001AA /* InventoryBrowseSummariesTests.swift in Sources */,
+				A1000000000000000000013D /* InventoryLocationReconcilerTests.swift in Sources */,
+				A10000000000000000000077 /* InventoryItemDetailViewModelTests.swift in Sources */,
+				A1000000000000000000012D /* InventoryHeroNavigationTitleMetricsTests.swift in Sources */,
+				A10000000000000000000136 /* InventoryAppearanceTests.swift in Sources */,
+				A10000000000000000000152 /* InventoryAppBootstrapTests.swift in Sources */,
+				A100000000000000000000A4 /* InventorySelectionOptionsTests.swift in Sources */,
+				A100000000000000000000AC /* InventoryListManagementTests.swift in Sources */,
+				A10000000000000000000216 /* InventoryListManagementPersistenceTests.swift in Sources */,
+				A100000000000000000000B3 /* InventoryFilterContextTests.swift in Sources */,
+				A100000000000000000001C1 /* LocalizationCatalogTests.swift in Sources */,
+				A100000000000000000001C3 /* LocalizationTestSupport.swift in Sources */,
+				A100000000000000000001C5 /* InventoryDataFileDisclosureTests.swift in Sources */,
+				A100000000000000000001C7 /* InventoryItemIconLocalizationTests.swift in Sources */,
+				A100000000000000000001C9 /* InventoryListManagementLocalizationTests.swift in Sources */,
+				A100000000000000000001CB /* InventoryLocalizationFormattingTests.swift in Sources */,
+				A100000000000000000001CD /* InventoryStorageCompatibilityTests.swift in Sources */,
+				A100000000000000000000BB /* LocationPlaceSummaryTests.swift in Sources */,
+				A10000000000000000000113 /* InventoryRecentItemViewsTests.swift in Sources */,
+				A10000000000000000000227 /* InventoryPlaceIdentityTests.swift in Sources */,
+				A10000000000000000000229 /* InventoryPlaceOpenPersistenceTests.swift in Sources */,
+				A10000000000000000000237 /* InventoryPlaceReconcilerTests.swift in Sources */,
+				A10000000000000000000129 /* InventoryTagStyleTests.swift in Sources */,
+				A10000000000000000000145 /* InventoryNotesEditorStateTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000000000000000000099 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000094 /* InventorySmokeUITests.swift in Sources */,
+				A100000000000000000001D0 /* InventoryUITestCase.swift in Sources */,
+				A100000000000000000001D2 /* InventoryStartupRecoveryUITests.swift in Sources */,
+				A100000000000000000001D4 /* InventorySettingsUITests.swift in Sources */,
+				A100000000000000000001D6 /* InventoryItemFormUITests.swift in Sources */,
+				A100000000000000000001D8 /* InventoryBrowseDetailUITests.swift in Sources */,
+				A10000000000000000000155 /* InventoryManagedValueRowUITests.swift in Sources */,
+				A10000000000000000000130 /* InventoryScreenshotCaptureUITests.swift in Sources */,
+				A1000000000000000000016A /* PlaceSummaryRowUITests.swift in Sources */,
+				A10000000000000000000132 /* InventoryReleaseScreenshotUITests.swift in Sources */,
+				A10000000000000000000134 /* InventoryScreenshotUITestCase.swift in Sources */,
+				A1000000000000000000015A /* RecentItemsTileLayoutUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A10000000000000000000063 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A10000000000000000000002 /* HomeStuffInventoryApp */;
+			targetProxy = A10000000000000000000062 /* PBXContainerItemProxy */;
+		};
+		A1000000000000000000009D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A10000000000000000000002 /* HomeStuffInventoryApp */;
+			targetProxy = A1000000000000000000009C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		A10000000000000000000042 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A10000000000000000000043 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A10000000000000000000044 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "Inventory-app";
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = UV2B3KXK4Q;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Home Stuff";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.2.8;
+				PRODUCT_BUNDLE_IDENTIFIER = com.stradivarius23.HomeStuffInventoryApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		A10000000000000000000045 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "Inventory-app";
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = UV2B3KXK4Q;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Home Stuff";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.2.8;
+				PRODUCT_BUNDLE_IDENTIFIER = com.stradivarius23.HomeStuffInventoryApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		A10000000000000000000066 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.2.8;
+				PRODUCT_BUNDLE_IDENTIFIER = com.stradivarius23.HomeStuffInventoryAppTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HomeStuffInventoryApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HomeStuffInventoryApp";
+			};
+			name = Debug;
+		};
+		A10000000000000000000067 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.2.8;
+				PRODUCT_BUNDLE_IDENTIFIER = com.stradivarius23.HomeStuffInventoryAppTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HomeStuffInventoryApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HomeStuffInventoryApp";
+			};
+			name = Release;
+		};
+		A1000000000000000000009E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundlePackageType = BNDL;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.2.8;
+				PRODUCT_BUNDLE_IDENTIFIER = com.stradivarius23.HomeStuffInventoryAppUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = HomeStuffInventoryApp;
+			};
+			name = Debug;
+		};
+		A1000000000000000000009F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundlePackageType = BNDL;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.2.8;
+				PRODUCT_BUNDLE_IDENTIFIER = com.stradivarius23.HomeStuffInventoryAppUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = HomeStuffInventoryApp;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A10000000000000000000040 /* Build configuration list for PBXNativeTarget "HomeStuffInventoryApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10000000000000000000044 /* Debug */,
+				A10000000000000000000045 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A10000000000000000000041 /* Build configuration list for PBXProject "HomeStuffInventoryApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10000000000000000000042 /* Debug */,
+				A10000000000000000000043 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A10000000000000000000065 /* Build configuration list for PBXNativeTarget "HomeStuffInventoryAppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10000000000000000000066 /* Debug */,
+				A10000000000000000000067 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A100000000000000000000A0 /* Build configuration list for PBXNativeTarget "HomeStuffInventoryAppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1000000000000000000009E /* Debug */,
+				A1000000000000000000009F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A10000000000000000000000 /* Project object */;
+}

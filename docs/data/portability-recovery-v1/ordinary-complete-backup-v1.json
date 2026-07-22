@@ -1,0 +1,80 @@
+{
+  "formatIdentifier": "com.stradivarius23.home-stuff-inventory.portability",
+  "artifactType": "completeBackup",
+  "schemaVersion": 1,
+  "integrity": {
+    "algorithm": "SHA-256",
+    "canonicalization": "RFC8785",
+    "digest": "72b37340cb969ce269828250bf58e179c90271165bb988e4c3b0bccda2fc8fa1"
+  },
+  "metadata": {
+    "createdAt": "2026-07-14T09:30:00.000Z",
+    "appVersion": "1.0.0",
+    "appBuild": "100",
+    "platform": "iOS"
+  },
+  "inventory": {
+    "locations": [
+      {
+        "id": "10000000-0000-0000-0000-000000000001",
+        "name": "Home",
+        "iconID": "house",
+        "notes": "Main residence",
+        "createdAt": "2026-07-01T08:00:00.000Z",
+        "updatedAt": "2026-07-02T08:00:00.000Z"
+      }
+    ],
+    "customCategories": [
+      {
+        "id": "20000000-0000-0000-0000-000000000001",
+        "name": "Keepsakes",
+        "createdAt": "2026-07-01T08:00:00.000Z",
+        "updatedAt": "2026-07-02T08:00:00.000Z"
+      }
+    ],
+    "items": [
+      {
+        "id": "30000000-0000-0000-0000-000000000001",
+        "name": "USB-C cable",
+        "categoryStorageValue": "cablesAndAdapters",
+        "customCategoryID": null,
+        "locationName": "Home",
+        "locationID": "10000000-0000-0000-0000-000000000001",
+        "placeName": "Desk drawer",
+        "iconID": "cable.connector",
+        "quantity": 2,
+        "conditionStorageValue": "good",
+        "tags": [
+          "USB-C",
+          "spare"
+        ],
+        "notes": "1 m braided cable",
+        "createdAt": "2026-07-01T08:00:00.000Z",
+        "updatedAt": "2026-07-02T08:00:00.000Z"
+      },
+      {
+        "id": "30000000-0000-0000-0000-000000000002",
+        "name": "Concert ticket",
+        "categoryStorageValue": "Keepsakes",
+        "customCategoryID": "20000000-0000-0000-0000-000000000001",
+        "locationName": "Home",
+        "locationID": "10000000-0000-0000-0000-000000000001",
+        "placeName": "Memory box",
+        "iconID": null,
+        "quantity": 1,
+        "conditionStorageValue": "good",
+        "tags": [],
+        "notes": "Summer show",
+        "createdAt": "2026-07-03T08:00:00.000Z",
+        "updatedAt": "2026-07-03T08:00:00.000Z"
+      }
+    ],
+    "recentItemViewEvents": [
+      {
+        "id": "40000000-0000-0000-0000-000000000001",
+        "itemID": "30000000-0000-0000-0000-000000000001",
+        "viewedAt": "2026-07-03T09:00:00.000Z"
+      }
+    ]
+  }
+}

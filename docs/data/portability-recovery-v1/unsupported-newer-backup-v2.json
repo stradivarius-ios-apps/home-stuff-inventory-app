@@ -1,0 +1,24 @@
+{
+  "formatIdentifier": "com.stradivarius23.home-stuff-inventory.portability",
+  "artifactType": "completeBackup",
+  "schemaVersion": 3,
+  "integrity": {
+    "algorithm": "SHA-512",
+    "canonicalization": "FUTURE-RULE",
+    "digest": "not-interpreted-by-version-1-reader"
+  },
+  "metadata": {
+    "createdAt": "2026-07-14T12:00:00.000Z",
+    "appVersion": "2.0.0",
+    "appBuild": "200",
+    "platform": "iOS"
+  },
+  "inventory": {
+    "futureRecords": [
+      {
+        "id": "50000000-0000-0000-0000-000000000001",
+        "futureUserOwnedField": "Must not be discarded by an older restore"
+      }
+    ]
+  }
+}

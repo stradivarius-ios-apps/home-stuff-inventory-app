@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "destination_repository": "stradivarius-ios-apps/home-stuff-inventory-app",
+  "mode": "plan-only",
+  "apply_allowed": false,
+  "publication_authorized": false,
+  "observed_staging_state": {
+    "observed_on": "2026-07-22",
+    "visibility": "private",
+    "empty": true,
+    "default_branch": "main",
+    "rulesets": "unavailable-while-private-on-current-plan",
+    "actions_default_workflow_permissions": "write",
+    "actions_allowed_policy": "all",
+    "actions_sha_pinning_required": false,
+    "dependabot_alerts": "disabled",
+    "automated_security_fixes": "disabled",
+    "private_vulnerability_reporting": "not-enabled-or-unavailable"
+  },
+  "required_checks": {
+    "state": "blocked-until-integrated-staging-evidence-and-handoff-verifier-fixes",
+    "global_candidates_not_authorized_for_rulesets": [
+      "Classify changed files",
+      "CI workflow validation",
+      "Public candidate boundary"
+    ],
+    "conditional_not_global": {
+      "Build and test": "runs only when Classify changed files marks app validation required",
+      "Code coverage": "runs only when Classify changed files marks app validation required",
+      "Full Test Suite": "not globally required; protect release or explicit full-validation paths only after exact-SHA trigger semantics and ruleset support are proven"
+    },
+    "blockers": [
+      "Full Test Suite needs a release-SHA trigger and exact-source proof before it can protect a release handoff",
+      "the private verifier must bind successful checks to the expected GitHub Actions source app",
+      "the integrated candidate must prove the public-hosted and private-self-hosted workflow split",
+      "exact required names must be observed on the clean staging repository before any ruleset is applied"
+    ],
+    "dco": {
+      "policy": "mandatory-per-commit-signoff-no-CLA",
+      "state": "blocked-until-repository-scoped-app-is-installed-and-check-is-observed",
+      "candidate_name": "DCO",
+      "required_source_app": "record-exact-observed-source-app-before-ruleset",
+      "maintainer_override": "emergency-only-never-for-convenience"
+    }
+  },
+  "policy_stack": {
+    "code_license": "MIT",
+    "brand_materials": "reserved-see-BRAND.md",
+    "external_contributions": "accepted",
+    "dco": "mandatory-version-1.1",
+    "cla": "not-used",
+    "code_of_conduct": "not-adopted-no-moderator-team-or-process",
+    "community_abuse_controls": "GitHub-block-report-lock",
+    "supported_security_versions": "latest-Apple-App-Store-release-only",
+    "security_reporting": "GitHub-Private-Vulnerability-Reporting",
+    "product_work": "canonical-public-repository-only",
+    "release_signing_runner_operations": "retained-private"
+  },
+  "integration_identities": {
+    "governance_pr": {
+      "number": 635,
+      "state": "blocked-until-merged",
+      "merge_commit_sha": null
+    },
+    "bootstrap_pr": {
+      "number": 636,
+      "state": "blocked-until-merged",
+      "merge_commit_sha": null
+    }
+  },
+  "desired_controls": {
+    "actions": {
+      "default_workflow_permissions": "read",
+      "can_approve_pull_request_reviews": false,
+      "allowed_actions": "selected-reviewed-actions-only",
+      "require_full_commit_sha_pins": true,
+      "fork_pull_requests": "approval-policy-plus-read-only-hosted-execution-without-secrets",
+      "pull_request_target_with_untrusted_checkout": "prohibited",
+      "self_hosted_runners": "prohibited"
+    },
+    "main_ruleset": {
+      "state": "blocked-until-main-exists-and-required-check-names-are-stable",
+      "pull_request_required": true,
+      "required_approvals": 1,
+      "code_owner_review_required": true,
+      "dismiss_stale_approvals": true,
+      "conversation_resolution_required": true,
+      "required_status_checks": "use-exact-observed-required-checks",
+      "dco_check": "require-exact-observed-check-after-provider-installation",
+      "force_push": "prohibited",
+      "deletion": "prohibited",
+      "bypass": "minimum-maintainer-emergency-set-to-be-recorded"
+    },
+    "release_tag_ruleset": {
+      "state": "blocked-until-clean-root-and-tag-contract-are-integrated",
+      "pattern": "v*",
+      "creation": "maintainer-only-after-required-checks",
+      "update": "prohibited",
+      "deletion": "prohibited",
+      "force_update": "prohibited"
+    },
+    "security_features": {
+      "secret_scanning": "enable-when-supported",
+      "push_protection": "enable-when-supported",
+      "private_vulnerability_reporting": "enable-before-publication",
+      "dependency_graph": "enable-before-publication",
+      "dependabot_alerts": "enable-before-publication",
+      "dependabot_security_updates": "enable-after-reviewed-dependency-policy",
+      "code_scanning": "enable-supported-default-setup-or-record-compensating-control",
+      "dependency_review": "enable-when-supported-or-record-compensating-control",
+      "security_advisories": "verify-maintainer-access-before-publication"
+    }
+  },
+  "gates": {
+    "maintainer_policy_decisions": "approved",
+    "private_release_file_decision": "approved-pending-final-disposition-evidence",
+    "dco_provider_check": "blocked",
+    "dependency_pull_requests_integrated": "blocked",
+    "clean_root_commit_created": "blocked",
+    "required_checks_observed": "blocked",
+    "rulesets_tested_non_admin": "blocked",
+    "fork_isolation_tested": "blocked",
+    "security_features_verified": "blocked",
+    "sec_pub_09_result": "GO-required",
+    "separate_maintainer_publication_authorization": "required"
+  }
+}

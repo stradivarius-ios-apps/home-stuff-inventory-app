@@ -1,0 +1,180 @@
+name: PR UI Screenshots
+
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: Pull request number, branch, tag, or full commit SHA to capture.
+        type: string
+        required: false
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: pr-ui-screenshots-${{ inputs.source || github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  PROJECT: HomeStuffInventoryApp.xcodeproj
+  SCHEME: HomeStuffInventoryApp
+  CONFIGURATION: Debug
+
+jobs:
+  pr-ui-screenshots:
+    name: Capture PR UI screenshots
+    runs-on: macos-26-intel
+    timeout-minutes: 60
+
+    steps:
+      - name: Check out workflow definition
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Resolve requested PR or ref
+        id: source
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUESTED_SOURCE: ${{ inputs.source || github.sha }}
+        run: |
+          set -euo pipefail
+          resolved_ref="$(ruby .github/scripts/resolve_pr_ui_ref.rb "$REQUESTED_SOURCE")"
+
+          echo "resolved_ref=$resolved_ref" >> "$GITHUB_OUTPUT"
+
+      - name: Check out requested source
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ steps.source.outputs.resolved_ref }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Summarize resolved source
+        id: resolved
+        shell: bash
+        env:
+          REQUESTED_SOURCE: ${{ inputs.source || github.sha }}
+          RESOLVED_REF: ${{ steps.source.outputs.resolved_ref }}
+        run: |
+          set -euo pipefail
+          resolved_sha="$(git rev-parse HEAD)"
+          if [[ "$RESOLVED_REF" =~ ^[0-9a-f]{40}$ && "$RESOLVED_REF" != "$resolved_sha" ]]; then
+            echo "Requested SHA $RESOLVED_REF resolved to unexpected commit $resolved_sha."
+            exit 1
+          fi
+          echo "sha=$resolved_sha" >> "$GITHUB_OUTPUT"
+          {
+            echo "## Requested source"
+            echo
+            echo "- Input: \`$REQUESTED_SOURCE\`"
+            echo "- Resolved ref: \`$RESOLVED_REF\`"
+            echo "- Commit: \`$resolved_sha\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Show Xcode environment
+        run: bash .github/scripts/configure_hosted_xcode.sh
+
+      - name: Show hosted simulator environment
+        run: |
+          xcodebuild -version
+          xcode-select -p
+          xcrun simctl list devices available
+
+      - name: Create isolated screenshot simulator
+        run: |
+          set -euo pipefail
+          simulator_name="HSI PR Screenshots ${GITHUB_RUN_ID}-${GITHUB_JOB}-${GITHUB_RUN_ATTEMPT}"
+          simulator_udid="$(xcrun simctl create "$simulator_name" "iPhone 17" "com.apple.CoreSimulator.SimRuntime.iOS-26-5")"
+          echo "SIMULATOR_UDID=$simulator_udid" >> "$GITHUB_ENV"
+          echo "DESTINATION=platform=iOS Simulator,id=$simulator_udid" >> "$GITHUB_ENV"
+          xcrun simctl boot "$simulator_udid"
+          xcrun simctl bootstatus "$simulator_udid" -b
+
+      - name: Normalize screenshot presentation state
+        run: |
+          set -euo pipefail
+          xcrun simctl spawn "$SIMULATOR_UDID" defaults write -g AppleContentSizeCategory UICTContentSizeCategoryL
+          xcrun simctl spawn "$SIMULATOR_UDID" defaults write -g AppleLanguages -array en
+          xcrun simctl spawn "$SIMULATOR_UDID" defaults write -g AppleLocale en_US
+          xcrun simctl spawn "$SIMULATOR_UDID" defaults write com.apple.Accessibility ReduceMotionEnabled -bool false
+          xcrun simctl spawn "$SIMULATOR_UDID" defaults write com.apple.Accessibility ReduceTransparencyEnabled -bool false
+          xcrun simctl spawn "$SIMULATOR_UDID" defaults write com.apple.Accessibility DarkerSystemColorsEnabled -bool false
+
+      - name: Prepare screenshot directories
+        run: |
+          rm -rf TestResults pr-ui-screenshots
+          mkdir -p TestResults
+
+      - name: Capture deterministic PR screenshots
+        run: |
+          xcodebuild test \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -destination "$DESTINATION" \
+            -configuration "$CONFIGURATION" \
+            -only-testing:"HomeStuffInventoryAppUITests/InventoryScreenshotCaptureUITests/testEnglishLightReviewScreenshots" \
+            -only-testing:"HomeStuffInventoryAppUITests/InventoryScreenshotCaptureUITests/testEnglishDarkReviewScreenshots" \
+            -only-testing:"HomeStuffInventoryAppUITests/InventoryScreenshotCaptureUITests/testUkrainianLightReviewScreenshots" \
+            -only-testing:"HomeStuffInventoryAppUITests/InventoryScreenshotCaptureUITests/testUkrainianDarkReviewScreenshots" \
+            -resultBundlePath TestResults/PRUIScreenshots.xcresult \
+            SWIFT_ACTIVE_COMPILATION_CONDITIONS="DEBUG PR_UI_SCREENSHOTS" \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Export screenshot attachments
+        run: ruby .github/scripts/export_pr_ui_screenshots.rb TestResults/PRUIScreenshots.xcresult pr-ui-screenshots
+
+      - name: Upload PR UI screenshots
+        id: upload-screenshots
+        if: success()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: pr-ui-screenshots-${{ steps.resolved.outputs.sha }}
+          path: pr-ui-screenshots
+          if-no-files-found: error
+          retention-days: 3
+
+      - name: Upload PR screenshot result bundle on failure
+        id: upload-failure
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: pr-ui-screenshot-result-${{ github.run_id }}
+          path: TestResults/PRUIScreenshots.xcresult
+          if-no-files-found: ignore
+          retention-days: 3
+
+      - name: Summarize screenshot artifacts
+        if: always()
+        env:
+          SCREENSHOTS_URL: ${{ steps.upload-screenshots.outputs.artifact-url }}
+          FAILURE_URL: ${{ steps.upload-failure.outputs.artifact-url }}
+          RESOLVED_SHA: ${{ steps.resolved.outputs.sha }}
+        run: |
+          {
+            echo
+            echo "## PR UI screenshot result"
+            echo
+            echo "- Commit: \`$RESOLVED_SHA\`"
+            if [[ -n "$SCREENSHOTS_URL" ]]; then
+              echo "- Screenshot artifact: $SCREENSHOTS_URL"
+              echo "- Contents: \`index.html\`, \`summary.md\`, and EN/UK light/dark screenshot directories"
+              echo "- Retention: 3 days"
+            else
+              echo "- Capture failed. Inspect the job log."
+              if [[ -n "$FAILURE_URL" ]]; then
+                echo "- Failure xcresult: $FAILURE_URL"
+              fi
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Delete isolated screenshot simulator
+        if: always()
+        run: |
+          if [[ -n "${SIMULATOR_UDID:-}" ]]; then
+            xcrun simctl shutdown "$SIMULATOR_UDID" || true
+            xcrun simctl delete "$SIMULATOR_UDID" || true
+          fi

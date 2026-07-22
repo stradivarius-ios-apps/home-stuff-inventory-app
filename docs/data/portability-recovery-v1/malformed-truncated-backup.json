@@ -1,0 +1,14 @@
+{
+  "formatIdentifier": "com.stradivarius23.home-stuff-inventory.portability",
+  "artifactType": "completeBackup",
+  "schemaVersion": 1,
+  "metadata": {
+    "createdAt": "2026-07-14T11:00:00.000Z",
+    "appVersion": "1.0.0",
+    "appBuild": "100",
+    "platform": "iOS"
+  },
+  "inventory": {
+    "locations": [],
+    "customCategories": [],
+    "items": [

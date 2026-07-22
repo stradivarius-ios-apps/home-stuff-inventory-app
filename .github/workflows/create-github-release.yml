@@ -1,0 +1,131 @@
+name: Create GitHub Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_version:
+        description: Optional release version as MAJOR.MINOR.PATCH or vMAJOR.MINOR.PATCH. It must exactly match committed MARKETING_VERSION.
+        type: string
+        required: false
+      source_ref:
+        description: Source ref to tag after release prep is merged. Normal flow uses main; recovery accepts only an exact SHA.
+        type: string
+        default: main
+        required: true
+      allow_non_main_source_ref:
+        description: Explicit maintainer approval for exact-SHA recovery outside current main. Never use a release-prep branch.
+        type: boolean
+        default: false
+        required: true
+  workflow_call:
+    inputs:
+      target_version:
+        description: Optional release version as MAJOR.MINOR.PATCH or vMAJOR.MINOR.PATCH. It must exactly match committed MARKETING_VERSION.
+        type: string
+        required: false
+      source_ref:
+        description: Source ref to tag after release prep is merged. Normal flow uses main; recovery accepts only an exact SHA.
+        type: string
+        default: main
+        required: false
+      allow_non_main_source_ref:
+        description: Explicit maintainer approval for exact-SHA recovery outside current main. Never use a release-prep branch.
+        type: boolean
+        default: false
+        required: false
+    outputs:
+      tag_name:
+        description: Created annotated release tag.
+        value: ${{ jobs.create-github-release.outputs.tag_name }}
+      source_sha:
+        description: Commit SHA used for the release tag.
+        value: ${{ jobs.create-github-release.outputs.source_sha }}
+      release_url:
+        description: Created GitHub Release URL.
+        value: ${{ jobs.create-github-release.outputs.release_url }}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: create-github-release-${{ inputs.target_version || 'committed-version' }}
+  cancel-in-progress: false
+
+jobs:
+  create-github-release:
+    name: Create annotated tag and GitHub Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      tag_name: ${{ steps.preflight.outputs.tag_name }}
+      source_sha: ${{ steps.preflight.outputs.source_sha }}
+      release_url: ${{ steps.release.outputs.release_url }}
+
+    steps:
+      - name: Check selected ref
+        run: |
+          if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
+            echo "Create GitHub Release workflow definition must be dispatched from the main branch."
+            echo "Run: GitHub repo > Actions > Create GitHub Release > Run workflow > Branch: main"
+            exit 1
+          fi
+
+      - name: Check out release source
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ inputs.source_ref || 'main' }}
+          fetch-depth: 0
+
+      - name: Run release preflight checks
+        id: preflight
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_VERSION: ${{ inputs.target_version }}
+          SOURCE_REF: ${{ inputs.source_ref || 'main' }}
+          ALLOW_RECOVERY: ${{ inputs.allow_non_main_source_ref }}
+        run: |
+          set -euo pipefail
+          args=(--target-version "$TARGET_VERSION" --source-ref "$SOURCE_REF" --release-body-path release-notes.md)
+          if [[ "$ALLOW_RECOVERY" == "true" ]]; then args+=(--allow-non-main-source-ref); fi
+          ruby .github/scripts/create_github_release_preflight.rb "${args[@]}"
+
+      - name: Create annotated tag and GitHub Release
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ steps.preflight.outputs.tag_name }}
+          SOURCE_SHA: ${{ steps.preflight.outputs.source_sha }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag --annotate "$TAG_NAME" "$SOURCE_SHA" --message "Home Stuff Inventory $TAG_NAME"
+          git push origin "refs/tags/$TAG_NAME"
+          gh release create "$TAG_NAME" \
+            --repo "$GITHUB_REPOSITORY" \
+            --verify-tag \
+            --title "$TAG_NAME" \
+            --notes-file release-notes.md
+          release_url="$(gh release view "$TAG_NAME" --repo "$GITHUB_REPOSITORY" --json url --jq .url)"
+          echo "release_url=$release_url" >> "$GITHUB_OUTPUT"
+
+      - name: Summarize GitHub Release
+        env:
+          TAG_NAME: ${{ steps.preflight.outputs.tag_name }}
+          MARKETING_VERSION: ${{ steps.preflight.outputs.marketing_version }}
+          SOURCE_REF: ${{ steps.preflight.outputs.source_ref }}
+          SOURCE_SHA: ${{ steps.preflight.outputs.source_sha }}
+          RELEASE_URL: ${{ steps.release.outputs.release_url }}
+        run: |
+          {
+            echo "Created GitHub Release:"
+            echo
+            echo "- Marketing version: \`$MARKETING_VERSION\`"
+            echo "- Annotated tag: \`$TAG_NAME\`"
+            echo "- Source ref: \`$SOURCE_REF\`"
+            echo "- Target commit: \`$SOURCE_SHA\`"
+            echo "- Release URL: $RELEASE_URL"
+            echo "- Release notes: finalized matching \`CHANGELOG.md\` entry"
+            echo
+            echo "No TestFlight deployment, metadata publication, App Review submission, or public App Store release was performed."
+          } >> "$GITHUB_STEP_SUMMARY"

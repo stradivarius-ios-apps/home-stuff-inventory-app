@@ -1,0 +1,52 @@
+name: Prepare Release Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_version:
+        description: Optional MAJOR.MINOR.PATCH version. Blank selects the next patch after the latest release tag.
+        type: string
+        required: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: prepare-release-version-main
+  cancel-in-progress: false
+
+jobs:
+  prepare-release-version:
+    name: Prepare version and changelog PR
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check selected ref
+        run: |
+          if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
+            echo "Prepare Release Version must be dispatched from the main branch."
+            echo "Run: GitHub repo > Actions > Prepare Release Version > Run workflow > Branch: main"
+            exit 1
+          fi
+
+      - name: Check out current main
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Configure git author
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Prepare release-prep PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ruby .github/scripts/prepare_release_version.rb \
+            --target-version "${{ inputs.target_version }}" \
+            --push \
+            --create-pr

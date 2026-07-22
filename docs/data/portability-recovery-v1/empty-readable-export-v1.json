@@ -1,0 +1,21 @@
+{
+  "formatIdentifier": "com.stradivarius23.home-stuff-inventory.portability",
+  "artifactType": "readableExport",
+  "schemaVersion": 1,
+  "integrity": {
+    "algorithm": "SHA-256",
+    "canonicalization": "RFC8785",
+    "digest": "b8c51f170805e55d258c1ef390367d4810caefde9afbd7efe01702843331cd43"
+  },
+  "metadata": {
+    "createdAt": "2026-07-14T09:00:00.000Z",
+    "appVersion": "1.0.0",
+    "appBuild": "100",
+    "platform": "iOS"
+  },
+  "inventory": {
+    "locations": [],
+    "customCategories": [],
+    "items": []
+  }
+}

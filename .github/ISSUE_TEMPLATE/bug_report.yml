@@ -1,0 +1,49 @@
+name: Bug report
+description: Report a reproducible, non-sensitive product problem.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Do not report vulnerabilities, credentials, exploit details, or real household
+        inventory here. Use the private route in SECURITY.md.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Describe the expected and actual behavior without private data.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+      description: Use synthetic item, location, and place names only.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: App version or commit
+    validations:
+      required: true
+  - type: dropdown
+    id: appearance
+    attributes:
+      label: Appearance
+      options:
+        - Light
+        - Dark
+        - Both
+        - Not relevant
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Public-data confirmation
+      options:
+        - label: I removed real household inventory and all sensitive or security-related information.
+          required: true

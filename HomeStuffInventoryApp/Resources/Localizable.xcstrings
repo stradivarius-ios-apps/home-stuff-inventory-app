@@ -1,0 +1,2392 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "inventory.action.add" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Додати" } }
+      }
+    },
+    "inventory.action.addItem" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add Item" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Додати річ" } }
+      }
+    },
+    "inventory.action.addItem.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add Item" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Додати річ" } }
+      }
+    },
+    "inventory.action.cancel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cancel" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Скасувати" } }
+      }
+    },
+    "inventory.action.discard" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Discard Changes" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Відкинути зміни" } }
+      }
+    },
+    "inventory.action.keepEditing" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Keep Editing" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Продовжити редагування" } }
+      }
+    },
+    "inventory.action.keepPlace" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Keep Storage Place" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Залишити місце зберігання" } }
+      }
+    },
+    "inventory.action.clearFilters" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Clear Filters" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Очистити фільтри" } }
+      }
+    },
+    "inventory.action.clearPlace" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Clear Storage Place" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Очистити місце зберігання" } }
+      }
+    },
+    "inventory.action.clearSearch" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Clear Search" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Очистити пошук" } }
+      }
+    },
+    "inventory.action.clearSearchAndFilters" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Clear Search and Filters" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Очистити пошук і фільтри" } }
+      }
+    },
+    "inventory.selection.category.addNew" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add New Category" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Додати нову категорію" } }
+      }
+    },
+    "inventory.selection.category.create" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add Category" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Додати категорію" } }
+      }
+    },
+    "inventory.selection.category.newPrompt" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "New category" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Нова категорія" } }
+      }
+    },
+    "inventory.selection.existing" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Existing" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Наявні" } }
+      }
+    },
+    "inventory.selection.location.addNew" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add New Location" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Додати нову локацію" } }
+      }
+    },
+    "inventory.selection.location.create" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add Location" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Додати локацію" } }
+      }
+    },
+    "inventory.selection.location.newPrompt" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "New location" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Нова локація" } }
+      }
+    },
+    "inventory.selection.selected" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Selected" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вибрано" } }
+      }
+    },
+    "locationIcons.category.bathroomAndLaundry" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Bathroom & Laundry" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Ванна й прання" } }
+      }
+    },
+    "locationIcons.category.bedroomAndCloset" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Bedroom & Closet" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Спальня й шафа" } }
+      }
+    },
+    "locationIcons.category.garageAndTools" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Garage & Tools" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Гараж та інструменти" } }
+      }
+    },
+    "locationIcons.category.home" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Home" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Дім" } }
+      }
+    },
+    "locationIcons.category.kitchenAndDining" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Kitchen & Dining" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Кухня й їдальня" } }
+      }
+    },
+    "locationIcons.category.livingAreas" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Living Areas" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Житлові зони" } }
+      }
+    },
+    "locationIcons.category.office" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Office" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Офіс" } }
+      }
+    },
+    "locationIcons.category.outdoorAndUtility" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Outdoor & Utility" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вулиця й господарське" } }
+      }
+    },
+    "locationIcons.category.storage" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Storage" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Зберігання" } }
+      }
+    },
+    "locationIcons.footer.optional" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Icon selection is optional. Locations without a chosen icon use the default marker." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вибір іконки необов’язковий. Локації без іконки використовують стандартний маркер." } }
+      }
+    },
+    "locationIcons.option.archive" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Archive" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Архів" } }
+      }
+    },
+    "locationIcons.option.balcony" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Balcony" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Балкон" } }
+      }
+    },
+    "locationIcons.option.bathroom" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Bathroom" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Ванна" } }
+      }
+    },
+    "locationIcons.option.bedroom" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Bedroom" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Спальня" } }
+      }
+    },
+    "locationIcons.option.bikeStorage" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Bike Storage" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Місце для велосипеда" } }
+      }
+    },
+    "locationIcons.option.books" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Books" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Книги" } }
+      }
+    },
+    "locationIcons.option.box" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Box" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Коробка" } }
+      }
+    },
+    "locationIcons.option.cabinet" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cabinet" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Шафка" } }
+      }
+    },
+    "locationIcons.option.closet" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Closet" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Гардероб" } }
+      }
+    },
+    "locationIcons.option.coffeeStation" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Coffee Station" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Кавова зона" } }
+      }
+    },
+    "locationIcons.option.default" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Default Location Icon" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Стандартна іконка локації" } }
+      }
+    },
+    "locationIcons.option.entryway" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Entryway" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Передпокій" } }
+      }
+    },
+    "locationIcons.option.files" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Files" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Файли" } }
+      }
+    },
+    "locationIcons.option.garage" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Garage" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Гараж" } }
+      }
+    },
+    "locationIcons.option.home" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Home" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Дім" } }
+      }
+    },
+    "locationIcons.option.kitchen" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Kitchen" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Кухня" } }
+      }
+    },
+    "locationIcons.option.lampArea" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Reading Corner" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Куточок для читання" } }
+      }
+    },
+    "locationIcons.option.laundry" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Laundry" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Пральня" } }
+      }
+    },
+    "locationIcons.option.livingRoom" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Living Room" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вітальня" } }
+      }
+    },
+    "locationIcons.option.office" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Office" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Офіс" } }
+      }
+    },
+    "locationIcons.option.refrigerator" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Refrigerator" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Холодильник" } }
+      }
+    },
+    "locationIcons.option.room" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Room" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Кімната" } }
+      }
+    },
+    "locationIcons.option.shed" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Shed" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Сарай" } }
+      }
+    },
+    "locationIcons.option.tools" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Tools" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Інструменти" } }
+      }
+    },
+    "locationIcons.option.tray" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Tray" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Лоток" } }
+      }
+    },
+    "locationIcons.option.tvArea" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "TV Area" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "ТВ-зона" } }
+      }
+    },
+    "locationIcons.option.utilitySink" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Utility Sink" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Господарська раковина" } }
+      }
+    },
+    "locationIcons.option.wardrobe" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Wardrobe" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Шафа для одягу" } }
+      }
+    },
+    "locationIcons.option.workbench" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Workbench" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Верстак" } }
+      }
+    },
+    "locationIcons.picker.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Location Icon" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Іконка локації" } }
+      }
+    },
+    "locationIcons.section.icon" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Icon" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Іконка" } }
+      }
+    },
+
+    "itemIcons.category.boxesAndSupplies" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Boxes & Supplies" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Коробки й запаси" } }
+      }
+    },
+    "itemIcons.category.cablesAndElectronics" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cables & Electronics" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Кабелі й електроніка" } }
+      }
+    },
+    "itemIcons.category.healthAndSafety" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Health & Safety" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Здоров’я й безпека" } }
+      }
+    },
+    "itemIcons.category.homeAndPersonal" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Home & Personal" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Дім і особисте" } }
+      }
+    },
+    "itemIcons.category.kitchenCleaningAndUtility" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Kitchen, Cleaning & Utility" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Кухня, прибирання й господарське" } }
+      }
+    },
+    "itemIcons.category.toolsAndRepair" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Tools & Repair" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Інструменти й ремонт" } }
+      }
+    },
+    "itemIcons.default.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Default" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Типова" } }
+      }
+    },
+    "itemIcons.footer.optional" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Icon selection is optional. Items without a chosen icon use a neutral item symbol." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вибір іконки необов’язковий. Речі без вибраної іконки використовують нейтральний символ." } }
+      }
+    },
+    "itemIcons.option.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%@ item icon" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Іконка речі: %@" } }
+      }
+    },
+    "itemIcons.option.archive" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Archive Box" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Архівна коробка" } }
+      }
+    },
+    "itemIcons.option.bag" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Bag" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Сумка" } }
+      }
+    },
+    "itemIcons.option.bandage" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Bandage" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Бинт" } }
+      }
+    },
+    "itemIcons.option.battery" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Battery" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Батарейка" } }
+      }
+    },
+    "itemIcons.option.box" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Box" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Коробка" } }
+      }
+    },
+    "itemIcons.option.cable" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cable" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Кабель" } }
+      }
+    },
+    "itemIcons.option.clothing" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Clothing" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Одяг" } }
+      }
+    },
+    "itemIcons.option.cup" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cup" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Чашка" } }
+      }
+    },
+    "itemIcons.option.desktop" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Desktop Computer" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Настільний комп’ютер" } }
+      }
+    },
+    "itemIcons.option.display" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Display" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Дисплей" } }
+      }
+    },
+    "itemIcons.option.document" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Document" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Документ" } }
+      }
+    },
+    "itemIcons.option.drop" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Liquid or Cleaner" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Рідина або засіб" } }
+      }
+    },
+    "itemIcons.option.firstAid" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "First Aid Kit" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Аптечка" } }
+      }
+    },
+    "itemIcons.option.folder" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Folder" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Папка" } }
+      }
+    },
+    "itemIcons.option.gear" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Part or Gear" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Деталь або механізм" } }
+      }
+    },
+    "itemIcons.option.glasses" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Glasses" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Окуляри" } }
+      }
+    },
+    "itemIcons.option.hammer" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Hammer" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Молоток" } }
+      }
+    },
+    "itemIcons.option.headphones" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Headphones" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Навушники" } }
+      }
+    },
+    "itemIcons.option.key" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Key" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Ключ" } }
+      }
+    },
+    "itemIcons.option.kitchen" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Kitchen Item" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Кухонна річ" } }
+      }
+    },
+    "itemIcons.option.laptop" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Laptop" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Ноутбук" } }
+      }
+    },
+    "itemIcons.option.leaf" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Outdoor or Garden" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Для вулиці або саду" } }
+      }
+    },
+    "itemIcons.option.phone" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Phone" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Телефон" } }
+      }
+    },
+    "itemIcons.option.pills" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Medicine" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Ліки" } }
+      }
+    },
+    "itemIcons.option.powerPlug" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Power Plug" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Штепсель" } }
+      }
+    },
+    "itemIcons.option.screwdriver" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Screwdriver" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Викрутка" } }
+      }
+    },
+    "itemIcons.option.sparkles" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cleaning Supplies" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Засоби для прибирання" } }
+      }
+    },
+    "itemIcons.option.stethoscope" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Medical Device" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Медичний пристрій" } }
+      }
+    },
+    "itemIcons.option.toolkit" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Toolkit" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Набір інструментів" } }
+      }
+    },
+    "itemIcons.option.tray" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Tray" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Лоток" } }
+      }
+    },
+    "itemIcons.option.wallet" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Wallet" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Гаманець" } }
+      }
+    },
+    "itemIcons.picker.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Item Icon" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Іконка речі" } }
+      }
+    },
+    "itemIcons.selected.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Item icon: %@" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Іконка речі: %@" } }
+      }
+    },
+    "inventory.action.delete" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Delete" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Видалити" } }
+      }
+    },
+    "inventory.action.deleteItem" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Delete Item" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Видалити річ" } }
+      }
+    },
+    "inventory.action.edit" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Edit" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Редагувати" } }
+      }
+    },
+    "inventory.action.editItem" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Edit Item" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Редагувати річ" } }
+      }
+    },
+    "inventory.action.rename" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Rename" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Перейменувати" } }
+      }
+    },
+    "inventory.action.ok" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "OK" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "ОК" } }
+      }
+    },
+    "inventory.action.save" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Save" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Зберегти" } }
+      }
+    },
+    "inventory.alert.delete.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This removes %@ from your inventory." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Річ «%@» буде видалено з інвентарю." } }
+      }
+    },
+    "inventory.alert.delete.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Delete Item?" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Видалити річ?" } }
+      }
+    },
+    "inventory.alert.deleteError.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The item could not be deleted. Please try again." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося видалити річ. Спробуйте ще раз." } }
+      }
+    },
+    "inventory.alert.deleteError.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Item Not Deleted" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Річ не видалено" } }
+      }
+    },
+    "inventory.alert.discardItemChanges.editMessage" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Discard your changes? The saved item will not be changed." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Відкинути зміни? Збережена річ не зміниться." } }
+      }
+    },
+    "inventory.alert.discardItemChanges.newMessage" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Discard this new item? It will not be saved." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Відкинути нову річ? Її не буде збережено." } }
+      }
+    },
+    "inventory.alert.discardItemChanges.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Discard Changes?" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Відкинути зміни?" } }
+      }
+    },
+    "inventory.alert.reviewPlaceAfterLocationChange.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The Storage Place “%@” may belong to the previous Location. Keep it after changing Location to “%@”, or clear it and enter a new Storage Place." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Місце зберігання «%@» може належати попередній локації. Залишити його після зміни локації на «%@» чи очистити й ввести нове місце зберігання?" } }
+      }
+    },
+    "inventory.alert.reviewPlaceAfterLocationChange.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Review Storage Place" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Перевірте місце зберігання" } }
+      }
+    },
+    "inventory.alert.saveError.editTitle" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Item Not Updated" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Річ не оновлено" } }
+      }
+    },
+    "inventory.alert.saveError.newTitle" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Item Not Saved" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Річ не збережено" } }
+      }
+    },
+    "inventory.alert.saveError.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your changes could not be saved. Please try again." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося зберегти зміни. Спробуйте ще раз." } }
+      }
+    },
+    "inventory.selection.creation.error.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Couldn't save this value. Please try again." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося зберегти це значення. Спробуйте ще раз." } }
+      }
+    },
+    "inventory.selection.creation.error.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Value Not Saved" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Значення не збережено" } }
+      }
+    },
+    "inventory.selection.place.addNew" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add New Storage Place" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Додати нове місце зберігання" } }
+      }
+    },
+    "inventory.selection.place.create" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "New Storage Place" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Нове місце зберігання" } }
+      }
+    },
+    "inventory.selection.place.icon" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Storage Place Icon" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Іконка місця зберігання" } }
+      }
+    },
+    "inventory.selection.place.icon.help" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose an icon for this Storage Place. Box is selected by default." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Виберіть іконку для цього місця зберігання. Типово вибрано коробку." } }
+      }
+    },
+    "inventory.selection.place.newPrompt" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Storage Place name" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Назва місця зберігання" } }
+      }
+    },
+    "inventory.category.batteries" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Batteries" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Батарейки" } }
+      }
+    },
+    "inventory.category.cablesAndAdapters" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cables & Adapters" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Кабелі й адаптери" } }
+      }
+    },
+    "inventory.category.documents" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Documents" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Документи" } }
+      }
+    },
+    "inventory.category.electronics" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Electronics" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Електроніка" } }
+      }
+    },
+    "inventory.category.householdSupplies" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Household Supplies" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Побутові речі" } }
+      }
+    },
+    "inventory.category.miscellaneous" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Miscellaneous" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Різне" } }
+      }
+    },
+    "inventory.category.outdoorAndTravel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Outdoor & Travel" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Для вулиці й подорожей" } }
+      }
+    },
+    "inventory.category.spareParts" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Spare Parts" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Запчастини" } }
+      }
+    },
+    "inventory.category.tools" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Tools" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Інструменти" } }
+      }
+    },
+    "inventory.condition.good" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Good" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Гарний" } }
+      }
+    },
+    "inventory.condition.needsRepair" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Needs Repair" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Потребує ремонту" } }
+      }
+    },
+    "inventory.condition.new" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "New" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Новий" } }
+      }
+    },
+    "inventory.condition.unknown" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Unknown" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Невідомий" } }
+      }
+    },
+    "inventory.condition.worn" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Worn" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Зношений" } }
+      }
+    },
+    "inventory.empty.filtered.filters" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No items match the selected filters." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Немає речей для вибраних фільтрів." } }
+      }
+    },
+    "inventory.empty.filtered.search" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No stored items match this search." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "За цим запитом речей не знайдено." } }
+      }
+    },
+    "inventory.empty.filtered.searchAndFilters" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No items match this search and filter combination." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "За цим пошуком і фільтрами речей не знайдено." } }
+      }
+    },
+    "inventory.empty.filtered.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No Matching Items" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Нічого не знайдено" } }
+      }
+    },
+    "inventory.empty.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add household items with their location and exact storage place so you can find them later." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Додавайте домашні речі з локацією та точним місцем зберігання, щоб знаходити їх пізніше." } }
+      }
+    },
+    "inventory.startup.loading" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Opening your inventory…" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Відкриваємо ваш інвентар…" } }
+      }
+    },
+    "inventory.startup.tryAgain" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Try Again" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Спробувати ще раз" } }
+      }
+    },
+    "inventory.startup.tryAgain.accessibilityHint" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Attempts to open your local inventory again." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Повторно намагається відкрити ваш локальний інвентар." } }
+      }
+    },
+    "inventory.startup.tryAgain.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Try opening inventory again" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Спробувати відкрити інвентар ще раз" } }
+      }
+    },
+    "inventory.startup.unavailable.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your inventory could not be opened. Your existing local data was not deleted. Try again to open it." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося відкрити ваш інвентар. Наявні локальні дані не видалено. Спробуйте відкрити його ще раз." } }
+      }
+    },
+    "inventory.startup.unavailable.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Inventory Unavailable" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Інвентар недоступний" } }
+      }
+    },
+    "inventory.empty.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Nothing stored yet" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Поки нічого не додано" } }
+      }
+    },
+    "inventory.fallback.noContainer" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No Storage Place" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Без місця зберігання" } }
+      }
+    },
+    "inventory.fallback.noLocation" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No location" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Без локації" } }
+      }
+    },
+    "inventory.fallback.noNotes" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No notes" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Без нотаток" } }
+      }
+    },
+    "inventory.notes.card.accessibilityHint" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Opens the Notes editor." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Відкриває редактор нотаток." } }
+      }
+    },
+    "inventory.notes.card.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Notes: %@" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Нотатки: %@" } }
+      }
+    },
+    "inventory.notes.discard.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Discard the changes you made to Notes?" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Відкинути внесені зміни до нотаток?" } }
+      }
+    },
+    "inventory.notes.discard.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Discard Changes?" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Відкинути зміни?" } }
+      }
+    },
+    "inventory.notes.editor.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Edit Notes" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Редагувати нотатки" } }
+      }
+    },
+    "inventory.notes.placeholder" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add details: what it’s for, what’s included, or where to find it." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Додайте деталі: для чого це, що в комплекті або де шукати." } }
+      }
+    },
+    "inventory.search.match.notes" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Matched in notes" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Збіг у нотатках" } }
+      }
+    },
+    "inventory.search.match.tag" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Matched tag: %@" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Збіг за тегом: %@" } }
+      }
+    },
+    "inventory.field.category" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Category" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Категорія" } }
+      }
+    },
+    "inventory.field.condition" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Condition" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Стан" } }
+      }
+    },
+    "inventory.field.container" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Storage Place" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Місце зберігання" } }
+      }
+    },
+    "inventory.field.created" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Created" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Створено" } }
+      }
+    },
+    "inventory.field.itemIcon" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Item Icon" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Іконка речі" } }
+      }
+    },
+    "inventory.field.updated" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Updated" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Оновлено" } }
+      }
+    },
+    "inventory.field.location" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Location" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Локація" } }
+      }
+    },
+    "inventory.field.name" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Name" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Назва" } }
+      }
+    },
+    "inventory.field.notes" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Notes" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Нотатки" } }
+      }
+    },
+    "inventory.field.quantity" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Quantity" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Кількість" } }
+      }
+    },
+    "inventory.field.tags.placeholder" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Adapters, tools, spare" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Адаптери, інструменти, запчастини" } }
+      }
+    },
+    "inventory.filter.accessibilityHint" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Filter by category, location, or storage place" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Фільтрувати за категорією, локацією або місцем зберігання" } }
+      }
+    },
+    "inventory.filter.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Filter inventory" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Фільтрувати інвентар" } }
+      }
+    },
+    "inventory.filter.anyCategory" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Any Category" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Будь-яка категорія" } }
+      }
+    },
+    "inventory.filter.anyLocation" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Any Location" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Будь-яка локація" } }
+      }
+    },
+    "inventory.filter.anyPlace" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Any Storage Place" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Будь-яке місце зберігання" } }
+      }
+    },
+    "inventory.filter.menu" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Filters" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Фільтри" } }
+      }
+    },
+    "inventory.filterContext.category" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Category: %@" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Категорія: %@" } }
+      }
+    },
+    "inventory.filterContext.location" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Location: %@" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Локація: %@" } }
+      }
+    },
+    "inventory.filterContext.place" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Storage Place: %@" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Місце зберігання: %@" } }
+      }
+    },
+    "inventory.filterContext.search" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Search: %@" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Пошук: %@" } }
+      }
+    },
+    "inventory.form.editItem.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Edit Item" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Редагувати річ" } }
+      }
+    },
+    "inventory.form.nameRequiredFooter" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Name is required." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Назва обов’язкова." } }
+      }
+    },
+    "inventory.form.newItem.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "New Item" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Нова річ" } }
+      }
+    },
+    "inventory.form.storageFooter" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add the exact drawer, box, shelf, cabinet, or organizer." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Додайте точну шухляду, коробку, полицю, шафу або органайзер." } }
+      }
+    },
+    "inventory.itemCount.word.few" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "items" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "речі" } }
+      }
+    },
+    "inventory.itemCount.word.many" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "items" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "речей" } }
+      }
+    },
+    "inventory.itemCount.word.one" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "item" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "річ" } }
+      }
+    },
+    "inventory.itemCount.word.other" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "items" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "речей" } }
+      }
+    },
+    "inventory.form.extraContextFooter" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Tags can help with alternate names or related searches." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Теги допомагають із альтернативними назвами або пов’язаним пошуком." } }
+      }
+    },
+    "inventory.form.tagsMaxLengthFooter" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Keep each tag to %d characters or fewer. “%@” is too long." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Кожен тег має містити не більше %d символів. «%@» занадто довгий." } }
+      }
+    },
+    "inventory.lists.actions" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "List value actions" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Дії зі значенням списку" } }
+      }
+    },
+    "inventory.lists.addCategory" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add Category" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Додати категорію" } }
+      }
+    },
+    "inventory.lists.addLocation" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add Location" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Додати локацію" } }
+      }
+    },
+    "inventory.lists.categories" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Categories" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Категорії" } }
+      }
+    },
+    "inventory.lists.categories.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Manage Categories" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Керування категоріями" } }
+      }
+    },
+    "inventory.lists.defaultBadge" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Default" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Типова" } }
+      }
+    },
+    "inventory.lists.items.empty.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Items that use this value appear here." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Тут відображаються речі, що використовують це значення." } }
+      }
+    },
+    "inventory.lists.items.empty.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No Items" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Немає речей" } }
+      }
+    },
+    "inventory.lists.delete.categoryMessage" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This removes %@ from custom categories." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "«%@» буде видалено з власних категорій." } }
+      }
+    },
+    "inventory.lists.delete.locationMessage" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This removes %@ from reusable locations." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "«%@» буде видалено з багаторазових локацій." } }
+      }
+    },
+    "inventory.lists.delete.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Delete Value?" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Видалити значення?" } }
+      }
+    },
+    "inventory.lists.error.default.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Built-in categories cannot be renamed or deleted." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вбудовані категорії не можна перейменовувати або видаляти." } }
+      }
+    },
+    "inventory.lists.error.default.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Default Category" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Типова категорія" } }
+      }
+    },
+    "inventory.lists.error.delete.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The value could not be deleted. Please try again." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося видалити значення. Спробуйте ще раз." } }
+      }
+    },
+    "inventory.lists.error.delete.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Value Not Deleted" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Значення не видалено" } }
+      }
+    },
+    "inventory.lists.error.delete.validationMessage" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The value could not be checked before deletion. Please try again." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося перевірити значення перед видаленням. Спробуйте ще раз." } }
+      }
+    },
+    "inventory.lists.error.duplicate.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%@ is already in this list." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "«%@» уже є в цьому списку." } }
+      }
+    },
+    "inventory.lists.error.duplicate.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Name Already Exists" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Назва вже існує" } }
+      }
+    },
+    "inventory.lists.error.empty.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Enter a name before saving." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Введіть назву перед збереженням." } }
+      }
+    },
+    "inventory.lists.error.empty.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Name Required" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Потрібна назва" } }
+      }
+    },
+    "inventory.lists.error.save.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "List Not Updated" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Список не оновлено" } }
+      }
+    },
+    "inventory.lists.error.save.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your list changes could not be saved. Please try again." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося зберегти зміни списку. Спробуйте ще раз." } }
+      }
+    },
+    "inventory.lists.error.used.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%@ is used by %@. Rename it or update those items before deleting it." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "«%@» використовується в %@. Перейменуйте значення або оновіть ці речі перед видаленням." } }
+      }
+    },
+    "inventory.lists.error.locationContainsPlaces.message.few" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%@ contains %d storage places. Remove those storage places before deleting this location." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "«%@» містить %d місця зберігання. Видаліть ці місця зберігання перед видаленням локації." } }
+      }
+    },
+    "inventory.lists.error.locationContainsPlaces.message.many" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%@ contains %d storage places. Remove those storage places before deleting this location." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "«%@» містить %d місць зберігання. Видаліть ці місця зберігання перед видаленням локації." } }
+      }
+    },
+    "inventory.lists.error.locationContainsPlaces.message.one" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%@ contains %d storage place. Remove that storage place before deleting this location." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "«%@» містить %d місце зберігання. Видаліть це місце зберігання перед видаленням локації." } }
+      }
+    },
+    "inventory.lists.error.locationContainsPlaces.message.other" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%@ contains %d storage places. Remove those storage places before deleting this location." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "«%@» містить %d місць зберігання. Видаліть ці місця зберігання перед видаленням локації." } }
+      }
+    },
+    "inventory.lists.error.placeDoesNotBelongToLocation.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This storage place does not belong to the selected location." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Це місце зберігання не належить вибраній локації." } }
+      }
+    },
+    "inventory.lists.error.used.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Value Is In Use" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Значення використовується" } }
+      }
+    },
+    "inventory.lists.locations" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Locations" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Локації" } }
+      }
+    },
+    "inventory.places.add" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add Storage Place" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Додати місце зберігання" } }
+      }
+    },
+    "inventory.places.delete.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Delete %@ from reusable Storage Places?" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Видалити «%@» з багаторазових місць зберігання?" } }
+      }
+    },
+    "inventory.places.delete.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Delete Storage Place?" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Видалити місце зберігання?" } }
+      }
+    },
+    "inventory.places.edit" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Edit Storage Place" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Редагувати місце зберігання" } }
+      }
+    },
+    "inventory.places.empty.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add exact shelves, drawers, boxes, or organizers to remember where Items live." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Додайте точні полиці, шухляди, коробки або органайзери, щоб пам’ятати, де зберігаються речі." } }
+      }
+    },
+    "inventory.places.empty.noLocations.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "A Storage Place is an exact shelf, drawer, box, or organizer inside a Location." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Місце зберігання — це точна полиця, шухляда, коробка або органайзер усередині локації." } }
+      }
+    },
+    "inventory.places.empty.noLocations.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add a Location first" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Спочатку додайте локацію" } }
+      }
+    },
+    "inventory.places.empty.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No Storage Places yet" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Місць зберігання ще немає" } }
+      }
+    },
+    "inventory.places.icon.help" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose an icon for this Storage Place." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Виберіть іконку для цього місця зберігання." } }
+      }
+    },
+    "inventory.places.location" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Location" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Локація" } }
+      }
+    },
+    "inventory.places.location.help" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose the parent Location for this Storage Place." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Виберіть батьківську локацію для цього місця зберігання." } }
+      }
+    },
+    "inventory.places.name" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Storage Place name" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Назва місця зберігання" } }
+      }
+    },
+    "inventory.places.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Storage Places" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Місця зберігання" } }
+      }
+    },
+    "inventory.places.viewItems.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "View items in %@ at %@, %@" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Переглянути речі в «%@» у «%@», %@" } }
+      }
+    },
+    "inventory.lists.locations.empty" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No reusable locations yet." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Багаторазових локацій ще немає." } }
+      }
+    },
+    "inventory.lists.locations.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Manage Locations" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Керування локаціями" } }
+      }
+    },
+    "inventory.lists.viewItems" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "View Items" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Переглянути речі" } }
+      }
+    },
+    "inventory.lists.viewItems.category.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "View items in category %@, %@" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Переглянути речі в категорії «%@», %@" } }
+      }
+    },
+    "inventory.lists.viewItems.location.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "View items in %@, %@" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Переглянути речі в «%@», %@" } }
+      }
+    },
+    "inventory.lists.renameCategory" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Rename Category" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Перейменувати категорію" } }
+      }
+    },
+    "inventory.lists.editLocation" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Edit Location" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Редагувати локацію" } }
+      }
+    },
+    "inventory.lists.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Manage Lists" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Керування списками" } }
+      }
+    },
+    "inventory.quantity.inline" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Quantity %d" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Кількість: %d" } }
+      }
+    },
+    "inventory.search.prompt" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Search inventory" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Шукати в інвентарі" } }
+      }
+    },
+    "inventory.tab.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Inventory tab" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вкладка інвентарю" } }
+      }
+    },
+    "inventory.tags.collapse" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Show fewer tags" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Показати менше тегів" } }
+      }
+    },
+    "inventory.tags.showMore.accessibilityLabel.few" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Show %d more tags" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Показати ще %d теги" } }
+      }
+    },
+    "inventory.tags.showMore.accessibilityLabel.many" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Show %d more tags" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Показати ще %d тегів" } }
+      }
+    },
+    "inventory.tags.showMore.accessibilityLabel.one" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Show %d more tag" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Показати ще %d тег" } }
+      }
+    },
+    "inventory.tags.showMore.accessibilityLabel.other" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Show %d more tags" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Показати ще %d тегів" } }
+      }
+    },
+    "inventory.tags.showMore.compact" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "+%d" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "+%d" } }
+      }
+    },
+    "inventory.section.dates" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Dates" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Дати" } }
+      }
+    },
+    "inventory.section.extraContext" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Context" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Контекст" } }
+      }
+    },
+    "inventory.section.item" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Item" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Річ" } }
+      }
+    },
+    "inventory.section.itemKind" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Details" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Деталі" } }
+      }
+    },
+    "inventory.section.notes" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Notes" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Нотатки" } }
+      }
+    },
+    "inventory.section.tags" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Tags" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Теги" } }
+      }
+    },
+    "inventory.section.whereIsIt" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Where is it?" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Де це зберігається?" } }
+      }
+    },
+    "inventory.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Inventory" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Інвентар" } }
+      }
+    },
+    "locations.empty.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add items with a location and exact storage place so this list can show where things live." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Додайте речі з локацією та точним місцем зберігання, щоб бачити, де що лежить." } }
+      }
+    },
+    "locations.empty.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No locations yet" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Локацій поки немає" } }
+      }
+    },
+    "locations.allItems.row.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "All items, %@" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Усі речі, %@" } }
+      }
+    },
+    "locations.allItems.subtitle" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%@ in this location" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "%@ у цій локації" } }
+      }
+    },
+    "locations.allItems.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "All items" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Усі речі" } }
+      }
+    },
+    "locations.detailHero.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Location summary, %@, %@" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Підсумок локації, %1$@, %2$@" } }
+      }
+    },
+    "locations.placeDetailHero.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Storage Place summary, %1$@, %2$@, %3$@" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Підсумок місця зберігання, %1$@, %2$@, %3$@" } }
+      }
+    },
+    "locations.placeDetailHero.parentLocation.accessibilityText" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Location: %@" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Локація: %@" } }
+      }
+    },
+    "locations.placeDetail.itemsSection" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Items" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Речі" } }
+      }
+    },
+    "locations.itemsAccess.allItemsAction.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Show all items in %@" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Показати всі речі в локації %@" } }
+      }
+    },
+    "locations.itemsAccess.allItemsAction.accessibilityHint" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Opens the full item list for this location." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Відкриває повний список речей у цій локації." } }
+      }
+    },
+    "locations.recentItems.itemAction.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Open %@" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Відкрити %@" } }
+      }
+    },
+    "locations.recentItems.itemAction.accessibilityHint" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Opens the item detail screen." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Відкриває екран деталей речі." } }
+      }
+    },
+    "locations.categoryPreview.overflow" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "+%d" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "+%d" } }
+      }
+    },
+    "locations.previewGroup.categories.accessibilityText" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "categories: %@" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "категорії: %@" } }
+      }
+    },
+    "locations.previewGroup.categories.accessibilityTextWithHiddenCount" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "categories: %@, %d more" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "категорії: %@, ще %d" } }
+      }
+    },
+    "locations.previewGroup.categories.label" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Categories" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Категорії" } }
+      }
+    },
+    "locations.previewGroup.places.accessibilityText" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "storage places: %@" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "місця зберігання: %@" } }
+      }
+    },
+    "locations.previewGroup.places.accessibilityTextWithHiddenCount" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "storage places: %@, %d more" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "місця зберігання: %@, ще %d" } }
+      }
+    },
+    "locations.previewGroup.places.label" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Storage Places" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Місця зберігання" } }
+      }
+    },
+    "locations.previewGroup.recentItems.accessibilityText" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "recently viewed items: %@" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "нещодавно переглянуті речі: %@" } }
+      }
+    },
+    "locations.previewGroup.recentItems.accessibilityTextWithHiddenCount" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "recently viewed items: %@, %d more" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "нещодавно переглянуті речі: %@, ще %d" } }
+      }
+    },
+    "locations.previewGroup.recentItems.label" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Recent items" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Нещодавні речі" } }
+      }
+    },
+    "locations.items.empty.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Items moved out of this location will appear in their new storage spot." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Речі, перенесені з цієї локації, з’являться у новому місці зберігання." } }
+      }
+    },
+    "locations.items.empty.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No Items Here" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Тут немає речей" } }
+      }
+    },
+    "locations.placeItems.empty.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Items moved out of this storage place will appear in their new storage place." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Речі, перенесені з цього місця зберігання, з’являться у новому місці зберігання." } }
+      }
+    },
+    "locations.placeItems.empty.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No Items in This Storage Place" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "У цьому місці зберігання немає речей" } }
+      }
+    },
+    "locations.places.empty.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add an item to start organizing this location by storage place." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Додайте річ, щоб почати впорядковувати цю локацію за місцями зберігання." } }
+      }
+    },
+    "locations.places.row.hiddenCategories.few" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%d more categories" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "ще %d категорії" } }
+      }
+    },
+    "locations.places.row.hiddenCategories.many" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%d more categories" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "ще %d категорій" } }
+      }
+    },
+    "locations.places.row.hiddenCategories.one" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%d more category" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "ще %d категорія" } }
+      }
+    },
+    "locations.places.row.hiddenCategories.other" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%d more categories" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "ще %d категорій" } }
+      }
+    },
+    "locations.placeCount.word.few" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "storage places" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "місця зберігання" } }
+      }
+    },
+    "locations.placeCount.word.many" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "storage places" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "місць зберігання" } }
+      }
+    },
+    "locations.placeCount.word.one" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "storage place" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "місце зберігання" } }
+      }
+    },
+    "locations.placeCount.word.other" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "storage places" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "місць зберігання" } }
+      }
+    },
+    "locations.row.accessibilityLabelWithPlaces" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%1$@, %2$@, storage places: %3$@" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "%1$@, %2$@, місця зберігання: %3$@" } }
+      }
+    },
+    "locations.tab.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Locations tab" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вкладка локацій" } }
+      }
+    },
+    "locations.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Locations" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Локації" } }
+      }
+    },
+    "settings.restore.accessibilityHint" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose a complete backup, review its contents, and replace this device’s inventory." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Виберіть повну резервну копію, перевірте її вміст і замініть інвентар на цьому пристрої." } }
+      }
+    },
+    "settings.restore.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Restore Inventory from Backup" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Відновити інвентар із резервної копії" } }
+      }
+    },
+    "settings.restore.error.dismiss" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "OK" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Гаразд" } }
+      }
+    },
+    "settings.restore.error.fileTooLarge.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The selected file exceeds the supported 16 MiB restore size. Your inventory was not changed." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вибраний файл перевищує підтримуваний розмір відновлення 16 МіБ. Інвентар не змінено." } }
+      }
+    },
+    "settings.restore.error.fileTooLarge.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "File Too Large" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Файл завеликий" } }
+      }
+    },
+    "settings.restore.error.integrity.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The backup’s integrity check failed. Choose an unchanged backup file. Your inventory was not changed." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Перевірка цілісності резервної копії не пройдена. Виберіть незмінений файл копії. Інвентар не змінено." } }
+      }
+    },
+    "settings.restore.error.integrity.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Backup Was Changed" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Резервну копію змінено" } }
+      }
+    },
+    "settings.restore.error.lowStorage.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "There is not enough local storage for the safety copy and restored inventory. Free space and try again. Your inventory was not changed." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Недостатньо локального місця для страхової копії та відновленого інвентарю. Звільніть місце й спробуйте ще раз. Інвентар не змінено." } }
+      }
+    },
+    "settings.restore.error.lowStorage.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Not Enough Storage" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Недостатньо місця" } }
+      }
+    },
+    "settings.restore.error.malformed.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The backup is malformed or incomplete. Create a new backup and try again. Your inventory was not changed." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Резервна копія пошкоджена або неповна. Створіть нову копію та спробуйте ще раз. Інвентар не змінено." } }
+      }
+    },
+    "settings.restore.error.malformed.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Invalid Backup" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Недійсна резервна копія" } }
+      }
+    },
+    "settings.restore.error.tooComplex.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The backup exceeds supported record, tag, field, or nesting limits. Your inventory was not changed." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Резервна копія перевищує підтримувані обмеження записів, тегів, полів або вкладеності. Інвентар не змінено." } }
+      }
+    },
+    "settings.restore.error.tooComplex.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Backup Too Complex" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Резервна копія надто складна" } }
+      }
+    },
+    "settings.restore.error.newerVersion.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Update Home Stuff Inventory before restoring this newer backup. Your inventory was not changed." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Оновіть Home Stuff Inventory, перш ніж відновлювати цю новішу копію. Інвентар не змінено." } }
+      }
+    },
+    "settings.restore.error.newerVersion.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Newer App Required" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Потрібна новіша версія застосунку" } }
+      }
+    },
+    "settings.restore.error.recovery.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "A recovery copy could not be prepared, so restore did not start. Free storage and try again. Your inventory was not changed." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося підготувати копію для відновлення, тому заміну не розпочато. Звільніть місце й спробуйте ще раз. Інвентар не змінено." } }
+      }
+    },
+    "settings.restore.error.recovery.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Restore Couldn’t Start" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося почати відновлення" } }
+      }
+    },
+    "settings.restore.error.recoveryRequired.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Automatic recovery could not verify either inventory. Your recovery files were preserved. Restart the app and try again, or contact Support before changing inventory." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Автоматичне відновлення не змогло перевірити жоден інвентар. Файли відновлення збережено. Перезапустіть застосунок і спробуйте ще раз або зверніться до підтримки, перш ніж змінювати інвентар." } }
+      }
+    },
+    "settings.restore.error.recoveryRequired.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Inventory Recovery Required" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Потрібне відновлення інвентарю" } }
+      }
+    },
+    "settings.restore.error.relationships.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The backup contains broken Item, Location, Storage Place, or Category relationships. Your inventory was not changed." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Резервна копія містить пошкоджені зв’язки між речами, локаціями, місцями зберігання або категоріями. Інвентар не змінено." } }
+      }
+    },
+    "settings.restore.error.relationships.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Backup Relationships Are Invalid" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Зв’язки в резервній копії недійсні" } }
+      }
+    },
+    "settings.restore.error.replacement.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The replacement failed and was rolled back. Your original inventory remains unchanged." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося виконати заміну, тому зміни скасовано. Початковий інвентар не змінено." } }
+      }
+    },
+    "settings.restore.error.replacement.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Inventory Was Not Restored" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Інвентар не відновлено" } }
+      }
+    },
+    "settings.restore.error.unreadable.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The selected file could not be read. Check its availability and try again. Your inventory was not changed." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося прочитати вибраний файл. Перевірте його доступність і спробуйте ще раз. Інвентар не змінено." } }
+      }
+    },
+    "settings.restore.error.unreadable.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "File Couldn’t Be Read" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося прочитати файл" } }
+      }
+    },
+    "settings.restore.error.verification.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The restored data could not be verified and the replacement was rolled back. Your original inventory remains unchanged." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося перевірити відновлені дані, тому заміну скасовано. Початковий інвентар не змінено." } }
+      }
+    },
+    "settings.restore.error.verification.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Restore Verification Failed" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося перевірити відновлення" } }
+      }
+    },
+    "settings.restore.error.wrongType.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose a complete Home Stuff Inventory backup, not a readable export. Your inventory was not changed." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Виберіть повну резервну копію Home Stuff Inventory, а не читабельний експорт. Інвентар не змінено." } }
+      }
+    },
+    "settings.restore.error.wrongType.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Not a Complete Backup" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Це не повна резервна копія" } }
+      }
+    },
+    "settings.restore.preflight.appVersion" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "App version" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Версія застосунку" } }
+      }
+    },
+    "settings.restore.preflight.backupDate" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Backup date" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Дата копії" } }
+      }
+    },
+    "settings.restore.preflight.backupDetails" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Backup Details" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Відомості про копію" } }
+      }
+    },
+    "settings.restore.preflight.cancel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cancel" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Скасувати" } }
+      }
+    },
+    "settings.restore.preflight.categories" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Custom Categories" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Власні категорії" } }
+      }
+    },
+    "settings.restore.preflight.compatibility" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Compatibility" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Сумісність" } }
+      }
+    },
+    "settings.restore.preflight.confirm" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Replace This Device’s Inventory" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Замінити інвентар на цьому пристрої" } }
+      }
+    },
+    "settings.restore.preflight.confirm.accessibilityHint" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Permanently replaces the current local dataset with this backup after creating a recovery copy." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Назавжди замінює поточні локальні дані цією копією після створення копії для відновлення." } }
+      }
+    },
+    "settings.restore.preflight.contents" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Exact Contents" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Точний вміст" } }
+      }
+    },
+    "settings.restore.preflight.items" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Items" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Речі" } }
+      }
+    },
+    "settings.restore.preflight.locations" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Locations" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Локації" } }
+      }
+    },
+    "settings.restore.preflight.places" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Storage Places" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Місця зберігання" } }
+      }
+    },
+    "settings.restore.preflight.recentViews" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Recent Item Views" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Недавні перегляди речей" } }
+      }
+    },
+    "settings.restore.preflight.replacementExplanation" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This is a replacement, not a merge. All Items, Locations, Storage Places, Categories, and recent-view history currently on this device will be replaced by the exact backup contents. A recovery copy is created first." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Це заміна, а не об’єднання. Усі речі, локації, місця зберігання, категорії та історію недавніх переглядів на цьому пристрої буде замінено точним вмістом копії. Спочатку буде створено копію для відновлення." } }
+      }
+    },
+    "settings.restore.preflight.replacementHeader" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Replace Local Inventory" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Замінити локальний інвентар" } }
+      }
+    },
+    "settings.restore.preflight.schemaVersion" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Backup format" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Формат копії" } }
+      }
+    },
+    "settings.restore.preflight.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Review Backup" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Перевірка резервної копії" } }
+      }
+    },
+    "settings.restore.preflight.warning.newerApp" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This backup was created by a newer app version. Its supported format is valid, but update the app if restored content looks unfamiliar." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Цю копію створено новішою версією застосунку. Її підтримуваний формат дійсний, але оновіть застосунок, якщо відновлений вміст виглядає незнайомо." } }
+      }
+    },
+    "settings.restore.progress" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Restoring inventory…" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Відновлення інвентарю…" } }
+      }
+    },
+    "settings.restore.success.dismiss" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Done" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Готово" } }
+      }
+    },
+    "settings.restore.success.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This device now contains the verified backup inventory." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Тепер цей пристрій містить перевірений інвентар із резервної копії." } }
+      }
+    },
+    "settings.restore.success.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Inventory Restored" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Інвентар відновлено" } }
+      }
+    },
+    "settings.restore.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Restore from Backup" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Відновити з резервної копії" } }
+      }
+    },
+    "settings.backup.accessibilityHint" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Creates a complete local backup and opens the system document save screen." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Створює повну локальну резервну копію та відкриває системний екран збереження документа." } }
+      }
+    },
+    "settings.backup.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Back Up Inventory" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Створити резервну копію інвентарю" } }
+      }
+    },
+    "settings.backup.error.destination.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The selected destination couldn’t save the backup. Your inventory was not changed." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося зберегти резервну копію у вибраному місці. Інвентар не змінено." } }
+      }
+    },
+    "settings.backup.error.destination.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Backup Couldn’t Be Saved" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося зберегти резервну копію" } }
+      }
+    },
+    "settings.backup.error.dismiss" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "OK" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Гаразд" } }
+      }
+    },
+    "settings.backup.error.encoding.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Inventory data couldn’t be encoded. Your inventory was not changed." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося закодувати дані інвентарю. Інвентар не змінено." } }
+      }
+    },
+    "settings.backup.error.encoding.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Backup Couldn’t Be Created" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося створити резервну копію" } }
+      }
+    },
+    "settings.backup.error.lowStorage.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Free up space or choose another destination, then try again. No backup file was saved." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Звільніть місце або виберіть інше місце збереження та спробуйте ще раз. Файл резервної копії не збережено." } }
+      }
+    },
+    "settings.backup.error.lowStorage.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Not Enough Storage" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Недостатньо місця" } }
+      }
+    },
+    "settings.backup.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Back Up Inventory" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Створити резервну копію" } }
+      }
+    },
+    "settings.export.accessibilityHint" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Creates an offline JSON copy and opens the system share sheet." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Створює офлайн-копію JSON і відкриває системне меню поширення." } }
+      }
+    },
+    "settings.export.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Export Inventory" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Експортувати інвентар" } }
+      }
+    },
+    "settings.export.failure.generation.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The inventory copy could not be prepared. Your inventory was not changed. Try again." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося підготувати копію інвентарю. Ваш інвентар не змінено. Спробуйте ще раз." } }
+      }
+    },
+    "settings.portability.failure.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The backup/export could not be created because this inventory cannot be represented within the supported portability limits. Your inventory was not changed." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося створити резервну копію або експорт, бо цей інвентар не можна подати в межах підтримуваних обмежень переносимості. Інвентар не змінено." } }
+      }
+    },
+    "settings.portability.failure.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Backup/Export Not Created" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Резервну копію або експорт не створено" } }
+      }
+    },
+    "settings.export.failure.generation.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Export Not Created" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Експорт не створено" } }
+      }
+    },
+    "settings.export.failure.retry" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Try Again" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Спробувати ще раз" } }
+      }
+    },
+    "settings.export.failure.storage.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Free some storage on this device, then try the export again. Your inventory was not changed." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Звільніть місце на цьому пристрої та повторіть експорт. Ваш інвентар не змінено." } }
+      }
+    },
+    "settings.export.failure.storage.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Not Enough Storage" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Недостатньо місця" } }
+      }
+    },
+    "settings.export.failure.write.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The export file could not be written or verified. Your inventory was not changed. Try again." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося записати або перевірити файл експорту. Ваш інвентар не змінено. Спробуйте ще раз." } }
+      }
+    },
+    "settings.export.failure.write.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Export File Not Saved" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Файл експорту не збережено" } }
+      }
+    },
+    "settings.export.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Export Inventory" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Експортувати інвентар" } }
+      }
+    },
+    "settings.fileDisclosure.backup.continue" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Continue to Backup" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Продовжити створення копії" } }
+      }
+    },
+    "settings.fileDisclosure.backup.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The backup contains your complete local inventory, including item details, locations, storage places, notes, tags, dates, and recent item-view history. Home Stuff does not encrypt or password-protect the backup file. After you save it, its protection depends on the destination you choose." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Резервна копія містить увесь локальний інвентар, зокрема дані речей, локації, місця зберігання, нотатки, теги, дати та історію нещодавніх переглядів. Home Stuff не шифрує й не захищає паролем файл резервної копії. Після збереження його захист залежить від вибраного місця призначення." } }
+      }
+    },
+    "settings.fileDisclosure.cancel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cancel" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Скасувати" } }
+      }
+    },
+    "settings.fileDisclosure.export.continue" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Continue to Export" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Продовжити експорт" } }
+      }
+    },
+    "settings.fileDisclosure.export.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The export may include item names, locations, storage places, categories, quantities, conditions, tags, notes, and dates. Home Stuff does not encrypt or password-protect the exported JSON file. After you save or share it, its protection depends on the destination you choose." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Експорт може містити назви речей, локації, місця зберігання, категорії, кількість, стан, теги, нотатки та дати. Home Stuff не шифрує й не захищає паролем експортований JSON-файл. Після збереження або надсилання його захист залежить від вибраного місця призначення." } }
+      }
+    },
+    "settings.fileDisclosure.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This file is not password-protected" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Цей файл не захищено паролем" } }
+      }
+    },
+    "settings.introduction.body" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Locations and Storage Places help you remember where every item lives." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Локації та місця зберігання допомагають памʼятати, де зберігається кожна річ." } }
+      }
+    },
+    "settings.introduction.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Organize your inventory" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Упорядкуйте свої речі" } }
+      }
+    },
+    "settings.lists.categories" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Categories" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Категорії" } }
+      }
+    },
+    "settings.lists.categories.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Manage Categories" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Керувати категоріями" } }
+      }
+    },
+    "settings.lists.locations" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Locations" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Локації" } }
+      }
+    },
+    "settings.lists.places" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Storage Places" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Місця зберігання" } }
+      }
+    },
+    "settings.lists.places.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Manage Storage Places" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Керувати місцями зберігання" } }
+      }
+    },
+    "settings.lists.locations.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Manage Locations" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Керувати локаціями" } }
+      }
+    },
+    "settings.section.lists" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Lists" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Списки" } }
+      }
+    },
+    "settings.section.data" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Data" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Дані" } }
+      }
+    },
+    "settings.tab.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Settings tab" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вкладка налаштувань" } }
+      }
+    },
+    "inventory.placeIcon.archive" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Archive box" } }, "uk" : { "stringUnit" : { "state" : "translated", "value" : "Архівна коробка" } } } },
+    "inventory.placeIcon.basket" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Basket" } }, "uk" : { "stringUnit" : { "state" : "translated", "value" : "Кошик" } } } },
+    "inventory.placeIcon.box" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Box" } }, "uk" : { "stringUnit" : { "state" : "translated", "value" : "Коробка" } } } },
+    "inventory.placeIcon.cabinet" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Cabinet" } }, "uk" : { "stringUnit" : { "state" : "translated", "value" : "Шафа" } } } },
+    "inventory.placeIcon.drawer" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Drawer" } }, "uk" : { "stringUnit" : { "state" : "translated", "value" : "Шухляда" } } } },
+    "inventory.placeIcon.folder" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Folder" } }, "uk" : { "stringUnit" : { "state" : "translated", "value" : "Тека" } } } },
+    "inventory.placeIcon.hanger" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Hanger" } }, "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вішак" } } } },
+    "inventory.placeIcon.shelf" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Shelf" } }, "uk" : { "stringUnit" : { "state" : "translated", "value" : "Полиця" } } } },
+    "inventory.placeIcon.tray" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Tray" } }, "uk" : { "stringUnit" : { "state" : "translated", "value" : "Лоток" } } } },
+    "settings.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Settings" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Налаштування" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

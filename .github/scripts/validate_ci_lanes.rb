@@ -139,7 +139,7 @@ fail_contract("Full Test Validation must cover pull requests") unless full_test_
 full_test_text = strings(full_test_workflow).join("\n")
 [
   "build-for-testing", "test-without-building", "DerivedData/FullTestValidation",
-  "HSI Full Tests A", "HSI Full Tests B", "simctl create", "simctl bootstatus",
+  ".github/scripts/create_full_test_simulators.sh",
   "run-ui-shards",
   "Delete isolated full-test simulators", "simctl shutdown", "simctl delete"
 ].each { |text| fail_contract("#{full_test_path} is missing required full-test architecture: #{text}") unless full_test_text.include?(text) }
@@ -153,7 +153,13 @@ fail_contract("Full Test Validation unit stage must not rebuild") unless unit_st
 unit_result_step = step!(full_test_steps, "Reject empty successful unit results")["run"].to_s
 fail_contract("Full Test Validation must reject empty successful unit results") unless unit_result_step.include?("validate-unit-result")
 simulator_step = step!(full_test_steps, "Create isolated full-test simulators")["run"].to_s
-fail_contract("Full Test Validation must create two distinct iPhone 17 simulators") unless simulator_step.scan("simctl create").length == 2 && simulator_step.include?("simulator_a") && simulator_step.include?("simulator_b")
+fail_contract("Full Test Validation simulator setup must use the bounded process helper") unless simulator_step.include?("ruby .github/scripts/bounded_process.rb run")
+fail_contract("Full Test Validation simulator setup must use a local 600-second deadline") unless simulator_step.include?("--timeout-seconds 600")
+fail_contract("Full Test Validation simulator setup must preserve a log and summary") unless simulator_step.include?("TestResults/SimulatorSetup.log") && simulator_step.include?("TestResults/simulator-setup-summary.json")
+simulator_helper = File.read(".github/scripts/create_full_test_simulators.sh")
+fail_contract("Full Test Validation must create two distinct iPhone 17 simulators") unless simulator_helper.scan("simctl create").length == 2 && simulator_helper.include?("HSI Full Tests A") && simulator_helper.include?("HSI Full Tests B") && simulator_helper.include?("simulator_a") && simulator_helper.include?("simulator_b")
+fail_contract("Full Test Validation must boot and await both simulators") unless simulator_helper.scan("simctl boot \"").length == 2 && simulator_helper.scan("simctl bootstatus").length == 2
+fail_contract("Full Test Validation simulator helper must clean incomplete setup") unless simulator_helper.include?("cleanup_incomplete_setup") && simulator_helper.include?("simctl shutdown") && simulator_helper.include?("simctl delete")
 shard_step = step!(full_test_steps, "Run concurrent UI shards without rebuilding")["run"].to_s
 fail_contract("Full Test Validation must run both UI shards from one shared test run") unless shard_step.include?("run-ui-shards") && shard_step.scan("platform=iOS Simulator,id=").length == 2
 configured_shard_timeout = full_test_job.fetch("env", {}).fetch("UI_SHARD_TIMEOUT_SECONDS", nil) || full_test_workflow.fetch("env", {}).fetch("UI_SHARD_TIMEOUT_SECONDS", nil)
@@ -161,7 +167,7 @@ fail_contract("Full Test Validation must reserve time for diagnostics after inde
 cleanup_step = step!(full_test_steps, "Delete isolated full-test simulators")
 fail_contract("Full Test Validation simulator cleanup must always run") unless cleanup_step["if"] == "always()"
 fail_contract("Full Test Validation cleanup must delete both simulators") unless cleanup_step["run"].to_s.include?("udid_a") && cleanup_step["run"].to_s.include?("udid_b")
-%w[Upload\ failed\ unit\ diagnostics Upload\ failed\ UI\ shard\ A\ diagnostics Upload\ failed\ UI\ shard\ B\ diagnostics].each do |name|
+%w[Upload\ failed\ unit\ diagnostics Upload\ failed\ simulator\ setup\ diagnostics Upload\ failed\ UI\ shard\ A\ diagnostics Upload\ failed\ UI\ shard\ B\ diagnostics].each do |name|
   fail_contract("missing full-test failure diagnostics step #{name}") unless full_test_steps.any? { |step| step["name"] == name }
 end
 manifest_script = ".github/scripts/full_test_validation.rb"

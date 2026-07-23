@@ -17,6 +17,7 @@ module PublicAutomationContract
   PUBLIC_NON_RUBY_HELPERS = %w[
     .github/scripts/capture_release_app_store_screenshots.sh
     .github/scripts/configure_hosted_xcode.sh
+    .github/scripts/create_full_test_simulators.sh
     scripts/ci/check-code-coverage.py
   ].freeze
 

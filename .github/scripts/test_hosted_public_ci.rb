@@ -126,6 +126,11 @@ class HostedPublicCITest < Minitest::Test
     assert_includes validation, "--timeout-seconds 900"
     assert_includes validation, "TestResults/ui-smoke-summary.json"
     assert_includes validation, "com.apple.CoreSimulator.SimRuntime.iOS-26-5"
+
+    full_test = File.read(".github/workflows/full-tests.yml")
+    assert_includes full_test, "ruby .github/scripts/bounded_process.rb run"
+    assert_includes full_test, "--timeout-seconds 600"
+    assert_includes full_test, "TestResults/simulator-setup-summary.json"
   end
 
   def test_public_artifacts_are_short_lived_and_not_named_from_free_form_input

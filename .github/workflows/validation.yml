@@ -223,22 +223,18 @@ jobs:
       - name: Verify exact validation source
         run: test "$(git rev-parse HEAD)" = "${{ github.sha }}"
 
-      - name: Select hosted Ruby 4.0.5
-        run: |
-          set -euo pipefail
-          ruby_bin="$RUNNER_TOOL_CACHE/Ruby/4.0.5/x64/bin"
-          if [[ ! -x "$ruby_bin/ruby" ]]; then
-            echo "Required hosted Ruby is unavailable: $ruby_bin/ruby"
-            exit 1
-          fi
-          echo "$ruby_bin" >> "$GITHUB_PATH"
+      - name: Set up locked Ruby
+        uses: ruby/setup-ruby@a30dfa457ad68707b8b910ac3a244714b61c0626 # v1.320.0
+        with:
+          ruby-version: "4.0.5"
+          bundler: "2.7.2"
+          bundler-cache: false
 
       - name: Verify production Ruby and Bundler
         run: |
           set -euo pipefail
           ruby -e 'abort "Expected production Ruby 4.0.5, found #{RUBY_VERSION}." unless RUBY_VERSION == "4.0.5"'
-          gem install bundler --version 2.7.2 --no-document
-          bundle _2.7.2_ --version
+          test "$(bundle _2.7.2_ --version)" = "Bundler version 2.7.2"
 
       - name: Install locked Fastlane bundle
         run: |

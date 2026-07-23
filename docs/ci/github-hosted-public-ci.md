@@ -19,10 +19,10 @@ required first-launch setup, and fails instead of changing runner class when the
 image no longer provides this contract. Update the runner image contract through review;
 never add a self-hosted fallback.
 
-The locked Fastlane smoke job activates Ruby 4.0.5 from the runner tool cache explicitly;
-the image's default `ruby` executable is not part of the contract. Simulator creation
-uses the exact `com.apple.CoreSimulator.SimRuntime.iOS-26-5` identifier rather than a
-display name.
+The locked Fastlane smoke job provisions Ruby 4.0.5 and Bundler 2.7.2 through the
+full-SHA-pinned `ruby/setup-ruby` action. It does not depend on the image's default Ruby
+or an assumed runner tool-cache path. Simulator creation uses the exact
+`com.apple.CoreSimulator.SimRuntime.iOS-26-5` identifier rather than a display name.
 
 The source references for this reviewed contract are GitHub's
 [hosted-runner labels](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)

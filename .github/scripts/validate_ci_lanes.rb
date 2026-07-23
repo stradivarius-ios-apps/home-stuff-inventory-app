@@ -203,10 +203,14 @@ fail_contract("Validation must run the Fastlane smoke test on the hosted runner"
   fail_contract("Validation #{job_name} must not exclude pull requests") if condition.include?("github.event_name != 'pull_request'")
 end
 fastlane_steps = Array(fastlane_smoke["steps"])
-select_ruby = step!(fastlane_steps, "Select hosted Ruby 4.0.5")["run"].to_s
-fail_contract("Fastlane smoke test must activate cached Ruby 4.0.5") unless select_ruby.include?('$RUNNER_TOOL_CACHE/Ruby/4.0.5/x64/bin')
+setup_ruby = step!(fastlane_steps, "Set up locked Ruby")
+fail_contract("Fastlane smoke test must pin reviewed ruby/setup-ruby") unless setup_ruby["uses"] == "ruby/setup-ruby@a30dfa457ad68707b8b910ac3a244714b61c0626"
+fail_contract("Fastlane smoke test must provision Ruby 4.0.5") unless setup_ruby.dig("with", "ruby-version").to_s == "4.0.5"
+fail_contract("Fastlane smoke test must provision Bundler 2.7.2") unless setup_ruby.dig("with", "bundler").to_s == "2.7.2"
+fail_contract("Fastlane smoke test must not use an implicit gem cache") unless setup_ruby.dig("with", "bundler-cache") == false
 verify_ruby = step!(fastlane_steps, "Verify production Ruby and Bundler")["run"].to_s
 fail_contract("Fastlane smoke test must require Ruby 4.0.5") unless verify_ruby.include?("RUBY_VERSION == \"4.0.5\"")
+fail_contract("Fastlane smoke test must require Bundler 2.7.2") unless verify_ruby.include?("Bundler version 2.7.2")
 install_bundle = step!(fastlane_steps, "Install locked Fastlane bundle")["run"].to_s
 fail_contract("Fastlane smoke test must install the locked bundle with Bundler 2.7.2") unless install_bundle.include?("bundle _2.7.2_ install")
 load_actions = step!(fastlane_steps, "Load locked Fastlane default actions")["run"].to_s

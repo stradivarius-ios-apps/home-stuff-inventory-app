@@ -132,7 +132,8 @@ full_test_path = ".github/workflows/full-tests.yml"
 full_test_workflow = YAML.load_file(full_test_path)
 full_test_job = full_test_workflow.dig("jobs", "full-test-suite")
 fail_contract("missing full-test-suite job") unless full_test_job.is_a?(Hash)
-fail_contract("Full Test Validation must use the supported GitHub-hosted runner") unless full_test_job["runs-on"] == expected_runner
+full_test_runner = "macos-26"
+fail_contract("Full Test Validation must use the supported Apple Silicon GitHub-hosted runner") unless full_test_job["runs-on"] == full_test_runner
 full_test_events = workflow_on(full_test_workflow)
 fail_contract("Full Test Validation must cover pull requests") unless full_test_events.key?("pull_request")
 full_test_text = strings(full_test_workflow).join("\n")

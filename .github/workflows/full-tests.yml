@@ -45,7 +45,7 @@ env:
 jobs:
   full-test-suite:
     name: Full Test Suite
-    runs-on: macos-26-intel
+    runs-on: macos-26
     timeout-minutes: 90
     outputs:
       validated_commit: ${{ steps.source.outputs.sha }}

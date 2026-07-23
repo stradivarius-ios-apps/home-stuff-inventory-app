@@ -6,6 +6,7 @@ require "yaml"
 
 class HostedPublicCITest < Minitest::Test
   HOSTED_RUNNER = "macos-26-intel"
+  FULL_TEST_RUNNER = "macos-26"
   ORDINARY_JOBS = {
     ".github/workflows/validation.yml" => {
       "classify-changes" => ["Classify changed files", "ubuntu-latest"],
@@ -15,7 +16,7 @@ class HostedPublicCITest < Minitest::Test
       "code-coverage" => ["Code coverage", HOSTED_RUNNER]
     },
     ".github/workflows/full-tests.yml" => {
-      "full-test-suite" => ["Full Test Suite", HOSTED_RUNNER]
+      "full-test-suite" => ["Full Test Suite", FULL_TEST_RUNNER]
     },
     ".github/workflows/pr-ui-screenshots.yml" => {
       "pr-ui-screenshots" => ["Capture PR UI screenshots", HOSTED_RUNNER]

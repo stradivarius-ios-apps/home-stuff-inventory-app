@@ -4,7 +4,10 @@ Status: Canonical contract for ordinary CI in the public product repository.
 
 ## Hosted environment
 
-All ordinary macOS jobs use the standard `macos-26-intel` GitHub-hosted runner. The
+Ordinary macOS jobs use reviewed standard GitHub-hosted runners. Validation,
+coverage, Fastlane smoke tests, and screenshots use `macos-26-intel`; the complete
+Full Test Validation lane uses the Apple Silicon `macos-26` runner to keep its two
+concurrent XCUITest shards within their independent hosted deadlines. The
 workflow selects `/Applications/Xcode_26.6.app/Contents/Developer` with
 `sudo xcode-select --switch` and then verifies both `xcodebuild -version` and
 `xcode-select -p`. The reviewed toolchain contract is:

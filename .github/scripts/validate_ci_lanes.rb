@@ -194,6 +194,16 @@ fail_contract("Validation must not enumerate individual release validators") if 
 fail_contract("Validation UI smoke must cover the free release gate Item creation flow") unless validation.include?("InventorySmokeUITests/testFreeReleaseGateLaunchCreateSearchAndReadWithoutEntitlement")
 fail_contract("Validation must not select the superseded standalone Item-creation smoke test") if validation.include?("testAddingItemFromMainInventoryScreen")
 validation_workflow = YAML.load_file(".github/workflows/validation.yml")
+validation_build_steps = Array(validation_workflow.dig("jobs", "build-test", "steps"))
+ui_smoke = step!(validation_build_steps, "Run UI smoke baseline")
+fail_contract("Validation UI smoke must use the bounded process helper") unless ui_smoke["run"].to_s.include?("ruby .github/scripts/bounded_process.rb run")
+fail_contract("Validation UI smoke must use a local 900-second deadline") unless ui_smoke["run"].to_s.include?("--timeout-seconds 900")
+fail_contract("Validation UI smoke must preserve failure for diagnostics") unless ui_smoke["continue-on-error"] == true
+ui_smoke_upload = step!(validation_build_steps, "Upload result bundles on failure")
+fail_contract("Validation UI smoke diagnostics must include its log") unless ui_smoke_upload.dig("with", "path").to_s.include?("TestResults/UITests.log")
+fail_contract("Validation UI smoke diagnostics must include its summary") unless ui_smoke_upload.dig("with", "path").to_s.include?("TestResults/ui-smoke-summary.json")
+ui_smoke_fail = step!(validation_build_steps, "Fail when UI smoke failed")
+fail_contract("Validation UI smoke failure must propagate") unless ui_smoke_fail["if"].to_s.include?("steps.ui-smoke.outcome == 'failure'")
 fastlane_smoke = validation_workflow.dig("jobs", "fastlane-smoke-test")
 fail_contract("Validation must run the Fastlane smoke test on the hosted runner") unless fastlane_smoke&.fetch("runs-on", nil) == expected_runner
 %w[fastlane-smoke-test build-test code-coverage].each do |job_name|

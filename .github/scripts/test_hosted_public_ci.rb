@@ -121,6 +121,9 @@ class HostedPublicCITest < Minitest::Test
     assert_includes validation, 'ruby-version: "4.0.5"'
     assert_includes validation, 'bundler: "2.7.2"'
     refute_includes validation, "$RUNNER_TOOL_CACHE/Ruby/"
+    assert_includes validation, "ruby .github/scripts/bounded_process.rb run"
+    assert_includes validation, "--timeout-seconds 900"
+    assert_includes validation, "TestResults/ui-smoke-summary.json"
     assert_includes validation, "com.apple.CoreSimulator.SimRuntime.iOS-26-5"
   end
 

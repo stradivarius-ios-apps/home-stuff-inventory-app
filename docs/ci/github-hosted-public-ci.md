@@ -41,7 +41,8 @@ Validation remains path-aware:
 - CI-relevant changes run workflow/release-contract checks, the hosted app baseline,
   and the locked Ruby 4.0.5, Bundler 2.7.2, and Fastlane 2.237.0 smoke check;
 - app-relevant changes run the Debug build, complete `HomeStuffInventoryAppTests`
-  target, PR UI smoke baseline, and 90% owned-code coverage gate;
+  target, a 15-minute process-group-bounded PR UI smoke baseline with failure
+  diagnostics, and the 90% owned-code coverage gate;
 - Full Test Validation builds once, runs the complete unit/localization target, and
   launches both ordinary UI shards concurrently on distinct ephemeral simulators;
 - PR UI Screenshots captures synthetic repository-owned EN/UK light/dark fixtures.

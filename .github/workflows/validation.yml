@@ -307,24 +307,48 @@ jobs:
             -resultBundlePath TestResults/UnitTests.xcresult
 
       - name: Run UI smoke baseline
+        id: ui-smoke
+        continue-on-error: true
         run: |
           rm -rf TestResults/UITests.xcresult
-          xcodebuild test \
-            -project "$PROJECT" \
-            -scheme "$SCHEME" \
-            -destination "$DESTINATION" \
-            -configuration "$CONFIGURATION" \
-            -only-testing:HomeStuffInventoryAppUITests/InventorySmokeUITests/testFreeReleaseGateLaunchCreateSearchAndReadWithoutEntitlement \
-            -resultBundlePath TestResults/UITests.xcresult
+          ruby .github/scripts/bounded_process.rb run \
+            --timeout-seconds 900 \
+            --grace-seconds 10 \
+            --progress-seconds 60 \
+            --log TestResults/UITests.log \
+            --summary TestResults/ui-smoke-summary.json \
+            -- \
+            xcodebuild test \
+              -project "$PROJECT" \
+              -scheme "$SCHEME" \
+              -destination "$DESTINATION" \
+              -configuration "$CONFIGURATION" \
+              -only-testing:HomeStuffInventoryAppUITests/InventorySmokeUITests/testFreeReleaseGateLaunchCreateSearchAndReadWithoutEntitlement \
+              -resultBundlePath TestResults/UITests.xcresult
+
+      - name: Print UI smoke diagnostics
+        if: steps.ui-smoke.outcome == 'failure'
+        run: |
+          echo "::group::UI smoke log"
+          rg -n -i -C 20 "assertion failure|xctassert|test case.*failed|\*\* test execute failed \*\*" TestResults/UITests.log || true
+          tail -n 250 TestResults/UITests.log || true
+          echo "::endgroup::"
 
       - name: Upload result bundles on failure
-        if: failure()
+        if: failure() || steps.ui-smoke.outcome == 'failure'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: xcode-result-bundles
-          path: TestResults/*.xcresult
+          path: |
+            TestResults/*.xcresult
+            TestResults/UITests.log
+            TestResults/ui-smoke-summary.json
           if-no-files-found: ignore
           retention-days: 3
+
+      - name: Fail when UI smoke failed
+        if: steps.ui-smoke.outcome == 'failure'
+        run: exit 1
 
       - name: Delete isolated simulator
         if: always()

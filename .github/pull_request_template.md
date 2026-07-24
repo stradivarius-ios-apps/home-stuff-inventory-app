@@ -7,6 +7,18 @@ product source.
 
 List the GitHub-hosted or local checks run for this exact change.
 
+## Public change provenance
+
+- [ ] The branch name uses either a real public issue/task ID or a sanitized no-ID
+      `feature/<description>` / `hotfix/<description>` form.
+- [ ] The branch, commits, and pull request describe only this concrete public change
+      and its validation; they contain no non-public planning identifiers, links,
+      codenames, acceptance criteria, roadmap, monetization, timing, or operational
+      details.
+- [ ] Any `Closes #...` or `Fixes #...` reference points to a real, intentionally
+      public issue in this repository. No public issue was invented merely to satisfy
+      a naming or linking convention.
+
 ## Security and release boundary
 
 - [ ] This change contains no credentials, private keys, tokens, real household

@@ -3,16 +3,19 @@
 ## Git And PR Hygiene
 
 - Start each task from updated `main`: run `git pull --ff-only`, then create a separate feature or hotfix branch.
-- Branch names must start with `feature/` or `hotfix/`, followed by the task identifier, an underscore, and a short kebab-case description.
-- Use the explicit task id from the task title when one exists, for example `feature/UIS-05_standardize-empty-state-screen-wrappers`.
-- Use `TASK-<number>` only when the work has a real task or issue number but no explicit task id, for example `hotfix/TASK-150_fix-empty-search-state`.
-- Use `ad_hoc` only for work with no task, issue, or ticket number, for example `feature/ad_hoc_document-localization-churn-rule`.
+- Branch names must start with `feature/` or `hotfix/`.
+- When a real, intentionally public issue owns the change, include its explicit public task ID followed by an underscore and a short kebab-case description, for example `feature/UIS-05_standardize-empty-state-screen-wrappers`.
+- Use `TASK-<number>` only for a real public issue number that has no explicit task ID, for example `hotfix/TASK-150_fix-empty-search-state`.
+- When work has no explicitly authorized public issue, use the sanitized no-ID form `feature/<short-kebab-description>` or `hotfix/<short-kebab-description>`. Describe only the concrete published change; do not include a non-public identifier, codename, roadmap phase, monetization label, or release date.
+- Do not invent a `TASK-<number>` or `ad_hoc` identifier as a proxy for non-public maintainer planning. Do not open or invent a public issue merely to satisfy branch, commit, or pull-request conventions.
+- Public branches, commits, pull requests, code comments, documentation, checks, and releases may contain only the concrete published change, public-safe rationale, and validation. Do not publish non-public planning identifiers, URLs, titles, codenames, acceptance criteria, roadmap sequencing, monetization plans, release timing, deferred scope, or operational details.
+- Public commits and pull requests must be self-contained and understandable without access to non-public systems. Do not describe hidden provenance or add backlinks to non-public planning. Maintainers may record the public pull request, commit SHA, checks, and merge result in a non-public system; traceability never points back from public artifacts.
 - Do not use `codex`, `Codex`, assistant names, author lines, generated-by comments, or similar attribution in branch names, PR titles, source files, or documentation.
 - Keep commits narrowly scoped. Exclude unrelated local changes, generated user data, and Xcode metadata churn.
 - Before committing, inspect `git status --short` and the diff for `HomeStuffInventoryApp/Resources/Localizable.xcstrings`.
 - Commit `HomeStuffInventoryApp/Resources/Localizable.xcstrings` only for intentional changes to user-facing strings, localization keys, or localization call sites. Keep English and Ukrainian values together and run localization tests.
 - For tasks that do not intentionally change localization, restore working-tree changes in `HomeStuffInventoryApp/Resources/Localizable.xcstrings` to `HEAD` immediately. Do not stash, defer, or commit unrelated localization catalog churn.
-- Keep PR titles focused on the user-facing or engineering change. When a PR fully satisfies an issue, include `Closes #<issue-number>` in the PR body.
+- Keep PR titles focused on the user-facing or engineering change. Use `Closes #<issue-number>` or `Fixes #<issue-number>` only when that number is a real, intentionally public issue in this repository; otherwise omit issue-closing syntax.
 - Treat the final step of completed code or content work as committing the focused branch, pushing it to GitHub, and creating or updating the related PR via the GitHub plugin or connector.
 - Use the GitHub connector for creating or updating PR bodies with multi-line Markdown. Do not pass structured PR summaries through shell-escaped `gh pr create` or `gh pr edit` bodies, because quoting can break headings, bullets, or code spans.
 - If `gh` fails inside the filesystem sandbox, retry the same GitHub CLI check or operation with sandbox escalation before treating GitHub authentication or connectivity as a blocker. `gh` may work outside the sandbox even when its sandboxed invocation fails.

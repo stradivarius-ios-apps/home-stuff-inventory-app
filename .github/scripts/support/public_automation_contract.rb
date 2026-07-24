@@ -27,6 +27,7 @@ module PublicAutomationContract
     test_pr_ui_screenshots.rb
     test_prepare_release_version.rb
     test_public_automation_check_closure.rb
+    test_public_change_provenance.rb
     test_public_governance.rb
     test_public_release_contracts.rb
     test_public_security_gates.rb

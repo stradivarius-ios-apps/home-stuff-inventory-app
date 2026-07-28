@@ -156,7 +156,7 @@ unit_result_step = step!(full_test_steps, "Reject empty successful unit results"
 fail_contract("Full Test Validation must reject empty successful unit results") unless unit_result_step.include?("validate-unit-result")
 simulator_step = step!(full_test_steps, "Create isolated full-test simulators")["run"].to_s
 fail_contract("Full Test Validation must create two distinct iPhone 17 simulators") unless simulator_step.scan("simctl create").length == 2 && simulator_step.include?("simulator_a") && simulator_step.include?("simulator_b")
-shard_step = step!(full_test_steps, "Run concurrent UI shards without rebuilding")["run"].to_s
+shard_step = step!(full_test_steps, "Run sequential UI shards without rebuilding")["run"].to_s
 fail_contract("Full Test Validation must run both UI shards from one shared test run") unless shard_step.include?("run-ui-shards") && shard_step.scan("platform=iOS Simulator,id=").length == 2
 configured_shard_timeout = full_test_job.fetch("env", {}).fetch("UI_SHARD_TIMEOUT_SECONDS", nil) || full_test_workflow.fetch("env", {}).fetch("UI_SHARD_TIMEOUT_SECONDS", nil)
 fail_contract("Full Test Validation must reserve time for diagnostics after independently bounded UI shards") unless configured_shard_timeout.is_a?(Integer) && configured_shard_timeout.between?(1, 1800)
@@ -173,6 +173,7 @@ fail_contract("UI shards must disable nested Xcode parallel testing") unless man
 fail_contract("UI shards need separate result bundles and logs") unless manifest_source.include?('UIShard#{name}.xcresult') && manifest_source.include?('UIShard#{name}.log')
 fail_contract("UI shards must reject missing identifiers") unless manifest_source.include?("missing_test_identifiers")
 fail_contract("UI shards must run in independently terminable process groups") unless manifest_source.include?("pgroup: true") && manifest_source.include?("terminate_process_group")
+fail_contract("UI shards must avoid concurrent hosted XCTest automation sessions") unless manifest_source.include?("SHARDS.each_key do |name|")
 fail_contract("UI shard timeout must fail closed") unless manifest_source.include?('status: "timeout"') && manifest_source.include?('result.fetch("status") != "success"')
 manifest_output, manifest_status = Open3.capture2e("ruby", manifest_script, "validate-manifest")
 fail_contract("UI shard manifest validator failed: #{manifest_output}") unless manifest_status.success?

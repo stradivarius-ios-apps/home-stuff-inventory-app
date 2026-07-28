@@ -28,6 +28,9 @@ DEFAULT_PROCESS_TERMINATION_GRACE_SECONDS = 10
 DEFAULT_PROGRESS_INTERVAL_SECONDS = 60
 PROCESS_POLL_INTERVAL_SECONDS = 0.1
 
+$stdout.sync = true
+$stderr.sync = true
+
 def abort_with(message)
   warn "Full Test Validation failed: #{message}"
   exit 1
@@ -250,57 +253,56 @@ def run_ui_shards
   end
   orchestration_completed = false
   begin
-    abort_with("received SIG#{interrupted_signal} before UI shard startup") if interrupted_signal
-    running["A"] = run_shard("A", test_run, destination_a, result_directory, timeout_seconds)
-    abort_with("received SIG#{interrupted_signal} during UI shard startup") if interrupted_signal
-    running["B"] = run_shard("B", test_run, destination_b, result_directory, timeout_seconds)
-    running.each { |name, shard| puts "Started UI shard #{name} as process group #{shard.fetch("pid")} with a #{timeout_seconds.to_i}-second timeout." }
-    next_progress_at = Process.clock_gettime(Process::CLOCK_MONOTONIC) + progress_seconds
+    destinations = { "A" => destination_a, "B" => destination_b }
+    SHARDS.each_key do |name|
+      abort_with("received SIG#{interrupted_signal} before UI shard #{name} startup") if interrupted_signal
+      running[name] = run_shard(name, test_run, destinations.fetch(name), result_directory, timeout_seconds)
+      shard = running.fetch(name)
+      puts "Started UI shard #{name} as process group #{shard.fetch("pid")} with a #{timeout_seconds.to_i}-second timeout."
+      next_progress_at = Process.clock_gettime(Process::CLOCK_MONOTONIC) + progress_seconds
 
-    until running.empty?
-      running.dup.each do |name, shard|
+      loop do
         completed = wait_for_process(shard.fetch("pid"))
-        next unless completed
+        if completed
+          process_status = completed.last
+          payload[name] = shard_result(name, shard, process_status, status: process_status.success? ? "success" : "failure")
+          puts "UI shard #{name} finished with status #{payload.fetch(name).fetch("status")} after #{payload.fetch(name).fetch("duration_seconds")} seconds."
+          running.delete(name)
+          write_shard_summary(result_directory, payload)
+          break
+        end
 
-        process_status = completed.last
-        payload[name] = shard_result(name, shard, process_status, status: process_status.success? ? "success" : "failure")
-        puts "UI shard #{name} finished with status #{payload.fetch(name).fetch("status")} after #{payload.fetch(name).fetch("duration_seconds")} seconds."
-        running.delete(name)
-        write_shard_summary(result_directory, payload)
-      end
-      break if running.empty?
-
-      if interrupted_signal
-        running.each do |name, shard|
+        if interrupted_signal
           process_status = terminate_process_group(shard.fetch("pid"))
           payload[name] = shard_result(name, shard, process_status, status: "failure", reason: "was interrupted by SIG#{interrupted_signal}")
+          running.delete(name)
+          write_shard_summary(result_directory, payload)
+          break
         end
-        running.clear
-        write_shard_summary(result_directory, payload)
-        break
+
+        now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+        if now >= next_progress_at
+          report_running_shards(running)
+          next_progress_at = now + progress_seconds
+        end
+        if now >= shard.fetch("deadline")
+          process_status = terminate_process_group(shard.fetch("pid"))
+          payload[name] = shard_result(
+            name,
+            shard,
+            process_status,
+            status: "timeout",
+            reason: "exceeded the independent #{timeout_seconds.to_i}-second timeout and its process group was terminated"
+          )
+          warn "UI shard #{name} timed out after #{payload.fetch(name).fetch("duration_seconds")} seconds; its process group was terminated."
+          running.delete(name)
+          write_shard_summary(result_directory, payload)
+          break
+        end
+        sleep PROCESS_POLL_INTERVAL_SECONDS
       end
 
-      now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-      if now >= next_progress_at
-        report_running_shards(running)
-        next_progress_at = now + progress_seconds
-      end
-      running.dup.each do |name, shard|
-        next if now < shard.fetch("deadline")
-
-        process_status = terminate_process_group(shard.fetch("pid"))
-        payload[name] = shard_result(
-          name,
-          shard,
-          process_status,
-          status: "timeout",
-          reason: "exceeded the independent #{timeout_seconds.to_i}-second timeout and its process group was terminated"
-        )
-        warn "UI shard #{name} timed out after #{payload.fetch(name).fetch("duration_seconds")} seconds; its process group was terminated."
-        running.delete(name)
-        write_shard_summary(result_directory, payload)
-      end
-      sleep PROCESS_POLL_INTERVAL_SECONDS unless running.empty?
+      break if interrupted_signal
     end
     orchestration_completed = true
   ensure

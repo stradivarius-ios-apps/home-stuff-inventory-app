@@ -18,6 +18,8 @@ Dir.mktmpdir("full-test-validation") do |directory|
   fake_bin = File.join(directory, "bin")
   FileUtils.mkdir_p(fake_bin)
   fake_xcodebuild = File.join(fake_bin, "xcodebuild")
+  shard_a_finished = File.join(directory, "shard-a-finished")
+  overlap_marker = File.join(directory, "overlap")
   File.write(fake_xcodebuild, <<~SH)
     #!/bin/sh
     destination=""
@@ -25,7 +27,12 @@ Dir.mktmpdir("full-test-validation") do |directory|
       if [ "$1" = "-destination" ]; then destination="$2"; shift 2; continue; fi
       shift
     done
-    if echo "$destination" | grep -q shard-a; then sleep 1; exit 1; fi
+    if echo "$destination" | grep -q shard-a; then
+      sleep 1
+      touch "$SHARD_A_FINISHED"
+      exit 1
+    fi
+    if [ ! -f "$SHARD_A_FINISHED" ]; then touch "$OVERLAP_MARKER"; fi
     sleep 2
   SH
   FileUtils.chmod("u+x", fake_xcodebuild)
@@ -33,7 +40,9 @@ Dir.mktmpdir("full-test-validation") do |directory|
   output_path = File.join(directory, "github-output")
   environment = {
     "PATH" => "#{fake_bin}:#{ENV.fetch("PATH")}",
-    "GITHUB_OUTPUT" => output_path
+    "GITHUB_OUTPUT" => output_path,
+    "SHARD_A_FINISHED" => shard_a_finished,
+    "OVERLAP_MARKER" => overlap_marker
   }
   results = File.join(directory, "results")
   output, status = Open3.capture2e(environment, "ruby", SCRIPT, "run-ui-shards", "shared.xctestrun", "platform=iOS Simulator,id=shard-a", "platform=iOS Simulator,id=shard-b", results)
@@ -43,6 +52,7 @@ Dir.mktmpdir("full-test-validation") do |directory|
   summary = JSON.parse(File.read(File.join(results, "ui-shard-summary.json")))
   assert(summary.dig("A", "status") == "failure", "shard A failure was not recorded")
   assert(summary.dig("B", "status") == "success", "shard B must finish after shard A fails")
+  assert(!File.exist?(overlap_marker), "UI shards overlapped on one hosted runner")
   assert(File.read(output_path).include?("shard_b_status=success"), "shard B completion output was not published")
   assert(Time.parse(summary.dig("B", "finished_at")) >= Time.parse(summary.dig("A", "finished_at")), "orchestrator returned before the second shard completed")
 end
@@ -123,17 +133,12 @@ Dir.mktmpdir("full-test-validation-invalid-timeout") do |directory|
   end
 end
 
-Dir.mktmpdir("full-test-validation-partial-startup") do |directory|
+Dir.mktmpdir("full-test-validation-second-startup-failure") do |directory|
   fake_bin = File.join(directory, "bin")
   FileUtils.mkdir_p(fake_bin)
-  child_pid_path = File.join(directory, "shard-a-child-pid")
   File.write(File.join(fake_bin, "xcodebuild"), <<~SH)
     #!/bin/sh
-    trap 'exit 0' TERM
-    sh -c 'trap "" TERM; while :; do sleep 1; done' &
-    child=$!
-    echo "$child" > "$SHARD_A_CHILD_PID_PATH"
-    wait "$child"
+    exit 0
   SH
   FileUtils.chmod("u+x", File.join(fake_bin, "xcodebuild"))
   results = File.join(directory, "results")
@@ -150,16 +155,13 @@ Dir.mktmpdir("full-test-validation-partial-startup") do |directory|
   RUBY
   environment = {
     "PATH" => "#{fake_bin}:#{ENV.fetch("PATH")}",
-    "GITHUB_OUTPUT" => output_path,
-    "SHARD_A_CHILD_PID_PATH" => child_pid_path,
-    "UI_SHARD_TERMINATION_GRACE_SECONDS" => "0.2"
+    "GITHUB_OUTPUT" => output_path
   }
   output, status = Open3.capture2e(environment, "ruby", "-e", runner)
   assert(!status.success?, "a shard B launch failure must fail orchestration: #{output}")
   summary = JSON.parse(File.read(File.join(results, "ui-shard-summary.json")))
-  assert(summary.dig("A", "status") == "failure", "partial startup cleanup did not record shard A failure")
-  assert(File.read(output_path).include?("shard_a_status=failure"), "partial startup cleanup did not publish shard A failure")
-  assert(File.read(File.join(results, "UIShardA.log")).include?("orchestrator cleanup"), "partial startup cleanup diagnostics were not recorded")
+  assert(summary.dig("A", "status") == "success", "completed shard A result was not retained")
+  assert(File.read(output_path).include?("shard_a_status=success"), "completed shard A status was not published")
   shard_pid = summary.dig("A", "process_id")
   shard_alive = begin
     Process.kill(0, shard_pid)
@@ -167,17 +169,7 @@ Dir.mktmpdir("full-test-validation-partial-startup") do |directory|
   rescue Errno::ESRCH
     false
   end
-  assert(!shard_alive, "shard B launch failure left shard A process group leader running")
-  if File.exist?(child_pid_path)
-    child_pid = Integer(File.read(child_pid_path))
-    child_alive = begin
-      Process.kill(0, child_pid)
-      true
-    rescue Errno::ESRCH
-      false
-    end
-    assert(!child_alive, "shard B launch failure left shard A child running")
-  end
+  assert(!shard_alive, "shard B launch failure left completed shard A process group running")
 end
 
 Dir.mktmpdir("full-test-validation-observability") do |directory|

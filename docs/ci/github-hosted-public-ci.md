@@ -49,8 +49,12 @@ Full Test Validation is intentionally outside the pull-request baseline. Ordinar
 commits and documentation changes do not run the full unit and UI matrix. The workflow
 runs for protected version tags matching `v*`, explicit maintainer dispatch, or a
 reusable release-workflow call. It builds once, runs the complete unit/localization
-target, and launches both ordinary UI shards concurrently on distinct ephemeral
-simulators so a specific release candidate receives full-version evidence.
+target, and runs both ordinary UI shards sequentially on distinct ephemeral
+simulators so a specific release candidate receives full-version evidence. Keeping
+one XCTest automation session active at a time avoids the CoreSimulator event-loop
+and accessibility-query stalls observed when two sessions competed on one hosted
+Intel runner. Each shard retains its own process-group timeout, result bundle, log,
+status, and cleanup boundary.
 
 `Classify changed files` is also the unconditional public boundary check: it validates
 the tracked public surface, prepares the exact candidate, verifies the trusted Gitleaks

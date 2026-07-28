@@ -39,7 +39,7 @@ env:
   CONFIGURATION: Debug
   DERIVED_DATA: DerivedData/FullTestValidation
   BUILD_DESTINATION: platform=iOS Simulator,name=iPhone 17,OS=26.5
-  UI_SHARD_TIMEOUT_SECONDS: 1800
+  UI_SHARD_TIMEOUT_SECONDS: 1500
 
 jobs:
   full-test-suite:
@@ -173,7 +173,7 @@ jobs:
           xcrun simctl bootstatus "$simulator_a" -b
           xcrun simctl bootstatus "$simulator_b" -b
 
-      - name: Run concurrent UI shards without rebuilding
+      - name: Run sequential UI shards without rebuilding
         id: ui-shards
         if: steps.unit-tests.outcome == 'success'
         continue-on-error: true

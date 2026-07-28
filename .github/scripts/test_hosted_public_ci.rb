@@ -43,7 +43,7 @@ class HostedPublicCITest < Minitest::Test
   end
 
   def test_pull_request_baseline_is_secretless_and_has_no_private_fallback
-    %w[validation.yml full-tests.yml pr-ui-screenshots.yml].each do |name|
+    %w[validation.yml pr-ui-screenshots.yml].each do |name|
       path = File.join(".github/workflows", name)
       workflow = YAML.load_file(path)
       events = workflow["on"] || workflow[true] || {}
@@ -56,6 +56,17 @@ class HostedPublicCITest < Minitest::Test
       refute_includes text, "home-stuff-inventory, xcode"
       refute_match(%r{repos/[^$\s]+/home-stuff-inventory}, text)
     end
+  end
+
+  def test_full_test_validation_is_release_only
+    path = ".github/workflows/full-tests.yml"
+    workflow = YAML.load_file(path)
+    events = workflow["on"] || workflow[true] || {}
+
+    refute events.key?("pull_request"), "#{path} must not run for ordinary pull requests"
+    assert_equal ["v*"], events.dig("push", "tags")
+    assert events.key?("workflow_dispatch"), "#{path} must support explicit version validation"
+    assert events.key?("workflow_call"), "#{path} must remain reusable by release automation"
   end
 
   def test_ci_lane_changes_exercise_the_hosted_app_baseline

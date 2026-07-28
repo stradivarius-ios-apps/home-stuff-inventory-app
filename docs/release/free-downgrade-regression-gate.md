@@ -2,10 +2,6 @@
 
 Status: Mandatory release gate
 
-Parent sub-epic: historical task #386
-
-Parent epic: historical task #380
-
 ## Purpose
 
 Run this gate before activating, changing, or releasing any monetization behavior. It enforces the canonical [Free capability contract](../product/free-capability-contract.md) across all six entitlement states and verifies that results created by future premium workflows remain ordinary user-owned Inventory data after downgrade.
@@ -17,7 +13,7 @@ The gate is deterministic and offline. It must not use live StoreKit, App Store,
 - [ ] `InventoryFreeDowngradeRegressionGateTests` passes. It must enumerate exactly the six canonical entitlement states and every `InventoryFreeCapability`.
 - [ ] `PremiumAccessTests` and `InventoryFreeAccessPolicyTests` pass so premium availability can change without changing Free access.
 - [ ] Portability suites pass: readable export, complete backup, restore, integrity, interruption, and recovery.
-- [ ] `InventorySmokeUITests/testFreeReleaseGateLaunchCreateSearchAndReadWithoutEntitlement` and `testFreeReleaseGateBrowseAndPortabilityWithoutEntitlement` pass for launch, basic Item creation, Search, Location/Place browsing, edit, ordinary single-Item movement, export, backup, and restore. Backup UI automation verifies that the native action remains enabled; `InventoryBackupTests` deterministically exercise preparation because XCTest does not own the system file-exporter destination UI.
+- [ ] `InventorySmokeUITests/testFreeReleaseGateLaunchCreateSearchAndReadWithoutEntitlement` and `testFreeReleaseGateBrowseAndPortabilityWithoutEntitlement` pass for launch, basic Item creation, Search, Location/Storage-Place browsing, edit, ordinary single-Item movement, export, backup, and restore. Backup UI automation verifies that the native action remains enabled; `InventoryBackupTests` deterministically exercise preparation because XCTest does not own the system file-exporter destination UI.
 - [ ] Settings disclosure tests cover English and Ukrainian, while the maximum Dynamic Type flow and free release gate retain accessibility and portability interaction coverage. Screenshot attachments are diagnostic only and are not visual-comparison evidence.
 - [ ] Localization tests pass even when no strings changed.
 - [ ] The baseline iPhone 17 Debug build passes.
@@ -75,4 +71,4 @@ xcodebuild build \
 
 ## Release and rollback rule
 
-A rollback may remove or disable new premium creation, automation, bulk operations, or continuing services. It must preserve schema compatibility and keep every existing Item, Location, Place, Category, view event, readable export, backup, restore, and recovery path available. Failure of that guarantee blocks both release and rollback until the data remains readable and recoverable.
+A rollback may remove or disable new premium creation, automation, bulk operations, or continuing services. It must preserve schema compatibility and keep every existing Item, Location, Storage Place, nested relationship, Category, view event, readable export, backup, restore, and recovery path available. Without verified Pro, hierarchy structure may be read-only, but ordinary Item use and flat Storage Place management remain Free. Failure of that guarantee blocks both release and rollback until the data remains readable and recoverable.

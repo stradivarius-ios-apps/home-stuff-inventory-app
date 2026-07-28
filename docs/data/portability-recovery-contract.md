@@ -2,12 +2,6 @@
 
 Status: Canonical repository contract; version 2 implementation shipped
 
-Parent sub-epic: historical task #386
-
-Parent epic: historical task #380
-
-Implementation task: historical task #389
-
 ## Purpose and scope
 
 This document defines the local, versioned file boundary for Home Stuff Inventory portability and recovery. It is the source of truth for the shipped version 2 readable export, complete backup, compatible restore, and their fixtures. Version 1 fixtures remain supported legacy inputs. The contract itself remains implementation-independent; production owners are `InventoryReadableExportService`, `InventoryBackupService`, `InventoryBackupRestoreService`, `InventoryBackupRecoveryStore`, and the Settings file/share surfaces.
@@ -71,7 +65,7 @@ The digest scope is the entire root JSON object with the root `integrity` member
 
 A supported reader validates the descriptor values and lowercase digest syntax, removes only the root `integrity` member, repeats the same canonicalization and hash, and compares all 32 digest bytes. `invalidIntegrity` covers a missing/malformed descriptor or unsupported algorithm/canonicalization. `integrityMismatch` covers a well-formed descriptor whose digest does not match. Neither result permits record decoding or mutation.
 
-The input-only version `0` compatibility profile predates this integrity envelope and may omit it. Its entire schema is validated before migration and it receives a version `2` integrity envelope whenever it is subsequently written as a new backup. Future versions must retain this envelope or define their replacement before implementation; the backup implementation issue historical task #392 consumes this exact algorithm and byte scope.
+The input-only version `0` compatibility profile predates this integrity envelope and may omit it. Its entire schema is validated before migration and it receives a version `2` integrity envelope whenever it is subsequently written as a new backup. Future versions must retain this envelope or define their replacement before implementation; backup implementations consume this exact algorithm and byte scope.
 
 Metadata describes the producer and is not restored into SwiftData:
 
@@ -305,4 +299,4 @@ Fixtures use fixed IDs and timestamps and must not be rewritten with generated v
 
 The shipped workflows are local-only and add no account, network request, analytics, tracking, or sensitive-device permission. They use user-selected destinations/sources or the system share surface. Backups contain private household data and are not uploaded by the app; any destination or recipient chosen in the system UI is controlled by the user.
 
-Readable export shipped through historical task #391, complete backup through historical task #392, and compatible atomic restore through historical task #393. A future rollback may disable new premium creation or automation, but must keep readable export, complete backup, compatible restore, local Inventory access, and all understood premium-created data available. Once a schema is emitted in production, its reader and recovery path cannot be removed without an explicit migration and product decision.
+Readable export, complete backup, and compatible atomic restore are shipped. A future rollback may disable new premium creation or automation, but must keep readable export, complete backup, compatible restore, local Inventory access, and all understood premium-created data available. Once a schema is emitted in production, its reader and recovery path cannot be removed without an explicit migration and product decision.

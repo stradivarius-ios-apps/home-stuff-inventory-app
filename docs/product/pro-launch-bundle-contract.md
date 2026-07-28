@@ -1,9 +1,6 @@
 # Home Stuff Pro Launch-Bundle Contract
 
 Status: Canonical repository contract; implementation and release activation deferred
-Parent sub-epic: historical task #387
-Parent epic: historical task #380
-Contract task: historical task #395
 
 ## Purpose and authority
 
@@ -13,13 +10,11 @@ The bundle contains exactly five local capabilities:
 
 1. Room Sweep rapid batch capture;
 2. movement of explicitly selected Items;
-3. movement of all current contents of one Place;
+3. movement of all current contents of one Storage Place;
 4. movement history with bounded extended Undo;
-5. advanced Inventory Inbox batch cleanup.
+5. nested Storage Places.
 
-This contract authorizes only the separately scoped implementation issues linked below. It does not claim that any capability ships today, add a trial or allowance, choose a product identifier or price, create an App Store Connect product, or authorize a visible paywall.
-
-Repository reality at approval time matters: Inventory, Locations/Place browsing, Item Form, and Item Detail exist, but there is no Inventory Inbox screen, Inbox membership policy, or `InventoryInboxView.swift` in the app. The launch bundle approves advanced Inbox batch cleanup as a future Pro capability; it does not retroactively make its missing basic Free prerequisite implemented.
+This contract authorizes only separately scoped implementation work. It does not claim that any capability ships today, add a trial or allowance, create an App Store Connect product, or authorize a visible paywall. The planned non-consumable product identifier is `com.stradivarius23.HomeStuffInventoryApp.pro.lifetime`; USD 19.99 is a planning hypothesis, never hardcoded product copy.
 
 ## Entitlement and gate vocabulary
 
@@ -45,11 +40,11 @@ The owner paths below are the required responsibility boundaries for their imple
 
 | Capability and task | Entry point and flow | Free invocation | Entitlement | Data created or changed | Downgrade visibility | Offline behavior | Failure and cancellation | Owner files |
 |---|---|---|---|---|---|---|---|---|
-| Room Sweep rapid batch capture (historical task #399) | One new secondary toolbar menu attached to the existing Place item-list surface contains `Room Sweep`; the action opens a native sheet/navigation stack with that Location/Place preselected for confirmation. The user may clear the optional Place, then repeatedly saves Items with the current one-name minimum and existing draft fields. The existing Add Item button stays a direct one-tap Free action. | After activation, route to the contextual upgrade coordinator before creating the sweep draft. Before activation, no production entry point. | Local Pro | Each successful save creates one ordinary Item. It retains the confirmed destination between saves and clears Item-specific fields. When relocation history applies, the save also creates its approved movement record. | Every saved Item remains an ordinary visible, searchable, editable, movable, exportable, and recoverable Free record. Associated history remains readable. Starting a new sweep is disabled without access. | Fully local after verified ownership has been established; no network, account, or server dependency. | Each Item save is atomic and immediately visible. A failed save creates neither partial Item nor history. Cancellation keeps already-saved Items and discards only the unsaved draft. Duplicate names follow ordinary creation rules. | Existing entry anchor: `Views/Locations/LocationScopedItemsListView.swift`; existing reuse: `Views/InventoryItemFormView.swift`, `InventoryPresentation/InventoryItemDraft.swift`; new focused owners: `Views/Locations/PlaceRoomSweepView.swift`, `InventoryPresentation/InventoryRoomSweepState.swift`, `InventoryLogic/InventoryRoomSweepService.swift`. |
-| Selected-Item bulk movement (historical task #400) | Native selection/edit mode in the top-level Inventory list only; a toolbar action opens the shared destination picker and a preflight showing selected count, source scope, and destination. Only explicitly selected IDs move. | Check access before selection mode or selection state is created. A visible intentional action routes to contextual upgrade; no Item is selected or changed. | Local Pro | Atomically updates Location/Place for the explicit Item set and creates one grouped movement operation with per-Item records. Other Item fields and identity are unchanged. | Moved Items and their history remain visible and editable. Ordinary single-Item movement remains Free. Starting another bulk move or extended Undo is disabled without access. | Fully local after verified ownership; current Search and filters continue to work offline and only help find candidates. | Cancellation clears selection and changes nothing. A validation, destination, entitlement-before-commit, or write failure moves none and creates no history. Filtered-out or unselected Items never move. Same-destination Items are handled and disclosed deterministically. | Existing entry anchor: `Views/InventoryListView.swift`; planned new focused owners: `Views/Inventory/InventoryBulkMoveView.swift`, `InventoryPresentation/InventoryBulkMoveState.swift`; planned new shared mutation owners: `InventoryLogic/InventoryMovementService.swift`, `InventoryData/InventoryMovementRecord.swift`. |
-| Whole-Place contents movement (historical task #401) | One `Move Place Contents` action in the same new secondary toolbar menu attached to the existing Place item-list surface opens the destination picker and preflight shared with bulk movement. The preflight shows the exact current Item count and destination. | An empty Place shows the ordinary calm empty explanation and never a paywall. For a non-empty Place, check access before editable move state; a visible intentional action routes Free to contextual upgrade without mutation. | Local Pro | Atomically changes Location/Place for every Item whose current Place matches the confirmed source and creates one grouped movement operation. The Place definition is not renamed, moved, merged, or deleted. | All moved Items and history remain readable and ordinary per-Item movement remains Free. Starting another whole-Place move or extended Undo is disabled without access. | Fully local after verified ownership; source resolution and commit do not require network access. | Re-resolve immediately before commit. If contents changed after preflight, destination disappeared, entitlement was lost, or any validation/write fails, move none and require refreshed confirmation. Identical destination is a localized no-op. Cancellation changes nothing. | Existing entry anchor: `Views/Locations/LocationScopedItemsListView.swift`; new focused owners: `Views/Locations/PlaceMoveContentsView.swift`, `InventoryPresentation/InventoryPlaceMoveState.swift`; new shared mutation owners: `InventoryLogic/InventoryMovementService.swift`, `InventoryData/InventoryMovementRecord.swift`. |
-| Movement history and bounded extended Undo (historical task #398) | A focused readable history section appears only in existing Item Detail. Extended Undo is available from that section for only the most recent eligible grouped operation and uses native confirmation/error presentation. | Ordinary single-Item movement remains Free. Reading existing history is Free. Invoking eligible extended Undo after activation routes a Free user to contextual upgrade before mutation. | Local Pro only for initiating extended Undo; history creation/readability is a data-integrity concern and cannot hide movement results | Successful movements create backward-compatible bounded records containing stable Item identity, from/to Location and Place snapshots, timestamp, operation/group ID, and origin (`single`, `bulk`, `placeMove`, or `roomSweep`). Undo creates the approved reversing state/history atomically. | History created while access existed remains readable. Current Item state remains visible/editable. Downgrade never prunes records merely because access changed. New extended Undo is disabled, while ordinary Free relocation remains usable. | History recording, pruning, eligibility, and Undo are local-only. Previously verified local Pro supports Undo offline. | Cancelled or failed mutations create no history. Undo is unavailable if current data no longer matches the operation post-state, the operation is not most recent/eligible, or safe restoration is impossible; explain this without changing data. Retention is deterministic and bounded. | Existing entry anchors: `Views/Inventory/InventoryItemDetailSurfaces.swift`, `InventoryPresentation/InventoryItemDetailViewModel.swift`; planned new focused owner: `Views/Inventory/InventoryMovementHistoryView.swift`; planned new data/logic owners: `InventoryData/InventoryMovementRecord.swift`, `InventoryLogic/InventoryMovementService.swift`, `InventoryLogic/InventoryMovementHistory.swift`. |
-| Advanced Inventory Inbox batch cleanup (historical task #402) | After a separately approved basic Free Inbox prerequisite exists, an explicit native batch mode on that planned Inventory Inbox supports only: common Location, common Place valid for that Location, common Category, and marking selected missing fields for individual follow-up. Every operation has count/field preflight. No Inbox surface ships today. | The future ordinary single-Item Inbox review/edit prerequisite must be Free and ungated. Once both surfaces are approved and implemented, check access before Pro batch selection/state; a visible intentional batch action routes Free to contextual upgrade without mutation. | Local Pro for batch mode only; the planned basic Inbox is Free | Atomically updates only the confirmed fields on explicitly selected Items and recomputes membership using the separately approved basic Inbox rules. Non-empty values are preserved unless the user explicitly chooses `Replace existing values` for that operation. | Resulting Items and fields are ordinary visible, searchable, editable Free data. Once implemented, single-Item Inbox handling stays Free. Starting a new batch is disabled without access. | Fully local after verified ownership; no inference, server, or network dependency. | Cancellation or validation/write failure changes none. Invalid Location/Place pairs stop the operation. Hidden, filtered-out, or unselected Items are untouched. Membership is recomputed only after successful commit. If the Free Inbox prerequisite is still missing when #402 begins, implementation stops for an approved dependency/scope decision. | Planned prerequisite owner (new; not present today): `Views/Inventory/InventoryInboxView.swift` plus separately approved membership logic. Planned Pro owners (new): `Views/Inventory/InventoryInboxBatchCleanupView.swift`, `InventoryPresentation/InventoryInboxBatchState.swift`, `InventoryLogic/InventoryInboxBatchCleanup.swift`. #402 cannot implicitly create, scope, or gate the missing Free prerequisite and does not authorize a new root tab or navigation system. |
+| Room Sweep rapid batch capture | A secondary action on a Storage Place item-list opens rapid repeated Item capture with the destination retained between saves. | Check access before creating sweep state; ordinary Add Item remains Free. | Local Pro | Each successful save creates one ordinary Item and any applicable movement record. | Saved Items remain fully usable Free; only starting a new sweep is disabled. | Local after verified access. | Each save is atomic; cancellation discards only the unsaved draft. | Focused Room Sweep presentation, state, and service owners reusing the ordinary Item form contract. |
+| Selected-Item bulk movement | Native selection in Inventory opens a shared destination picker and exact preflight. | Check access before selection state; ordinary one-Item movement remains Free. | Local Pro | Atomically moves only confirmed Item IDs and records one grouped operation. | Items and history remain readable/editable; new bulk movement and extended Undo are disabled. | Local after verified access. | Any validation or write failure moves none; cancellation changes nothing. | Focused bulk-move presentation plus shared movement service and record model. |
+| Whole-Storage-Place contents movement | A Storage Place action opens the shared destination picker and exact current-content preflight. | Empty places never trigger a paywall; otherwise check access before editable move state. | Local Pro | Atomically moves direct Item contents only; it does not rename, move, merge, or delete the Storage Place or nested child places. | Items and history remain usable Free; ordinary one-Item movement remains Free. | Local after verified access. | Re-resolve before commit; changed source, invalid destination, lost access, or write failure moves none. | Focused Storage Place movement presentation plus the shared movement service. |
+| Movement history and bounded extended Undo | Item Detail shows readable history; only the most recent compatible grouped operation may be undone. | History and ordinary one-Item movement are Free; check access before extended Undo. | Local Pro only for initiating extended Undo | Successful movements create bounded, backward-compatible records; Undo reverses atomically and records the result. | History remains readable and current Item state remains editable. | Local after verified access. | Incompatible current state, an ineligible operation, or unsafe restoration disables Undo without mutation. | Focused history UI and shared movement/history data and logic owners. |
+| Nested Storage Places | Storage Places form an unbounded `Location → Storage Place → Storage Place → … → Item` tree. A subtree can be moved atomically within or across Locations. Names are unique only among siblings. | Free can create and fully manage only flat top-level places. Existing tree-participating places remain visible but their name, icon, parent, hierarchy, move, and delete operations are read-only. Items remain visible, editable, searchable, exportable, recoverable, and individually movable to or from existing nested destinations. | Local Pro for creating or structurally editing a hierarchy | Adds parent/child relationships and changes a subtree destination without changing stable identities. Deletion never cascades. | Loss of access preserves the tree as read-only while flat top-level places and all ordinary Item operations retain Free editing. | Local after verified access; no network required. | Reject cycles, invalid destinations, sibling-name conflicts, cascade deletion, or partial subtree moves. Bounded Undo applies only to the latest compatible structural operation. | Versioned hierarchy schema and integrity rules; focused mutation service, destination picker, browse/Search presentation, backup/restore/export, and gate coverage. |
 
 ## Protected Free adjacency
 
@@ -59,11 +54,12 @@ In particular, these adjacent workflows stay Free in every entitlement, loading,
 
 - unlimited ordinary Items and ordinary one-Item creation with the current one-name minimum;
 - viewing, editing, deleting, searching, filtering, exporting, backing up, restoring, and recovering user-owned records;
-- ordinary movement of one Item by editing its Location and/or Place;
-- ordinary Location and Place creation, management, browsing, and `Location → Place → Item` navigation;
+- ordinary movement of one Item by editing its Location and/or Storage Place;
+- ordinary Location and flat top-level Storage Place creation, management, browsing, and `Location → Storage Place → Item` navigation;
 - current Search, Category and Location filters, current root Tab Bar, and current Inventory/Locations navigation;
-- current missing-Location/Place guidance and, if a basic Inventory Inbox is separately approved and implemented, its ordinary single-Item review and editing; the planned Free prerequisite can never become a Pro gate;
-- reading every Item and every result created through Room Sweep, bulk movement, whole-Place movement, history, Undo, or Inbox cleanup;
+- current missing-Location/Storage-Place guidance;
+- reading every Item and every result created through Room Sweep, bulk movement, whole-Storage-Place movement, history, Undo, or nested hierarchy;
+- full ordinary Item editing and individual movement to or from an existing nested destination, even while hierarchy structure is read-only;
 - readable movement history, even when initiating extended Undo is unavailable.
 
 The policy may disable a new Pro operation. It may not filter SwiftData, alter Search results, hide a row because of its creation origin, replace a real store with an empty one, impose an Item-count limit, or make export/recovery dependent on StoreKit.
@@ -73,10 +69,9 @@ The policy may disable a new Pro operation. It may not filter SwiftData, alter S
 No new root destination is authorized. Implementations remain anchored to current product surfaces:
 
 - **Inventory:** the top-level list may expose selected-Item movement through native selection mode; Search and filters remain unchanged.
-- **Locations and Place:** one new secondary menu attached to the existing Place item-list toolbar is the single entry for Room Sweep and whole-Place movement, without changing its hero, direct Add Item button, or Item list composition.
+- **Locations and Storage Places:** one secondary menu attached to the existing Storage Place item-list toolbar is the entry for Room Sweep and whole-place movement. Hierarchy navigation extends this existing surface without a new root destination.
 - **Item Form:** Room Sweep reuses current draft semantics, validation, managed-value options, and destination language; it does not replace ordinary creation.
 - **Item Detail:** history is a focused readable section or existing property/list-card surface; extended Undo is a native action and does not introduce a timeline design system.
-- **Inbox (planned prerequisite, not shipped):** no Inbox surface or membership policy exists in the current repository. A separate approved Free task must define and implement ordinary single-Item review before #402 attaches the four-operation Pro batch mode. #402 must stop for a dependency/scope decision if that prerequisite is absent; it cannot quietly implement it, gate it, invent membership rules, or create a new tab. The later batch mode is not a spreadsheet or arbitrary multi-field editor.
 - **Settings:** after the full activation gate passes, one `Home Stuff Pro` row may show current state and intentionally open the shared upgrade surface. Existing export, backup, restore, and other Settings rows remain Free and unchanged.
 
 All visible implementation must use native SwiftUI navigation, sheets, toolbars, menus, forms, list selection, confirmations, semantic colors and type, SF Symbols, platform spacing, current backgrounds, and established Inventory card/hero/row/glass primitives. Preserve the palette, Search, and root Tab Bar. Do not add a custom navigation/tab bar, design system, decorative gradient, copied glass recipe, celebratory treatment, countdown, discount badge, or unrelated redesign.
@@ -100,7 +95,7 @@ Verified ownership is the authority for enabling a Pro operation. The implementa
 | Entitlement changes during an operation | Recheck immediately before commit. A revoked operation fails atomically; previously committed operations and records remain. |
 | Feature cancellation or app interruption | Follow the capability-specific atomicity rule. Never infer purchase cancellation from feature cancellation, and never leave partial batch state committed. |
 
-StoreKit purchase/restore lifecycle behavior belongs to historical task #397 and historical task #403. Contextual presentation belongs to historical task #404. No feature view calls StoreKit directly.
+StoreKit purchase/restore lifecycle and contextual presentation remain separate responsibilities. No feature view calls StoreKit directly. Restore Purchases must recover a verified lifetime license.
 
 ## Localization and accessibility gate
 
@@ -138,7 +133,7 @@ No production Pro feature entry point, contextual paywall, Settings purchase row
 6. the single contextual upgrade coordinator and Settings surface, using StoreKit-localized product display name and price;
 7. English and Ukrainian localization, accessibility/adaptive-state evidence, and light/dark and accessibility-setting checks for every affected flow;
 8. protected Free regression evidence, data readability after downgrade, migration/legacy-store coverage, atomic failure/cancellation tests, localization tests, baseline simulator build, and focused UI flows;
-9. privacy-manifest/disclosure assessment, IAP metadata and App Review notes, staged activation, release evidence, and rollback rehearsal required by historical task #405.
+9. privacy-manifest/disclosure assessment, IAP metadata and App Review notes, staged activation, release evidence, and rollback rehearsal.
 
 Passing only StoreKit or one bundle feature does not open the gate. DEBUG/test presets must be unavailable from release UI. App Store Connect upload or deployment still requires explicit maintainer authorization.
 
@@ -146,12 +141,12 @@ Passing only StoreKit or one bundle feature does not open the gate. DEBUG/test p
 
 This contract itself changes no source, schema, persisted model, permission, capability, or shipped behavior and needs no migration.
 
-Later movement/history work must provide a backward-compatible schema and migration for existing Items and exact `containerName` Place values. Room Sweep and cleanup results use ordinary Item data. Every persisted addition must remain readable by the release that created it and covered by versioned backup/restore/export rules.
+Later movement/history and hierarchy work must provide backward-compatible schemas and migrations for existing Items and exact `containerName` compatibility values. Room Sweep results use ordinary Item data. Every persisted addition must remain readable by the release that created it and covered by versioned backup/restore/export rules.
 
 Activation is staged only after the frozen launch gate passes. A rollback may hide or disable new Pro operation entry points and purchase presentation in a follow-up release. It must not:
 
-- delete or hide Items, movement records, history, cleanup results, or ownership evidence;
-- disable ordinary Free creation, movement, Search, browse, export, backup, restore, or recovery, or disable ordinary single-Item Inbox handling after that separately approved Free prerequisite exists;
+- delete or hide Items, Storage Place relationships, movement records, history, or ownership evidence;
+- disable ordinary Free creation, movement, Search, browse, export, backup, restore, or recovery;
 - make prior Pro-created content unreadable;
 - silently downgrade or destructively rewrite the persistence schema;
 - prevent a valid lifetime purchase from being restorable when the purchase path returns.
@@ -164,22 +159,22 @@ Everything outside the five-item matrix is deferred. In particular, this contrac
 
 - QR labels, QR scanning, barcodes, deep links for labels, or printable label workflows;
 - Spotlight, Siri, App Intents, Shortcuts, widgets, controls, or reminders;
-- Item or Place photos, Camera or Photos access, OCR, scanning, or AI identification/categorization;
+- Item or Storage Place photos, Camera or Photos access, OCR, scanning, or AI identification/categorization;
 - temporary-away, lent, borrowed, repair, reservation, due-date, or notification workflows;
 - consumable quantity history, low-stock tracking, shopping lists, replenishment, price tracking, or reports;
 - configurable/advanced exports beyond the protected readable export, backup, and recovery paths;
-- bulk edit beyond the four approved Inbox cleanup operations; bulk delete, merge, arbitrary spreadsheet/grid editing, templates, or automation;
+- arbitrary bulk edit, bulk delete, merge, spreadsheet/grid editing, templates, or automation;
 - unlimited history, audit logs, history editing/deletion, warehouse/employee checkout, procurement, insurance, marketplace, or enterprise features;
 - Free trials, feature allowances, introductory offers, discounts, pricing experiments, promo codes, or a hard/first-launch paywall;
 - a separate paid application, new Bundle ID, account system, custom backend, analytics, ads, or tracking;
 - CloudKit, personal sync, Family & Sync purchase, household sharing, invitations, roles, permissions, or subscription comparison/presentation;
-- product identifiers, price tiers, App Store Connect creation, deployment/upload, or public marketing/legal/support publication;
+- App Store Connect creation, deployment/upload, or public marketing/legal/support publication;
 - changes to the current palette, Search, root Tab Bar, navigation architecture, or unrelated screens.
 
 A deferred idea requires its own approved contract and implementation issue. It cannot enter the bundle through refactoring, convenience scope, test fixtures, placeholder UI, App Store copy, or paywall marketing.
 
 ## Change control
 
-Adding, removing, combining, renaming, or changing the entitlement of a launch capability is a product decision. It requires an explicit issue updating parent epic #380, the monetization model, this contract, the Free adjacency review, entitlement mapping, data/downgrade behavior, localization/accessibility scope, privacy/App Store impact, release evidence, and rollback plan.
+Adding, removing, combining, renaming, or changing the entitlement of a launch capability is a product decision. It requires an explicit approved change updating the monetization model, this contract, the Free adjacency review, entitlement mapping, data/downgrade behavior, localization/accessibility scope, privacy/App Store impact, release evidence, and rollback plan.
 
 Implementation PRs may make only the behavior listed for their capability and must preserve unspecified appearance and behavior. If a task cannot implement this contract as written, it must stop for approval rather than choose an alternative.

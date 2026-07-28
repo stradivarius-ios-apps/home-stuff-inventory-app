@@ -1,8 +1,6 @@
 # Home Stuff Inventory Monetization Model
 
 Status: Approved product concept; premium implementation deferred; protected Free portability implemented
-Parent epic: historical task #380
-Initialization task: historical task #381
 
 ## Purpose
 
@@ -61,21 +59,21 @@ The Free tier must continue to answer the core product question without requirin
 At minimum, Free retains:
 
 - unlimited basic Items;
-- Locations and Places;
+- Locations and flat top-level Storage Places;
 - add, edit, and delete flows;
 - ordinary relocation of one Item;
-- local Search across supported item and storage fields;
+- local Search across supported Item and Storage Place fields;
 - Category and Location filters;
-- the complete `Location → Place → Item` browsing flow;
+- the complete flat `Location → Storage Place → Item` browsing flow;
 - basic Notes, Tags, Quantity, Condition, icons, and reusable-value management;
-- basic guidance for Items that have no Location or no exact Place;
+- basic guidance for Items that have no Location or no exact Storage Place;
 - access to every existing personal inventory record;
 - a safe manual complete backup, compatible atomic restore, and readable JSON export path.
 
 The following are not valid premium gates:
 
 - Search;
-- ordinary Place use;
+- ordinary flat Storage Place use;
 - ordinary single-item movement;
 - viewing existing records;
 - editing the user's personal local inventory;
@@ -87,25 +85,28 @@ Free may show discoverable premium actions, but invoking those actions must neve
 
 ## Home Stuff Pro — lifetime unlock
 
-`Home Stuff Pro` is planned as a non-consumable In-App Purchase inside the existing application.
+`Home Stuff Pro` is planned as an individual non-consumable In-App Purchase inside the existing application, using product identifier `com.stradivarius23.HomeStuffInventoryApp.pro.lifetime`. It does not use Apple Family Sharing.
 
 It represents advanced local workflows whose value does not depend on an ongoing hosted service. A valid lifetime purchase permanently grants local Pro access for the purchasing Apple account under StoreKit rules.
 
-Potential Home Stuff Pro scope includes:
+The initial Home Stuff Pro launch contract contains exactly:
 
 - Room Sweep and rapid batch capture;
-- bulk Item movement;
-- moving the contents of an entire Place;
+- selected-Item bulk movement;
+- moving the direct Item contents of an entire Storage Place;
 - movement history and extended Undo;
-- advanced Inventory Inbox and batch cleanup;
-- QR labels for Places;
+- nested Storage Places;
+
+Potential later Home Stuff Pro scope includes:
+
+- QR labels for Storage Places;
 - Spotlight, Siri, App Intents, and Shortcuts integrations;
-- Item and Place photos;
+- Item and Storage Place photos;
 - temporary-away, lent, and repair workflows;
 - optional consumable quantity tracking and low-stock tools;
 - advanced reports and configurable exports.
 
-This list defines the intended boundary between basic inventory and advanced local workflows. It is not an implementation checklist. Each capability requires a separate product task before work begins.
+The five-item launch list is frozen by the canonical launch-bundle contract. The later list defines possible direction only; each capability requires a separate product decision before work begins.
 
 Lifetime Pro must not be launched as a payment for one minor convenience. The initial Pro release should contain a coherent bundle with clear user value.
 
@@ -117,12 +118,12 @@ The exact initial bundle, protected Free adjacency, release gate, and rollback c
 
 A subscription is appropriate only after the product provides reliable continuing service value. It must not be introduced merely to rent local features that could function indefinitely on-device.
 
-The future subscription is expected to include:
+The future subscription uses annual product identifier `com.stradivarius23.HomeStuffInventoryApp.family-sync.annual` and is expected to include:
 
 - all Home Stuff Pro capabilities while the subscription is active;
 - private synchronization between the user's devices;
 - shared household inventory;
-- shared Locations, Places, and Items;
+- shared Locations, Storage Places, and Items;
 - participant and permission management;
 - offline-first synchronization;
 - conflict handling and recovery;
@@ -130,7 +131,7 @@ The future subscription is expected to include:
 
 Personal sync must be stable before shared household work begins. The subscription must not be created in App Store Connect until sync architecture, privacy implications, data ownership, expiry behavior, and App Review scope are separately approved.
 
-The annual plan should be the primary subscription presentation. A monthly option may exist as a lower-commitment alternative, not as the main product proposition.
+The annual plan is the only planned launch subscription. A monthly option is deferred. The annual product is intended to support Apple Family Sharing, subject to a separately authorized App Store Connect configuration. CloudKit invitation alone grants no paid access: every household member must have a locally verified purchased or `familyShared` annual entitlement.
 
 ## Entitlement model
 
@@ -177,8 +178,8 @@ A paywall, cancelled purchase, billing issue, refund, or expired subscription mu
 
 Future implementation must preserve these rules:
 
-- no Item, Location, Place, photo, movement record, quantity record, backup, or shared record is deleted only because access changes;
-- existing records remain readable;
+- no Item, Location, Storage Place, hierarchy relationship, photo, movement record, quantity record, backup, or shared record is deleted only because access changes;
+- existing records remain readable; nested hierarchy structure becomes read-only without verified local Pro access;
 - the user's personal local inventory remains usable;
 - export and recovery remain available;
 - content created through a premium workflow remains visible after downgrade;
@@ -187,14 +188,16 @@ Future implementation must preserve these rules:
 - loss of network access must not make the local personal inventory unusable;
 - subscription expiry must not silently replace the user's real inventory with an empty store.
 
-Family & Sync expiry requires a separate detailed contract before implementation. That contract must define:
+Family & Sync expiry and household lifecycle require a detailed implementation contract. It must preserve these approved boundaries:
 
 - the local snapshot retained on each device;
-- read-only versus editable shared content;
+- the whole shared household becomes read-only for every participant when the owner's subscription expires;
 - pending local changes;
 - ownership of shared records;
-- participant removal;
-- household owner expiry;
+- one immutable owner, one read-write participant role, no granular roles or owner transfer, at most six members including the owner, and one active household per user;
+- voluntary leave may offer an explicit copy to personal inventory; forced removal ends access after CloudKit confirmation and offers no post-removal household export;
+- an offline removed device may display only its last snapshot until it learns of removal;
+- owner-initiated offline deletion remains cancellable and pending until CloudKit acknowledgement, refreshes remote changes before commit, and requires re-confirmation if participant data changed;
 - reactivation behavior;
 - export or copy-to-personal options;
 - conflict resolution after reactivation.
@@ -334,8 +337,7 @@ The initial planning hypotheses are:
 
 ```text
 Home Stuff Pro Lifetime: USD 19.99 equivalent tier
-Family & Sync Annual: USD 14.99 equivalent tier
-Optional monthly alternative: approximately USD 2.99 equivalent tier
+Family & Sync Annual: USD 9.99 equivalent tier
 ```
 
 These values:
@@ -374,11 +376,10 @@ A future business or warehouse product with employees, asset checkout, procureme
 The following require later product and technical decisions:
 
 - free trials or feature allowances;
-- final product identifiers;
 - final App Store price tiers;
 - introductory or promotional subscription offers;
-- StoreKit Family Sharing configuration;
-- whether monthly Family & Sync is offered at launch;
+- final App Store Connect configuration for annual-plan Apple Family Sharing;
+- whether a monthly Family & Sync option is offered after launch;
 - personal sync data model and migration;
 - household identity, ownership, roles, and invitation model;
 - refund and revocation UX;

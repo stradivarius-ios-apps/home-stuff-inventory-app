@@ -1,9 +1,6 @@
 # Free Capability Contract
 
 Status: Canonical repository contract
-Parent sub-epic: historical task #386
-Parent epic: historical task #380
-Implementation task: historical task #390
 
 ## Purpose
 
@@ -23,25 +20,27 @@ Every capability in the matrix is protected from monetization gates. `InventoryF
 | `editItem` | Edit an Item and its supported fields | Implemented | `Views/InventoryListView.swift`; `Views/InventoryItemFormView.swift`; `InventoryPresentation/InventoryItemDraft.swift` |
 | `deleteItem` | Delete an Item through the ordinary destructive flow | Implemented | `Views/InventoryListView.swift` |
 | `manageLocations` | Create, rename, use, and remove reusable Locations under existing safety rules | Implemented | `Views/InventoryListManagementView.swift`; `Views/InventoryListManagementState.swift`; `InventoryLogic/InventoryListManagement.swift` |
-| `managePlaces` | Enter, edit, browse, and ordinarily use exact Places | Implemented | `Views/InventoryItemFormView.swift`; `Views/Locations/LocationPlacesListView.swift`; `InventoryLogic/InventoryBrowseSummaries.swift` |
-| `relocateSingleItem` | Move one Item by changing its Location and/or Place | Implemented | `Views/InventoryItemFormView.swift`; `InventoryPresentation/InventoryItemDraft.swift` |
-| `searchSupportedFields` | Search across Item name, Category, Location, Place, Tags, and Notes, including current missing-value guidance terms | Implemented | `Views/InventoryListView.swift`; `InventoryLogic/InventorySearch.swift` |
+| `managePlaces` | Enter, edit, browse, and ordinarily use flat top-level Storage Places | Implemented | `Views/InventoryItemFormView.swift`; `Views/Locations/LocationPlacesListView.swift`; `InventoryLogic/InventoryBrowseSummaries.swift` |
+| `relocateSingleItem` | Move one Item by changing its Location and/or Storage Place | Implemented | `Views/InventoryItemFormView.swift`; `InventoryPresentation/InventoryItemDraft.swift` |
+| `searchSupportedFields` | Search across Item name, Category, Location, Storage Place, Tags, and Notes, including current missing-value guidance terms | Implemented | `Views/InventoryListView.swift`; `InventoryLogic/InventorySearch.swift` |
 | `filterByCategory` | Filter Inventory by Category | Implemented | `Views/InventoryListView.swift`; `InventoryLogic/InventorySearch.swift`; `InventoryPresentation/InventoryFilterContext.swift` |
 | `filterByLocation` | Filter Inventory by Location | Implemented | `Views/InventoryListView.swift`; `InventoryLogic/InventorySearch.swift`; `InventoryPresentation/InventoryFilterContext.swift` |
-| `browseLocationPlaceItem` | Browse the complete `Location → Place → Item` hierarchy | Implemented | `Views/Locations/`; `InventoryLogic/InventoryBrowseSummaries.swift`; `InventoryPresentation/LocationPlaceSummary.swift` |
+| `browseLocationPlaceItem` | Browse the complete flat `Location → Storage Place → Item` hierarchy | Implemented | `Views/Locations/`; `InventoryLogic/InventoryBrowseSummaries.swift`; `InventoryPresentation/LocationPlaceSummary.swift` |
 | `editNotes` | Add, read, and edit basic Item Notes | Implemented | `Views/Inventory/InventoryNotesEditorView.swift`; `InventoryPresentation/InventoryNotesEditorState.swift` |
 | `editTags` | Add, read, edit, and remove basic Item Tags | Implemented | `Views/InventoryItemFormView.swift`; `InventoryPresentation/InventoryItemDraft.swift` |
 | `editQuantity` | Add, read, and edit basic Item Quantity | Implemented | `Views/InventoryItemFormView.swift`; `Views/Inventory/InventoryItemDetailSurfaces.swift`; `InventoryPresentation/InventoryItemDraft.swift` |
 | `editCondition` | Add, read, and edit basic Item Condition | Implemented | `Views/InventoryItemFormView.swift`; `Views/Inventory/InventoryItemDetailSurfaces.swift`; `InventoryPresentation/InventoryItemDraft.swift` |
 | `manageReusableValues` | Manage reusable Location and Category values under existing in-use and default-value protections | Implemented | `Views/InventoryListManagementView.swift`; `InventoryLogic/InventoryListManagement.swift` |
 | `guideMissingLocation` | See and act on guidance when an Item has no Location | Implemented | `Views/InventoryListView.swift`; `Views/InventoryEmptyStateView.swift`; `InventoryPresentation/InventoryEmptyStateViewModel.swift`; `InventoryLogic/InventorySearch.swift` |
-| `guideMissingPlace` | See missing-Place guidance while retaining ordinary Item and Place access | Implemented | `Views/InventoryListView.swift`; `Views/Inventory/InventoryItemDetailSurfaces.swift`; `InventoryLogic/InventorySearch.swift` |
+| `guideMissingPlace` | See missing-Storage-Place guidance while retaining ordinary Item and Storage Place access | Implemented | `Views/InventoryListView.swift`; `Views/Inventory/InventoryItemDetailSurfaces.swift`; `InventoryLogic/InventorySearch.swift` |
 | `viewExistingRecords` | Read every existing personal record and premium-created content after any entitlement change | Implemented as a data rule | All record-detail surfaces; `InventoryData/`; `Persistence/InventoryModelContainer.swift` |
 | `exportInventory` | Produce a readable export of user-owned Inventory data | Implemented | `Views/Settings/SettingsHomeView.swift`; `InventoryLogic/InventoryReadableExportService.swift` |
 | `backUpInventory` | Create a safe manual backup | Implemented | `Views/Settings/SettingsHomeView.swift`; `Views/Settings/InventoryBackupDocument.swift`; `InventoryLogic/InventoryBackup.swift` |
 | `restoreInventory` | Validate and atomically restore a compatible backup without losing the current recoverable state | Implemented | `Views/Settings/SettingsHomeView.swift`; `Views/Settings/InventoryBackupRestorePreflightView.swift`; `InventoryLogic/InventoryBackupRestore.swift`; `InventoryLogic/InventoryBackupRecoveryStore.swift` |
 
 Readable export, complete backup, and compatible atomic restore are shipped Settings workflows. They remain available in every entitlement state, including missing or unavailable entitlement state, and never accept a readable export as a restore source.
+
+When a backup or prior entitlement contains nested Storage Places, Free restores and displays the complete hierarchy without flattening or data loss. Storage Places participating in the tree are structurally read-only without verified local Pro access: name, icon, parent, hierarchy, move, and delete operations are unavailable. Items inside the tree remain visible, editable, searchable, exportable, recoverable, and individually movable to or from existing nested destinations. Flat top-level Storage Places without parents or children retain full ordinary Free management.
 
 ## Forbidden gates
 
@@ -50,7 +49,7 @@ The following gates are forbidden, including indirect gates implemented through 
 - Item counts or ordinary Item CRUD;
 - Search across any currently supported field;
 - Category or Location filters;
-- ordinary Location or Place use;
+- ordinary Location or flat Storage Place use;
 - ordinary movement of one Item;
 - viewing or editing existing personal records;
 - reading data created while a paid entitlement was active;
@@ -80,7 +79,7 @@ Adding a capability to Free is allowed. The same change must add its stable `Inv
 Removing, narrowing, renaming, or gating a protected capability is a product decision, not a refactor. It requires all of the following before implementation:
 
 1. an explicit product-decision issue;
-2. an update to parent epic historical task #380;
+2. an update to the approved product decision;
 3. an update to `docs/product/monetization-model.md` and this canonical contract;
 4. explicit data ownership, downgrade, offline, recovery, privacy, localization, accessibility, release, and rollback review.
 

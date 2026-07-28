@@ -1,6 +1,6 @@
 # Soft Cabinet Refinement Contract
 
-Status: Approved implementation contract for epic historical task #594
+Status: Approved implementation contract
 
 This document freezes the target for the SCU refinement. It translates the approved visual direction into implementation boundaries that can be verified in source, tests, and rendered SwiftUI. It is an incremental refinement of the shipped app, not a new design system or product redesign.
 
@@ -74,7 +74,7 @@ Any future palette calibration requires a separate explicitly approved task with
 
 ## Shared Visual Rules
 
-- Preserve the compact, backgroundless identity headers introduced by historical task #590.
+- Preserve the established compact, backgroundless identity headers.
 - Keep content readable on stable semantic surfaces. Do not apply Liquid Glass to repeated rows, properties, Notes, Tags, form fields, warnings, or dense text.
 - Reuse native navigation, scroll views, lists, forms, sheets, toolbars, menus, pickers, system typography, SF Symbols, and platform spacing.
 - Reuse existing primitives under `Views/Shared/` before adding an abstraction. A new reusable view requires a second concrete consumer.
@@ -84,7 +84,7 @@ Any future palette calibration requires a separate explicitly approved task with
 
 ## Approved Screen Changes
 
-### Locations Overview — SCU-02 / #597
+### Locations Overview
 
 Owner: [`LocationsListView.swift`](../../HomeStuffInventoryApp/Views/Locations/LocationsListView.swift) and [`LocationSummaryRowView.swift`](../../HomeStuffInventoryApp/Views/Locations/LocationSummaryRowView.swift).
 
@@ -108,7 +108,7 @@ Do not:
 - introduce a carousel, horizontally scrolling chips, manual ordering, or a new summary model unrelated to bounded presentation;
 - change Location or Place colors.
 
-### Location Detail Place Index — SCU-03 / #596
+### Location Detail Place Index
 
 Owner: [`LocationPlacesListView.swift`](../../HomeStuffInventoryApp/Views/Locations/LocationPlacesListView.swift) and [`PlaceSummaryRowView.swift`](../../HomeStuffInventoryApp/Views/Locations/PlaceSummaryRowView.swift).
 
@@ -128,7 +128,7 @@ Do not:
 - add numbering, a timeline, a tree control, custom indentation, drag ordering, or another spatial-order metaphor;
 - change Place management, recent-view behavior, or Location/Place semantic colors.
 
-### Inventory Overview Rows — SCU-04 / #598
+### Inventory Overview Rows
 
 Owner: [`InventoryItemNavigationCard.swift`](../../HomeStuffInventoryApp/Views/Inventory/InventoryItemNavigationCard.swift), [`InventoryCompactItemCard.swift`](../../HomeStuffInventoryApp/Views/Inventory/InventoryCompactItemCard.swift), and [`ScopedInventoryItemsListView.swift`](../../HomeStuffInventoryApp/Views/Inventory/ScopedInventoryItemsListView.swift) where they route or render compact Inventory/scoped-list rows. [`InventoryItemRowView.swift`](../../HomeStuffInventoryApp/Views/Inventory/InventoryItemRowView.swift) is the Search-only row and remains a nonvisual regression boundary; it may change only for a minimal, proven separation that leaves Search output unchanged.
 
@@ -156,7 +156,7 @@ Do not:
 
 If Search and Inventory currently share implementation, separating their presentation is allowed only to keep Search unchanged. The split itself must not modify Search output.
 
-### Item Detail — SCU-05 / #599
+### Item Detail
 
 Owner: [`InventoryItemDetailView.swift`](../../HomeStuffInventoryApp/Views/Inventory/InventoryItemDetailView.swift), [`InventoryItemDetailSurfaces.swift`](../../HomeStuffInventoryApp/Views/Inventory/InventoryItemDetailSurfaces.swift), and [`InventoryItemDetailViewModel.swift`](../../HomeStuffInventoryApp/InventoryPresentation/InventoryItemDetailViewModel.swift).
 
@@ -191,7 +191,7 @@ Do not:
 - add or change tag CRUD, tag ordering, notes persistence, metadata, colors, or animation systems;
 - invent a replacement chip layout when the current tag layout can be bounded.
 
-### Add/Edit Item — SCU-06 / #600
+### Add/Edit Item
 
 Owner: [`InventoryItemFormView.swift`](../../HomeStuffInventoryApp/Views/InventoryItemFormView.swift), focused children under `Views/Inventory/Form/`, and the existing form workflow/persistence owners.
 
@@ -235,19 +235,9 @@ The epic does not modify:
 
 ## Delivery Boundaries And Dependencies
 
-| Issue | Outcome | Dependency | Branch |
-| --- | --- | --- | --- |
-| historical task #595 | Freeze this contract | None | `feature/SCU-01_freeze-soft-cabinet-refinement-contract` |
-| historical task #597 | Compact Location overview | #595 | `feature/SCU-02_compact-location-overview-cards` |
-| historical task #596 | Simplify Location Place index | #595; after #597 when shared Location primitives overlap | `feature/SCU-03_simplify-location-place-index` |
-| historical task #598 | Quiet repeated Inventory rows | #595 | `feature/SCU-04_reduce-inventory-row-chrome` |
-| historical task #599 | Rebalance Item detail | #595 | `feature/SCU-05_rebalance-item-detail-content` |
-| historical task #600 | Streamline Item capture | #595 | `feature/SCU-06_streamline-item-quick-capture` |
-| historical task #601 | Integrated validation | #596 through #600 | `feature/SCU-07_validate-soft-cabinet-refinement` |
+Freeze this contract before implementation. Inventory, Item Detail, and Item Form may then proceed independently. Keep the Location lane ordered: compact the Location overview before simplifying the Location Storage Place index when their shared primitives overlap. Integrated validation is last and may fix only contract regressions; a new idea requires a separate approved change.
 
-After #595 merges, Inventory, Item Detail, and Item Form may proceed independently. Keep the Location lane ordered `#597 → #596` when their shared primitives overlap. #601 is the final task and may fix only contract regressions; a new idea becomes a separate issue.
-
-### Integrated Validation — SCU-07 / #601
+### Integrated Validation
 
 Owner: current source, tests, and this contract record the shipped facts. The former
 integrated audit evidence is retained only in the private historical archive and is not
@@ -255,11 +245,11 @@ part of the clean public Git history. Integrated validation may not introduce a 
 decision, expand implementation scope, or revise this contract to authorize a new
 idea; any out-of-contract finding requires a separate issue.
 
-One issue equals one focused branch and PR. A child PR must include `Parent epic: #594` and `Closes #<child-issue>`.
+Each implementation change remains focused and independently reviewable.
 
 ## Validation Matrix
 
-Every implementation issue validates its changed surface. #601 repeats the integrated matrix.
+Every implementation change validates its changed surface. Final integrated validation repeats the full matrix.
 
 | Surface | Required states | Required regression proof |
 | --- | --- | --- |

@@ -30,7 +30,7 @@ and the [`macos-26` image inventory](https://github.com/actions/runner-images/bl
 
 ## Pull-request baseline
 
-`Validation`, `Full Test Validation`, and `PR UI Screenshots` use `pull_request`, not
+`Validation` and `PR UI Screenshots` use `pull_request`, not
 `pull_request_target`. They run for same-repository and external-fork pull requests with
 read-only `GITHUB_TOKEN` permissions and no repository or environment secrets.
 
@@ -43,9 +43,14 @@ Validation remains path-aware:
 - app-relevant changes run the Debug build, complete `HomeStuffInventoryAppTests`
   target, a 15-minute process-group-bounded PR UI smoke baseline with failure
   diagnostics, and the 90% owned-code coverage gate;
-- Full Test Validation builds once, runs the complete unit/localization target, and
-  launches both ordinary UI shards concurrently on distinct ephemeral simulators;
 - PR UI Screenshots captures synthetic repository-owned EN/UK light/dark fixtures.
+
+Full Test Validation is intentionally outside the pull-request baseline. Ordinary
+commits and documentation changes do not run the full unit and UI matrix. The workflow
+runs for protected version tags matching `v*`, explicit maintainer dispatch, or a
+reusable release-workflow call. It builds once, runs the complete unit/localization
+target, and launches both ordinary UI shards concurrently on distinct ephemeral
+simulators so a specific release candidate receives full-version evidence.
 
 `Classify changed files` is also the unconditional public boundary check: it validates
 the tracked public surface, prepares the exact candidate, verifies the trusted Gitleaks
@@ -72,14 +77,14 @@ release verification:
 | PR UI Screenshots | Capture PR UI screenshots |
 | Release App Store Screenshots | Capture release App Store screenshots |
 
-Each lane records or verifies the checked-out commit. For pull requests,
+Each lane records or verifies the checked-out commit. For pull-request lanes,
 `${{ github.sha }}` is the tested merge commit supplied by GitHub. Manually or
 reusably dispatched exact-SHA lanes reject a checkout that resolves to a different
 commit. Full Test Validation exposes `validated_commit`; release screenshots expose
 `source_sha`. A private release verifier can read workflow/check results for this SHA
 without write access and without receiving a source-tree artifact.
 
-Full Test Validation also runs when a protected release tag matching `v*` is pushed.
+Full Test Validation runs automatically only when a protected release tag matching `v*` is pushed.
 That event checks out only `${{ github.sha }}` and rejects any `source_ref` override;
 manual and reusable calls retain their existing explicit-ref behavior. Before publication,
 exercise this path in the clean staging repository and record public check metadata proving:

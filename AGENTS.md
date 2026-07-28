@@ -24,8 +24,8 @@
 
 - Home Stuff Inventory is a private, local-first iOS app for tracking household items and answering: "Where did I put this thing?"
 - Keep the product centered on personal household inventory. Do not shift it toward warehouse, retail, marketplace, insurance, enterprise inventory, or legacy/reference-app concepts.
-- Use the domain terms `Item`, `Inventory`, `Location`, `Place`, `Category`, `Quantity`, and `Notes`.
-- Use `Place` / `Місце` in user-facing copy for the exact drawer, box, shelf, cabinet, or organizer. Use `Container` only for existing internal compatibility such as `containerName`.
+- Use the domain terms `Item`, `Inventory`, `Location`, `Storage Place`, `Category`, `Quantity`, and `Notes`.
+- Use `Storage Place` / `Місце зберігання` in user-facing copy for the exact drawer, box, shelf, cabinet, or organizer. Use `Place` and `Container` only for existing internal compatibility such as type names, localization keys, and `containerName`.
 - Preserve the native iOS, SwiftUI-first, SwiftData-backed, local-only, privacy-first direction.
 - Do not add accounts, backend services, analytics, ads, tracking, networking, cloud sync, subscriptions, marketplace features, price tracking, barcode scanning, AI identification, import/export, sharing, collaboration, photos, reminders, widgets, Shortcuts, Spotlight, or QR labels unless the task explicitly asks for that feature.
 - Document deferred features only as future possibilities. README and in-app UI must not promise features as implemented before they exist.
@@ -81,7 +81,7 @@
 - Use custom glass shaders, fake reflections, stacked blur overlays, translucent wallpaper effects, decorative gradients, or animation-heavy atmosphere only when the task explicitly approves a custom visual treatment. Otherwise use native iOS 26+ Liquid Glass/system material APIs and stable readable inventory surfaces.
 - Remove glass or transparency that hurts readability, scan speed, contrast, Dynamic Type behavior, Reduce Transparency behavior, or Increase Contrast behavior.
 - Keep reusable UI primitives small and semantic. Use focused files under `Views/Shared/` and shared values in `InventoryPresentation/InventoryDesign.swift` only for repeated or intentionally coordinated behavior.
-- Treat #143 as the pilot model for reusable UI extraction: reuse its visual language, accessibility behavior, and native Liquid Glass fallback approach, not one-off screen dimensions.
+- Treat the established reusable UI pilot as the model for extraction: reuse its visual language, accessibility behavior, and native Liquid Glass fallback approach, not one-off screen dimensions.
 - Standardize repeated content card surfaces through `InventoryCard`, `InventoryPropertyCard`, and their semantic modifiers.
 - Standardize repeated hero surfaces through `InventoryHeroCard` and `InventoryHeroIcon`; keep hero treatments calm and location-first.
 - Standardize repeated compact list-row cards, row accessories, icon bubbles, picker rows, focus behavior, validation surfaces, and empty-state wrappers through shared primitives or a focused modifier.

@@ -134,7 +134,10 @@ full_test_job = full_test_workflow.dig("jobs", "full-test-suite")
 fail_contract("missing full-test-suite job") unless full_test_job.is_a?(Hash)
 fail_contract("Full Test Validation must use the supported GitHub-hosted runner") unless full_test_job["runs-on"] == expected_runner
 full_test_events = workflow_on(full_test_workflow)
-fail_contract("Full Test Validation must cover pull requests") unless full_test_events.key?("pull_request")
+fail_contract("Full Test Validation must not run for ordinary pull requests") if full_test_events.key?("pull_request")
+fail_contract("Full Test Validation must cover protected version tags") unless full_test_events.dig("push", "tags") == ["v*"]
+fail_contract("Full Test Validation must support explicit version validation") unless full_test_events.key?("workflow_dispatch")
+fail_contract("Full Test Validation must remain reusable by release automation") unless full_test_events.key?("workflow_call")
 full_test_text = strings(full_test_workflow).join("\n")
 [
   "build-for-testing", "test-without-building", "DerivedData/FullTestValidation",

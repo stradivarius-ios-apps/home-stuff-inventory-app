@@ -16,7 +16,7 @@ is a procedure template, not evidence by itself.
       controls are not presented as a private moderation channel.
 - [ ] SEC-PUB-02, SEC-PUB-03, SEC-PUB-05, and SEC-PUB-06 are integrated and their
       final contracts pass from the selected source state.
-- [ ] PR #635 (governance) and PR #636 (bootstrap) are non-draft and merged. Record
+- [ ] The governance and bootstrap changes are non-draft and merged. Record
       both exact merge commit SHAs outside this repository until merge, then prove the
       final source commit descends from both and bind their files to the recomputed
       candidate path-set/snapshot identity.

@@ -4,8 +4,10 @@ Status: Canonical contract for ordinary CI in the public product repository.
 
 ## Hosted environment
 
-All ordinary macOS jobs use the standard `macos-26-intel` GitHub-hosted runner. The
-workflow selects `/Applications/Xcode_26.6.app/Contents/Developer` with
+Ordinary validation and screenshot jobs use the standard `macos-26-intel`
+GitHub-hosted runner. Full Test build and UI matrix jobs use the reviewed Apple
+Silicon `macos-26` runner. Every macOS workflow selects
+`/Applications/Xcode_26.6.app/Contents/Developer` with
 `sudo xcode-select --switch` and then verifies both `xcodebuild -version` and
 `xcode-select -p`. The reviewed toolchain contract is:
 
@@ -49,12 +51,13 @@ Full Test Validation is intentionally outside the pull-request baseline. Ordinar
 commits and documentation changes do not run the full unit and UI matrix. The workflow
 runs for protected version tags matching `v*`, explicit maintainer dispatch, or a
 reusable release-workflow call. It builds once, runs the complete unit/localization
-target, and runs both ordinary UI shards sequentially on distinct ephemeral
-simulators so a specific release candidate receives full-version evidence. Keeping
-one XCTest automation session active at a time avoids the CoreSimulator event-loop
-and accessibility-query stalls observed when two sessions competed on one hosted
-Intel runner. Each shard retains its own process-group timeout, result bundle, log,
-status, and cleanup boundary.
+target, packages only the immutable test products, and fans the explicit 72-test UI
+manifest into 18 Apple Silicon matrix shards. Each shard restores the same products,
+runs four methods with `test-without-building`, and owns one ephemeral simulator on
+its runner. This avoids the CoreSimulator accessibility-service contention observed
+when two XCTest sessions shared one runner while keeping each shard independently
+bounded with its own result bundle, log, status, diagnostics, and cleanup. A final
+`Full Test Suite` aggregator remains the stable release-verification check.
 
 `Classify changed files` is also the unconditional public boundary check: it validates
 the tracked public surface, prepares the exact candidate, verifies the trusted Gitleaks
@@ -112,10 +115,13 @@ always shut down and delete them. `xcodebuild` exit status remains authoritative
 when output is captured. Full Test Validation rejects duplicate UI identifiers and
 successful zero-test results and reports unit/UI totals and timing in the job summary.
 
-Public artifacts are limited to synthetic screenshots and failure diagnostics already
-owned by the repository. Retention is three days. Artifact names use commit SHA or
-GitHub run identifiers, never free-form user input. Do not upload DerivedData, the
-source tree, signing metadata, credentials, private host details, or household data.
+Public artifacts are limited to synthetic screenshots, failure diagnostics already
+owned by the repository, and the Full Test lane's compressed immutable `Build/Products`
+payload. Matrix jobs consume that payload only to run `test-without-building`; it is
+retained for one day, while diagnostics are retained for three days. Artifact names
+use commit SHA or GitHub run identifiers, never free-form user input. Do not upload
+the wider DerivedData tree, the source tree, signing metadata, credentials, private
+host details, or household data.
 
 ## Private release boundary
 

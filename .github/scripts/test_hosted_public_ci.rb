@@ -6,6 +6,7 @@ require "yaml"
 
 class HostedPublicCITest < Minitest::Test
   HOSTED_RUNNER = "macos-26-intel"
+  FULL_TEST_RUNNER = "macos-26"
   ORDINARY_JOBS = {
     ".github/workflows/validation.yml" => {
       "classify-changes" => ["Classify changed files", "ubuntu-latest"],
@@ -15,7 +16,10 @@ class HostedPublicCITest < Minitest::Test
       "code-coverage" => ["Code coverage", HOSTED_RUNNER]
     },
     ".github/workflows/full-tests.yml" => {
-      "full-test-suite" => ["Full Test Suite", HOSTED_RUNNER]
+      "source" => ["Resolve Exact Source", "ubuntu-latest"],
+      "build-and-unit-tests" => ["Build, Unit, and Localization Tests", FULL_TEST_RUNNER],
+      "ui-shards" => ['UI Shard ${{ matrix.shard }}', FULL_TEST_RUNNER],
+      "full-test-suite" => ["Full Test Suite", "ubuntu-latest"]
     },
     ".github/workflows/pr-ui-screenshots.yml" => {
       "pr-ui-screenshots" => ["Capture PR UI screenshots", HOSTED_RUNNER]
@@ -97,8 +101,8 @@ class HostedPublicCITest < Minitest::Test
     events = workflow["on"] || workflow[true] || {}
     assert_equal ["v*"], events.dig("push", "tags")
 
-    job = workflow.dig("jobs", "full-test-suite")
-    assert_equal "Full Test Suite", job.fetch("name")
+    job = workflow.dig("jobs", "source")
+    assert_equal "Resolve Exact Source", job.fetch("name")
     checkout = job.fetch("steps").find { |step| step["name"] == "Check out repository" }
     assert_equal "${{ github.event_name == 'push' && github.sha || inputs.source_ref || github.sha }}",
                  checkout.dig("with", "ref")

@@ -33,7 +33,10 @@ class HostedPublicCITest < Minitest::Test
     ORDINARY_JOBS.each do |path, expected_jobs|
       workflow = YAML.load_file(path)
       unless path.end_with?("pr-ui-screenshots.yml")
-        assert_equal({ "contents" => "read" }, workflow.fetch("permissions"), "#{path} needs read-only default permissions")
+        expected_permissions = path.end_with?("full-tests.yml") ?
+          { "actions" => "read", "contents" => "read" } :
+          { "contents" => "read" }
+        assert_equal expected_permissions, workflow.fetch("permissions"), "#{path} needs read-only default permissions"
       end
 
       expected_jobs.each do |job_id, (check_name, runner)|
@@ -153,5 +156,23 @@ class HostedPublicCITest < Minitest::Test
         end
       end
     end
+  end
+
+  def test_full_test_products_download_obeys_the_organization_action_allowlist
+    workflow = YAML.load_file(".github/workflows/full-tests.yml")
+    build_job = workflow.dig("jobs", "build-and-unit-tests")
+    shard_job = workflow.dig("jobs", "ui-shards")
+    upload = build_job.fetch("steps").find { |step| step["name"] == "Upload immutable shared test products" }
+    download = shard_job.fetch("steps").find { |step| step["name"] == "Download immutable shared test products" }
+
+    assert_equal "${{ steps.test-products.outputs.artifact-id }}",
+                 build_job.dig("outputs", "test_products_artifact_id")
+    assert_equal "test-products", upload.fetch("id")
+    assert_equal "${{ needs.build-and-unit-tests.outputs.test_products_artifact_id }}",
+                 download.dig("env", "ARTIFACT_ID")
+    assert_equal "${{ github.token }}", download.dig("env", "GITHUB_TOKEN")
+    assert_includes download.fetch("run"), "api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID/zip"
+    assert_includes download.fetch("run"), '[[ ! "$ARTIFACT_ID" =~ ^[0-9]+$ ]]'
+    refute_includes File.read(".github/workflows/full-tests.yml"), "actions/download-artifact@"
   end
 end

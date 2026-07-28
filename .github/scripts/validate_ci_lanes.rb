@@ -146,7 +146,8 @@ fail_contract("Full Test Validation must remain reusable by release automation")
 full_test_text = strings(full_test_workflow).join("\n")
 [
   "build-for-testing", "test-without-building", "DerivedData/FullTestValidation",
-  "FullTestProducts.tar.gz", "download-artifact", "simctl create", "simctl bootstatus",
+  "FullTestProducts.tar.gz", "api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID/zip",
+  "simctl create", "simctl bootstatus",
   "run-ui-shard",
   "Delete isolated shard simulator", "simctl shutdown", "simctl delete"
 ].each { |text| fail_contract("#{full_test_path} is missing required full-test architecture: #{text}") unless full_test_text.include?(text) }
@@ -162,6 +163,15 @@ fail_contract("Full Test Validation unit stage must not rebuild") unless unit_st
 unit_result_step = step!(full_test_build_steps, "Reject empty successful unit results")["run"].to_s
 fail_contract("Full Test Validation must reject empty successful unit results") unless unit_result_step.include?("validate-unit-result")
 fail_contract("Full Test Validation must package only immutable test products") unless step!(full_test_build_steps, "Package immutable shared test products")["run"].to_s.include?('-C "$DERIVED_DATA/Build" Products')
+artifact_upload = step!(full_test_build_steps, "Upload immutable shared test products")
+artifact_download = step!(full_test_shard_steps, "Download immutable shared test products")
+fail_contract("Full Test Validation must pass the immutable artifact ID to shards") unless
+  artifact_upload["id"] == "test-products" &&
+  full_test_build_job.dig("outputs", "test_products_artifact_id") == "${{ steps.test-products.outputs.artifact-id }}" &&
+  artifact_download.dig("env", "ARTIFACT_ID") == "${{ needs.build-and-unit-tests.outputs.test_products_artifact_id }}"
+fail_contract("Full Test Validation must fail closed on an invalid artifact ID") unless artifact_download["run"].to_s.include?('[[ ! "$ARTIFACT_ID" =~ ^[0-9]+$ ]]')
+fail_contract("Full Test Validation must use the organization-compatible artifact API") if
+  File.read(full_test_path).include?("actions/download-artifact@")
 matrix_shards = full_test_shard_job.dig("strategy", "matrix", "shard")
 fail_contract("Full Test Validation must use 18 explicit matrix shards") unless matrix_shards == (1..18).map { |number| format("%02d", number) }
 simulator_step = step!(full_test_shard_steps, "Create isolated shard simulator")

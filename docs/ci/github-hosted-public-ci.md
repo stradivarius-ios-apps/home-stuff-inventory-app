@@ -118,7 +118,9 @@ successful zero-test results and reports unit/UI totals and timing in the job su
 Public artifacts are limited to synthetic screenshots, failure diagnostics already
 owned by the repository, and the Full Test lane's compressed immutable `Build/Products`
 payload. Matrix jobs consume that payload only to run `test-without-building`; it is
-retained for one day, while diagnostics are retained for three days. Artifact names
+downloaded by immutable artifact ID through the Actions REST API so the lane remains
+compatible with the organization's restricted action allowlist. It is retained for
+one day, while diagnostics are retained for three days. Artifact names
 use commit SHA or GitHub run identifiers, never free-form user input. Do not upload
 the wider DerivedData tree, the source tree, signing metadata, credentials, private
 host details, or household data.

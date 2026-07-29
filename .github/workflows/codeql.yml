@@ -8,6 +8,15 @@ on:
   schedule:
     - cron: "17 3 * * 0"
   workflow_dispatch:
+    inputs:
+      swift_batch_variant:
+        description: Select the reviewed Swift batch-count benchmark variant.
+        type: choice
+        options:
+          - default
+          - six
+        default: default
+        required: true
 
 permissions:
   contents: read
@@ -86,8 +95,24 @@ jobs:
           config-file: ${{ env.CODEQL_CONFIG }}
 
       - name: Build Swift for CodeQL
+        env:
+          SWIFT_BATCH_VARIANT: ${{ inputs.swift_batch_variant || 'default' }}
         run: |
           set -euo pipefail
+
+          swift_batch_flags=()
+          case "$SWIFT_BATCH_VARIANT" in
+            default)
+              ;;
+            six)
+              swift_batch_flags=("OTHER_SWIFT_FLAGS=-driver-batch-count 6")
+              ;;
+            *)
+              echo "Unsupported Swift batch variant: $SWIFT_BATCH_VARIANT"
+              exit 1
+              ;;
+          esac
+
           xcodebuild build \
             -project "$PROJECT" \
             -target "$TARGET" \
@@ -99,7 +124,10 @@ jobs:
             ONLY_ACTIVE_ARCH=YES \
             SWIFT_OPTIMIZATION_LEVEL=-Onone \
             SWIFT_COMPILATION_MODE=singlefile \
-            DEBUG_INFORMATION_FORMAT=dwarf
+            DEBUG_INFORMATION_FORMAT=dwarf \
+            "${swift_batch_flags[@]}"
+
+          echo "Swift batch benchmark variant: \`$SWIFT_BATCH_VARIANT\`" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Analyze
         uses: github/codeql-action/analyze@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3

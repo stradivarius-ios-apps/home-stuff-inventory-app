@@ -21,6 +21,10 @@ class CodeQLAdvancedSetupTest < Minitest::Test
     assert events.key?("pull_request")
     assert events.key?("schedule")
     assert events.key?("workflow_dispatch")
+    assert_equal %w[default six],
+                 events.dig("workflow_dispatch", "inputs", "swift_batch_variant", "options")
+    assert_equal "default",
+                 events.dig("workflow_dispatch", "inputs", "swift_batch_variant", "default")
 
     @workflow.fetch("jobs").each_value do |job|
       assert_equal "vars.ADVANCED_CODEQL_ENABLED == 'true'", job.fetch("if")
@@ -69,6 +73,8 @@ class CodeQLAdvancedSetupTest < Minitest::Test
       "SWIFT_COMPILATION_MODE=singlefile",
       "DEBUG_INFORMATION_FORMAT=dwarf"
     ].each { |value| assert_includes build, value }
+    assert_includes build, 'swift_batch_flags=("OTHER_SWIFT_FLAGS=-driver-batch-count 6")'
+    refute_includes build, "${{ inputs.swift_batch_variant }}"
     refute_includes text, "#{CODEQL_ACTION}/autobuild@"
   end
 

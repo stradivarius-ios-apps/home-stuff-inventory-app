@@ -50,8 +50,8 @@ analysis.
 `swift` coverage and the remote-and-local source threat model on pull requests, every
 `main` push, and the weekly schedule. Interpreted languages use CodeQL's no-build mode
 on `ubuntu-latest`. Swift uses a reviewed manual Release build on `macos-26`: one unsigned
-`iphoneos`/`arm64` target, `-Onone`, and single-file compilation. It does not skip Swift
-based on changed paths.
+`iphoneos`/`arm64` target, `-Onone`, single-file compilation, and six fixed Swift driver
+batches. It does not skip Swift based on changed paths.
 
 The manual Swift build was selected from hosted measurements against Default Setup:
 
@@ -61,6 +61,11 @@ The manual Swift build was selected from hosted measurements against Default Set
 
 This reduces the observed median Swift critical path by 6:37, or approximately 24%,
 without reducing analyzed source coverage or changing Release compilation conditions.
+
+A follow-up exact-SHA comparison on the standard three-core hosted runner measured three
+default-batch jobs at 18:02–22:25 (median 21:36) and three six-batch jobs at 17:26–22:48
+(median 18:25). The fixed six-batch configuration reduced the total median by 3:11 and
+the build-step median by 3:08. Every valid run scanned the same 114 of 173 Swift files.
 
 The repository variable `ADVANCED_CODEQL_ENABLED` is a deliberate transition and
 rollback gate. Switch setup modes in this order so every protected `main` SHA remains

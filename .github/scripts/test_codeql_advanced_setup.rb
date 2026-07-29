@@ -14,13 +14,13 @@ class CodeQLAdvancedSetupTest < Minitest::Test
     @workflow = YAML.load_file(WORKFLOW_PATH)
   end
 
-  def test_trigger_and_transition_gate_preserve_post_merge_scanning
+  def test_trigger_and_transition_gate_preserve_scanning
     events = @workflow["on"] || @workflow[true] || {}
 
     assert_equal ["main"], events.dig("push", "branches")
+    assert events.key?("pull_request")
     assert events.key?("schedule")
     assert events.key?("workflow_dispatch")
-    refute events.key?("pull_request")
 
     @workflow.fetch("jobs").each_value do |job|
       assert_equal "vars.ADVANCED_CODEQL_ENABLED == 'true'", job.fetch("if")

@@ -41,15 +41,17 @@ and the [`macos-26` image inventory](https://github.com/actions/runner-images/bl
 read-only `GITHUB_TOKEN` permissions and no repository or environment secrets.
 `Validation` also supports explicit manual dispatch. It does not run again on a push to
 protected `main`: the required pull-request check validates GitHub's merge ref, while
-the separate `CodeQL` workflow performs post-merge and weekly security analysis.
+the separate `CodeQL` workflow performs pull-request, post-merge, and weekly security
+analysis.
 
 ## CodeQL advanced setup
 
 `.github/workflows/codeql.yml` preserves the existing `actions`, `python`, `ruby`, and
-`swift` coverage and the remote-and-local source threat model. Interpreted languages use
-CodeQL's no-build mode on `ubuntu-latest`. Swift uses a reviewed manual Release build on
-`macos-26`: one unsigned `iphoneos`/`arm64` target, `-Onone`, and single-file compilation.
-It does not skip Swift based on changed paths.
+`swift` coverage and the remote-and-local source threat model on pull requests, every
+`main` push, and the weekly schedule. Interpreted languages use CodeQL's no-build mode
+on `ubuntu-latest`. Swift uses a reviewed manual Release build on `macos-26`: one unsigned
+`iphoneos`/`arm64` target, `-Onone`, and single-file compilation. It does not skip Swift
+based on changed paths.
 
 The manual Swift build was selected from hosted measurements against Default Setup:
 

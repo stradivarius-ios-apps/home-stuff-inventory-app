@@ -221,23 +221,58 @@ fail_contract("Validation must not enumerate individual release validators") if 
 fail_contract("Validation UI smoke must cover the free release gate Item creation flow") unless validation.include?("InventorySmokeUITests/testFreeReleaseGateLaunchCreateSearchAndReadWithoutEntitlement")
 fail_contract("Validation must not select the superseded standalone Item-creation smoke test") if validation.include?("testAddingItemFromMainInventoryScreen")
 validation_workflow = YAML.load_file(".github/workflows/validation.yml")
+validation_events = workflow_on(validation_workflow)
+fail_contract("Validation must run for pull requests") unless validation_events.key?("pull_request")
+fail_contract("Validation must support manual dispatch") unless validation_events.key?("workflow_dispatch")
+fail_contract("Validation must not repeat after protected main merges") if validation_events.key?("push")
 validation_build_steps = Array(validation_workflow.dig("jobs", "build-test", "steps"))
+validation_build = validation_workflow.dig("jobs", "build-test")
+isolated_simulator_contract!(validation_build, "Create isolated simulator", "Delete isolated simulator")
+build_once = step!(validation_build_steps, "Build coverage-enabled test products once")["run"].to_s
+fail_contract("Validation must build test products exactly once") unless build_once.scan("build-for-testing").length == 1
+fail_contract("Validation build must enable coverage before test execution") unless build_once.include?("-enableCodeCoverage YES")
+unit_tests = step!(validation_build_steps, "Run coverage-enabled unit and localization tests without rebuilding")["run"].to_s
+fail_contract("Validation must run the complete unit/localization target") unless unit_tests.include?("-only-testing:HomeStuffInventoryAppTests")
+fail_contract("Validation unit/localization phase must not rebuild") unless unit_tests.include?("test-without-building")
+unit_result = step!(validation_build_steps, "Reject empty successful unit results")["run"].to_s
+fail_contract("Validation must reject empty successful unit results") unless unit_result.include?("ordinary_validation.rb validate-result")
 ui_smoke = step!(validation_build_steps, "Run UI smoke baseline")
 fail_contract("Validation UI smoke must use the bounded process helper") unless ui_smoke["run"].to_s.include?("ruby .github/scripts/bounded_process.rb run")
 fail_contract("Validation UI smoke must use a local 900-second deadline") unless ui_smoke["run"].to_s.include?("--timeout-seconds 900")
 fail_contract("Validation UI smoke must preserve failure for diagnostics") unless ui_smoke["continue-on-error"] == true
+fail_contract("Validation UI smoke must reuse built products") unless ui_smoke["run"].to_s.include?("test-without-building")
+ui_result = step!(validation_build_steps, "Reject empty successful UI smoke result")["run"].to_s
+fail_contract("Validation must reject empty successful UI smoke results") unless ui_result.include?("ordinary_validation.rb validate-result")
+coverage = step!(validation_build_steps, "Enforce 90% app-code coverage")["run"].to_s
+fail_contract("Validation coverage must use the authoritative unit result") unless coverage.include?("check-code-coverage.py TestResults/UnitTests.xcresult --minimum 90")
 ui_smoke_upload = step!(validation_build_steps, "Upload result bundles on failure")
 fail_contract("Validation UI smoke diagnostics must include its log") unless ui_smoke_upload.dig("with", "path").to_s.include?("TestResults/UITests.log")
 fail_contract("Validation UI smoke diagnostics must include its summary") unless ui_smoke_upload.dig("with", "path").to_s.include?("TestResults/ui-smoke-summary.json")
-ui_smoke_fail = step!(validation_build_steps, "Fail when UI smoke failed")
-fail_contract("Validation UI smoke failure must propagate") unless ui_smoke_fail["if"].to_s.include?("steps.ui-smoke.outcome == 'failure'")
+fail_contract("Validation unit diagnostics must include its log") unless ui_smoke_upload.dig("with", "path").to_s.include?("TestResults/UnitTests.log")
+summary = step!(validation_build_steps, "Summarize ordinary validation timing")["run"].to_s
+fail_contract("Validation must publish timing observability") unless summary.include?("ordinary_validation.rb summarize")
+phase_gate = step!(validation_build_steps, "Fail unless every app validation phase succeeded")
+%w[BUILD_OUTCOME UNIT_OUTCOME COVERAGE_OUTCOME UI_OUTCOME].each do |outcome|
+  fail_contract("Validation required app gate must propagate #{outcome}") unless phase_gate.dig("env", outcome)
+end
 fastlane_smoke = validation_workflow.dig("jobs", "fastlane-smoke-test")
-fail_contract("Validation must run the Fastlane smoke test on the hosted runner") unless fastlane_smoke&.fetch("runs-on", nil) == expected_runner
-%w[fastlane-smoke-test build-test code-coverage].each do |job_name|
-  fail_contract("Validation #{job_name} must use the supported hosted runner") unless validation_workflow.dig("jobs", job_name, "runs-on") == expected_runner
+fail_contract("Validation must run Fastlane smoke away from scarce macOS capacity") unless fastlane_smoke&.fetch("runs-on", nil) == "ubuntu-latest"
+{
+  "fastlane-smoke-test" => "ubuntu-latest",
+  "build-test" => "macos-26",
+  "code-coverage" => "ubuntu-latest"
+}.each do |job_name, runner|
+  fail_contract("Validation #{job_name} must use the reviewed hosted runner") unless validation_workflow.dig("jobs", job_name, "runs-on") == runner
   condition = validation_workflow.dig("jobs", job_name, "if").to_s
   fail_contract("Validation #{job_name} must remain path-aware") unless condition.include?("needs.classify-changes.outputs.")
   fail_contract("Validation #{job_name} must not exclude pull requests") if condition.include?("github.event_name != 'pull_request'")
+end
+coverage_gate = validation_workflow.dig("jobs", "code-coverage")
+fail_contract("Stable Code coverage check must depend on combined app validation") unless Array(coverage_gate["needs"]).include?("build-test")
+required_gate = validation_workflow.dig("jobs", "ci-validation")
+fail_contract("Required CI workflow validation must always aggregate selected phases") unless required_gate["if"] == "always()"
+%w[classify-changes ci-contracts fastlane-smoke-test build-test code-coverage].each do |dependency|
+  fail_contract("Required CI workflow validation must depend on #{dependency}") unless Array(required_gate["needs"]).include?(dependency)
 end
 fastlane_steps = Array(fastlane_smoke["steps"])
 setup_ruby = step!(fastlane_steps, "Set up locked Ruby")

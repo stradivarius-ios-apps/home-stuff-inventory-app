@@ -6,19 +6,20 @@ require "yaml"
 
 class HostedPublicCITest < Minitest::Test
   HOSTED_RUNNER = "macos-26-intel"
-  FULL_TEST_RUNNER = "macos-26"
+  APPLE_SILICON_RUNNER = "macos-26"
   ORDINARY_JOBS = {
     ".github/workflows/validation.yml" => {
       "classify-changes" => ["Classify changed files", "ubuntu-latest"],
+      "ci-contracts" => ["CI contract checks", "ubuntu-latest"],
       "ci-validation" => ["CI workflow validation", "ubuntu-latest"],
-      "fastlane-smoke-test" => ["Locked Fastlane smoke test", HOSTED_RUNNER],
-      "build-test" => ["Build and test", HOSTED_RUNNER],
-      "code-coverage" => ["Code coverage", HOSTED_RUNNER]
+      "fastlane-smoke-test" => ["Locked Fastlane smoke test", "ubuntu-latest"],
+      "build-test" => ["Build and test", APPLE_SILICON_RUNNER],
+      "code-coverage" => ["Code coverage", "ubuntu-latest"]
     },
     ".github/workflows/full-tests.yml" => {
       "source" => ["Resolve Exact Source", "ubuntu-latest"],
-      "build-and-unit-tests" => ["Build, Unit, and Localization Tests", FULL_TEST_RUNNER],
-      "ui-shards" => ['UI Shard ${{ matrix.shard }}', FULL_TEST_RUNNER],
+      "build-and-unit-tests" => ["Build, Unit, and Localization Tests", APPLE_SILICON_RUNNER],
+      "ui-shards" => ['UI Shard ${{ matrix.shard }}', APPLE_SILICON_RUNNER],
       "full-test-suite" => ["Full Test Suite", "ubuntu-latest"]
     },
     ".github/workflows/pr-ui-screenshots.yml" => {
@@ -55,6 +56,10 @@ class HostedPublicCITest < Minitest::Test
       workflow = YAML.load_file(path)
       events = workflow["on"] || workflow[true] || {}
       assert events.key?("pull_request"), "#{path} must run for same-repository and fork pull requests"
+      if name == "validation.yml"
+        refute events.key?("push"), "#{path} must not repeat complete validation after a protected merge"
+        assert events.key?("workflow_dispatch"), "#{path} must retain manual validation"
+      end
 
       text = File.read(path)
       refute_includes text, "pull_request_target"
@@ -134,7 +139,7 @@ class HostedPublicCITest < Minitest::Test
       assert_includes File.read(path), "bash .github/scripts/configure_hosted_xcode.sh"
     end
     validation = File.read(".github/workflows/validation.yml")
-    assert_operator validation.scan("bash .github/scripts/configure_hosted_xcode.sh").length, :>=, 2
+    assert_equal 1, validation.scan("bash .github/scripts/configure_hosted_xcode.sh").length
     assert_includes validation, "ruby/setup-ruby@a30dfa457ad68707b8b910ac3a244714b61c0626"
     assert_includes validation, 'ruby-version: "4.0.5"'
     assert_includes validation, 'bundler: "2.7.2"'
@@ -143,6 +148,11 @@ class HostedPublicCITest < Minitest::Test
     assert_includes validation, "--timeout-seconds 900"
     assert_includes validation, "TestResults/ui-smoke-summary.json"
     assert_includes validation, "com.apple.CoreSimulator.SimRuntime.iOS-26-5"
+    assert_equal 1, validation.scan("build-for-testing").length
+    assert_operator validation.scan("test-without-building").length, :>=, 2
+    assert_includes validation, "scripts/ci/check-code-coverage.py TestResults/UnitTests.xcresult --minimum 90"
+    assert_includes validation, "ordinary_validation.rb validate-result"
+    assert_includes validation, "ordinary_validation.rb summarize"
   end
 
   def test_public_artifacts_are_short_lived_and_not_named_from_free_form_input

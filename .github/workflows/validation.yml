@@ -522,7 +522,7 @@ jobs:
           "$CODEQL_CLI" database create "$RUNNER_TEMP/swift-codeql-database" \
             --language=swift \
             --source-root="$GITHUB_WORKSPACE" \
-            --command="xcodebuild build -project '$PROJECT' -target '$SCHEME' -configuration Release -sdk iphoneos -arch arm64 CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO ONLY_ACTIVE_ARCH=YES SWIFT_OPTIMIZATION_LEVEL=-Onone SWIFT_COMPILATION_MODE=singlefile DEBUG_INFORMATION_FORMAT=dwarf"
+            --command="xcodebuild build -project $PROJECT -target $SCHEME -configuration Release -sdk iphoneos -arch arm64 CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO ONLY_ACTIVE_ARCH=YES SWIFT_OPTIMIZATION_LEVEL=-Onone SWIFT_COMPILATION_MODE=singlefile DEBUG_INFORMATION_FORMAT=dwarf"
           finished_at="$(date -u +%s)"
           duration="$((finished_at - started_at))"
           echo "CODEQL_BUILD_SECONDS=$duration" >> "$GITHUB_ENV"

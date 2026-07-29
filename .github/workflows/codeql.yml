@@ -1,0 +1,106 @@
+name: CodeQL
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "17 3 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CODEQL_CONFIG: ./.github/codeql/codeql-config.yml
+
+jobs:
+  interpreted:
+    name: CodeQL (${{ matrix.language }})
+    if: vars.ADVANCED_CODEQL_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language:
+          - actions
+          - python
+          - ruby
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Verify exact CodeQL source
+        run: test "$(git rev-parse HEAD)" = "${{ github.sha }}"
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+          config-file: ${{ env.CODEQL_CONFIG }}
+
+      - name: Analyze
+        uses: github/codeql-action/analyze@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
+        with:
+          category: /language:${{ matrix.language }}
+
+  swift:
+    name: CodeQL (swift)
+    if: vars.ADVANCED_CODEQL_ENABLED == 'true'
+    runs-on: macos-26
+    timeout-minutes: 30
+
+    env:
+      PROJECT: HomeStuffInventoryApp.xcodeproj
+      TARGET: HomeStuffInventoryApp
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Verify exact CodeQL source
+        run: test "$(git rev-parse HEAD)" = "${{ github.sha }}"
+
+      - name: Select reviewed Xcode
+        run: bash .github/scripts/configure_hosted_xcode.sh
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
+        with:
+          languages: swift
+          build-mode: manual
+          config-file: ${{ env.CODEQL_CONFIG }}
+
+      - name: Build Swift for CodeQL
+        run: |
+          set -euo pipefail
+          xcodebuild build \
+            -project "$PROJECT" \
+            -target "$TARGET" \
+            -configuration Release \
+            -sdk iphoneos \
+            -arch arm64 \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            ONLY_ACTIVE_ARCH=YES \
+            SWIFT_OPTIMIZATION_LEVEL=-Onone \
+            SWIFT_COMPILATION_MODE=singlefile \
+            DEBUG_INFORMATION_FORMAT=dwarf
+
+      - name: Analyze
+        uses: github/codeql-action/analyze@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
+        with:
+          category: /language:swift

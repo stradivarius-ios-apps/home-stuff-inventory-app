@@ -491,7 +491,7 @@ jobs:
         run: test "$(git rev-parse HEAD)" = "${{ github.sha }}"
 
       - name: Select reviewed Xcode
-        run: .github/scripts/configure_hosted_xcode.sh
+        run: bash .github/scripts/configure_hosted_xcode.sh
 
       - name: Install pinned CodeQL bundle
         env:

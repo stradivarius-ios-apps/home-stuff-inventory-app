@@ -73,7 +73,7 @@ class CodeQLAdvancedSetupTest < Minitest::Test
       "SWIFT_COMPILATION_MODE=singlefile",
       "DEBUG_INFORMATION_FORMAT=dwarf"
     ].each { |value| assert_includes build, value }
-    assert_includes build, 'swift_batch_flags=("OTHER_SWIFT_FLAGS=-driver-batch-count 6")'
+    assert_includes build, 'set -- "OTHER_SWIFT_FLAGS=-driver-batch-count 6"'
     refute_includes build, "${{ inputs.swift_batch_variant }}"
     refute_includes text, "#{CODEQL_ACTION}/autobuild@"
   end

@@ -100,12 +100,12 @@ jobs:
         run: |
           set -euo pipefail
 
-          swift_batch_flags=()
+          set --
           case "$SWIFT_BATCH_VARIANT" in
             default)
               ;;
             six)
-              swift_batch_flags=("OTHER_SWIFT_FLAGS=-driver-batch-count 6")
+              set -- "OTHER_SWIFT_FLAGS=-driver-batch-count 6"
               ;;
             *)
               echo "Unsupported Swift batch variant: $SWIFT_BATCH_VARIANT"
@@ -125,7 +125,7 @@ jobs:
             SWIFT_OPTIMIZATION_LEVEL=-Onone \
             SWIFT_COMPILATION_MODE=singlefile \
             DEBUG_INFORMATION_FORMAT=dwarf \
-            "${swift_batch_flags[@]}"
+            "$@"
 
           echo "Swift batch benchmark variant: \`$SWIFT_BATCH_VARIANT\`" >> "$GITHUB_STEP_SUMMARY"
 

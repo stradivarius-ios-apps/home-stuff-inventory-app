@@ -131,8 +131,13 @@ end
 full_test_path = ".github/workflows/full-tests.yml"
 full_test_workflow = YAML.load_file(full_test_path)
 full_test_job = full_test_workflow.dig("jobs", "full-test-suite")
+full_test_source_job = full_test_workflow.dig("jobs", "source")
+full_test_build_job = full_test_workflow.dig("jobs", "build-and-unit-tests")
+full_test_shard_job = full_test_workflow.dig("jobs", "ui-shards")
 fail_contract("missing full-test-suite job") unless full_test_job.is_a?(Hash)
-fail_contract("Full Test Validation must use the supported GitHub-hosted runner") unless full_test_job["runs-on"] == expected_runner
+fail_contract("Full Test Validation must keep a stable hosted aggregator") unless full_test_job["runs-on"] == "ubuntu-latest" && full_test_job["name"] == "Full Test Suite"
+fail_contract("Full Test Validation must resolve exact source separately") unless full_test_source_job.is_a?(Hash) && full_test_source_job["runs-on"] == "ubuntu-latest"
+fail_contract("Full Test Validation build and shards must use reviewed hosted Apple Silicon") unless full_test_build_job["runs-on"] == "macos-26" && full_test_shard_job["runs-on"] == "macos-26"
 full_test_events = workflow_on(full_test_workflow)
 fail_contract("Full Test Validation must not run for ordinary pull requests") if full_test_events.key?("pull_request")
 fail_contract("Full Test Validation must cover protected version tags") unless full_test_events.dig("push", "tags") == ["v*"]
@@ -141,31 +146,49 @@ fail_contract("Full Test Validation must remain reusable by release automation")
 full_test_text = strings(full_test_workflow).join("\n")
 [
   "build-for-testing", "test-without-building", "DerivedData/FullTestValidation",
-  "HSI Full Tests A", "HSI Full Tests B", "simctl create", "simctl bootstatus",
-  "run-ui-shards",
-  "Delete isolated full-test simulators", "simctl shutdown", "simctl delete"
+  "FullTestProducts.tar.gz", "api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID/zip",
+  "simctl create", "simctl bootstatus",
+  "run-ui-shard",
+  "Delete isolated shard simulator", "simctl shutdown", "simctl delete"
 ].each { |text| fail_contract("#{full_test_path} is missing required full-test architecture: #{text}") unless full_test_text.include?(text) }
-full_test_steps = Array(full_test_job["steps"])
-build_step = step!(full_test_steps, "Build test products once")["run"].to_s
+full_test_source_steps = Array(full_test_source_job["steps"])
+full_test_build_steps = Array(full_test_build_job["steps"])
+full_test_shard_steps = Array(full_test_shard_job["steps"])
+build_step = step!(full_test_build_steps, "Build test products once")["run"].to_s
 fail_contract("Full Test Validation must build test products exactly once") unless build_step.scan("build-for-testing").length == 1
-fail_contract("Full Test Validation must resolve one generated xctestrun") unless step!(full_test_steps, "Resolve shared test run file")["run"].to_s.include?("Expected exactly one generated .xctestrun")
-unit_step = step!(full_test_steps, "Run full unit and localization tests without rebuilding")["run"].to_s
+fail_contract("Full Test Validation must resolve one generated xctestrun") unless step!(full_test_build_steps, "Resolve shared test run file")["run"].to_s.include?("Expected exactly one generated .xctestrun")
+unit_step = step!(full_test_build_steps, "Run full unit and localization tests without rebuilding")["run"].to_s
 fail_contract("Full Test Validation must keep the complete unit target") unless unit_step.include?("-only-testing:HomeStuffInventoryAppTests")
 fail_contract("Full Test Validation unit stage must not rebuild") unless unit_step.include?("test-without-building")
-unit_result_step = step!(full_test_steps, "Reject empty successful unit results")["run"].to_s
+unit_result_step = step!(full_test_build_steps, "Reject empty successful unit results")["run"].to_s
 fail_contract("Full Test Validation must reject empty successful unit results") unless unit_result_step.include?("validate-unit-result")
-simulator_step = step!(full_test_steps, "Create isolated full-test simulators")["run"].to_s
-fail_contract("Full Test Validation must create two distinct iPhone 17 simulators") unless simulator_step.scan("simctl create").length == 2 && simulator_step.include?("simulator_a") && simulator_step.include?("simulator_b")
-shard_step = step!(full_test_steps, "Run concurrent UI shards without rebuilding")["run"].to_s
-fail_contract("Full Test Validation must run both UI shards from one shared test run") unless shard_step.include?("run-ui-shards") && shard_step.scan("platform=iOS Simulator,id=").length == 2
-configured_shard_timeout = full_test_job.fetch("env", {}).fetch("UI_SHARD_TIMEOUT_SECONDS", nil) || full_test_workflow.fetch("env", {}).fetch("UI_SHARD_TIMEOUT_SECONDS", nil)
-fail_contract("Full Test Validation must reserve time for diagnostics after independently bounded UI shards") unless configured_shard_timeout.is_a?(Integer) && configured_shard_timeout.between?(1, 1800)
-cleanup_step = step!(full_test_steps, "Delete isolated full-test simulators")
+fail_contract("Full Test Validation must package only immutable test products") unless step!(full_test_build_steps, "Package immutable shared test products")["run"].to_s.include?('-C "$DERIVED_DATA/Build" Products')
+artifact_upload = step!(full_test_build_steps, "Upload immutable shared test products")
+artifact_download = step!(full_test_shard_steps, "Download immutable shared test products")
+fail_contract("Full Test Validation must pass the immutable artifact ID to shards") unless
+  artifact_upload["id"] == "test-products" &&
+  full_test_build_job.dig("outputs", "test_products_artifact_id") == "${{ steps.test-products.outputs.artifact-id }}" &&
+  artifact_download.dig("env", "ARTIFACT_ID") == "${{ needs.build-and-unit-tests.outputs.test_products_artifact_id }}"
+fail_contract("Full Test Validation must fail closed on an invalid artifact ID") unless artifact_download["run"].to_s.include?('[[ ! "$ARTIFACT_ID" =~ ^[0-9]+$ ]]')
+fail_contract("Full Test Validation must use the organization-compatible artifact API") if
+  File.read(full_test_path).include?("actions/download-artifact@")
+matrix_shards = full_test_shard_job.dig("strategy", "matrix", "shard")
+fail_contract("Full Test Validation must use 18 explicit matrix shards") unless matrix_shards == (1..18).map { |number| format("%02d", number) }
+simulator_step = step!(full_test_shard_steps, "Create isolated shard simulator")
+fail_contract("Each Full Test UI shard must create exactly one isolated simulator") unless simulator_step["run"].to_s.scan("simctl create").length == 1
+fail_contract("Each Full Test UI shard simulator setup must be bounded") unless simulator_step["timeout-minutes"].is_a?(Integer) && simulator_step["timeout-minutes"] <= 10
+shard_step = step!(full_test_shard_steps, "Run bounded UI shard without rebuilding")["run"].to_s
+fail_contract("Each Full Test UI shard must use restored products without rebuilding") unless shard_step.include?("run-ui-shard") && shard_step.include?("steps.test-run.outputs.path")
+configured_shard_timeout = full_test_workflow.fetch("env", {}).fetch("UI_SHARD_TIMEOUT_SECONDS", nil)
+fail_contract("Full Test Validation must reserve time for per-shard diagnostics") unless configured_shard_timeout.is_a?(Integer) && configured_shard_timeout.between?(1, 1200)
+cleanup_step = step!(full_test_shard_steps, "Delete isolated shard simulator")
 fail_contract("Full Test Validation simulator cleanup must always run") unless cleanup_step["if"] == "always()"
-fail_contract("Full Test Validation cleanup must delete both simulators") unless cleanup_step["run"].to_s.include?("udid_a") && cleanup_step["run"].to_s.include?("udid_b")
-%w[Upload\ failed\ unit\ diagnostics Upload\ failed\ UI\ shard\ A\ diagnostics Upload\ failed\ UI\ shard\ B\ diagnostics].each do |name|
-  fail_contract("missing full-test failure diagnostics step #{name}") unless full_test_steps.any? { |step| step["name"] == name }
-end
+fail_contract("Full Test Validation cleanup must delete its matrix simulator") unless cleanup_step["run"].to_s.include?("steps.simulator.outputs.udid")
+fail_contract("Full Test Validation must retain unit failure diagnostics") unless full_test_build_steps.any? { |step| step["name"] == "Upload failed unit diagnostics" }
+fail_contract("Full Test Validation must retain per-shard failure diagnostics") unless full_test_shard_steps.any? { |step| step["name"] == "Upload failed UI shard diagnostics" }
+source_checkout = step!(full_test_source_steps, "Check out repository")
+fail_contract("Full Test Validation source resolver must preserve exact ref selection") unless source_checkout.dig("with", "ref") == "${{ github.event_name == 'push' && github.sha || inputs.source_ref || github.sha }}"
+fail_contract("Full Test Suite aggregator must wait for every matrix shard") unless Array(full_test_job["needs"]).include?("ui-shards")
 manifest_script = ".github/scripts/full_test_validation.rb"
 fail_contract("missing UI shard manifest validator") unless File.exist?(manifest_script)
 manifest_source = File.read(manifest_script)
@@ -173,6 +196,7 @@ fail_contract("UI shards must disable nested Xcode parallel testing") unless man
 fail_contract("UI shards need separate result bundles and logs") unless manifest_source.include?('UIShard#{name}.xcresult') && manifest_source.include?('UIShard#{name}.log')
 fail_contract("UI shards must reject missing identifiers") unless manifest_source.include?("missing_test_identifiers")
 fail_contract("UI shards must run in independently terminable process groups") unless manifest_source.include?("pgroup: true") && manifest_source.include?("terminate_process_group")
+fail_contract("UI shard manifest must contain 18 bounded groups") unless manifest_source.scan(/^\s+"[0-9]{2}" => %w\[/).length == 18
 fail_contract("UI shard timeout must fail closed") unless manifest_source.include?('status: "timeout"') && manifest_source.include?('result.fetch("status") != "success"')
 manifest_output, manifest_status = Open3.capture2e("ruby", manifest_script, "validate-manifest")
 fail_contract("UI shard manifest validator failed: #{manifest_output}") unless manifest_status.success?

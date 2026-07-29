@@ -27,6 +27,7 @@ on:
         value: ${{ jobs.full-test-suite.outputs.validation_status }}
 
 permissions:
+  actions: read
   contents: read
 
 concurrency:
@@ -39,16 +40,16 @@ env:
   CONFIGURATION: Debug
   DERIVED_DATA: DerivedData/FullTestValidation
   BUILD_DESTINATION: platform=iOS Simulator,name=iPhone 17,OS=26.5
-  UI_SHARD_TIMEOUT_SECONDS: 1800
+  UI_SHARD_TIMEOUT_SECONDS: 1200
+  TEST_PRODUCTS_ARTIFACT: full-test-products-${{ github.run_id }}-${{ github.run_attempt }}
 
 jobs:
-  full-test-suite:
-    name: Full Test Suite
-    runs-on: macos-26-intel
-    timeout-minutes: 90
+  source:
+    name: Resolve Exact Source
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     outputs:
-      validated_commit: ${{ steps.source.outputs.sha }}
-      validation_status: ${{ steps.result.outputs.status }}
+      sha: ${{ steps.source.outputs.sha }}
 
     steps:
       - name: Check out repository
@@ -92,17 +93,32 @@ jobs:
             fi
           fi
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
-          echo "VALIDATED_SHA=$sha" >> "$GITHUB_ENV"
-          echo "WORKFLOW_STARTED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+
+      - name: Validate explicit UI shard manifest
+        run: ruby .github/scripts/full_test_validation.rb validate-manifest
+
+  build-and-unit-tests:
+    name: Build, Unit, and Localization Tests
+    needs: source
+    runs-on: macos-26
+    timeout-minutes: 35
+    outputs:
+      test_products_artifact_id: ${{ steps.test-products.outputs.artifact-id }}
+
+    steps:
+      - name: Check out exact validated source
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ needs.source.outputs.sha }}
+          persist-credentials: false
+
+      - name: Verify exact validated source
+        env:
+          VALIDATED_SHA: ${{ needs.source.outputs.sha }}
+        run: test "$(git rev-parse HEAD)" = "$VALIDATED_SHA"
 
       - name: Show Xcode environment
         run: bash .github/scripts/configure_hosted_xcode.sh
-
-      - name: Show hosted simulator environment
-        run: |
-          xcodebuild -version
-          xcode-select -p
-          xcrun simctl list devices available
 
       - name: Prepare shared test products and result directory
         run: |
@@ -110,17 +126,13 @@ jobs:
           mkdir -p TestResults
 
       - name: Build test products once
-        id: build-for-testing
         run: |
-          set -euo pipefail
-          started_at=$(date +%s)
           xcodebuild build-for-testing \
             -project "$PROJECT" \
             -scheme "$SCHEME" \
             -configuration "$CONFIGURATION" \
             -destination "$BUILD_DESTINATION" \
             -derivedDataPath "$DERIVED_DATA"
-          echo "duration_seconds=$(( $(date +%s) - started_at ))" >> "$GITHUB_OUTPUT"
 
       - name: Resolve shared test run file
         id: test-run
@@ -135,89 +147,39 @@ jobs:
           test_run="$(find "$DERIVED_DATA/Build/Products" -name '*.xctestrun' -type f -print -quit)"
           echo "path=$test_run" >> "$GITHUB_OUTPUT"
 
-      - name: Validate explicit UI shard manifest
-        run: ruby .github/scripts/full_test_validation.rb validate-manifest
-
       - name: Run full unit and localization tests without rebuilding
         id: unit-tests
         continue-on-error: true
         run: |
           set -o pipefail
-          started_at=$(date +%s)
           xcodebuild test-without-building \
             -xctestrun "${{ steps.test-run.outputs.path }}" \
             -destination "$BUILD_DESTINATION" \
             -only-testing:HomeStuffInventoryAppTests \
             -resultBundlePath TestResults/UnitTests.xcresult 2>&1 | tee TestResults/UnitTests.log
-          status=${PIPESTATUS[0]}
-          echo "duration_seconds=$(( $(date +%s) - started_at ))" >> "$GITHUB_OUTPUT"
-          exit "$status"
+          exit "${PIPESTATUS[0]}"
 
       - name: Reject empty successful unit results
         id: unit-result
         if: steps.unit-tests.outcome == 'success'
         run: ruby .github/scripts/full_test_validation.rb validate-unit-result TestResults
 
-      - name: Create isolated full-test simulators
-        id: simulators
-        if: steps.unit-tests.outcome == 'success'
-        run: |
-          set -euo pipefail
-          suffix="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          simulator_a="$(xcrun simctl create "HSI Full Tests A $suffix" "iPhone 17" "com.apple.CoreSimulator.SimRuntime.iOS-26-5")"
-          simulator_b="$(xcrun simctl create "HSI Full Tests B $suffix" "iPhone 17" "com.apple.CoreSimulator.SimRuntime.iOS-26-5")"
-          echo "udid_a=$simulator_a" >> "$GITHUB_OUTPUT"
-          echo "udid_b=$simulator_b" >> "$GITHUB_OUTPUT"
-          xcrun simctl boot "$simulator_a"
-          xcrun simctl boot "$simulator_b"
-          xcrun simctl bootstatus "$simulator_a" -b
-          xcrun simctl bootstatus "$simulator_b" -b
+      - name: Package immutable shared test products
+        if: steps.unit-tests.outcome == 'success' && steps.unit-result.outcome == 'success'
+        run: tar -czf TestResults/FullTestProducts.tar.gz -C "$DERIVED_DATA/Build" Products
 
-      - name: Run concurrent UI shards without rebuilding
-        id: ui-shards
-        if: steps.unit-tests.outcome == 'success'
-        continue-on-error: true
-        run: |
-          ruby .github/scripts/full_test_validation.rb run-ui-shards \
-            "${{ steps.test-run.outputs.path }}" \
-            "platform=iOS Simulator,id=${{ steps.simulators.outputs.udid_a }}" \
-            "platform=iOS Simulator,id=${{ steps.simulators.outputs.udid_b }}" \
-            TestResults
-
-      - name: Report Full Test Validation timing
-        if: always()
-        env:
-          BUILD_DURATION_SECONDS: ${{ steps.build-for-testing.outputs.duration_seconds }}
-          UNIT_DURATION_SECONDS: ${{ steps.unit-tests.outputs.duration_seconds }}
-        run: ruby .github/scripts/full_test_validation.rb summarize TestResults
-
-      - name: Print failed UI shard diagnostics
-        if: always() && (steps.ui-shards.outputs.shard_a_status == 'failure' || steps.ui-shards.outputs.shard_a_status == 'timeout' || steps.ui-shards.outputs.shard_b_status == 'failure' || steps.ui-shards.outputs.shard_b_status == 'timeout')
-        run: |
-          for shard in A B; do
-            if [[ ("${{ steps.ui-shards.outputs.shard_a_status }}" == "failure" || "${{ steps.ui-shards.outputs.shard_a_status }}" == "timeout") && "$shard" == "A" || ("${{ steps.ui-shards.outputs.shard_b_status }}" == "failure" || "${{ steps.ui-shards.outputs.shard_b_status }}" == "timeout") && "$shard" == "B" ]]; then
-              echo "::group::UI shard $shard log"
-              rg -n -i -C 20 "assertion failure|xctassert|test case.*failed|\*\* test execute failed \*\*" "TestResults/UIShard${shard}.log" || true
-              tail -n 250 "TestResults/UIShard${shard}.log" || true
-              echo "::endgroup::"
-            fi
-          done
-
-      - name: Fail when unit or either UI shard failed
-        if: always()
-        run: |
-          if [[ "${{ steps.unit-tests.outcome }}" != "success" || "${{ steps.unit-result.outcome }}" != "success" || "${{ steps.ui-shards.outputs.shard_a_status }}" != "success" || "${{ steps.ui-shards.outputs.shard_b_status }}" != "success" ]]; then
-            exit 1
-          fi
-
-      - name: Record successful full validation
-        id: result
-        run: echo "status=success" >> "$GITHUB_OUTPUT"
+      - name: Upload immutable shared test products
+        id: test-products
+        if: steps.unit-tests.outcome == 'success' && steps.unit-result.outcome == 'success'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ env.TEST_PRODUCTS_ARTIFACT }}
+          path: TestResults/FullTestProducts.tar.gz
+          if-no-files-found: error
+          retention-days: 1
 
       - name: Upload failed unit diagnostics
-        id: unit-failure-diagnostics
-        if: failure() && (steps.unit-tests.outcome == 'failure' || steps.unit-result.outcome == 'failure')
-        continue-on-error: true
+        if: steps.unit-tests.outcome == 'failure' || steps.unit-result.outcome == 'failure'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: full-test-unit-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
@@ -227,43 +189,175 @@ jobs:
           if-no-files-found: ignore
           retention-days: 3
 
-      - name: Upload failed UI shard A diagnostics
-        id: shard-a-failure-diagnostics
-        if: failure() && (steps.ui-shards.outputs.shard_a_status == 'failure' || steps.ui-shards.outputs.shard_a_status == 'timeout')
-        continue-on-error: true
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: full-test-ui-shard-a-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            TestResults/UIShardA.xcresult
-            TestResults/UIShardA.log
-          if-no-files-found: ignore
-          retention-days: 3
+      - name: Fail when unit or localization tests failed
+        if: steps.unit-tests.outcome != 'success' || steps.unit-result.outcome != 'success'
+        run: exit 1
 
-      - name: Upload failed UI shard B diagnostics
-        id: shard-b-failure-diagnostics
-        if: failure() && (steps.ui-shards.outputs.shard_b_status == 'failure' || steps.ui-shards.outputs.shard_b_status == 'timeout')
-        continue-on-error: true
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: full-test-ui-shard-b-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            TestResults/UIShardB.xcresult
-            TestResults/UIShardB.log
-          if-no-files-found: ignore
-          retention-days: 3
+  ui-shards:
+    name: UI Shard ${{ matrix.shard }}
+    needs:
+      - source
+      - build-and-unit-tests
+    strategy:
+      fail-fast: false
+      matrix:
+        shard:
+          - "01"
+          - "02"
+          - "03"
+          - "04"
+          - "05"
+          - "06"
+          - "07"
+          - "08"
+          - "09"
+          - "10"
+          - "11"
+          - "12"
+          - "13"
+          - "14"
+          - "15"
+          - "16"
+          - "17"
+          - "18"
+    runs-on: macos-26
+    timeout-minutes: 40
 
-      - name: Report unavailable failure diagnostics
-        if: failure() && (steps.unit-failure-diagnostics.outcome == 'failure' || steps.shard-a-failure-diagnostics.outcome == 'failure' || steps.shard-b-failure-diagnostics.outcome == 'failure')
+    steps:
+      - name: Check out exact validated source
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ needs.source.outputs.sha }}
+          persist-credentials: false
+
+      - name: Verify exact validated source
+        env:
+          VALIDATED_SHA: ${{ needs.source.outputs.sha }}
+        run: test "$(git rev-parse HEAD)" = "$VALIDATED_SHA"
+
+      - name: Show Xcode environment
+        run: bash .github/scripts/configure_hosted_xcode.sh
+
+      - name: Prepare shard directories
         run: |
-          echo ":warning: Full Validation failed, and some diagnostic artifacts could not be uploaded. Check the repository Actions artifact quota." >> "$GITHUB_STEP_SUMMARY"
+          rm -rf "$DERIVED_DATA" TestResults
+          mkdir -p "$DERIVED_DATA/Build" TestResults
 
-      - name: Delete isolated full-test simulators
+      - name: Download immutable shared test products
+        env:
+          ARTIFACT_ID: ${{ needs.build-and-unit-tests.outputs.test_products_artifact_id }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$ARTIFACT_ID" =~ ^[0-9]+$ ]]; then
+            echo "Expected one numeric test-products artifact ID; received '$ARTIFACT_ID'."
+            exit 1
+          fi
+          curl --fail --location --silent --show-error \
+            --header "Accept: application/vnd.github+json" \
+            --header "Authorization: Bearer $GITHUB_TOKEN" \
+            --header "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID/zip" \
+            --output TestResults/FullTestProducts.zip
+          unzip -q TestResults/FullTestProducts.zip -d TestResults
+          test -s TestResults/FullTestProducts.tar.gz
+
+      - name: Restore shared test products
+        run: tar -xzf TestResults/FullTestProducts.tar.gz -C "$DERIVED_DATA/Build"
+
+      - name: Resolve shared test run file
+        id: test-run
+        run: |
+          set -euo pipefail
+          test_run_count="$(find "$DERIVED_DATA/Build/Products" -name '*.xctestrun' -type f | wc -l | tr -d ' ')"
+          if [[ "$test_run_count" != "1" ]]; then
+            echo "Expected exactly one restored .xctestrun file; found $test_run_count."
+            exit 1
+          fi
+          echo "path=$(find "$DERIVED_DATA/Build/Products" -name '*.xctestrun' -type f -print -quit)" >> "$GITHUB_OUTPUT"
+
+      - name: Create isolated shard simulator
+        id: simulator
+        timeout-minutes: 10
+        run: |
+          set -euo pipefail
+          simulator="$(xcrun simctl create "HSI Full Tests ${{ matrix.shard }} ${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" "iPhone 17" "com.apple.CoreSimulator.SimRuntime.iOS-26-5")"
+          echo "udid=$simulator" >> "$GITHUB_OUTPUT"
+          xcrun simctl boot "$simulator"
+          xcrun simctl bootstatus "$simulator" -b
+
+      - name: Run bounded UI shard without rebuilding
+        id: ui-shard
+        continue-on-error: true
+        run: |
+          ruby .github/scripts/full_test_validation.rb run-ui-shard \
+            "${{ matrix.shard }}" \
+            "${{ steps.test-run.outputs.path }}" \
+            "platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}" \
+            TestResults
+
+      - name: Report UI shard timing
+        if: always()
+        env:
+          VALIDATED_SHA: ${{ needs.source.outputs.sha }}
+        run: ruby .github/scripts/full_test_validation.rb summarize TestResults
+
+      - name: Print failed UI shard diagnostics
+        if: always() && steps.ui-shard.outputs.status != 'success'
+        run: |
+          log="TestResults/UIShard${{ matrix.shard }}.log"
+          grep -Eni -C 20 "assertion failure|xctassert|test case.*failed|\*\* test execute failed \*\*" "$log" || true
+          tail -n 250 "$log" || true
+
+      - name: Upload failed UI shard diagnostics
+        if: always() && steps.ui-shard.outputs.status != 'success'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: full-test-ui-shard-${{ matrix.shard }}-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            TestResults/UIShard${{ matrix.shard }}.xcresult
+            TestResults/UIShard${{ matrix.shard }}.log
+            TestResults/ui-shard-summary.json
+          if-no-files-found: ignore
+          retention-days: 3
+
+      - name: Delete isolated shard simulator
         if: always()
         run: |
-          for simulator_udid in "${{ steps.simulators.outputs.udid_a }}" "${{ steps.simulators.outputs.udid_b }}"; do
-            if [[ -n "$simulator_udid" ]]; then
-              xcrun simctl shutdown "$simulator_udid" || true
-              xcrun simctl delete "$simulator_udid" || true
-            fi
-          done
+          simulator="${{ steps.simulator.outputs.udid }}"
+          if [[ -n "$simulator" ]]; then
+            xcrun simctl shutdown "$simulator" || true
+            xcrun simctl delete "$simulator" || true
+          fi
+
+      - name: Fail when UI shard failed
+        if: always() && steps.ui-shard.outputs.status != 'success'
+        run: exit 1
+
+  full-test-suite:
+    name: Full Test Suite
+    if: always()
+    needs:
+      - source
+      - build-and-unit-tests
+      - ui-shards
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      validated_commit: ${{ needs.source.outputs.sha }}
+      validation_status: ${{ steps.result.outputs.status }}
+
+    steps:
+      - name: Fail unless every full-test stage succeeded
+        env:
+          SOURCE_RESULT: ${{ needs.source.result }}
+          BUILD_AND_UNIT_RESULT: ${{ needs.build-and-unit-tests.result }}
+          UI_SHARDS_RESULT: ${{ needs.ui-shards.result }}
+        run: |
+          if [[ "$SOURCE_RESULT" != "success" || "$BUILD_AND_UNIT_RESULT" != "success" || "$UI_SHARDS_RESULT" != "success" ]]; then
+            exit 1
+          fi
+
+      - name: Record successful full validation
+        id: result
+        run: echo "status=success" >> "$GITHUB_OUTPUT"

@@ -50,7 +50,7 @@ class PublicAutomationCheckClosureTest < Minitest::Test
       workflow.fetch("jobs").each do |job_name, job|
         next unless job.key?("runs-on")
 
-        assert_includes %w[ubuntu-latest macos-26-intel], job.fetch("runs-on"),
+        assert_includes %w[ubuntu-latest macos-26 macos-26-intel], job.fetch("runs-on"),
                         "#{path}:#{job_name} is not on a reviewed GitHub-hosted runner"
       end
     end

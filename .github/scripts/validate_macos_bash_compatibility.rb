@@ -10,7 +10,8 @@ Dir[".github/workflows/*.yml"].sort.each do |path|
   jobs = workflow.fetch("jobs", {})
   macos_job = jobs.values.any? do |job|
     labels = Array(job["runs-on"])
-    labels.include?("macos-26-intel") || (labels.include?("self-hosted") && labels.include?("macOS"))
+    labels.include?("macos-26") || labels.include?("macos-26-intel") ||
+      (labels.include?("self-hosted") && labels.include?("macOS"))
   end
   next unless macos_job
 

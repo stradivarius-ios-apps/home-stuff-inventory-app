@@ -10,23 +10,122 @@ ROOT = File.expand_path("../..", __dir__)
 UI_TEST_DIRECTORY = File.join(ROOT, "HomeStuffInventoryAppUITests")
 SCREENSHOT_SUITES = %w[InventoryScreenshotCaptureUITests InventoryReleaseScreenshotUITests].freeze
 SHARDS = {
-  "A" => %w[
-    InventorySmokeUITests
-    InventorySettingsUITests
-    InventoryItemFormUITests
-    InventoryStartupRecoveryUITests
-    InventoryManagedValueRowUITests
+  "01" => %w[
+    InventoryBrowseDetailUITests/testCompactInventoryRowPreservesRetrievalOrderAndTapTarget
+    InventoryBrowseDetailUITests/testPrimaryEditAndNotesSaveKeepDestructiveAndContextControlsAsNegativeControls
+    InventoryBrowseDetailUITests/testPlaceFilterNarrowsInventoryAndCanBeCleared
+    InventoryBrowseDetailUITests/testSearchingByItemNameLocationAndPlace
   ],
-  "B" => %w[
-    InventoryBrowseDetailUITests
-    PlaceSummaryRowUITests
-    RecentItemsTileLayoutUITests
+  "02" => %w[
+    InventoryBrowseDetailUITests/testInventorySearchAndEmptyStateSurfaces
+    InventoryBrowseDetailUITests/testLocationAndPlaceDetailContextualAddAndHeroQA
+    InventoryBrowseDetailUITests/testDeletingLastPlaceItemKeepsEmptyPlaceContext
+    InventoryBrowseDetailUITests/testOpeningItemDetailKeepsHeroAndRevealsNavigationTitleAfterScroll
+  ],
+  "03" => %w[
+    InventoryBrowseDetailUITests/testItemDetailBoundsAndExpandsManyTagsAfterNotes
+    InventoryBrowseDetailUITests/testItemDetailPlacesLabeledDatesAfterNotesAndTags
+    InventoryBrowseDetailUITests/testItemDetailStorageFitsUkrainianAccessibilityWithReducedTransparency
+    InventoryBrowseDetailUITests/testExistingNotesEditorLifecycleSupportsDismissDiscardAndSave
+  ],
+  "04" => %w[
+    InventoryBrowseDetailUITests/testEmptyNotesCardOpensNotesEditor
+    InventoryItemFormUITests/testNewItemFormInitiallyFocusesNameWhileEditFormDoesNotForceFocus
+    InventoryItemFormUITests/testPreScopedNewItemFormInitiallyFocusesName
+    InventoryItemFormUITests/testReturningFromItemFormPickersDoesNotRestoreNameFocus
+  ],
+  "05" => %w[
+    InventoryItemFormUITests/testAddNewPlaceUsesLocalizedScopedPickerAndDefaultIcon
+    InventoryItemFormUITests/testPrimaryActionCreationMatrixRendersInDarkHighContrastAccessibility
+    InventoryItemFormUITests/testAddLocationCreationSurfaceRendersAtAccessibilitySize
+    InventoryItemFormUITests/testAddCategoryCreationSurfaceRendersAtAccessibilitySize
+  ],
+  "06" => %w[
+    InventoryItemFormUITests/testItemFormDiscardProtectionForNewContextualAndEditFlows
+    InventoryItemFormUITests/testEditingLocationReviewsExistingPlaceBeforeSaving
+    InventoryItemFormUITests/testPlacePickerCanClearASelectedPlace
+    InventoryItemFormUITests/testCreatingLocationAndCategoryFromItemFormSelectsPersistedValues
+  ],
+  "07" => %w[
+    InventoryItemFormUITests/testAddItemFormTextFieldsFocusFromExpandedRows
+    InventoryItemFormUITests/testNameValidationAppearsOnlyAfterNameFieldLosesFocus
+    InventoryItemFormUITests/testEditingExistingItem
+    InventoryItemFormUITests/testDeletingItemWithConfirmation
+  ],
+  "08" => %w[
+    InventoryManagedValueRowUITests/testManagedValueRowsKeepIdentityMetadataAndActionsHittable
+    InventoryManagedValueRowUITests/testMaximumDynamicTypeKeepsManagedRowIdentityBeforeActions
+    InventoryManagedValueRowUITests/testUkrainianStandardSizeKeepsThreeAndSixItemRowsStructurallyStable
+    InventorySettingsUITests/testPlaceDirectoryGroupsPlaceRowsUnderQuietLocationContextAndSupportsScopedEditor
+  ],
+  "09" => %w[
+    InventorySettingsUITests/testPlaceDirectoryIsLocalizedInUkrainianAndLeavesLocationCategorySemanticsUntouched
+    InventorySettingsUITests/testPlaceDirectoryKeepsSameNamePlacesScopedAndRoutesExactUsedPlaceItems
+    InventorySettingsUITests/testEmptyPlaceDirectoryExplainsLocationPrerequisiteAndRoutesToLocations
+    InventorySettingsUITests/testUsedPlaceDeleteKeepsScopeAndLocationDeleteShowsBlockedGuidance
+  ],
+  "10" => %w[
+    InventorySettingsUITests/testBlockedLocationDeleteUsesUkrainianGuidance
+    InventorySettingsUITests/testSettingsShowsAlwaysAvailableManualBackupAction
+    InventorySettingsUITests/testSettingsRestoreRowIsAlwaysAvailableAndInvokesTheImporterAction
+    InventorySettingsUITests/testListManagementEditorTextFieldSavesFromSettings
+  ],
+  "11" => %w[
+    InventorySettingsUITests/testSettingsDisclosesPlaintextExportAndBackupBeforeInvokingEitherAction
+    InventorySettingsUITests/testSettingsUkrainianPlaintextDisclosuresRemainActionSpecificAtAccessibilitySize
+    InventorySettingsUITests/testLocationIconPickerSavesLocationFromSettings
+    InventorySettingsUITests/testLocationManagementKeepsLocationEditorAndPickerSeparateFromCategories
+  ],
+  "12" => %w[
+    InventorySettingsUITests/testUsedManagedLocationOpensItemsAndBlockedDeleteShowsGuidance
+    InventorySmokeUITests/testOrdinaryDebugLaunchDoesNotInstallQAAppearanceMarker
+    InventorySmokeUITests/testFreeReleaseGateLaunchCreateSearchAndReadWithoutEntitlement
+    InventorySmokeUITests/testFreeReleaseGateBrowseAndPortabilityWithoutEntitlement
+  ],
+  "13" => %w[
+    InventorySmokeUITests/testMaximumDynamicTypeNavigatesLocationItemDetailAndPicker
+    InventoryStartupRecoveryUITests/testForcedStoreStartupFailureShowsRecoveryInsteadOfLaunchingTheApp
+    InventoryStartupRecoveryUITests/testStoreStartupFailureOnceCanRetryIntoNormalApp
+    InventoryStartupRecoveryUITests/testNormalLaunchOpensLocationsWithoutRecoveryScreen
+  ],
+  "14" => %w[
+    PlaceSummaryRowUITests/testPlaceRowKeepsFullCardHitTargetAndOpensExactPlaceDetail
+    PlaceSummaryRowUITests/testPlaceRowRemainsNavigableAtAccessibilityDynamicType
+    PlaceSummaryRowUITests/testLongPlaceNameKeepsCountChevronAndFullRowNavigation
+    PlaceSummaryRowUITests/testLongItemNameRemainsReachableAtAccessibilityDynamicType
+  ],
+  "15" => %w[
+    PlaceSummaryRowUITests/testLocationCardPopularityDoesNotChangeLocationDetailPlaceOrder
+    PlaceSummaryRowUITests/testAdaptiveCategoryRowKeepsWholeEntriesOrExactOverflowAtNarrowWidth
+    PlaceSummaryRowUITests/testAdaptiveCategoryUkrainianRowPreservesLocalizedCountAndFullName
+    RecentItemsTileLayoutUITests/testLocationRecentItemsUseFullWidthShelfRowsAndNavigate
+  ],
+  "16" => %w[
+    RecentItemsTileLayoutUITests/testPlaceRecentItemsUseFullWidthShelfRowsAndNavigate
+    RecentItemsTileLayoutUITests/testFourItemPlaceDoesNotExposeRecentItems
+    RecentItemsTileLayoutUITests/testAccessibilityDynamicTypeKeepsFiveItemPlaceRecentItemsNavigable
+    RecentItemsTileLayoutUITests/testAccessibilityDynamicTypeReachesAndActivatesEveryLocationRecentTile
+  ],
+  "17" => %w[
+    RecentItemsTileLayoutUITests/testLocationDetailPlacesFollowRecentItemsCard
+    RecentItemsTileLayoutUITests/testLocationDetailUsesAllItemsAccessWhenRecentItemsAreAbsent
+    RecentItemsTileLayoutUITests/testLocationDetailPlacesEmptyStateFollowsHeader
+    RecentItemsTileLayoutUITests/testLocationDetailCompositionFitsUkrainianAccessibilityInDarkAppearance
+  ],
+  "18" => %w[
+    RecentItemsTileLayoutUITests/testLocationDetailWithReduceMotionKeepsCompositionVisible
+    RecentItemsTileLayoutUITests/testLocationDetailWithReduceTransparencyKeepsCompositionVisible
+    RecentItemsTileLayoutUITests/testLocationDetailWithIncreaseContrastKeepsCompositionVisible
+    RecentItemsTileLayoutUITests/testDifferentiateWithoutColorKeepsItemLocationAndPlaceContextDistinct
   ]
 }.freeze
-DEFAULT_UI_SHARD_TIMEOUT_SECONDS = 30 * 60
+DEFAULT_UI_SHARD_TIMEOUT_SECONDS = 20 * 60
 DEFAULT_PROCESS_TERMINATION_GRACE_SECONDS = 10
 DEFAULT_PROGRESS_INTERVAL_SECONDS = 60
 PROCESS_POLL_INTERVAL_SECONDS = 0.1
+
+$stdout.sync = true
+$stderr.sync = true
 
 def abort_with(message)
   warn "Full Test Validation failed: #{message}"
@@ -42,17 +141,26 @@ def active_ui_test_classes
   end.sort
 end
 
-def active_ui_test_identifiers
-  SHARDS.values.flatten.flat_map do |suite|
+def active_ui_test_selectors
+  active_ui_test_classes.flat_map do |suite|
     path = File.join(UI_TEST_DIRECTORY, "#{suite}.swift")
     File.read(path).scan(/^\s*func (test\w+)\s*\(/).flatten.map do |method|
-      "HomeStuffInventoryAppUITests.#{suite} #{method}"
+      "#{suite}/#{method}"
     end
   end.sort
 end
 
+def selector_test_identifier(selector)
+  suite, method = selector.split("/", 2)
+  "HomeStuffInventoryAppUITests.#{suite} #{method}"
+end
+
+def active_ui_test_identifiers
+  active_ui_test_selectors.map { |selector| selector_test_identifier(selector) }.sort
+end
+
 def validate_manifest!
-  expected = active_ui_test_classes
+  expected = active_ui_test_selectors
   declared = SHARDS.values.flatten.sort
   duplicates = declared.tally.select { |_name, count| count > 1 }.keys
   missing = expected - declared
@@ -221,6 +329,7 @@ def publish_shard_outputs(payload)
 
   File.open(github_output, "a") do |output|
     payload.each { |name, result| output.puts "shard_#{name.downcase}_status=#{result.fetch("status")}" }
+    output.puts "status=#{payload.values.first.fetch("status")}" if payload.length == 1
   end
 end
 
@@ -233,10 +342,11 @@ def report_running_shards(running)
   end
 end
 
-def run_ui_shards
-  test_run, destination_a, destination_b, result_directory = ARGV
-  abort_with("usage: run-ui-shards XCTESTRUN DESTINATION_A DESTINATION_B RESULT_DIRECTORY") unless result_directory
+def run_ui_shard
+  name, test_run, destination, result_directory = ARGV
+  abort_with("usage: run-ui-shard SHARD XCTESTRUN DESTINATION RESULT_DIRECTORY") unless result_directory
   validate_manifest!
+  abort_with("unknown UI shard #{name.inspect}") unless SHARDS.key?(name)
   FileUtils.mkdir_p(result_directory)
   timeout_seconds = ui_shard_timeout_seconds
   progress_seconds = progress_interval_seconds
@@ -250,32 +360,27 @@ def run_ui_shards
   end
   orchestration_completed = false
   begin
-    abort_with("received SIG#{interrupted_signal} before UI shard startup") if interrupted_signal
-    running["A"] = run_shard("A", test_run, destination_a, result_directory, timeout_seconds)
-    abort_with("received SIG#{interrupted_signal} during UI shard startup") if interrupted_signal
-    running["B"] = run_shard("B", test_run, destination_b, result_directory, timeout_seconds)
-    running.each { |name, shard| puts "Started UI shard #{name} as process group #{shard.fetch("pid")} with a #{timeout_seconds.to_i}-second timeout." }
+    abort_with("received SIG#{interrupted_signal} before UI shard #{name} startup") if interrupted_signal
+    running[name] = run_shard(name, test_run, destination, result_directory, timeout_seconds)
+    shard = running.fetch(name)
+    puts "Started UI shard #{name} as process group #{shard.fetch("pid")} with a #{timeout_seconds.to_i}-second timeout."
     next_progress_at = Process.clock_gettime(Process::CLOCK_MONOTONIC) + progress_seconds
 
-    until running.empty?
-      running.dup.each do |name, shard|
-        completed = wait_for_process(shard.fetch("pid"))
-        next unless completed
-
+    loop do
+      completed = wait_for_process(shard.fetch("pid"))
+      if completed
         process_status = completed.last
         payload[name] = shard_result(name, shard, process_status, status: process_status.success? ? "success" : "failure")
         puts "UI shard #{name} finished with status #{payload.fetch(name).fetch("status")} after #{payload.fetch(name).fetch("duration_seconds")} seconds."
         running.delete(name)
         write_shard_summary(result_directory, payload)
+        break
       end
-      break if running.empty?
 
       if interrupted_signal
-        running.each do |name, shard|
-          process_status = terminate_process_group(shard.fetch("pid"))
-          payload[name] = shard_result(name, shard, process_status, status: "failure", reason: "was interrupted by SIG#{interrupted_signal}")
-        end
-        running.clear
+        process_status = terminate_process_group(shard.fetch("pid"))
+        payload[name] = shard_result(name, shard, process_status, status: "failure", reason: "was interrupted by SIG#{interrupted_signal}")
+        running.delete(name)
         write_shard_summary(result_directory, payload)
         break
       end
@@ -285,9 +390,7 @@ def run_ui_shards
         report_running_shards(running)
         next_progress_at = now + progress_seconds
       end
-      running.dup.each do |name, shard|
-        next if now < shard.fetch("deadline")
-
+      if now >= shard.fetch("deadline")
         process_status = terminate_process_group(shard.fetch("pid"))
         payload[name] = shard_result(
           name,
@@ -299,8 +402,9 @@ def run_ui_shards
         warn "UI shard #{name} timed out after #{payload.fetch(name).fetch("duration_seconds")} seconds; its process group was terminated."
         running.delete(name)
         write_shard_summary(result_directory, payload)
+        break
       end
-      sleep PROCESS_POLL_INTERVAL_SECONDS unless running.empty?
+      sleep PROCESS_POLL_INTERVAL_SECONDS
     end
     orchestration_completed = true
   ensure
@@ -312,28 +416,26 @@ def run_ui_shards
     write_shard_summary(result_directory, payload) unless payload.empty?
     publish_shard_outputs(payload) unless orchestration_completed || payload.empty?
   end
-  successful_shards = payload.select { |_name, result| result.fetch("status") == "success" }
-  duplicate_identifiers = successful_shards.values.flat_map { |result| result.fetch("test_identifiers") }.tally.select { |_identifier, count| count > 1 }.keys.sort
-  empty_shards = successful_shards.select { |_name, result| result.fetch("empty_successful_result") }.keys
-  executed_identifiers = successful_shards.values.flat_map { |result| result.fetch("test_identifiers") }.uniq.sort
-  missing_identifiers = payload.values.all? { |result| result.fetch("status") == "success" } ? active_ui_test_identifiers - executed_identifiers : []
-  unexpected_identifiers = payload.values.all? { |result| result.fetch("status") == "success" } ? executed_identifiers - active_ui_test_identifiers : []
-  payload.each_value do |result|
-    result["duplicate_test_identifiers"] = duplicate_identifiers
-    result["empty_successful_result"] ||= false
-    result["missing_test_identifiers"] = missing_identifiers
-    result["unexpected_test_identifiers"] = unexpected_identifiers
-  end
-  unless duplicate_identifiers.empty? && empty_shards.empty? && missing_identifiers.empty? && unexpected_identifiers.empty?
-    payload.each_value { |result| result["status"] = "failure" }
+  result = payload.fetch(name)
+  expected_identifiers = SHARDS.fetch(name).map { |selector| selector_test_identifier(selector) }.sort
+  executed_identifiers = result.fetch("test_identifiers")
+  duplicate_identifiers = result.fetch("test_durations").map { |test| test.fetch("identifier") }.tally.select { |_identifier, count| count > 1 }.keys.sort
+  missing_identifiers = result.fetch("status") == "success" ? expected_identifiers - executed_identifiers : []
+  unexpected_identifiers = result.fetch("status") == "success" ? executed_identifiers - expected_identifiers : []
+  result["duplicate_test_identifiers"] = duplicate_identifiers
+  result["empty_successful_result"] ||= false
+  result["missing_test_identifiers"] = missing_identifiers
+  result["unexpected_test_identifiers"] = unexpected_identifiers
+  unless duplicate_identifiers.empty? && !result.fetch("empty_successful_result") && missing_identifiers.empty? && unexpected_identifiers.empty?
+    result["status"] = "failure"
     warn "Full Test Validation failed: duplicate UI test identifiers: #{duplicate_identifiers.join(", ")}" unless duplicate_identifiers.empty?
-    warn "Full Test Validation failed: successful UI shard reported zero executed tests: #{empty_shards.join(", ")}" unless empty_shards.empty?
+    warn "Full Test Validation failed: successful UI shard reported zero executed tests: #{name}" if result.fetch("empty_successful_result")
     warn "Full Test Validation failed: missing UI test identifiers: #{missing_identifiers.join(", ")}" unless missing_identifiers.empty?
     warn "Full Test Validation failed: unexpected UI test identifiers: #{unexpected_identifiers.join(", ")}" unless unexpected_identifiers.empty?
   end
   write_shard_summary(result_directory, payload)
   publish_shard_outputs(payload)
-  exit 1 if payload.values.any? { |result| result.fetch("status") != "success" }
+  exit 1 if result.fetch("status") != "success"
 end
 
 def validate_unit_result
@@ -365,7 +467,9 @@ def summarize
   total_duration = (finished_at - started_at).round
   threshold = total_duration <= 900 ? "met 15-minute target" : total_duration <= 1080 ? "met 18-minute intermediate threshold" : "did not meet timing thresholds"
   ui_identifiers = shards.values.flat_map { |result| result.fetch("test_identifiers", []) }.sort
-  expected_ui_identifiers = active_ui_test_identifiers
+  expected_ui_identifiers = shards.keys.flat_map do |name|
+    SHARDS.fetch(name, []).map { |selector| selector_test_identifier(selector) }
+  end.sort
   missing_ui_identifiers = expected_ui_identifiers - ui_identifiers
   unexpected_ui_identifiers = ui_identifiers - expected_ui_identifiers
   slowest_tests = shards.values.flat_map { |result| result.fetch("test_durations", []) }.sort_by { |test| -test.fetch("duration_seconds") }.first(10)
@@ -397,9 +501,9 @@ end
 if __FILE__ == $PROGRAM_NAME
   case ARGV.shift
   when "validate-manifest" then validate_manifest!
-  when "run-ui-shards" then run_ui_shards
+  when "run-ui-shard" then run_ui_shard
   when "validate-unit-result" then validate_unit_result
   when "summarize" then summarize
-  else abort_with("expected validate-manifest, run-ui-shards, validate-unit-result, or summarize")
+  else abort_with("expected validate-manifest, run-ui-shard, validate-unit-result, or summarize")
   end
 end

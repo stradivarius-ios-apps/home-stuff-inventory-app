@@ -23,6 +23,7 @@ module PublicAutomationContract
   PUBLIC_CHECKS = %w[
     test_create_github_release_preflight.rb
     test_hosted_public_ci.rb
+    test_ordinary_validation.rb
     test_prepare_tracked_public_candidate.rb
     test_pr_ui_screenshots.rb
     test_prepare_release_version.rb
@@ -43,6 +44,7 @@ module PublicAutomationContract
   FASTLANE_SMOKE_TEST = "test_fastlane_default_actions.rb"
   PUBLIC_RUNTIME_RUBY_FILES = %w[
     full_test_validation.rb
+    ordinary_validation.rb
     test_full_test_validation.rb
   ].freeze
 

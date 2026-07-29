@@ -4,9 +4,9 @@ Status: Canonical contract for ordinary CI in the public product repository.
 
 ## Hosted environment
 
-Ordinary validation and screenshot jobs use the standard `macos-26-intel`
-GitHub-hosted runner. Full Test build and UI matrix jobs use the reviewed Apple
-Silicon `macos-26` runner. Every macOS workflow selects
+Ordinary app validation and Full Test build/UI jobs use the reviewed Apple Silicon
+`macos-26` GitHub-hosted runner. Screenshot jobs retain the standard
+`macos-26-intel` runner for their existing capture contracts. Every macOS workflow selects
 `/Applications/Xcode_26.6.app/Contents/Developer` with
 `sudo xcode-select --switch` and then verifies both `xcodebuild -version` and
 `xcode-select -p`. The reviewed toolchain contract is:
@@ -21,8 +21,12 @@ required first-launch setup, and fails instead of changing runner class when the
 image no longer provides this contract. Update the runner image contract through review;
 never add a self-hosted fallback.
 
-The locked Fastlane smoke job provisions Ruby 4.0.5 and Bundler 2.7.2 through the
-full-SHA-pinned `ruby/setup-ruby` action. It does not depend on the image's default Ruby
+The locked Fastlane smoke job runs on `ubuntu-latest` and provisions Ruby 4.0.5 and
+Bundler 2.7.2 through the full-SHA-pinned `ruby/setup-ruby` action. Moving this
+platform-independent load test away from constrained macOS capacity removes runner
+queueing without changing the lockfile contract. The job deliberately performs a clean
+locked install: measured bundle execution is short, so an additional cache is not
+justified without before/after evidence. It does not depend on an image's default Ruby
 or an assumed runner tool-cache path. Simulator creation uses the exact
 `com.apple.CoreSimulator.SimRuntime.iOS-26-5` identifier rather than a display name.
 
@@ -35,6 +39,9 @@ and the [`macos-26` image inventory](https://github.com/actions/runner-images/bl
 `Validation` and `PR UI Screenshots` use `pull_request`, not
 `pull_request_target`. They run for same-repository and external-fork pull requests with
 read-only `GITHUB_TOKEN` permissions and no repository or environment secrets.
+`Validation` also supports explicit manual dispatch. It does not run again on a push to
+protected `main`: the required pull-request check validates GitHub's merge ref, while
+GitHub Code Scanning Default Setup remains the separate post-merge security analysis.
 
 Validation remains path-aware:
 
@@ -42,10 +49,20 @@ Validation remains path-aware:
   workflow validation, metadata validation, and non-signing release-contract checks;
 - CI-relevant changes run workflow/release-contract checks, the hosted app baseline,
   and the locked Ruby 4.0.5, Bundler 2.7.2, and Fastlane 2.237.0 smoke check;
-- app-relevant changes run the Debug build, complete `HomeStuffInventoryAppTests`
-  target, a 15-minute process-group-bounded PR UI smoke baseline with failure
-  diagnostics, and the 90% owned-code coverage gate;
+- app-relevant changes build coverage-enabled test products once, run the complete
+  `HomeStuffInventoryAppTests` target and the process-group-bounded PR UI smoke through
+  `test-without-building` on one isolated simulator, and enforce the 90% owned-code
+  coverage gate from that authoritative unit/localization result;
 - PR UI Screenshots captures synthetic repository-owned EN/UK light/dark fixtures.
+
+The stable `Code coverage` job is a lightweight check over the combined app job rather
+than a second macOS build and test pass. The required `CI workflow validation` check is
+the final read-only aggregator for every path-selected contract, Fastlane, app, and
+coverage phase. A failed build, unit/localization suite, empty successful result,
+coverage threshold, or UI smoke therefore fails the required PR check after available
+diagnostics and simulator cleanup are retained. The app job summary reports external
+runner queue, setup/simulator, build, unit/localization, UI, coverage, cleanup, and total
+critical-path durations.
 
 Full Test Validation is intentionally outside the pull-request baseline. Ordinary
 commits and documentation changes do not run the full unit and UI matrix. The workflow
@@ -112,8 +129,10 @@ read-only, non-signing, and secretless.
 
 Simulator jobs create uniquely named ephemeral devices, wait for boot completion, and
 always shut down and delete them. `xcodebuild` exit status remains authoritative even
-when output is captured. Full Test Validation rejects duplicate UI identifiers and
-successful zero-test results and reports unit/UI totals and timing in the job summary.
+when output is captured. Ordinary Validation rejects successful zero-test unit and UI
+results and reports its critical-path timing. Full Test Validation rejects duplicate UI
+identifiers and successful zero-test results and reports unit/UI totals and timing in
+the job summary.
 
 Public artifacts are limited to synthetic screenshots, failure diagnostics already
 owned by the repository, and the Full Test lane's compressed immutable `Build/Products`

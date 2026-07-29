@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require "minitest/autorun"
+require "yaml"
 
 class PublicSecurityGatesTest < Minitest::Test
   WORKFLOW_PATH = ".github/workflows/validation.yml"
@@ -83,9 +84,14 @@ class PublicSecurityGatesTest < Minitest::Test
     refute_includes fixture_case, "app_validation_required=true"
   end
 
-  def test_validation_workflow_covers_pull_requests_and_main_pushes
+  def test_validation_workflow_covers_pull_requests_without_redundant_main_pushes
     workflow = File.read(WORKFLOW_PATH)
-    assert_match(/^on:\n  pull_request:\n  push:\n    branches:\n      - main$/m, workflow)
+    parsed = YAML.load_file(WORKFLOW_PATH)
+    events = parsed["on"] || parsed[true] || {}
+
+    assert events.key?("pull_request")
+    assert events.key?("workflow_dispatch")
+    refute events.key?("push")
   end
 
   def test_validator_test_remains_in_public_automation_checks

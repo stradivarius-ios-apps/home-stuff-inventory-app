@@ -2,9 +2,6 @@ name: Validation
 
 on:
   pull_request:
-  push:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       run_app_validation:
@@ -35,6 +32,7 @@ jobs:
     outputs:
       app_validation_required: ${{ steps.classify.outputs.app_validation_required }}
       ci_validation_required: ${{ steps.classify.outputs.ci_validation_required }}
+      app_validation_ready_at: ${{ steps.classify.outputs.app_validation_ready_at }}
 
     steps:
       - name: Check out repository
@@ -167,6 +165,7 @@ jobs:
           {
             echo "app_validation_required=$app_validation_required"
             echo "ci_validation_required=$ci_validation_required"
+            echo "app_validation_ready_at=$(date -u +%s)"
           } >> "$GITHUB_OUTPUT"
 
           {
@@ -181,8 +180,8 @@ jobs:
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 
-  ci-validation:
-    name: CI workflow validation
+  ci-contracts:
+    name: CI contract checks
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: classify-changes
@@ -209,8 +208,8 @@ jobs:
 
   fastlane-smoke-test:
     name: Locked Fastlane smoke test
-    runs-on: macos-26-intel
-    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: classify-changes
     if: needs.classify-changes.outputs.ci_validation_required == 'true'
 
@@ -247,10 +246,13 @@ jobs:
 
   build-test:
     name: Build and test
-    runs-on: macos-26-intel
-    timeout-minutes: 60
+    runs-on: macos-26
+    timeout-minutes: 45
     needs: classify-changes
     if: needs.classify-changes.outputs.app_validation_required == 'true'
+
+    env:
+      DERIVED_DATA: DerivedData/Validation
 
     steps:
       - name: Check out repository
@@ -261,14 +263,22 @@ jobs:
       - name: Verify exact validation source
         run: test "$(git rev-parse HEAD)" = "${{ github.sha }}"
 
-      - name: Select hosted Xcode toolchain
-        run: bash .github/scripts/configure_hosted_xcode.sh
+      - name: Record app validation queue
+        env:
+          READY_AT: ${{ needs.classify-changes.outputs.app_validation_ready_at }}
+        run: |
+          set -euo pipefail
+          started_at="$(date -u +%s)"
+          test -n "$READY_AT"
+          test "$started_at" -ge "$READY_AT"
+          {
+            echo "VALIDATION_JOB_STARTED_AT=$started_at"
+            echo "VALIDATION_QUEUE_SECONDS=$((started_at - READY_AT))"
+            echo "VALIDATION_SETUP_STARTED_AT=$started_at"
+          } >> "$GITHUB_ENV"
 
       - name: Show Xcode environment
-        run: |
-          xcodebuild -version
-          xcode-select -p
-          xcrun simctl list devices available
+        run: bash .github/scripts/configure_hosted_xcode.sh
 
       - name: Create isolated simulator
         run: |
@@ -282,35 +292,89 @@ jobs:
 
       - name: Prepare result bundle directory
         run: |
-          rm -rf TestResults
+          rm -rf "$DERIVED_DATA" TestResults
           mkdir -p TestResults
+          finished_at="$(date -u +%s)"
+          echo "VALIDATION_SETUP_SECONDS=$((finished_at - VALIDATION_SETUP_STARTED_AT))" >> "$GITHUB_ENV"
 
-      - name: Build app
+      - name: Build coverage-enabled test products once
+        id: build
+        continue-on-error: true
         run: |
-          rm -rf TestResults/Build.xcresult
-          xcodebuild build \
+          set +e
+          started_at="$(date -u +%s)"
+          xcodebuild build-for-testing \
             -project "$PROJECT" \
             -scheme "$SCHEME" \
             -destination "$DESTINATION" \
             -configuration "$CONFIGURATION" \
+            -derivedDataPath "$DERIVED_DATA" \
+            -enableCodeCoverage YES \
+            -parallel-testing-enabled NO \
             -resultBundlePath TestResults/Build.xcresult
+          status=$?
+          finished_at="$(date -u +%s)"
+          echo "VALIDATION_BUILD_SECONDS=$((finished_at - started_at))" >> "$GITHUB_ENV"
+          exit "$status"
 
-      - name: Run unit and localization tests
+      - name: Resolve shared test run file
+        id: test-run
+        if: steps.build.outcome == 'success'
         run: |
-          rm -rf TestResults/UnitTests.xcresult
-          xcodebuild test \
-            -project "$PROJECT" \
-            -scheme "$SCHEME" \
+          set -euo pipefail
+          test_run_count="$(find "$DERIVED_DATA/Build/Products" -name '*.xctestrun' -type f | wc -l | tr -d ' ')"
+          if [[ "$test_run_count" != "1" ]]; then
+            echo "Expected exactly one generated .xctestrun file; found $test_run_count."
+            find "$DERIVED_DATA/Build/Products" -name '*.xctestrun' -type f | sort
+            exit 1
+          fi
+          echo "TEST_RUN_PATH=$(find "$DERIVED_DATA/Build/Products" -name '*.xctestrun' -type f -print -quit)" >> "$GITHUB_ENV"
+
+      - name: Run coverage-enabled unit and localization tests without rebuilding
+        id: unit-tests
+        if: steps.build.outcome == 'success' && steps.test-run.outcome == 'success'
+        continue-on-error: true
+        run: |
+          set +e
+          set -o pipefail
+          started_at="$(date -u +%s)"
+          xcodebuild test-without-building \
+            -xctestrun "$TEST_RUN_PATH" \
             -destination "$DESTINATION" \
-            -configuration "$CONFIGURATION" \
+            -enableCodeCoverage YES \
+            -parallel-testing-enabled NO \
             -only-testing:HomeStuffInventoryAppTests \
-            -resultBundlePath TestResults/UnitTests.xcresult
+            -resultBundlePath TestResults/UnitTests.xcresult 2>&1 | tee TestResults/UnitTests.log
+          status="${PIPESTATUS[0]}"
+          finished_at="$(date -u +%s)"
+          echo "VALIDATION_UNIT_SECONDS=$((finished_at - started_at))" >> "$GITHUB_ENV"
+          exit "$status"
+
+      - name: Reject empty successful unit results
+        id: unit-result
+        if: steps.unit-tests.outcome == 'success'
+        run: ruby .github/scripts/ordinary_validation.rb validate-result TestResults/UnitTests.xcresult unit/localization
+
+      - name: Enforce 90% app-code coverage
+        id: coverage
+        if: steps.unit-tests.outcome == 'success' && steps.unit-result.outcome == 'success'
+        continue-on-error: true
+        run: |
+          set +e
+          started_at="$(date -u +%s)"
+          scripts/ci/check-code-coverage.py TestResults/UnitTests.xcresult --minimum 90
+          status=$?
+          finished_at="$(date -u +%s)"
+          echo "VALIDATION_COVERAGE_SECONDS=$((finished_at - started_at))" >> "$GITHUB_ENV"
+          exit "$status"
 
       - name: Run UI smoke baseline
         id: ui-smoke
+        if: steps.build.outcome == 'success' && steps.test-run.outcome == 'success'
         continue-on-error: true
         run: |
-          rm -rf TestResults/UITests.xcresult
+          started_at="$(date -u +%s)"
+          set +e
           ruby .github/scripts/bounded_process.rb run \
             --timeout-seconds 900 \
             --grace-seconds 10 \
@@ -318,37 +382,49 @@ jobs:
             --log TestResults/UITests.log \
             --summary TestResults/ui-smoke-summary.json \
             -- \
-            xcodebuild test \
-              -project "$PROJECT" \
-              -scheme "$SCHEME" \
+            xcodebuild test-without-building \
+              -xctestrun "$TEST_RUN_PATH" \
               -destination "$DESTINATION" \
-              -configuration "$CONFIGURATION" \
               -only-testing:HomeStuffInventoryAppUITests/InventorySmokeUITests/testFreeReleaseGateLaunchCreateSearchAndReadWithoutEntitlement \
               -resultBundlePath TestResults/UITests.xcresult
+          status=$?
+          finished_at="$(date -u +%s)"
+          echo "VALIDATION_UI_SECONDS=$((finished_at - started_at))" >> "$GITHUB_ENV"
+          exit "$status"
 
-      - name: Print UI smoke diagnostics
-        if: steps.ui-smoke.outcome == 'failure'
+      - name: Reject empty successful UI smoke result
+        id: ui-result
+        if: steps.ui-smoke.outcome == 'success'
+        run: ruby .github/scripts/ordinary_validation.rb validate-result TestResults/UITests.xcresult "UI smoke"
+
+      - name: Record diagnostics and cleanup start
+        if: always()
+        run: echo "VALIDATION_CLEANUP_STARTED_AT=$(date -u +%s)" >> "$GITHUB_ENV"
+
+      - name: Print test diagnostics
+        if: always() && (steps.build.outcome == 'failure' || steps.test-run.outcome == 'failure' || steps.unit-tests.outcome == 'failure' || steps.unit-result.outcome == 'failure' || steps.coverage.outcome == 'failure' || steps.ui-smoke.outcome == 'failure' || steps.ui-result.outcome == 'failure')
         run: |
+          echo "::group::Unit/localization log"
+          rg -n -i -C 20 "assertion failure|xctassert|test case.*failed|\*\* test execute failed \*\*" TestResults/UnitTests.log || true
+          tail -n 250 TestResults/UnitTests.log || true
+          echo "::endgroup::"
           echo "::group::UI smoke log"
           rg -n -i -C 20 "assertion failure|xctassert|test case.*failed|\*\* test execute failed \*\*" TestResults/UITests.log || true
           tail -n 250 TestResults/UITests.log || true
           echo "::endgroup::"
 
       - name: Upload result bundles on failure
-        if: failure() || steps.ui-smoke.outcome == 'failure'
+        if: always() && (steps.build.outcome == 'failure' || steps.test-run.outcome == 'failure' || steps.unit-tests.outcome == 'failure' || steps.unit-result.outcome == 'failure' || steps.coverage.outcome == 'failure' || steps.ui-smoke.outcome == 'failure' || steps.ui-result.outcome == 'failure')
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: xcode-result-bundles
+          name: validation-xcode-result-bundles
           path: |
             TestResults/*.xcresult
+            TestResults/UnitTests.log
             TestResults/UITests.log
             TestResults/ui-smoke-summary.json
           if-no-files-found: ignore
           retention-days: 3
-
-      - name: Fail when UI smoke failed
-        if: steps.ui-smoke.outcome == 'failure'
-        run: exit 1
 
       - name: Delete isolated simulator
         if: always()
@@ -357,13 +433,51 @@ jobs:
             xcrun simctl shutdown "$SIMULATOR_UDID" || true
             xcrun simctl delete "$SIMULATOR_UDID" || true
           fi
+          finished_at="$(date -u +%s)"
+          if [[ -n "${VALIDATION_CLEANUP_STARTED_AT:-}" ]]; then
+            echo "VALIDATION_CLEANUP_SECONDS=$((finished_at - VALIDATION_CLEANUP_STARTED_AT))" >> "$GITHUB_ENV"
+          fi
+
+      - name: Summarize ordinary validation timing
+        if: always()
+        env:
+          VALIDATED_SHA: ${{ github.sha }}
+          BUILD_OUTCOME: ${{ steps.build.outcome }}
+          UNIT_OUTCOME: ${{ steps.unit-tests.outcome }}
+          COVERAGE_OUTCOME: ${{ steps.coverage.outcome }}
+          UI_OUTCOME: ${{ steps.ui-smoke.outcome }}
+        run: ruby .github/scripts/ordinary_validation.rb summarize
+
+      - name: Fail unless every app validation phase succeeded
+        if: always()
+        env:
+          BUILD_OUTCOME: ${{ steps.build.outcome }}
+          TEST_RUN_OUTCOME: ${{ steps.test-run.outcome }}
+          UNIT_OUTCOME: ${{ steps.unit-tests.outcome }}
+          UNIT_RESULT_OUTCOME: ${{ steps.unit-result.outcome }}
+          COVERAGE_OUTCOME: ${{ steps.coverage.outcome }}
+          UI_OUTCOME: ${{ steps.ui-smoke.outcome }}
+          UI_RESULT_OUTCOME: ${{ steps.ui-result.outcome }}
+        run: |
+          set -euo pipefail
+          for outcome in \
+            "$BUILD_OUTCOME" "$TEST_RUN_OUTCOME" "$UNIT_OUTCOME" \
+            "$UNIT_RESULT_OUTCOME" "$COVERAGE_OUTCOME" "$UI_OUTCOME" "$UI_RESULT_OUTCOME"
+          do
+            if [[ "$outcome" != "success" ]]; then
+              echo "A required app validation phase concluded with: $outcome"
+              exit 1
+            fi
+          done
 
   code-coverage:
     name: Code coverage
-    runs-on: macos-26-intel
-    timeout-minutes: 60
-    needs: classify-changes
-    if: needs.classify-changes.outputs.app_validation_required == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs:
+      - classify-changes
+      - build-test
+    if: always() && needs.classify-changes.outputs.app_validation_required == 'true'
 
     steps:
       - name: Check out repository
@@ -374,60 +488,56 @@ jobs:
       - name: Verify exact validation source
         run: test "$(git rev-parse HEAD)" = "${{ github.sha }}"
 
-      - name: Select hosted Xcode toolchain
-        run: bash .github/scripts/configure_hosted_xcode.sh
+      - name: Confirm combined coverage gate
+        env:
+          BUILD_TEST_RESULT: ${{ needs.build-test.result }}
+        run: test "$BUILD_TEST_RESULT" = "success"
 
-      - name: Show Xcode environment
-        run: |
-          xcodebuild -version
-          xcode-select -p
-          xcrun simctl list devices available
+  ci-validation:
+    name: CI workflow validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs:
+      - classify-changes
+      - ci-contracts
+      - fastlane-smoke-test
+      - build-test
+      - code-coverage
+    if: always()
 
-      - name: Create isolated simulator
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Verify exact validation source
+        run: test "$(git rev-parse HEAD)" = "${{ github.sha }}"
+
+      - name: Require every selected validation phase
+        env:
+          CLASSIFY_RESULT: ${{ needs.classify-changes.result }}
+          CI_CONTRACT_RESULT: ${{ needs.ci-contracts.result }}
+          FASTLANE_RESULT: ${{ needs.fastlane-smoke-test.result }}
+          BUILD_TEST_RESULT: ${{ needs.build-test.result }}
+          CODE_COVERAGE_RESULT: ${{ needs.code-coverage.result }}
+          APP_VALIDATION_REQUIRED: ${{ needs.classify-changes.outputs.app_validation_required }}
+          CI_VALIDATION_REQUIRED: ${{ needs.classify-changes.outputs.ci_validation_required }}
         run: |
           set -euo pipefail
-          simulator_name="HSI Validation ${GITHUB_RUN_ID}-${GITHUB_JOB}-${GITHUB_RUN_ATTEMPT}"
-          simulator_udid="$(xcrun simctl create "$simulator_name" "iPhone 17" "com.apple.CoreSimulator.SimRuntime.iOS-26-5")"
-          echo "SIMULATOR_UDID=$simulator_udid" >> "$GITHUB_ENV"
-          echo "DESTINATION=platform=iOS Simulator,id=$simulator_udid" >> "$GITHUB_ENV"
-          xcrun simctl boot "$simulator_udid"
-          xcrun simctl bootstatus "$simulator_udid" -b
+          test "$CLASSIFY_RESULT" = "success"
+          test "$CI_CONTRACT_RESULT" = "success"
 
-      - name: Prepare result bundle directory
-        run: |
-          rm -rf TestResults
-          mkdir -p TestResults
+          if [[ "$CI_VALIDATION_REQUIRED" == "true" ]]; then
+            test "$FASTLANE_RESULT" = "success"
+          else
+            test "$FASTLANE_RESULT" = "skipped"
+          fi
 
-      - name: Run coverage-enabled app tests
-        run: |
-          rm -rf TestResults/Coverage.xcresult
-          xcodebuild test \
-            -project "$PROJECT" \
-            -scheme "$SCHEME" \
-            -destination "$DESTINATION" \
-            -configuration "$CONFIGURATION" \
-            -enableCodeCoverage YES \
-            -parallel-testing-enabled NO \
-            -only-testing:HomeStuffInventoryAppTests \
-            -resultBundlePath TestResults/Coverage.xcresult
-
-      - name: Enforce 90% app-code coverage
-        run: |
-          scripts/ci/check-code-coverage.py TestResults/Coverage.xcresult --minimum 90
-
-      - name: Upload coverage result bundle on failure
-        if: failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: coverage-xcode-result-bundle
-          path: TestResults/Coverage.xcresult
-          if-no-files-found: ignore
-          retention-days: 3
-
-      - name: Delete isolated simulator
-        if: always()
-        run: |
-          if [[ -n "${SIMULATOR_UDID:-}" ]]; then
-            xcrun simctl shutdown "$SIMULATOR_UDID" || true
-            xcrun simctl delete "$SIMULATOR_UDID" || true
+          if [[ "$APP_VALIDATION_REQUIRED" == "true" ]]; then
+            test "$BUILD_TEST_RESULT" = "success"
+            test "$CODE_COVERAGE_RESULT" = "success"
+          else
+            test "$BUILD_TEST_RESULT" = "skipped"
+            test "$CODE_COVERAGE_RESULT" = "skipped"
           fi

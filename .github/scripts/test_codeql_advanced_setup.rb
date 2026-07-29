@@ -67,7 +67,8 @@ class CodeQLAdvancedSetupTest < Minitest::Test
       "ONLY_ACTIVE_ARCH=YES",
       "SWIFT_OPTIMIZATION_LEVEL=-Onone",
       "SWIFT_COMPILATION_MODE=singlefile",
-      "DEBUG_INFORMATION_FORMAT=dwarf"
+      "DEBUG_INFORMATION_FORMAT=dwarf",
+      'OTHER_SWIFT_FLAGS="-driver-batch-count 6"'
     ].each { |value| assert_includes build, value }
     refute_includes text, "#{CODEQL_ACTION}/autobuild@"
   end

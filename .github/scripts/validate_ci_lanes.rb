@@ -55,7 +55,7 @@ path = ".github/workflows/pr-ui-screenshots.yml"
 workflow = YAML.load_file(path)
 events = workflow_on(workflow)
 event_names = events.is_a?(Hash) ? events.keys.map(&:to_s) : Array(events).map(&:to_s)
-fail_contract("#{path} must cover pull requests and manual capture") unless event_names == %w[pull_request workflow_dispatch]
+fail_contract("#{path} must support manual capture only") unless event_names == %w[workflow_dispatch]
 
 job = workflow.dig("jobs", "pr-ui-screenshots")
 fail_contract("missing pr-ui-screenshots job") unless job.is_a?(Hash)

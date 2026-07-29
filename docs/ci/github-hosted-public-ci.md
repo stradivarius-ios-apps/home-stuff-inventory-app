@@ -36,13 +36,15 @@ and the [`macos-26` image inventory](https://github.com/actions/runner-images/bl
 
 ## Pull-request baseline
 
-`Validation` and `PR UI Screenshots` use `pull_request`, not
-`pull_request_target`. They run for same-repository and external-fork pull requests with
-read-only `GITHUB_TOKEN` permissions and no repository or environment secrets.
-`Validation` also supports explicit manual dispatch. It does not run again on a push to
-protected `main`: the required pull-request check validates GitHub's merge ref, while
-the separate `CodeQL` workflow performs pull-request, post-merge, and weekly security
-analysis.
+`Validation` uses `pull_request`, not `pull_request_target`. It runs for
+same-repository and external-fork pull requests with read-only `GITHUB_TOKEN`
+permissions and no repository or environment secrets. It also supports explicit manual
+dispatch. It does not run again on a push to protected `main`: the required pull-request
+check validates GitHub's merge ref, while the separate `CodeQL` workflow performs
+pull-request, post-merge, and weekly security analysis. `PR UI Screenshots` is
+manual-only so routine pull requests do not consume a separate macOS runner; dispatch
+it with a pull-request number, branch, tag, or full commit SHA when visual review is
+needed.
 
 ## CodeQL advanced setup
 
@@ -50,8 +52,8 @@ analysis.
 `swift` coverage and the remote-and-local source threat model on pull requests, every
 `main` push, and the weekly schedule. Interpreted languages use CodeQL's no-build mode
 on `ubuntu-latest`. Swift uses a reviewed manual Release build on `macos-26`: one unsigned
-`iphoneos`/`arm64` target, `-Onone`, and single-file compilation. It does not skip Swift
-based on changed paths.
+`iphoneos`/`arm64` target, `-Onone`, single-file compilation, and six fixed Swift driver
+batches. It does not skip Swift based on changed paths.
 
 The manual Swift build was selected from hosted measurements against Default Setup:
 
@@ -61,6 +63,11 @@ The manual Swift build was selected from hosted measurements against Default Set
 
 This reduces the observed median Swift critical path by 6:37, or approximately 24%,
 without reducing analyzed source coverage or changing Release compilation conditions.
+
+A follow-up exact-SHA comparison on the standard three-core hosted runner measured three
+default-batch jobs at 18:02–22:25 (median 21:36) and three six-batch jobs at 17:26–22:48
+(median 18:25). The fixed six-batch configuration reduced the total median by 3:11 and
+the build-step median by 3:08. Every valid run scanned the same 114 of 173 Swift files.
 
 The repository variable `ADVANCED_CODEQL_ENABLED` is a deliberate transition and
 rollback gate. Switch setup modes in this order so every protected `main` SHA remains
@@ -89,7 +96,8 @@ Validation remains path-aware:
   `HomeStuffInventoryAppTests` target and the process-group-bounded PR UI smoke through
   `test-without-building` on one isolated simulator, and enforce the 90% owned-code
   coverage gate from that authoritative unit/localization result;
-- PR UI Screenshots captures synthetic repository-owned EN/UK light/dark fixtures.
+- Manual PR UI Screenshots captures synthetic repository-owned EN/UK light/dark fixtures
+  when visual review is requested.
 
 The stable `Code coverage` job is a lightweight check over the combined app job rather
 than a second macOS build and test pass. The required `CI workflow validation` check is

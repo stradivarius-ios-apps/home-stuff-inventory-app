@@ -51,23 +51,32 @@ class HostedPublicCITest < Minitest::Test
   end
 
   def test_pull_request_baseline_is_secretless_and_has_no_private_fallback
-    %w[validation.yml pr-ui-screenshots.yml].each do |name|
-      path = File.join(".github/workflows", name)
-      workflow = YAML.load_file(path)
-      events = workflow["on"] || workflow[true] || {}
-      assert events.key?("pull_request"), "#{path} must run for same-repository and fork pull requests"
-      if name == "validation.yml"
-        refute events.key?("push"), "#{path} must not repeat complete validation after a protected merge"
-        assert events.key?("workflow_dispatch"), "#{path} must retain manual validation"
-      end
+    path = ".github/workflows/validation.yml"
+    workflow = YAML.load_file(path)
+    events = workflow["on"] || workflow[true] || {}
+    assert events.key?("pull_request"), "#{path} must run for same-repository and fork pull requests"
+    refute events.key?("push"), "#{path} must not repeat complete validation after a protected merge"
+    assert events.key?("workflow_dispatch"), "#{path} must retain manual validation"
 
-      text = File.read(path)
-      refute_includes text, "pull_request_target"
-      refute_match(/\$\{\{\s*secrets\./, text)
-      refute_includes text, "self-hosted"
-      refute_includes text, "home-stuff-inventory, xcode"
-      refute_match(%r{repos/[^$\s]+/home-stuff-inventory}, text)
-    end
+    text = File.read(path)
+    refute_includes text, "pull_request_target"
+    refute_match(/\$\{\{\s*secrets\./, text)
+    refute_includes text, "self-hosted"
+    refute_includes text, "home-stuff-inventory, xcode"
+    refute_match(%r{repos/[^$\s]+/home-stuff-inventory}, text)
+  end
+
+  def test_pr_ui_screenshots_are_manual_only
+    path = ".github/workflows/pr-ui-screenshots.yml"
+    workflow = YAML.load_file(path)
+    events = workflow["on"] || workflow[true] || {}
+
+    assert_equal ["workflow_dispatch"], events.keys.map(&:to_s)
+
+    text = File.read(path)
+    refute_includes text, "pull_request_target"
+    refute_match(/\$\{\{\s*secrets\./, text)
+    refute_includes text, "self-hosted"
   end
 
   def test_full_test_validation_is_release_only

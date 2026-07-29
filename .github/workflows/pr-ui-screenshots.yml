@@ -1,7 +1,6 @@
 name: PR UI Screenshots
 
 on:
-  pull_request:
   workflow_dispatch:
     inputs:
       source:
@@ -14,7 +13,7 @@ permissions:
   pull-requests: read
 
 concurrency:
-  group: pr-ui-screenshots-${{ inputs.source || github.event.pull_request.number || github.ref }}
+  group: pr-ui-screenshots-${{ inputs.source || github.ref }}
   cancel-in-progress: true
 
 env:

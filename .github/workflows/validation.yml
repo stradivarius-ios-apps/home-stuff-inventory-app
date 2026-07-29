@@ -508,15 +508,18 @@ jobs:
             shasum --algorithm 256 --check
           mkdir -p "$install_root"
           tar -x --zstd --file "$archive" --directory "$install_root"
-          test -x "$install_root/codeql/codeql"
-          test -f "$install_root/codeql/swift/ql/src/codeql-suites/swift-code-scanning.qls"
-          echo "CODEQL_HOME=$install_root/codeql" >> "$GITHUB_ENV"
+          codeql_cli="$(find "$install_root" -type f -name codeql -perm -111 -print -quit)"
+          query_suite="$(find "$install_root" -type f -name swift-code-scanning.qls -print -quit)"
+          test -x "$codeql_cli"
+          test -f "$query_suite"
+          echo "CODEQL_CLI=$codeql_cli" >> "$GITHUB_ENV"
+          echo "CODEQL_SWIFT_SUITE=$query_suite" >> "$GITHUB_ENV"
 
       - name: Create manual Swift CodeQL database
         run: |
           set -euo pipefail
           started_at="$(date -u +%s)"
-          "$CODEQL_HOME/codeql" database create "$RUNNER_TEMP/swift-codeql-database" \
+          "$CODEQL_CLI" database create "$RUNNER_TEMP/swift-codeql-database" \
             --language=swift \
             --source-root="$GITHUB_WORKSPACE" \
             --command="xcodebuild build -project '$PROJECT' -target '$SCHEME' -configuration Release -sdk iphoneos -arch arm64 CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO ONLY_ACTIVE_ARCH=YES SWIFT_OPTIMIZATION_LEVEL=-Onone SWIFT_COMPILATION_MODE=singlefile DEBUG_INFORMATION_FORMAT=dwarf"
@@ -530,8 +533,8 @@ jobs:
         run: |
           set -euo pipefail
           started_at="$(date -u +%s)"
-          "$CODEQL_HOME/codeql" database analyze "$RUNNER_TEMP/swift-codeql-database" \
-            "$CODEQL_HOME/swift/ql/src/codeql-suites/swift-code-scanning.qls" \
+          "$CODEQL_CLI" database analyze "$RUNNER_TEMP/swift-codeql-database" \
+            "$CODEQL_SWIFT_SUITE" \
             --format=sarif-latest \
             --output="$RUNNER_TEMP/swift-codeql-results.sarif" \
             --threads=0

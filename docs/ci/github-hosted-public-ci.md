@@ -67,7 +67,9 @@ rollback gate. Switch setup modes in this order so every protected `main` SHA re
 covered:
 
 1. Merge the reviewed workflow while Default Setup remains enabled and the variable is
-   absent or not `true`.
+   absent or not `true`. GitHub rejects Advanced Setup workflow runs with
+   `startup_failure` while Default Setup owns CodeQL; this expected staging result is
+   not scan evidence.
 2. Confirm Default Setup successfully analyzed the merge SHA.
 3. Disable Default Setup, set `ADVANCED_CODEQL_ENABLED` to `true`, manually dispatch
    `CodeQL` on that same `main` SHA, and require all four language jobs to succeed.

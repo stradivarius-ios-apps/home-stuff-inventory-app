@@ -41,7 +41,43 @@ and the [`macos-26` image inventory](https://github.com/actions/runner-images/bl
 read-only `GITHUB_TOKEN` permissions and no repository or environment secrets.
 `Validation` also supports explicit manual dispatch. It does not run again on a push to
 protected `main`: the required pull-request check validates GitHub's merge ref, while
-GitHub Code Scanning Default Setup remains the separate post-merge security analysis.
+the separate `CodeQL` workflow performs pull-request, post-merge, and weekly security
+analysis.
+
+## CodeQL advanced setup
+
+`.github/workflows/codeql.yml` preserves the existing `actions`, `python`, `ruby`, and
+`swift` coverage and the remote-and-local source threat model on pull requests, every
+`main` push, and the weekly schedule. Interpreted languages use CodeQL's no-build mode
+on `ubuntu-latest`. Swift uses a reviewed manual Release build on `macos-26`: one unsigned
+`iphoneos`/`arm64` target, `-Onone`, and single-file compilation. It does not skip Swift
+based on changed paths.
+
+The manual Swift build was selected from hosted measurements against Default Setup:
+
+- eight Default Setup runs: 19:14–50:24, median 27:26;
+- three identical single-file manual-build runs: 13:50–21:48, median 20:49;
+- one whole-module comparison: 26:18.
+
+This reduces the observed median Swift critical path by 6:37, or approximately 24%,
+without reducing analyzed source coverage or changing Release compilation conditions.
+
+The repository variable `ADVANCED_CODEQL_ENABLED` is a deliberate transition and
+rollback gate. Switch setup modes in this order so every protected `main` SHA remains
+covered:
+
+1. Merge the reviewed workflow while Default Setup remains enabled and the variable is
+   absent or not `true`. GitHub rejects Advanced Setup workflow runs with
+   `startup_failure` while Default Setup owns CodeQL; this expected staging result is
+   not scan evidence.
+2. Confirm Default Setup successfully analyzed the merge SHA.
+3. Disable Default Setup, set `ADVANCED_CODEQL_ENABLED` to `true`, manually dispatch
+   `CodeQL` on that same `main` SHA, and require all four language jobs to succeed.
+4. Keep the variable enabled for future `main` pushes and weekly scans.
+
+For rollback, first set the variable to `false`, enable Default Setup, and confirm its
+analysis succeeds before removing the advanced workflow. Never leave both setup modes
+inactive.
 
 Validation remains path-aware:
 
@@ -97,6 +133,8 @@ release verification:
 | Validation | Locked Fastlane smoke test |
 | Validation | Build and test |
 | Validation | Code coverage |
+| CodeQL | CodeQL (actions), CodeQL (python), CodeQL (ruby) |
+| CodeQL | CodeQL (swift) |
 | Full Test Validation | Full Test Suite |
 | PR UI Screenshots | Capture PR UI screenshots |
 | Release App Store Screenshots | Capture release App Store screenshots |

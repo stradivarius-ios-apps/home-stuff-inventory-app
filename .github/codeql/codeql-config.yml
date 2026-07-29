@@ -1,0 +1,4 @@
+name: Home Stuff Inventory CodeQL configuration
+
+# Keep the repository's existing remote-and-local source threat model.
+threat-models: local

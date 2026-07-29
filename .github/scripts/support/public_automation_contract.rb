@@ -4,6 +4,7 @@ require "set"
 
 module PublicAutomationContract
   PUBLIC_HOSTED_WORKFLOWS = %w[
+    .github/workflows/codeql.yml
     .github/workflows/create-github-release.yml
     .github/workflows/validation.yml
     .github/workflows/full-tests.yml
@@ -15,12 +16,14 @@ module PublicAutomationContract
   CANONICAL_RELEASE_SCREENSHOT_WORKFLOW = ".github/workflows/release-app-store-screenshots.yml"
 
   PUBLIC_NON_RUBY_HELPERS = %w[
+    .github/codeql/codeql-config.yml
     .github/scripts/capture_release_app_store_screenshots.sh
     .github/scripts/configure_hosted_xcode.sh
     scripts/ci/check-code-coverage.py
   ].freeze
 
   PUBLIC_CHECKS = %w[
+    test_codeql_advanced_setup.rb
     test_create_github_release_preflight.rb
     test_hosted_public_ci.rb
     test_ordinary_validation.rb

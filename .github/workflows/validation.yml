@@ -9,6 +9,11 @@ on:
         type: boolean
         default: true
         required: true
+      run_swift_codeql_benchmark:
+        description: Benchmark the manual Swift CodeQL build without uploading results.
+        type: boolean
+        default: false
+        required: true
 
 permissions:
   contents: read
@@ -469,6 +474,57 @@ jobs:
               exit 1
             fi
           done
+
+  swift-codeql-benchmark:
+    name: Swift CodeQL manual-build benchmark
+    if: github.event_name == 'workflow_dispatch' && inputs.run_swift_codeql_benchmark
+    runs-on: macos-26
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Verify exact benchmark source
+        run: test "$(git rev-parse HEAD)" = "${{ github.sha }}"
+
+      - name: Select reviewed Xcode
+        run: .github/scripts/configure_hosted_xcode.sh
+
+      - name: Initialize manual Swift CodeQL database
+        uses: github/codeql-action/init@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
+        with:
+          languages: swift
+          build-mode: manual
+
+      - name: Build release sources for CodeQL
+        run: |
+          set -euo pipefail
+          started_at="$(date -u +%s)"
+          xcodebuild build \
+            -project "$PROJECT" \
+            -target "$SCHEME" \
+            -configuration Release \
+            -sdk iphoneos \
+            -arch arm64 \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            ONLY_ACTIVE_ARCH=YES \
+            SWIFT_OPTIMIZATION_LEVEL=-Onone \
+            SWIFT_COMPILATION_MODE=singlefile \
+            DEBUG_INFORMATION_FORMAT=dwarf
+          finished_at="$(date -u +%s)"
+          duration="$((finished_at - started_at))"
+          echo "CODEQL_BUILD_SECONDS=$duration" >> "$GITHUB_ENV"
+          printf 'Manual Swift CodeQL build: **%dm%02ds**\n' "$((duration / 60))" "$((duration % 60))" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Analyze benchmark database without upload
+        uses: github/codeql-action/analyze@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
+        with:
+          category: /language:swift-manual-benchmark
+          upload: never
 
   code-coverage:
     name: Code coverage

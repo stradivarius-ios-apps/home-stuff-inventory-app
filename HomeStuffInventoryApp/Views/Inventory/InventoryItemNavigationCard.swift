@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 
 struct InventoryItemNavigationCard: View {
@@ -8,6 +9,7 @@ struct InventoryItemNavigationCard: View {
     let reduceMotion: Bool
     let accessibilityIdentifier: String
     let action: () -> Void
+    @Query(sort: \InventoryPlace.name) private var places: [InventoryPlace]
 
     init(
         item: InventoryItem,
@@ -31,9 +33,9 @@ struct InventoryItemNavigationCard: View {
         Button(action: action) {
             switch presentation {
             case .compactInventory:
-                InventoryCompactItemCard(item: item)
+                InventoryCompactItemCard(item: item, placePath: placePath)
             case .searchResults:
-                InventoryItemRowView(item: item, matchContext: matchContext)
+                InventoryItemRowView(item: item, matchContext: matchContext, placePath: placePath)
             }
         }
         .buttonStyle(.plain)
@@ -43,6 +45,15 @@ struct InventoryItemNavigationCard: View {
             reduceMotion: reduceMotion
         )
         .accessibilityIdentifier(accessibilityIdentifier)
+    }
+
+    private var placePath: String? {
+        guard let placeID = item.placeID,
+              let place = places.first(where: { $0.id == placeID })
+        else {
+            return nil
+        }
+        return InventoryPlaceHierarchy.path(for: place, places: places).displayName
     }
 }
 

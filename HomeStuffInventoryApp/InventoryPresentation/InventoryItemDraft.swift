@@ -3,12 +3,14 @@ import Foundation
 struct InventoryItemCreateContext: Equatable {
     var locationName: String
     var placeName: String
+    var placeID: UUID?
 
     static let global = InventoryItemCreateContext()
 
-    init(locationName: String = "", placeName: String = "") {
+    init(locationName: String = "", placeName: String = "", placeID: UUID? = nil) {
         self.locationName = locationName
         self.placeName = placeName
+        self.placeID = placeID
     }
 }
 
@@ -34,6 +36,7 @@ struct InventoryItemDraft: Equatable {
     init(createContext: InventoryItemCreateContext) {
         locationName = createContext.locationName
         containerName = createContext.placeName
+        placeID = createContext.placeID
     }
 
     init(item: InventoryItem) {

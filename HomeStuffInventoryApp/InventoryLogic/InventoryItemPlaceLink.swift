@@ -2,6 +2,16 @@ import Foundation
 
 /// Resolves Item form Place linkage without ever matching a Place globally by name.
 enum InventoryItemPlaceLink {
+    struct DestinationOption: Identifiable, Equatable {
+        let id: UUID
+        let name: String
+        let iconID: String?
+        let pathComponents: [String]
+
+        var pathText: String { pathComponents.joined(separator: " › ") }
+        var depth: Int { max(0, pathComponents.count - 1) }
+    }
+
     struct ResolvedValue: Equatable {
         let locationName: String
         let placeName: String?
@@ -30,6 +40,7 @@ enum InventoryItemPlaceLink {
               let legacyPlace,
               let exact = places.first(where: {
                   $0.locationID == location.id
+                      && $0.parentPlaceID == nil
                       && InventoryNormalizedName.place($0.name) == InventoryNormalizedName.place(legacyPlace)
               }) else {
             return .init(locationName: location.name, placeName: legacyPlace, placeID: nil)
@@ -41,6 +52,26 @@ enum InventoryItemPlaceLink {
         guard let location else { return [] }
         return places.filter { $0.locationID == location.id }.sorted {
             $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+        }
+    }
+
+    static func destinationOptions(
+        in location: StorageLocation?,
+        from places: [InventoryPlace]
+    ) -> [DestinationOption] {
+        self.places(in: location, from: places).map { place in
+            let path = InventoryPlaceHierarchy.path(for: place, places: places)
+            return DestinationOption(
+                id: place.id,
+                name: place.name,
+                iconID: place.iconID,
+                pathComponents: path.components
+            )
+        }
+        .sorted { lhs, rhs in
+            let comparison = lhs.pathText.localizedCaseInsensitiveCompare(rhs.pathText)
+            guard comparison == .orderedSame else { return comparison == .orderedAscending }
+            return lhs.id.uuidString < rhs.id.uuidString
         }
     }
 

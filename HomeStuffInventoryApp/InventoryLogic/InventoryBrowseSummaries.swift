@@ -35,6 +35,7 @@ enum InventoryBrowseSummaries {
                 )
 
                 return LocationSummary(
+                    storageLocationID: reusableLocation?.id,
                     name: reusableLocation?.name ?? location.displayName,
                     iconID: reusableLocation.flatMap { LocationIconCatalog.normalizedIconID($0.iconID) },
                     itemCount: items.count,
@@ -111,16 +112,78 @@ enum InventoryBrowseSummaries {
     static func placeSummaries(
         in items: [InventoryItem],
         matching location: LocationSummary,
+        places: [InventoryPlace] = [],
+        parentPlaceID: UUID? = nil,
         recentViewEvents: [InventoryItemViewEvent] = [],
         now: Date = .now,
         rollingWindow: TimeInterval = InventoryRecentItemViews.defaultRollingWindow,
         vocabulary: InventoryBrowseVocabulary = .default
     ) -> [PlaceSummary] {
         let locationItems = self.items(in: items, matching: location, vocabulary: vocabulary)
+        if let locationID = location.storageLocationID {
+            let reusableSummaries = InventoryPlaceHierarchy.children(
+                of: parentPlaceID,
+                locationID: locationID,
+                places: places
+            ).map { place in
+                reusablePlaceSummary(
+                    place,
+                    location: location,
+                    items: locationItems,
+                    places: places,
+                    recentViewEvents: recentViewEvents,
+                    now: now,
+                    rollingWindow: rollingWindow,
+                    vocabulary: vocabulary
+                )
+            }
+
+            guard parentPlaceID == nil else {
+                return reusableSummaries
+            }
+
+            let linkedPlaceIDs = Set(places.filter { $0.locationID == locationID }.map(\.id))
+            let legacyItems = locationItems.filter { item in
+                guard let placeID = item.placeID else { return true }
+                return !linkedPlaceIDs.contains(placeID)
+            }
+            return reusableSummaries + legacyPlaceSummaries(
+                in: legacyItems,
+                location: location,
+                excludingNames: Set(reusableSummaries.map {
+                    InventoryNormalizedName.place($0.name, vocabulary: vocabulary).comparisonKey
+                }),
+                recentViewEvents: recentViewEvents,
+                now: now,
+                rollingWindow: rollingWindow,
+                vocabulary: vocabulary
+            )
+        }
+
+        return legacyPlaceSummaries(
+            in: locationItems,
+            location: location,
+            excludingNames: [],
+            recentViewEvents: recentViewEvents,
+            now: now,
+            rollingWindow: rollingWindow,
+            vocabulary: vocabulary
+        )
+    }
+
+    private static func legacyPlaceSummaries(
+        in locationItems: [InventoryItem],
+        location: LocationSummary,
+        excludingNames: Set<String>,
+        recentViewEvents: [InventoryItemViewEvent],
+        now: Date,
+        rollingWindow: TimeInterval,
+        vocabulary: InventoryBrowseVocabulary
+    ) -> [PlaceSummary] {
         let groupedItems = Dictionary(grouping: locationItems) { normalizedPlaceName(for: $0, vocabulary: vocabulary) }
 
         let namedSummaries: [PlaceSummary] = groupedItems
-            .filter { !$0.key.isMissing }
+            .filter { !$0.key.isMissing && !excludingNames.contains($0.key.comparisonKey) }
             .map { entry in
                 placeSummary(
                     for: entry.key,
@@ -154,12 +217,14 @@ enum InventoryBrowseSummaries {
     static func placeDetailSummary(
         in items: [InventoryItem],
         matching place: PlaceSummary,
+        places: [InventoryPlace] = [],
         recentViewEvents: [InventoryItemViewEvent] = [],
         now: Date = .now,
         rollingWindow: TimeInterval = InventoryRecentItemViews.defaultRollingWindow,
         vocabulary: InventoryBrowseVocabulary = .default
     ) -> PlaceSummary {
         let placeItems = self.items(in: items, matching: place, vocabulary: vocabulary)
+        let containedItems = self.containedItems(in: items, matching: place, places: places, vocabulary: vocabulary)
         let normalizedPlace = place.isMissingPlace
             ? InventoryNormalizedName.missingPlace(vocabulary: vocabulary)
             : normalizedPlaceName(place.name, vocabulary: vocabulary)
@@ -176,7 +241,13 @@ enum InventoryBrowseSummaries {
             id: place.id,
             placeID: place.placeID,
             name: normalizedPlace.displayName,
-            itemCount: placeItems.count,
+            itemCount: containedItems.count,
+            directItemCount: placeItems.count,
+            recursiveItemCount: containedItems.count,
+            childPlaceCount: place.placeID.map { placeID in
+                places.filter { $0.parentPlaceID == placeID }.count
+            } ?? 0,
+            pathComponents: place.pathComponents,
             locationID: place.locationID,
             locationName: place.locationName,
             isMissingLocation: place.isMissingLocation,
@@ -207,6 +278,22 @@ enum InventoryBrowseSummaries {
             }
             return normalizedLocationName(for: item, vocabulary: vocabulary).matches(name: place.locationName, isMissing: place.isMissingLocation)
                 && normalizedPlaceName(for: item, vocabulary: vocabulary).matches(name: place.name, isMissing: place.isMissingPlace)
+        }
+    }
+
+    static func containedItems(
+        in items: [InventoryItem],
+        matching place: PlaceSummary,
+        places: [InventoryPlace],
+        vocabulary: InventoryBrowseVocabulary = .default
+    ) -> [InventoryItem] {
+        guard let placeID = place.placeID else {
+            return self.items(in: items, matching: place, vocabulary: vocabulary)
+        }
+        let subtreeIDs = InventoryPlaceHierarchy.descendantIDs(of: placeID, places: places)
+        return items.filter { item in
+            guard let itemPlaceID = item.placeID else { return false }
+            return subtreeIDs.contains(itemPlaceID)
         }
     }
 
@@ -297,6 +384,55 @@ enum InventoryBrowseSummaries {
             locationName: location.name,
             isMissingLocation: location.isMissingLocation,
             isMissingPlace: place.isMissing,
+            categoryPreview: categoryPreview.visibleNames,
+            hiddenCategoryCount: categoryPreview.hiddenCount,
+            categorySummaries: categorySummaries,
+            previewGroups: placePreviewGroups(
+                categoryPreview: categoryPreview,
+                recentItemPreview: recentPreview
+            )
+        )
+    }
+
+    private static func reusablePlaceSummary(
+        _ place: InventoryPlace,
+        location: LocationSummary,
+        items: [InventoryItem],
+        places: [InventoryPlace],
+        recentViewEvents: [InventoryItemViewEvent],
+        now: Date,
+        rollingWindow: TimeInterval,
+        vocabulary: InventoryBrowseVocabulary
+    ) -> PlaceSummary {
+        let subtreeIDs = InventoryPlaceHierarchy.descendantIDs(of: place.id, places: places)
+        let directItems = items.filter { $0.placeID == place.id }
+        let containedItems = items.filter { item in
+            item.placeID.map(subtreeIDs.contains) ?? false
+        }
+        let categoryPreview = commonCategories(from: containedItems, vocabulary: vocabulary)
+        let categorySummaries = placeCategorySummaries(from: containedItems, vocabulary: vocabulary)
+        let recentPreview = recentItems(
+            from: containedItems,
+            events: recentViewEvents,
+            now: now,
+            rollingWindow: rollingWindow
+        )
+        let path = InventoryPlaceHierarchy.path(for: place, places: places)
+
+        return PlaceSummary(
+            id: place.id.uuidString,
+            placeID: place.id,
+            parentPlaceID: place.parentPlaceID,
+            name: place.name,
+            itemCount: containedItems.count,
+            directItemCount: directItems.count,
+            recursiveItemCount: containedItems.count,
+            childPlaceCount: places.filter { $0.parentPlaceID == place.id }.count,
+            pathComponents: path.components,
+            locationID: location.id,
+            locationName: location.name,
+            isMissingLocation: location.isMissingLocation,
+            isMissingPlace: false,
             categoryPreview: categoryPreview.visibleNames,
             hiddenCategoryCount: categoryPreview.hiddenCount,
             categorySummaries: categorySummaries,

@@ -170,6 +170,9 @@ struct InventoryBackupRestoreService: Sendable {
         for event in try context.fetch(FetchDescriptor<InventoryItemViewEvent>()) {
             context.delete(event)
         }
+        for record in try context.fetch(FetchDescriptor<InventoryMovementRecord>()) {
+            context.delete(record)
+        }
         for item in try context.fetch(FetchDescriptor<InventoryItem>()) {
             context.delete(item)
         }
@@ -270,6 +273,36 @@ struct InventoryBackupRestoreService: Sendable {
                   let viewedAt = InventoryPortabilityDate.date(from: record.viewedAt)
             else { throw InventoryBackupRestoreError.invalidRelationships }
             context.insert(InventoryItemViewEvent(id: id, itemID: itemID, viewedAt: viewedAt))
+        }
+
+        for record in snapshot.movementRecords ?? [] {
+            guard let id = UUID(uuidString: record.id),
+                  let operationID = UUID(uuidString: record.operationID),
+                  let itemID = UUID(uuidString: record.itemID),
+                  let occurredAt = InventoryPortabilityDate.date(from: record.occurredAt)
+            else { throw InventoryBackupRestoreError.invalidRelationships }
+            context.insert(
+                InventoryMovementRecord(
+                    id: id,
+                    operationID: operationID,
+                    itemID: itemID,
+                    occurredAt: occurredAt,
+                    origin: InventoryMovementOrigin(rawValue: record.originStorageValue),
+                    reversedOperationID: record.reversedOperationID.flatMap(UUID.init(uuidString:)),
+                    source: InventoryMovementEndpointSnapshot(
+                        locationID: record.sourceLocationID.flatMap(UUID.init(uuidString:)),
+                        locationName: record.sourceLocationName,
+                        placeID: record.sourcePlaceID.flatMap(UUID.init(uuidString:)),
+                        placeName: record.sourcePlaceName
+                    ),
+                    destination: InventoryMovementEndpointSnapshot(
+                        locationID: record.destinationLocationID.flatMap(UUID.init(uuidString:)),
+                        locationName: record.destinationLocationName,
+                        placeID: record.destinationPlaceID.flatMap(UUID.init(uuidString:)),
+                        placeName: record.destinationPlaceName
+                    )
+                )
+            )
         }
     }
 }

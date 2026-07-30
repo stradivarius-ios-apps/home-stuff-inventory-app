@@ -117,6 +117,27 @@ final class InventoryItem {
         self.updatedAt = timestamp
     }
 
+    func applyMovement(
+        _ destination: InventoryMovementEndpointSnapshot,
+        updatedAt timestamp: Date = .now
+    ) {
+        let normalizedPlaceName = destination.placeName?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let placeName = normalizedPlaceName?.isEmpty == true ? nil : normalizedPlaceName
+
+        guard locationName != destination.locationName
+            || containerName != placeName
+            || placeID != destination.placeID
+        else {
+            return
+        }
+
+        locationName = destination.locationName
+        containerName = placeName
+        placeID = destination.placeID
+        updatedAt = timestamp
+    }
+
     static func isValidName(_ name: String) -> Bool {
         !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }

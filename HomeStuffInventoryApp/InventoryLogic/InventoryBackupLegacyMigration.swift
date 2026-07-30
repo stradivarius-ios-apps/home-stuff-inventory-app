@@ -32,7 +32,24 @@ private struct InventoryLegacyItemV0: Decodable {
 
 enum InventoryBackupLegacyMigration {
     static func migratePlaces(in document: InventoryPortabilityDocumentV1) throws -> InventoryPortabilityDocumentV1 {
-        guard document.schemaVersion == 1 else { return document }
+        guard document.schemaVersion < InventoryPortabilityEncoder.schemaVersion else { return document }
+        if document.schemaVersion == 2 {
+            let snapshot = InventoryPortabilitySnapshotV1(
+                locations: document.inventory.locations,
+                customCategories: document.inventory.customCategories,
+                items: document.inventory.items,
+                places: document.inventory.places,
+                recentItemViewEvents: document.inventory.recentItemViewEvents,
+                movementRecords: []
+            )
+            let data = try InventoryPortabilityEncoder.encode(
+                snapshot: snapshot,
+                metadata: document.metadata,
+                artifactType: document.artifactType,
+                prettyPrinted: false
+            )
+            return try InventoryPortabilityEncoder.decodeAndVerify(data)
+        }
         var placesByScope: [String: InventoryPortabilityPlaceV1] = [:]
         let locationIDs = Set(document.inventory.locations.map(\.id))
         let items = document.inventory.items.map { item -> InventoryPortabilityItemV1 in
@@ -57,9 +74,17 @@ enum InventoryBackupLegacyMigration {
         }
         let snapshot = InventoryPortabilitySnapshotV1(
             locations: document.inventory.locations, customCategories: document.inventory.customCategories,
-            items: items, places: Array(placesByScope.values), recentItemViewEvents: document.inventory.recentItemViewEvents
+            items: items,
+            places: Array(placesByScope.values),
+            recentItemViewEvents: document.inventory.recentItemViewEvents,
+            movementRecords: []
         )
-        try InventoryPortabilityValidator.validate(snapshot, artifactType: document.artifactType, invalidError: .invalidRelationships)
+        try InventoryPortabilityValidator.validate(
+            snapshot,
+            artifactType: document.artifactType,
+            schemaVersion: InventoryPortabilityEncoder.schemaVersion,
+            invalidError: .invalidRelationships
+        )
         let data = try InventoryPortabilityEncoder.encode(
             snapshot: snapshot, metadata: document.metadata, artifactType: document.artifactType, prettyPrinted: false
         )
@@ -128,7 +153,8 @@ enum InventoryBackupLegacyMigration {
             locations: legacy.inventory.locations,
             customCategories: legacy.inventory.customCategories,
             items: items,
-            recentItemViewEvents: []
+            recentItemViewEvents: [],
+            movementRecords: nil
         )
         do {
             let enriched = try migratePlaces(in: InventoryPortabilityDocumentV1(

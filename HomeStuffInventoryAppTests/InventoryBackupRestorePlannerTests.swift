@@ -25,13 +25,13 @@ struct InventoryBackupRestorePlannerTests: InventoryBackupRestoreTestCase {
             maximumLocations: 10, maximumCustomCategories: 10, maximumItems: 10, maximumRecentItemViewEvents: 10,
             maximumTagsPerItem: 10, maximumUTF8BytesPerString: 100, maximumTotalRecords: 10)
         let plan = try await InventoryBackupRestorePlanner(limits: compatible).plan(data: data)
-        #expect(plan.schemaVersion == 2)
+        #expect(plan.schemaVersion == 3)
     }
     @Test func versionOneBackupSynthesizesScopedPlacesAndLinksBeforeRestore() async throws {
         let data = try Data(contentsOf: fixtureURL("ordinary-complete-backup-v1.json"))
         let plan = try await InventoryBackupRestorePlanner().plan(data: data)
 
-        #expect(plan.schemaVersion == 2)
+        #expect(plan.schemaVersion == 3)
         #expect(plan.document.inventory.places.map(\.name) == ["Desk drawer", "Memory box"])
         #expect(plan.document.inventory.places.allSatisfy { $0.iconID == PlaceIconCatalog.defaultIconID })
         #expect(plan.document.inventory.items.allSatisfy { $0.placeID != nil })
@@ -47,7 +47,7 @@ struct InventoryBackupRestorePlannerTests: InventoryBackupRestoreTestCase {
             try await planner.plan(data: data.dropLast(data.count / 2))
         }
 
-        let newer = try mutate(data, reseal: false) { $0["schemaVersion"] = 3 }
+        let newer = try mutate(data, reseal: false) { $0["schemaVersion"] = 4 }
         await #expect(throws: InventoryBackupRestoreError.unsupportedNewerVersion) {
             try await planner.plan(data: newer)
         }
@@ -225,7 +225,7 @@ struct InventoryBackupRestorePlannerTests: InventoryBackupRestoreTestCase {
 
         #expect(plan.backupDate == date)
         #expect(plan.appVersion == "9.0")
-        #expect(plan.schemaVersion == 2)
+        #expect(plan.schemaVersion == 3)
         #expect(plan.counts == InventoryBackupRestoreCounts(
             items: 1,
             locations: 1,

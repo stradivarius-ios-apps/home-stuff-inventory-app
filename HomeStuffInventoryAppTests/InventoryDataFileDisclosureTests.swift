@@ -42,7 +42,7 @@ struct InventoryDataFileDisclosureTests {
             cleanupAction: {}
         )
         let workflow = InventoryDataTransferWorkflow(
-            readableExport: { _, _, _ in artifact },
+            readableExport: { _, _, _, _ in artifact },
             artifactCleanup: { _ in cleanupCount += 1 }
         )
 
@@ -63,7 +63,7 @@ struct InventoryDataFileDisclosureTests {
     @MainActor
     @Test func transferWorkflowMapsUnknownExportAndImporterFailuresWithoutRawErrors() {
         let workflow = InventoryDataTransferWorkflow(
-            readableExport: { _, _, _ in throw CocoaError(.fileWriteUnknown) }
+            readableExport: { _, _, _, _ in throw CocoaError(.fileWriteUnknown) }
         )
 
         workflow.export(items: [], locations: [], customCategories: [])
@@ -128,7 +128,7 @@ struct InventoryDataFileDisclosureTests {
             cleanupAction: {}
         )
         let workflow = InventoryDataTransferWorkflow(
-            readableExport: { _, _, _ in artifact }
+            readableExport: { _, _, _, _ in artifact }
         )
 
         workflow.export(items: [], locations: [], customCategories: [])
@@ -189,7 +189,7 @@ struct InventoryDataFileDisclosureTests {
             cleanupAction: {}
         )
         let workflow = InventoryDataTransferWorkflow(
-            readableExport: { _, _, _ in artifact },
+            readableExport: { _, _, _, _ in artifact },
             backupPreparation: { _ in
                 InventoryPreparedBackup(data: Data([0x7B, 0x7D]), suggestedFilename: "backup.json")
             }
@@ -235,7 +235,7 @@ struct InventoryDataFileDisclosureTests {
         let context = ModelContext(container)
         let plan = restorePlanFixture()
         let workflow = InventoryDataTransferWorkflow(
-            readableExport: { _, _, _ in throw InventoryReadableExportError.generationFailed },
+            readableExport: { _, _, _, _ in throw InventoryReadableExportError.generationFailed },
             backupPreparation: { _ in
                 InventoryPreparedBackup(data: Data(), suggestedFilename: "backup.json")
             },
@@ -270,7 +270,7 @@ struct InventoryDataFileDisclosureTests {
             cleanupAction: {}
         )
         let workflow = InventoryDataTransferWorkflow(
-            readableExport: { _, _, _ in artifact },
+            readableExport: { _, _, _, _ in artifact },
             backupPreparation: { _ in
                 do {
                     try await Task.sleep(for: .milliseconds(50))

@@ -19,6 +19,16 @@ enum InventoryItemMutationPersistence {
             for event in events {
                 modelContext.delete(event)
             }
+            let movementRecords = try modelContext.fetch(
+                FetchDescriptor<InventoryMovementRecord>(
+                    predicate: #Predicate<InventoryMovementRecord> { record in
+                        record.itemID == itemID
+                    }
+                )
+            )
+            for record in movementRecords {
+                modelContext.delete(record)
+            }
             modelContext.delete(item)
             try (persist ?? modelContext.save)()
         } catch {

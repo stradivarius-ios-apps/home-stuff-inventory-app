@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AC7700000000000000000001 /* InventoryMovementRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7700000000000000000002 /* InventoryMovementRecord.swift */; };
+		AC7700000000000000000003 /* InventoryMovementHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7700000000000000000004 /* InventoryMovementHistory.swift */; };
+		AC7700000000000000000005 /* InventoryMovementHistoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7700000000000000000006 /* InventoryMovementHistoryTests.swift */; };
 		A10000000000000000000240 /* InventoryItemPlaceLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000241 /* InventoryItemPlaceLink.swift */; };
 		A10000000000000000000242 /* InventoryItemPlaceSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000243 /* InventoryItemPlaceSelectionView.swift */; };
 		A10000000000000000000250 /* InventoryPlaceDirectoryPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000251 /* InventoryPlaceDirectoryPresentation.swift */; };
@@ -202,6 +205,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		AC7700000000000000000002 /* InventoryMovementRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryMovementRecord.swift; sourceTree = "<group>"; };
+		AC7700000000000000000004 /* InventoryMovementHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryMovementHistory.swift; sourceTree = "<group>"; };
+		AC7700000000000000000006 /* InventoryMovementHistoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryMovementHistoryTests.swift; sourceTree = "<group>"; };
 		A10000000000000000000241 /* InventoryItemPlaceLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemPlaceLink.swift; sourceTree = "<group>"; };
 		A10000000000000000000243 /* InventoryItemPlaceSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemPlaceSelectionView.swift; sourceTree = "<group>"; };
 		A10000000000000000000201 /* InventoryPortabilityResourceValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPortabilityResourceValidation.swift; sourceTree = "<group>"; };
@@ -459,6 +465,7 @@
 			children = (
 				A10000000000000000000186 /* InventoryPortabilityModels.swift */,
 				A10000000000000000000011 /* InventoryItem.swift */,
+				AC7700000000000000000002 /* InventoryMovementRecord.swift */,
 				A10000000000000000000108 /* InventoryItemViewEvent.swift */,
 				A55000000000000000000002 /* InventoryAppStoreDemoData.swift */,
 				A10000000000000000000220 /* InventoryPlaceOpenRecord.swift */,
@@ -477,6 +484,7 @@
 			isa = PBXGroup;
 			children = (
 				A10000000000000000000241 /* InventoryItemPlaceLink.swift */,
+				AC7700000000000000000004 /* InventoryMovementHistory.swift */,
 				A1000000000000000000018A /* InventoryReadableExportService.swift */,
 				A10000000000000000000192 /* InventoryBackup.swift */,
 				A10000000000000000000207 /* InventoryBackupFileReader.swift */,
@@ -661,6 +669,7 @@
 		A10000000000000000000053 /* HomeStuffInventoryAppTests */ = {
 			isa = PBXGroup;
 			children = (
+				AC7700000000000000000006 /* InventoryMovementHistoryTests.swift */,
 				A100000000000000000001A9 /* PrivacyManifestTests.swift */,
 				A100000000000000000001A7 /* InventoryFreeDowngradeRegressionGateTests.swift */,
 				A100000000000000000001A5 /* PremiumAccessTests.swift */,
@@ -871,6 +880,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AC7700000000000000000001 /* InventoryMovementRecord.swift in Sources */,
+				AC7700000000000000000003 /* InventoryMovementHistory.swift in Sources */,
 				A10000000000000000000200 /* InventoryPortabilityResourceValidation.swift in Sources */,
 				A10000000000000000000202 /* InventoryPortabilitySchemaValidation.swift in Sources */,
 				A10000000000000000000204 /* InventoryRFC8785Canonicalizer.swift in Sources */,
@@ -992,6 +1003,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AC7700000000000000000005 /* InventoryMovementHistoryTests.swift in Sources */,
 				A100000000000000000001A8 /* PrivacyManifestTests.swift in Sources */,
 				A100000000000000000001A6 /* InventoryFreeDowngradeRegressionGateTests.swift in Sources */,
 				A100000000000000000001A4 /* PremiumAccessTests.swift in Sources */,

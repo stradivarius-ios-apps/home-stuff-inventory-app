@@ -9,6 +9,7 @@ struct InventoryPortabilityLimits: Sendable, Equatable {
     let maximumCustomCategories: Int
     let maximumItems: Int
     let maximumRecentItemViewEvents: Int
+    let maximumMovementRecords: Int
     let maximumTagsPerItem: Int
     let maximumUTF8BytesPerString: Int
     let maximumTotalRecords: Int
@@ -21,6 +22,7 @@ struct InventoryPortabilityLimits: Sendable, Equatable {
         maximumCustomCategories: Int,
         maximumItems: Int,
         maximumRecentItemViewEvents: Int,
+        maximumMovementRecords: Int = 100_000,
         maximumTagsPerItem: Int,
         maximumUTF8BytesPerString: Int,
         maximumTotalRecords: Int
@@ -32,6 +34,7 @@ struct InventoryPortabilityLimits: Sendable, Equatable {
         self.maximumCustomCategories = maximumCustomCategories
         self.maximumItems = maximumItems
         self.maximumRecentItemViewEvents = maximumRecentItemViewEvents
+        self.maximumMovementRecords = maximumMovementRecords
         self.maximumTagsPerItem = maximumTagsPerItem
         self.maximumUTF8BytesPerString = maximumUTF8BytesPerString
         self.maximumTotalRecords = maximumTotalRecords
@@ -44,6 +47,7 @@ struct InventoryPortabilityLimits: Sendable, Equatable {
         maximumCustomCategories: 10_000,
         maximumItems: 50_000,
         maximumRecentItemViewEvents: 100_000,
+        maximumMovementRecords: 100_000,
         maximumTagsPerItem: 1_000,
         maximumUTF8BytesPerString: 1 * 1024 * 1024,
         maximumTotalRecords: 150_000
@@ -158,19 +162,38 @@ struct InventoryPortabilityRecentItemViewEventV1: Codable, Equatable, Sendable {
     let viewedAt: String
 }
 
+struct InventoryPortabilityMovementRecordV1: Codable, Equatable, Sendable {
+    let id: String
+    let operationID: String
+    let itemID: String
+    let occurredAt: String
+    let originStorageValue: String
+    let reversedOperationID: String?
+    let sourceLocationID: String?
+    let sourceLocationName: String
+    let sourcePlaceID: String?
+    let sourcePlaceName: String?
+    let destinationLocationID: String?
+    let destinationLocationName: String
+    let destinationPlaceID: String?
+    let destinationPlaceName: String?
+}
+
 struct InventoryPortabilitySnapshotV1: Codable, Equatable, Sendable {
     let locations: [InventoryPortabilityLocationV1]
     let customCategories: [InventoryPortabilityCustomCategoryV1]
     let items: [InventoryPortabilityItemV1]
     let places: [InventoryPortabilityPlaceV1]
     let recentItemViewEvents: [InventoryPortabilityRecentItemViewEventV1]?
+    let movementRecords: [InventoryPortabilityMovementRecordV1]?
 
     init(
         locations: [InventoryPortabilityLocationV1],
         customCategories: [InventoryPortabilityCustomCategoryV1],
         items: [InventoryPortabilityItemV1],
         places: [InventoryPortabilityPlaceV1] = [],
-        recentItemViewEvents: [InventoryPortabilityRecentItemViewEventV1]? = nil
+        recentItemViewEvents: [InventoryPortabilityRecentItemViewEventV1]? = nil,
+        movementRecords: [InventoryPortabilityMovementRecordV1]? = []
     ) {
         self.locations = locations.sorted { $0.id < $1.id }
         self.customCategories = customCategories.sorted { $0.id < $1.id }
@@ -179,10 +202,14 @@ struct InventoryPortabilitySnapshotV1: Codable, Equatable, Sendable {
         self.recentItemViewEvents = recentItemViewEvents?.sorted {
             ($0.viewedAt, $0.id) < ($1.viewedAt, $1.id)
         }
+        self.movementRecords = movementRecords?.sorted {
+            ($0.occurredAt, $0.operationID, $0.itemID, $0.id)
+                < ($1.occurredAt, $1.operationID, $1.itemID, $1.id)
+        }
     }
 
     private enum CodingKeys: String, CodingKey {
-        case locations, customCategories, items, places, recentItemViewEvents
+        case locations, customCategories, items, places, recentItemViewEvents, movementRecords
     }
 
     init(from decoder: Decoder) throws {
@@ -192,7 +219,8 @@ struct InventoryPortabilitySnapshotV1: Codable, Equatable, Sendable {
             customCategories: try values.decode([InventoryPortabilityCustomCategoryV1].self, forKey: .customCategories),
             items: try values.decode([InventoryPortabilityItemV1].self, forKey: .items),
             places: try values.decodeIfPresent([InventoryPortabilityPlaceV1].self, forKey: .places) ?? [],
-            recentItemViewEvents: try values.decodeIfPresent([InventoryPortabilityRecentItemViewEventV1].self, forKey: .recentItemViewEvents)
+            recentItemViewEvents: try values.decodeIfPresent([InventoryPortabilityRecentItemViewEventV1].self, forKey: .recentItemViewEvents),
+            movementRecords: try values.decodeIfPresent([InventoryPortabilityMovementRecordV1].self, forKey: .movementRecords)
         )
     }
 }

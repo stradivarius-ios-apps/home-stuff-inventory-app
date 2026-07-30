@@ -1,7 +1,7 @@
 {
   "formatIdentifier": "com.stradivarius23.home-stuff-inventory.portability",
   "artifactType": "completeBackup",
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "integrity": {
     "algorithm": "SHA-512",
     "canonicalization": "FUTURE-RULE",

@@ -28,7 +28,7 @@ struct InventoryBackupTests {
         let document = try InventoryPortabilityEncoder.decodeAndVerify(data)
 
         #expect(document.artifactType == .completeBackup)
-        #expect(document.schemaVersion == 3)
+        #expect(document.schemaVersion == 4)
         #expect(document.metadata == metadata)
         #expect(document.inventory == snapshot)
         #expect(document.inventory.locations.count == 1)

@@ -150,10 +150,29 @@ struct InventoryPortabilityItemV1: Codable, Equatable, Sendable {
 struct InventoryPortabilityPlaceV1: Codable, Equatable, Sendable {
     let id: String
     let locationID: String
+    let parentPlaceID: String?
     let name: String
     let iconID: String
     let createdAt: String
     let updatedAt: String
+
+    init(
+        id: String,
+        locationID: String,
+        parentPlaceID: String? = nil,
+        name: String,
+        iconID: String,
+        createdAt: String,
+        updatedAt: String
+    ) {
+        self.id = id
+        self.locationID = locationID
+        self.parentPlaceID = parentPlaceID
+        self.name = name
+        self.iconID = iconID
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+    }
 }
 
 struct InventoryPortabilityRecentItemViewEventV1: Codable, Equatable, Sendable {

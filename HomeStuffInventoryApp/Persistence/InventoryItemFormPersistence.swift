@@ -117,3 +117,44 @@ enum InventoryItemFormPersistence {
         return false
     }
 }
+
+enum InventoryRoomSweepPersistenceOutcome: Equatable {
+    case saved
+    case accessRequired
+    case invalidDraft
+    case saveFailed
+}
+
+enum InventoryRoomSweepPersistence {
+    @MainActor
+    static func save(
+        draft: InventoryItemDraft,
+        access: PremiumAccessProviding,
+        locations: [StorageLocation],
+        places: [InventoryPlace],
+        in modelContext: ModelContext,
+        occurredAt: Date = .now,
+        persist: (() throws -> Void)? = nil
+    ) -> InventoryRoomSweepPersistenceOutcome {
+        guard access.availability(of: .roomSweep) == .available else {
+            return .accessRequired
+        }
+
+        return switch InventoryItemFormPersistence.save(
+            draft: draft,
+            item: nil,
+            locations: locations,
+            places: places,
+            in: modelContext,
+            occurredAt: occurredAt,
+            persist: persist
+        ) {
+        case .saved:
+            .saved
+        case .invalidDraft:
+            .invalidDraft
+        case .saveFailed:
+            .saveFailed
+        }
+    }
+}

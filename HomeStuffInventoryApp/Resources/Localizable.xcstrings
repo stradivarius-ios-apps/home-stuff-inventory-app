@@ -2381,6 +2381,66 @@
     "inventory.placeIcon.hanger" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Hanger" } }, "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вішак" } } } },
     "inventory.placeIcon.shelf" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Shelf" } }, "uk" : { "stringUnit" : { "state" : "translated", "value" : "Полиця" } } } },
     "inventory.placeIcon.tray" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Tray" } }, "uk" : { "stringUnit" : { "state" : "translated", "value" : "Лоток" } } } },
+    "inventory.action.done" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Done" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Готово" } }
+      }
+    },
+    "inventory.roomSweep.action" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Room Sweep" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Швидкий облік" } }
+      }
+    },
+    "inventory.roomSweep.destination.footer" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This destination stays selected after each save. Choose a Storage Place when you know the exact spot." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Це місце лишатиметься вибраним після кожного збереження. Виберіть місце зберігання, якщо знаєте точне розташування." } }
+      }
+    },
+    "inventory.roomSweep.destination.section" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Keep Destination" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Спільне місце" } }
+      }
+    },
+    "inventory.roomSweep.saveAndContinue" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Save & Continue" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Зберегти й далі" } }
+      }
+    },
+    "inventory.roomSweep.savedCount" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%d items saved in this sweep." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Збережено речей під час цього обліку: %d." } }
+      }
+    },
+    "inventory.roomSweep.saveError.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Item Not Saved" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Річ не збережено" } }
+      }
+    },
+    "inventory.roomSweep.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Room Sweep" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Швидкий облік" } }
+      }
+    },
+    "inventory.roomSweep.upgrade.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Room Sweep requires Home Stuff Pro. Your inventory was not changed." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Для швидкого обліку потрібен Home Stuff Pro. Інвентар не змінено." } }
+      }
+    },
+    "inventory.roomSweep.upgrade.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro Required" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Потрібен Home Stuff Pro" } }
+      }
+    },
     "settings.title" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Settings" } },

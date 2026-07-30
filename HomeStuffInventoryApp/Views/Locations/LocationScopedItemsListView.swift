@@ -98,7 +98,8 @@ struct PlaceItemsListView: View {
     private var createContext: InventoryItemCreateContext {
         InventoryItemCreateContext(
             locationName: place.isMissingLocation ? "" : place.locationName,
-            placeName: place.isMissingPlace ? "" : place.name
+            placeName: place.isMissingPlace ? "" : place.name,
+            placeID: place.placeID
         )
     }
 

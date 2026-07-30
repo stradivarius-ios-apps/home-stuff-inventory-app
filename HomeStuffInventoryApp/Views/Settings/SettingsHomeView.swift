@@ -24,6 +24,7 @@ struct SettingsHomeView: View {
     @Query private var items: [InventoryItem]
     @Query private var locations: [StorageLocation]
     @Query private var customCategories: [InventoryCustomCategory]
+    @Query private var movementRecords: [InventoryMovementRecord]
 
     @State private var workflow = InventoryDataTransferWorkflow()
 #if DEBUG
@@ -266,7 +267,12 @@ struct SettingsHomeView: View {
                 title: Text(outcome.titleKey),
                 message: Text(outcome.messageKey),
                 primaryButton: .default(Text("settings.export.failure.retry")) {
-                    workflow.export(items: items, locations: locations, customCategories: customCategories)
+                    workflow.export(
+                        items: items,
+                        locations: locations,
+                        customCategories: customCategories,
+                        movementRecords: movementRecords
+                    )
                 },
                 secondaryButton: .cancel()
             )
@@ -304,7 +310,14 @@ struct SettingsHomeView: View {
     }
 
     private func confirmDataFileAction(_ action: InventoryDataFileAction) {
-        workflow.confirmDisclosure(action, items: items, locations: locations, customCategories: customCategories, context: modelContext)
+        workflow.confirmDisclosure(
+            action,
+            items: items,
+            locations: locations,
+            customCategories: customCategories,
+            movementRecords: movementRecords,
+            context: modelContext
+        )
 #if DEBUG
         guard action == .readableExport,
               ProcessInfo.processInfo.arguments.contains("--qa-suppress-export-share-sheet"),

@@ -11,7 +11,7 @@ Every well-formed version 1 fixture carries the contract's RFC 8785 / SHA-256 in
 | `unicode-readable-export-v1.json` | valid version 1 readable export with lossless EN/UK/Unicode content |
 | `legacy-compatible-backup-v0.json` | valid input-only version 0 backup; migrate in memory before restore |
 | `malformed-truncated-backup.json` | invalid JSON; reject without mutation |
-| `unsupported-newer-backup-v2.json` | Historical filename; valid JSON and recognized format with schema version 3, rejected without decoding records or mutation |
+| `unsupported-newer-backup-v2.json` | Historical filename; valid JSON and recognized format with schema version 4, rejected without decoding records or mutation |
 
 Validate the well-formed JSON fixtures from the repository root with:
 

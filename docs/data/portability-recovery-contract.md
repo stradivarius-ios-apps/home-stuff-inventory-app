@@ -1,10 +1,10 @@
 # Portability and Recovery File Contract
 
-Status: Canonical repository contract; version 2 implementation shipped
+Status: Canonical repository contract; version 3 implementation shipped
 
 ## Purpose and scope
 
-This document defines the local, versioned file boundary for Home Stuff Inventory portability and recovery. It is the source of truth for the shipped version 2 readable export, complete backup, compatible restore, and their fixtures. Version 1 fixtures remain supported legacy inputs. The contract itself remains implementation-independent; production owners are `InventoryReadableExportService`, `InventoryBackupService`, `InventoryBackupRestoreService`, `InventoryBackupRecoveryStore`, and the Settings file/share surfaces.
+This document defines the local, versioned file boundary for Home Stuff Inventory portability and recovery. It is the source of truth for the shipped version 3 readable export, complete backup, compatible restore, and their fixtures. Versions 1 and 2 remain supported legacy inputs. The contract itself remains implementation-independent; production owners are `InventoryReadableExportService`, `InventoryBackupService`, `InventoryBackupRestoreService`, `InventoryBackupRecoveryStore`, and the Settings file/share surfaces.
 
 The [Free Capability Contract](../product/free-capability-contract.md) classifies readable export, complete backup, and compatible restore as protected Free capabilities. They never require an entitlement, an account, or a network connection. A missing, expired, refunded, or unavailable entitlement cannot remove fields, records, or recovery access.
 
@@ -12,7 +12,7 @@ Two artifacts use the same envelope but serve different purposes:
 
 | `artifactType` | Purpose | Required contents |
 |---|---|---|
-| `readableExport` | A stable, pretty-printed copy a person can inspect or process with ordinary JSON tools | Every user-authored Item field, reusable Location and custom Category value, stable ID, and relationship; no interaction history |
+| `readableExport` | A stable, pretty-printed copy a person can inspect or process with ordinary JSON tools | Every user-authored Item field, reusable Location and custom Category value, stable ID, relationship, and movement record; no recent-view interaction history |
 | `completeBackup` | A lossless machine-restorable snapshot | Everything in `readableExport`, plus all persisted recent Item-view events and any future restorable record introduced by a schema version |
 
 A readable export is not accepted by restore. This prevents a deliberately reduced artifact from being mistaken for a complete backup. Only `completeBackup` can enter the restore pipeline.
@@ -27,7 +27,7 @@ The root object has exactly these schema-owned fields:
 {
   "formatIdentifier": "com.stradivarius23.home-stuff-inventory.portability",
   "artifactType": "completeBackup",
-    "schemaVersion": 2,
+  "schemaVersion": 3,
   "integrity": {
     "algorithm": "SHA-256",
     "canonicalization": "RFC8785",
@@ -44,18 +44,19 @@ The root object has exactly these schema-owned fields:
     "customCategories": [],
     "items": [],
     "places": [],
-    "recentItemViewEvents": []
+    "recentItemViewEvents": [],
+    "movementRecords": []
   }
 }
 ```
 
-`formatIdentifier`, `artifactType`, `schemaVersion`, `integrity`, `metadata`, and `inventory` are required. `schemaVersion` is an integer. Version `2` is the current emitted version. Producers must never emit version `0`. The `places` collection is required only for a version 2 `completeBackup`; readable export intentionally remains name-centered and does not carry reusable Place metadata.
+`formatIdentifier`, `artifactType`, `schemaVersion`, `integrity`, `metadata`, and `inventory` are required. `schemaVersion` is an integer. Version `3` is the current emitted version. Producers must never emit version `0`. The `places` collection is required for version 2 and newer `completeBackup` artifacts; readable export intentionally remains name-centered and does not carry reusable Place metadata. `movementRecords` is required in both version 3 artifact types.
 
 ### Integrity envelope
 
-Every version `1` and version `2` artifact has an `integrity` object with exactly three required string fields:
+Every version `1`, `2`, and `3` artifact has an `integrity` object with exactly three required string fields:
 
-| Field | Version 1 and 2 value |
+| Field | Version 1, 2, and 3 value |
 |---|---|
 | `algorithm` | `SHA-256` |
 | `canonicalization` | `RFC8785`, the JSON Canonicalization Scheme defined by RFC 8785 |
@@ -65,7 +66,7 @@ The digest scope is the entire root JSON object with the root `integrity` member
 
 A supported reader validates the descriptor values and lowercase digest syntax, removes only the root `integrity` member, repeats the same canonicalization and hash, and compares all 32 digest bytes. `invalidIntegrity` covers a missing/malformed descriptor or unsupported algorithm/canonicalization. `integrityMismatch` covers a well-formed descriptor whose digest does not match. Neither result permits record decoding or mutation.
 
-The input-only version `0` compatibility profile predates this integrity envelope and may omit it. Its entire schema is validated before migration and it receives a version `2` integrity envelope whenever it is subsequently written as a new backup. Future versions must retain this envelope or define their replacement before implementation; backup implementations consume this exact algorithm and byte scope.
+The input-only version `0` compatibility profile predates this integrity envelope and may omit it. Its entire schema is validated before migration and it receives a version `3` integrity envelope whenever it is subsequently written as a new backup. Future versions must retain this envelope or define their replacement before implementation; backup implementations consume this exact algorithm and byte scope.
 
 Metadata describes the producer and is not restored into SwiftData:
 
@@ -78,7 +79,7 @@ Metadata describes the producer and is not restored into SwiftData:
 
 Device name, account data, locale, file path, and hardware identifiers must not be recorded. Compatibility is determined only by `formatIdentifier`, `artifactType`, and `schemaVersion`, never by app version or build.
 
-## Version 2 inventory schema
+## Version 3 inventory schema
 
 All UUIDs use canonical lowercase `8-4-4-4-12` text. A producer preserves persisted IDs and never regenerates them during export or backup. A restore preserves those IDs. Duplicate IDs within or across record collections are invalid.
 
@@ -158,7 +159,7 @@ All fields except `customCategoryID`, `locationID`, `placeName`, `placeID`, and 
 
 ### Places
 
-`inventory.places` is required for a version 2 `completeBackup` and contains every reusable `InventoryPlace` record. It is excluded from readable export.
+`inventory.places` is required for a version 2 or newer `completeBackup` and contains every reusable `InventoryPlace` record. It is excluded from readable export.
 
 ```json
 {
@@ -187,11 +188,38 @@ All Place fields are required. `locationID` must reference a Location. The norma
 
 All fields are required. `itemID` must reference an Item in the same backup. An orphan event is invalid. Readable export intentionally excludes local interaction history while retaining all user-authored inventory content.
 
+### Movement records
+
+`movementRecords` is required in both version 3 artifact types. It contains the bounded persisted history created by successful Item movement and Undo operations:
+
+```json
+{
+  "id": "60000000-0000-0000-0000-000000000001",
+  "operationID": "70000000-0000-0000-0000-000000000001",
+  "itemID": "30000000-0000-0000-0000-000000000001",
+  "occurredAt": "2026-07-03T09:00:00.000Z",
+  "originStorageValue": "selectedItems",
+  "reversedOperationID": null,
+  "sourceLocationID": "10000000-0000-0000-0000-000000000001",
+  "sourceLocationName": "Home",
+  "sourcePlaceID": "50000000-0000-0000-0000-000000000001",
+  "sourcePlaceName": "Desk drawer",
+  "destinationLocationID": null,
+  "destinationLocationName": "Garage",
+  "destinationPlaceID": null,
+  "destinationPlaceName": "Shelf"
+}
+```
+
+`id`, `operationID`, `itemID`, `occurredAt`, `originStorageValue`, and both Location names are required. Nullable snapshot IDs/names and `reversedOperationID` may be omitted or `null` under the general optional-field rule. `itemID` must reference an Item in the same artifact. Snapshot IDs identify historical endpoints and may refer to a Location or Storage Place that was later removed, so they are validated as canonical UUIDs but are not live foreign keys.
+
+Every record in one `operationID` group has the same timestamp, origin, and `reversedOperationID`, and an Item appears at most once in a group. Unknown non-empty origin values remain readable for forward compatibility. `storagePlaceDirectContents` and `hierarchySubtree` are distinct origins: the former describes direct Item contents only, while the latter reserves separate future subtree semantics. An Undo operation uses origin `undo` and points `reversedOperationID` at the reversed operation even if deterministic retention later prunes that older group.
+
 ## Deterministic ordering
 
 Object member order is not semantically significant. Producers should use the example order for readable diffs. Collection order is not a relationship and restores must not infer UI order from it.
 
-For deterministic output, `locations`, `customCategories`, `places`, and `items` sort by lowercase UUID text ascending. `recentItemViewEvents` sort by `viewedAt` ascending, then lowercase UUID text ascending. `tags` retain their persisted user-visible order. Readers accept any collection order and detect duplicates independently of adjacency.
+For deterministic output, `locations`, `customCategories`, `places`, and `items` sort by lowercase UUID text ascending. `recentItemViewEvents` sort by `viewedAt` ascending, then lowercase UUID text ascending. `movementRecords` sort by `occurredAt`, `operationID`, `itemID`, then record `id`, all ascending. `tags` retain their persisted user-visible order. Readers accept any collection order and detect duplicates independently of adjacency.
 
 ## Validation and failure rules
 
@@ -200,7 +228,7 @@ Validation is read-only and completes before any persistent-store mutation. It p
 1. read bytes without changing Inventory;
 2. require valid UTF-8 and one complete JSON root object, rejecting malformed, truncated, or trailing non-whitespace content;
 3. validate `formatIdentifier`, then `artifactType`, then the integer `schemaVersion`; reject an unsupported newer version before interpreting its integrity or records;
-4. for supported versions `1` and `2`, validate the integrity descriptor and digest before decoding `metadata`, `inventory`, or any record; version `0` follows its fully specified legacy validation path;
+4. for supported versions `1`, `2`, and `3`, validate the integrity descriptor and digest before decoding `metadata`, `inventory`, or any record; version `0` follows its fully specified legacy validation path;
 5. validate required fields, JSON types, UUIDs, dates, value invariants, and artifact-specific collections;
 6. build complete ID indexes and reject every duplicate, dangling reference, name/reference mismatch, ambiguous reusable name, and orphan event;
 7. calculate the space needed for the staged store and pre-restore safety copy;
@@ -239,16 +267,18 @@ Validation order defines failure precedence, so the same bytes and supported rea
 
 The version matrix is normative:
 
-| Input | Version 2 reader behavior |
+| Input | Version 3 reader behavior |
 |---|---|
 | Version `1` readable export | Read/inspect/export only; reject restore because it is intentionally incomplete |
 | Version `1` complete backup | Verify, deterministically synthesize scoped default-icon Places and Item links, then restore atomically |
 | Version `2` complete backup | Validate and restore Place IDs, parent IDs, icons, and Item links atomically |
-| Version `0` legacy backup | Validate, migrate in memory to version `2` with scoped Places and links, then use the normal atomic restore path |
-| Version greater than `2` | Reject as `unsupportedNewerVersion`; preserve the file and current Inventory unchanged |
+| Version `3` complete backup | Validate and atomically restore Items, Places, recent views, and movement records |
+| Version `3` readable export | Read and inspect Items and bounded movement records; reject restore because the artifact is intentionally incomplete |
+| Version `0` legacy backup | Validate, migrate in memory to version `3` with scoped Places, links, and an empty movement collection, then use the normal atomic restore path |
+| Version greater than `3` | Reject as `unsupportedNewerVersion`; preserve the file and current Inventory unchanged |
 | Negative, fractional, string, or missing version | Reject as malformed |
 
-Versions `0` and `1` are input-only compatibility profiles for the former string-backed Place model. Their fixtures retain the former shape; after integrity validation where available, restore preserves Item text and deterministically creates one default-box Place per normalized Location+Place scope, never merging equal names across Locations. Missing Location or Place remains unlinked. The migration must not mutate the live store and a producer must never emit version `0` or `1`.
+Versions `0`, `1`, and `2` are input-only compatibility profiles. Versions `0` and `1` retain the former string-backed Place shape; after integrity validation where available, restore preserves Item text and deterministically creates one default-box Place per normalized Location+Place scope, never merging equal names across Locations. Version `2` preserves its first-class Places and gains an empty movement collection during in-memory migration. Missing Location or Place remains unlinked. Migration must not mutate the live store, and a current producer emits only version `3`.
 
 Every future schema version must document:
 
@@ -289,9 +319,9 @@ Fixtures live in [`portability-recovery-v1/`](portability-recovery-v1/README.md)
 | `empty-readable-export-v1.json` | Valid readable export; zero user records; not restorable |
 | `ordinary-complete-backup-v1.json` | Valid complete backup with reusable values, relationships, and a view event |
 | `unicode-readable-export-v1.json` | Valid readable export preserving English, Ukrainian, emoji, diacritics, and JSON escapes |
-| `legacy-compatible-backup-v0.json` | Valid input-only legacy backup; deterministic in-memory migration to version `2` |
+| `legacy-compatible-backup-v0.json` | Valid input-only legacy backup; deterministic in-memory migration to version `3` |
 | `malformed-truncated-backup.json` | Invalid/truncated JSON; reject before schema validation or mutation |
-| `unsupported-newer-backup-v2.json` | Historical filename; well-formed recognized backup with unsupported schema version 3, rejected before record decoding or mutation |
+| `unsupported-newer-backup-v2.json` | Historical filename; well-formed recognized backup with unsupported schema version 4, rejected before record decoding or mutation |
 
 Fixtures use fixed IDs and timestamps and must not be rewritten with generated values.
 

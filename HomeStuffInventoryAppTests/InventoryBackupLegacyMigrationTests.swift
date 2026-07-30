@@ -20,7 +20,7 @@ struct InventoryBackupLegacyMigrationTests: InventoryBackupRestoreTestCase {
         )
 
         #expect(try InventoryBackupSnapshotter.capture(in: context) == plan.document.inventory)
-        #expect(plan.schemaVersion == 2)
+        #expect(plan.schemaVersion == 3)
         #expect(plan.document.inventory.items.first { $0.name == "Legacy drill" }?.categoryStorageValue == "tools")
         #expect(plan.document.inventory.items.first { $0.name == "Legacy drill" }?.conditionStorageValue == "good")
         #expect(plan.document.inventory.items.first { $0.name == "Legacy unlabeled place" }?.placeName == "   ")

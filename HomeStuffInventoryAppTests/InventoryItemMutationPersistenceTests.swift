@@ -75,6 +75,52 @@ struct InventoryItemMutationPersistenceTests {
         #expect(Set(try context.fetch(FetchDescriptor<InventoryItemViewEvent>()).map(\.id)) == Set(events.map(\.id)))
     }
 
+    @Test func deleteRemovesOnlyTargetMovementHistoryAndRollsItBackOnFailure() throws {
+        let context = try modelContext()
+        let target = InventoryItem(name: "Cable", locationName: "Desk")
+        let unrelated = InventoryItem(name: "Adapter", locationName: "Desk")
+        context.insert(target)
+        context.insert(unrelated)
+        let endpoint = InventoryMovementEndpointSnapshot(
+            locationID: nil,
+            locationName: "Desk",
+            placeID: nil,
+            placeName: nil
+        )
+        let targetRecord = InventoryMovementRecord(
+            operationID: UUID(),
+            itemID: target.id,
+            origin: .singleItem,
+            source: endpoint,
+            destination: endpoint
+        )
+        let unrelatedRecord = InventoryMovementRecord(
+            operationID: UUID(),
+            itemID: unrelated.id,
+            origin: .singleItem,
+            source: endpoint,
+            destination: endpoint
+        )
+        context.insert(targetRecord)
+        context.insert(unrelatedRecord)
+        try context.save()
+
+        #expect(throws: PersistenceFailure.expected) {
+            try InventoryItemMutationPersistence.delete(
+                target,
+                in: context,
+                persist: { throw PersistenceFailure.expected }
+            )
+        }
+        #expect(
+            Set(try context.fetch(FetchDescriptor<InventoryMovementRecord>()).map(\.id))
+                == Set([targetRecord.id, unrelatedRecord.id])
+        )
+
+        try InventoryItemMutationPersistence.delete(target, in: context)
+        #expect(try context.fetch(FetchDescriptor<InventoryMovementRecord>()).map(\.id) == [unrelatedRecord.id])
+    }
+
     @Test func saveNotesPersistsNormalizedNotesAndTimestamp() throws {
         let originalTimestamp = Date(timeIntervalSince1970: 100)
         let updatedTimestamp = Date(timeIntervalSince1970: 200)

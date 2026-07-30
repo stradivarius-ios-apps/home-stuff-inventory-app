@@ -142,8 +142,8 @@ struct InventoryPlaceOpenPersistenceTests {
 
         #expect(readableAfter == readableBefore)
         #expect(completeAfter == completeBefore)
-        #expect(try InventoryPortabilityEncoder.decodeAndVerify(readableAfter).schemaVersion == 2)
-        #expect(try InventoryPortabilityEncoder.decodeAndVerify(completeAfter).schemaVersion == 2)
+        #expect(try InventoryPortabilityEncoder.decodeAndVerify(readableAfter).schemaVersion == 3)
+        #expect(try InventoryPortabilityEncoder.decodeAndVerify(completeAfter).schemaVersion == 3)
         #expect(String(decoding: completeAfter, as: UTF8.self).contains("placeIdentity") == false)
     }
 

@@ -73,6 +73,7 @@ enum InventoryModelContainer {
     static func make(inMemory: Bool = false) throws -> ModelContainer {
         let schema = Schema([
             InventoryItem.self,
+            InventoryMovementRecord.self,
             InventoryItemViewEvent.self,
             InventoryPlaceOpenRecord.self,
             InventoryPlace.self,

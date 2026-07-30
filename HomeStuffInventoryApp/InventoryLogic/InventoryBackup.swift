@@ -33,13 +33,15 @@ enum InventoryBackupSnapshotter {
         let items = try context.fetch(FetchDescriptor<InventoryItem>())
         let places = try context.fetch(FetchDescriptor<InventoryPlace>())
         let viewEvents = try context.fetch(FetchDescriptor<InventoryItemViewEvent>())
+        let movementRecords = try context.fetch(FetchDescriptor<InventoryMovementRecord>())
 
         return makeSnapshot(
             locations: locations,
             customCategories: customCategories,
             items: items,
             places: places,
-            viewEvents: viewEvents
+            viewEvents: viewEvents,
+            movementRecords: movementRecords
         )
     }
 
@@ -49,7 +51,8 @@ enum InventoryBackupSnapshotter {
         customCategories: [InventoryCustomCategory],
         items: [InventoryItem],
         places: [InventoryPlace],
-        viewEvents: [InventoryItemViewEvent]
+        viewEvents: [InventoryItemViewEvent],
+        movementRecords: [InventoryMovementRecord] = []
     ) -> InventoryPortabilitySnapshotV1 {
         let locationRecords = locations.map { location in
             InventoryPortabilityLocationV1(
@@ -106,13 +109,32 @@ enum InventoryBackupSnapshotter {
                 viewedAt: InventoryPortabilityDate.string(from: event.viewedAt)
             )
         }
+        let movementPortabilityRecords = movementRecords.map { record in
+            InventoryPortabilityMovementRecordV1(
+                id: record.id.inventoryPortabilityString,
+                operationID: record.operationID.inventoryPortabilityString,
+                itemID: record.itemID.inventoryPortabilityString,
+                occurredAt: InventoryPortabilityDate.string(from: record.occurredAt),
+                originStorageValue: record.originStorageValue,
+                reversedOperationID: record.reversedOperationID?.inventoryPortabilityString,
+                sourceLocationID: record.sourceLocationID?.inventoryPortabilityString,
+                sourceLocationName: record.sourceLocationName,
+                sourcePlaceID: record.sourcePlaceID?.inventoryPortabilityString,
+                sourcePlaceName: record.sourcePlaceName,
+                destinationLocationID: record.destinationLocationID?.inventoryPortabilityString,
+                destinationLocationName: record.destinationLocationName,
+                destinationPlaceID: record.destinationPlaceID?.inventoryPortabilityString,
+                destinationPlaceName: record.destinationPlaceName
+            )
+        }
 
         return InventoryPortabilitySnapshotV1(
             locations: locationRecords,
             customCategories: customCategoryRecords,
             items: itemRecords,
             places: placeRecords,
-            recentItemViewEvents: viewEventRecords
+            recentItemViewEvents: viewEventRecords,
+            movementRecords: movementPortabilityRecords
         )
     }
 

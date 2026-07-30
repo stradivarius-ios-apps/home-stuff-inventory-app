@@ -264,9 +264,7 @@ struct InventoryItemFormView: View {
             item: item,
             locations: locations,
             places: places,
-            insert: modelContext.insert,
-            persist: modelContext.save,
-            rollback: modelContext.rollback
+            in: modelContext
         ) {
         case .saved:
             dismiss()

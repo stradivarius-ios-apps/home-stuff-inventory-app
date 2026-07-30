@@ -59,13 +59,15 @@ struct InventoryReadableExportService {
         items: [InventoryItem],
         locations: [StorageLocation],
         customCategories: [InventoryCustomCategory],
+        movementRecords: [InventoryMovementRecord] = [],
         createdAt: Date = .now,
         artifactID: UUID = UUID()
     ) throws -> InventoryReadableExportArtifact {
         let snapshot = makeSnapshot(
             items: items,
             locations: locations,
-            customCategories: customCategories
+            customCategories: customCategories,
+            movementRecords: movementRecords
         )
         let metadata = InventoryPortabilityMetadataV1(
             createdAt: createdAt,
@@ -116,7 +118,8 @@ struct InventoryReadableExportService {
     func makeSnapshot(
         items: [InventoryItem],
         locations: [StorageLocation],
-        customCategories: [InventoryCustomCategory]
+        customCategories: [InventoryCustomCategory],
+        movementRecords: [InventoryMovementRecord] = []
     ) -> InventoryPortabilitySnapshotV1 {
         let locationRecords = locations.map {
             InventoryPortabilityLocationV1(
@@ -162,11 +165,33 @@ struct InventoryReadableExportService {
                 updatedAt: InventoryPortabilityDate.string(from: item.updatedAt)
             )
         }
+        let itemIDs = Set(items.map(\.id))
+        let movementPortabilityRecords = movementRecords
+            .filter { itemIDs.contains($0.itemID) }
+            .map { record in
+                InventoryPortabilityMovementRecordV1(
+                    id: record.id.inventoryPortabilityString,
+                    operationID: record.operationID.inventoryPortabilityString,
+                    itemID: record.itemID.inventoryPortabilityString,
+                    occurredAt: InventoryPortabilityDate.string(from: record.occurredAt),
+                    originStorageValue: record.originStorageValue,
+                    reversedOperationID: record.reversedOperationID?.inventoryPortabilityString,
+                    sourceLocationID: record.sourceLocationID?.inventoryPortabilityString,
+                    sourceLocationName: record.sourceLocationName,
+                    sourcePlaceID: record.sourcePlaceID?.inventoryPortabilityString,
+                    sourcePlaceName: record.sourcePlaceName,
+                    destinationLocationID: record.destinationLocationID?.inventoryPortabilityString,
+                    destinationLocationName: record.destinationLocationName,
+                    destinationPlaceID: record.destinationPlaceID?.inventoryPortabilityString,
+                    destinationPlaceName: record.destinationPlaceName
+                )
+            }
 
         return InventoryPortabilitySnapshotV1(
             locations: locationRecords,
             customCategories: categoryRecords,
-            items: itemRecords
+            items: itemRecords,
+            movementRecords: movementPortabilityRecords
         )
     }
 

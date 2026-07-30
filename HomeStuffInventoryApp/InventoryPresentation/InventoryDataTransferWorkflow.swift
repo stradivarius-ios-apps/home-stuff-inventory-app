@@ -128,7 +128,12 @@ enum InventoryDataTransferPhase: Equatable {
 @MainActor
 @Observable
 final class InventoryDataTransferWorkflow {
-    typealias ReadableExport = ([InventoryItem], [StorageLocation], [InventoryCustomCategory]) throws -> InventoryReadableExportArtifact
+    typealias ReadableExport = (
+        [InventoryItem],
+        [StorageLocation],
+        [InventoryCustomCategory],
+        [InventoryMovementRecord]
+    ) throws -> InventoryReadableExportArtifact
     typealias BackupPreparation = @MainActor (ModelContext) async throws -> InventoryPreparedBackup
     typealias BackupFileRead = (URL) async throws -> Data
     typealias RestorePlanning = (Data) async throws -> InventoryBackupRestorePlan
@@ -165,8 +170,13 @@ final class InventoryDataTransferWorkflow {
     private var operationID: UUID?
 
     init(
-        readableExport: @escaping ReadableExport = { items, locations, categories in
-            try InventoryReadableExportService().export(items: items, locations: locations, customCategories: categories)
+        readableExport: @escaping ReadableExport = { items, locations, categories, movementRecords in
+            try InventoryReadableExportService().export(
+                items: items,
+                locations: locations,
+                customCategories: categories,
+                movementRecords: movementRecords
+            )
         },
         backupPreparation: @escaping BackupPreparation = { context in
             try await InventoryBackupService().prepareBackup(in: context)
@@ -197,12 +207,18 @@ final class InventoryDataTransferWorkflow {
         items: [InventoryItem],
         locations: [StorageLocation],
         customCategories: [InventoryCustomCategory],
+        movementRecords: [InventoryMovementRecord] = [],
         context: ModelContext
     ) {
         guard phase == .disclosure(action) else { return }
         switch action {
         case .readableExport:
-            export(items: items, locations: locations, customCategories: customCategories)
+            export(
+                items: items,
+                locations: locations,
+                customCategories: customCategories,
+                movementRecords: movementRecords
+            )
         case .completeBackup:
             prepareBackup(in: context)
         }
@@ -211,7 +227,8 @@ final class InventoryDataTransferWorkflow {
     func export(
         items: [InventoryItem],
         locations: [StorageLocation],
-        customCategories: [InventoryCustomCategory]
+        customCategories: [InventoryCustomCategory],
+        movementRecords: [InventoryMovementRecord] = []
     ) {
         guard phase == .idle
                 || phase == .disclosure(.readableExport)
@@ -219,7 +236,7 @@ final class InventoryDataTransferWorkflow {
         else { return }
         phase = .generatingReadableExport
         do {
-            exportArtifact = try readableExport(items, locations, customCategories)
+            exportArtifact = try readableExport(items, locations, customCategories, movementRecords)
             phase = .sharingReadableExport
         } catch let error as InventoryReadableExportError {
             phase = .outcome(.readableExport(error))

@@ -176,11 +176,11 @@ struct InventoryHierarchyBrowseIntegrationTests {
             parentPlaceID: childID,
             name: "Tray",
             itemCount: 0,
+            pathComponents: ["Cabinet", "Shelf", "Tray"],
             locationID: locationSummary.id,
             locationName: location.name,
             isMissingLocation: false,
-            isMissingPlace: false,
-            pathComponents: ["Cabinet", "Shelf", "Tray"]
+            isMissingPlace: false
         )
 
         #expect(legacySummary != nil)

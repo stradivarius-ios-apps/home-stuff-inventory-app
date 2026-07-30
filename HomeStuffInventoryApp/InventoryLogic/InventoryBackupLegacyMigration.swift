@@ -33,14 +33,14 @@ private struct InventoryLegacyItemV0: Decodable {
 enum InventoryBackupLegacyMigration {
     static func migratePlaces(in document: InventoryPortabilityDocumentV1) throws -> InventoryPortabilityDocumentV1 {
         guard document.schemaVersion < InventoryPortabilityEncoder.schemaVersion else { return document }
-        if document.schemaVersion == 2 {
+        if document.schemaVersion == 2 || document.schemaVersion == 3 {
             let snapshot = InventoryPortabilitySnapshotV1(
                 locations: document.inventory.locations,
                 customCategories: document.inventory.customCategories,
                 items: document.inventory.items,
                 places: document.inventory.places,
                 recentItemViewEvents: document.inventory.recentItemViewEvents,
-                movementRecords: []
+                movementRecords: document.inventory.movementRecords ?? []
             )
             let data = try InventoryPortabilityEncoder.encode(
                 snapshot: snapshot,

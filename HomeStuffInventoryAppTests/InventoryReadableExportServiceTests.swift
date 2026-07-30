@@ -141,6 +141,69 @@ struct InventoryReadableExportServiceTests {
         #expect(FileManager.default.fileExists(atPath: artifact.url.path))
     }
 
+    @Test func readableExportPreservesTheCompleteNestedPlacePathWithoutEntitlement() throws {
+        let location = StorageLocation(
+            id: UUID(uuidString: "10000000-0000-0000-0000-000000000001")!,
+            name: "Workshop",
+            createdAt: timestamp,
+            updatedAt: timestamp
+        )
+        let root = InventoryPlace(
+            id: UUID(uuidString: "50000000-0000-0000-0000-000000000003")!,
+            locationID: location.id,
+            name: "Cabinet",
+            iconID: "cabinet",
+            createdAt: timestamp,
+            updatedAt: timestamp
+        )
+        let child = InventoryPlace(
+            id: UUID(uuidString: "50000000-0000-0000-0000-000000000002")!,
+            locationID: location.id,
+            parentPlaceID: root.id,
+            name: "Drawer",
+            iconID: "drawer",
+            createdAt: timestamp,
+            updatedAt: timestamp
+        )
+        let leaf = InventoryPlace(
+            id: UUID(uuidString: "50000000-0000-0000-0000-000000000001")!,
+            locationID: location.id,
+            parentPlaceID: child.id,
+            name: "Cable box",
+            iconID: "box",
+            createdAt: timestamp,
+            updatedAt: timestamp
+        )
+        let item = InventoryItem(
+            id: UUID(uuidString: "30000000-0000-0000-0000-000000000001")!,
+            name: "Adapter",
+            locationName: location.name,
+            containerName: leaf.name,
+            placeID: leaf.id,
+            createdAt: timestamp,
+            updatedAt: timestamp
+        )
+
+        let artifact = try service().export(
+            items: [item],
+            locations: [location],
+            customCategories: [],
+            places: [leaf, root, child],
+            createdAt: timestamp
+        )
+        defer { artifact.cleanup() }
+        let document = try InventoryPortabilityEncoder.decodeAndVerify(Data(contentsOf: artifact.url))
+
+        #expect(document.schemaVersion == 4)
+        #expect(document.inventory.places.map(\.id) == [leaf.id, child.id, root.id].map(\.inventoryPortabilityString))
+        #expect(document.inventory.places.map(\.parentPlaceID) == [
+            child.id.inventoryPortabilityString,
+            root.id.inventoryPortabilityString,
+            nil
+        ])
+        #expect(document.inventory.items.first?.placeID == leaf.id.inventoryPortabilityString)
+    }
+
     private func service() -> InventoryReadableExportService {
         InventoryReadableExportService(bundle: Bundle(for: TestBundleMarker.self))
     }

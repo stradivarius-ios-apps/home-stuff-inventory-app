@@ -22,6 +22,59 @@ struct InventoryBackupRestoreServiceTests: InventoryBackupRestoreTestCase {
         #expect(try InventoryBackupSnapshotter.capture(in: target) == expected)
         #expect(try target.fetch(FetchDescriptor<InventoryItem>()).allSatisfy { $0.name != "Existing Item" })
     }
+    @Test func nestedHierarchyRestoresExactlyWithoutEntitlementAndInvalidReplacementIsAtomic() async throws {
+        let target = try makeTargetContext()
+        let expected = nestedSnapshot()
+
+        for entitlementState in InventoryEntitlementState.allCases {
+            #expect(
+                InventoryFreeAccessPolicy().availability(
+                    of: .restoreInventory,
+                    entitlementState: entitlementState
+                ) == .available
+            )
+        }
+
+        _ = try await InventoryBackupRestoreService().restore(
+            try await makePlan(snapshot: expected),
+            in: target,
+            metadataSource: metadataSource,
+            recoveryStore: try makeRecoveryStore()
+        )
+
+        let restored = try InventoryBackupSnapshotter.capture(in: target)
+        #expect(restored == expected)
+        #expect(
+            restored.places.compactMap(\.parentPlaceID) == [
+                "50000000-0000-0000-0000-000000000002",
+                "50000000-0000-0000-0000-000000000003"
+            ]
+        )
+
+        var invalidPlaces = expected.places
+        invalidPlaces[0] = InventoryPortabilityPlaceV1(
+            id: invalidPlaces[0].id,
+            locationID: invalidPlaces[0].locationID,
+            parentPlaceID: "50000000-0000-0000-0000-000000000099",
+            name: invalidPlaces[0].name,
+            iconID: invalidPlaces[0].iconID,
+            createdAt: invalidPlaces[0].createdAt,
+            updatedAt: invalidPlaces[0].updatedAt
+        )
+        let invalid = InventoryPortabilitySnapshotV1(
+            locations: expected.locations,
+            customCategories: expected.customCategories,
+            items: expected.items,
+            places: invalidPlaces,
+            recentItemViewEvents: expected.recentItemViewEvents,
+            movementRecords: expected.movementRecords
+        )
+
+        #expect(throws: InventoryBackupRestoreError.invalidRelationships) {
+            try InventoryBackupRestoreService.replaceSnapshot(invalid, in: target)
+        }
+        #expect(try InventoryBackupSnapshotter.capture(in: target) == expected)
+    }
     @Test func emptyBackupReplacesTheWholeDatasetWithEmptyCollections() async throws {
         let target = try makeTargetContext()
         let empty = InventoryPortabilitySnapshotV1(

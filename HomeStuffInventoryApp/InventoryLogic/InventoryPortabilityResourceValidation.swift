@@ -72,7 +72,9 @@ enum InventoryPortabilityLimitValidator {
         var strings: [String?] = []
         strings += snapshot.locations.flatMap { [$0.id, $0.name, $0.iconID, $0.notes, $0.createdAt, $0.updatedAt] }
         strings += snapshot.customCategories.flatMap { [$0.id, $0.name, $0.createdAt, $0.updatedAt] }
-        strings += snapshot.places.flatMap { [$0.id, $0.locationID, $0.name, $0.iconID, $0.createdAt, $0.updatedAt] }
+        strings += snapshot.places.flatMap {
+            [$0.id, $0.locationID, $0.parentPlaceID, $0.name, $0.iconID, $0.createdAt, $0.updatedAt]
+        }
         for item in snapshot.items {
             strings += [item.id, item.name, item.categoryStorageValue, item.customCategoryID, item.locationName, item.locationID, item.placeName, item.placeID, item.iconID, item.conditionStorageValue, item.notes, item.createdAt, item.updatedAt]
             strings += item.tags

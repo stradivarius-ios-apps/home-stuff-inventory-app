@@ -132,6 +132,7 @@ final class InventoryDataTransferWorkflow {
         [InventoryItem],
         [StorageLocation],
         [InventoryCustomCategory],
+        [InventoryPlace],
         [InventoryMovementRecord]
     ) throws -> InventoryReadableExportArtifact
     typealias BackupPreparation = @MainActor (ModelContext) async throws -> InventoryPreparedBackup
@@ -170,11 +171,12 @@ final class InventoryDataTransferWorkflow {
     private var operationID: UUID?
 
     init(
-        readableExport: @escaping ReadableExport = { items, locations, categories, movementRecords in
+        readableExport: @escaping ReadableExport = { items, locations, categories, places, movementRecords in
             try InventoryReadableExportService().export(
                 items: items,
                 locations: locations,
                 customCategories: categories,
+                places: places,
                 movementRecords: movementRecords
             )
         },
@@ -207,6 +209,7 @@ final class InventoryDataTransferWorkflow {
         items: [InventoryItem],
         locations: [StorageLocation],
         customCategories: [InventoryCustomCategory],
+        places: [InventoryPlace] = [],
         movementRecords: [InventoryMovementRecord] = [],
         context: ModelContext
     ) {
@@ -217,6 +220,7 @@ final class InventoryDataTransferWorkflow {
                 items: items,
                 locations: locations,
                 customCategories: customCategories,
+                places: places,
                 movementRecords: movementRecords
             )
         case .completeBackup:
@@ -228,6 +232,7 @@ final class InventoryDataTransferWorkflow {
         items: [InventoryItem],
         locations: [StorageLocation],
         customCategories: [InventoryCustomCategory],
+        places: [InventoryPlace] = [],
         movementRecords: [InventoryMovementRecord] = []
     ) {
         guard phase == .idle
@@ -236,7 +241,7 @@ final class InventoryDataTransferWorkflow {
         else { return }
         phase = .generatingReadableExport
         do {
-            exportArtifact = try readableExport(items, locations, customCategories, movementRecords)
+            exportArtifact = try readableExport(items, locations, customCategories, places, movementRecords)
             phase = .sharingReadableExport
         } catch let error as InventoryReadableExportError {
             phase = .outcome(.readableExport(error))

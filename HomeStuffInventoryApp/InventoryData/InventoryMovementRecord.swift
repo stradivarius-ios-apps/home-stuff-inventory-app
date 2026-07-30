@@ -35,7 +35,7 @@ enum InventoryMovementOrigin: Equatable, Sendable {
     }
 }
 
-struct InventoryMovementEndpointSnapshot: Equatable, Sendable {
+struct InventoryMovementEndpointSnapshot: Equatable, Hashable, Sendable {
     let locationID: UUID?
     let locationName: String
     let placeID: UUID?

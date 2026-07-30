@@ -8,12 +8,16 @@ enum InventoryListPresentation {
 
 struct InventoryListView: View {
     @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
+    @Environment(PremiumAccessState.self) private var premiumAccess
     @State private var isShowingItemForm = false
     @Binding private var searchText: String
     @State private var selectedItemID: UUID?
     @State private var selectedCategory: String?
     @State private var selectedLocationName: String?
     @State private var selectedPlace: InventorySearch.PlaceFilter?
+    @State private var bulkSelection = InventoryBulkSelectionState()
+    @State private var bulkMovementRequest: InventoryBulkMovementSheetRequest?
+    @State private var isShowingBulkAccessRequired = false
     @Namespace private var itemNavigationNamespace
 
     private let presentation: InventoryListPresentation
@@ -107,7 +111,12 @@ struct InventoryListView: View {
 
     var body: some View {
         Group {
-            if contentState == .initial {
+            if bulkSelection.isActive {
+                InventoryBulkSelectionList(
+                    items: filteredItems,
+                    selectedItemIDs: bulkSelectionBinding
+                )
+            } else if contentState == .initial {
                 InventoryEmptyStateView(viewModel: .initial) {
                     isShowingItemForm = true
                 }
@@ -146,74 +155,125 @@ struct InventoryListView: View {
         }
         .navigationTitle("inventory.title")
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Menu {
-                    Picker("inventory.field.category", selection: $selectedCategory) {
-                        Text("inventory.filter.anyCategory").tag(String?.none)
-
-                        ForEach(availableCategories, id: \.self) { category in
-                            Text(category).tag(Optional(category))
-                        }
+            if bulkSelection.isActive {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("inventory.bulkMove.cancel") {
+                        bulkSelection.cancel()
                     }
+                    .accessibilityIdentifier("inventory.bulkSelection.cancelButton")
+                }
 
-                    Picker("inventory.field.location", selection: $selectedLocationName) {
-                        Text("inventory.filter.anyLocation").tag(String?.none)
-
-                        ForEach(availableLocations, id: \.self) { locationName in
-                            Text(locationName).tag(Optional(locationName))
-                        }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("inventory.bulkMove.move.action") {
+                        presentBulkMovement()
                     }
+                    .disabled(bulkSelection.selectedCount == 0)
+                    .accessibilityIdentifier("inventory.bulkSelection.moveButton")
+                }
 
-                    Picker("inventory.field.container", selection: $selectedPlace) {
-                        Text("inventory.filter.anyPlace").tag(InventorySearch.PlaceFilter?.none)
+                ToolbarItem(placement: .bottomBar) {
+                    Button("inventory.bulkMove.selectAll") {
+                        bulkSelection.selectAll(visibleItemIDs: filteredItems.map(\.id))
+                    }
+                    .disabled(filteredItems.isEmpty)
+                    .accessibilityIdentifier("inventory.bulkSelection.selectAllButton")
+                }
+            } else {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Picker("inventory.field.category", selection: $selectedCategory) {
+                            Text("inventory.filter.anyCategory").tag(String?.none)
 
-                        ForEach(availablePlaces, id: \.self) { place in
-                            switch place {
-                            case let .named(name):
-                                Text(name).tag(Optional(place))
-                            case .missing:
-                                Text(InventoryLocalization.noContainer).tag(Optional(place))
+                            ForEach(availableCategories, id: \.self) { category in
+                                Text(category).tag(Optional(category))
                             }
                         }
-                    }
-                    .accessibilityIdentifier("inventory.filter.placePicker")
 
-                    if hasActiveFilters {
-                        Divider()
+                        Picker("inventory.field.location", selection: $selectedLocationName) {
+                            Text("inventory.filter.anyLocation").tag(String?.none)
 
-                        Button {
-                            clearFilters()
-                        } label: {
-                            Label("inventory.action.clearFilters", systemImage: "xmark.circle")
+                            ForEach(availableLocations, id: \.self) { locationName in
+                                Text(locationName).tag(Optional(locationName))
+                            }
                         }
-                    }
-                } label: {
-                    Label("inventory.filter.menu", systemImage: filterMenuSystemImage)
-                }
-                .accessibilityLabel("inventory.filter.accessibilityLabel")
-                .accessibilityHint("inventory.filter.accessibilityHint")
-                .accessibilityIdentifier("inventory.filter.menu")
-            }
 
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    isShowingItemForm = true
-                } label: {
-                    Image(systemName: "plus")
+                        Picker("inventory.field.container", selection: $selectedPlace) {
+                            Text("inventory.filter.anyPlace").tag(InventorySearch.PlaceFilter?.none)
+
+                            ForEach(availablePlaces, id: \.self) { place in
+                                switch place {
+                                case let .named(name):
+                                    Text(name).tag(Optional(place))
+                                case .missing:
+                                    Text(InventoryLocalization.noContainer).tag(Optional(place))
+                                }
+                            }
+                        }
+                        .accessibilityIdentifier("inventory.filter.placePicker")
+
+                        if hasActiveFilters {
+                            Divider()
+
+                            Button {
+                                clearFilters()
+                            } label: {
+                                Label("inventory.action.clearFilters", systemImage: "xmark.circle")
+                            }
+                        }
+                    } label: {
+                        Label("inventory.filter.menu", systemImage: filterMenuSystemImage)
+                    }
+                    .accessibilityLabel("inventory.filter.accessibilityLabel")
+                    .accessibilityHint("inventory.filter.accessibilityHint")
+                    .accessibilityIdentifier("inventory.filter.menu")
                 }
-                .inventoryPrimaryActionTint()
-                .accessibilityLabel("inventory.action.addItem.accessibilityLabel")
-                .accessibilityIdentifier("inventory.addItemButton")
+
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        beginBulkSelection()
+                    } label: {
+                        Image(systemName: "checklist")
+                    }
+                    .disabled(filteredItems.isEmpty)
+                    .accessibilityLabel("inventory.bulkMove.select.action")
+                    .accessibilityHint("inventory.bulkMove.select.hint")
+                    .accessibilityIdentifier("inventory.bulkSelection.startButton")
+                }
+
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        isShowingItemForm = true
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                    .inventoryPrimaryActionTint()
+                    .accessibilityLabel("inventory.action.addItem.accessibilityLabel")
+                    .accessibilityIdentifier("inventory.addItemButton")
+                }
             }
         }
         .sheet(isPresented: $isShowingItemForm) {
             InventoryItemFormView()
+        }
+        .sheet(item: $bulkMovementRequest, onDismiss: {
+            bulkSelection.cancel()
+        }) { request in
+            InventoryBulkMovementView(selectedItemIDs: request.selectedItemIDs)
+        }
+        .alert(
+            "inventory.bulkMove.accessRequired.title",
+            isPresented: $isShowingBulkAccessRequired
+        ) {
+            Button("inventory.bulkMove.result.ok", role: .cancel) {}
+        } message: {
+            Text("inventory.bulkMove.accessRequired.message")
         }
         .onChange(of: selectedLocationName) { _, _ in
             reconcilePlaceSelection()
         }
         .onChange(of: items.map { "\($0.id)|\($0.locationName)|\($0.containerName ?? "")" }) { _, _ in
             reconcilePlaceSelection()
+            bulkSelection.reconcile(availableItemIDs: items.map(\.id))
         }
     }
 
@@ -229,6 +289,18 @@ struct InventoryListView: View {
                 selectedItemID = result.item.id
             }
         }
+    }
+
+    private var bulkSelectionBinding: Binding<Set<UUID>> {
+        Binding(
+            get: { bulkSelection.selectedItemIDs },
+            set: {
+                bulkSelection.replaceSelection(
+                    with: $0,
+                    visibleItemIDs: filteredItems.map(\.id)
+                )
+            }
+        )
     }
 
     private var filterMenuSystemImage: String {
@@ -276,5 +348,25 @@ struct InventoryListView: View {
     private func clearSearchAndFilters() {
         searchText = ""
         clearFilters()
+    }
+
+    private func beginBulkSelection() {
+        let outcome = bulkSelection.begin(
+            visibleItemIDs: filteredItems.map(\.id),
+            availability: premiumAccess.availability(of: .moveSelectedItems)
+        )
+        isShowingBulkAccessRequired = outcome == .accessRequired
+    }
+
+    private func presentBulkMovement() {
+        guard premiumAccess.availability(of: .moveSelectedItems) == .available else {
+            bulkSelection.cancel()
+            isShowingBulkAccessRequired = true
+            return
+        }
+        guard !bulkSelection.selectedItemIDs.isEmpty else { return }
+        bulkMovementRequest = InventoryBulkMovementSheetRequest(
+            selectedItemIDs: bulkSelection.selectedItemIDs
+        )
     }
 }

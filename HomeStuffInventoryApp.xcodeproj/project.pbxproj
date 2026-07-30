@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AD4000000000000000000001 /* InventoryBulkMovement.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD4000000000000000000011 /* InventoryBulkMovement.swift */; };
+		AD4000000000000000000002 /* InventoryBulkMovementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD4000000000000000000012 /* InventoryBulkMovementView.swift */; };
+		AD4000000000000000000003 /* InventoryBulkMovementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD4000000000000000000013 /* InventoryBulkMovementTests.swift */; };
 		AC7700000000000000000001 /* InventoryMovementRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7700000000000000000002 /* InventoryMovementRecord.swift */; };
 		AC7700000000000000000003 /* InventoryMovementHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7700000000000000000004 /* InventoryMovementHistory.swift */; };
 		AC7700000000000000000005 /* InventoryMovementHistoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7700000000000000000006 /* InventoryMovementHistoryTests.swift */; };
@@ -211,6 +214,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		AD4000000000000000000011 /* InventoryBulkMovement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBulkMovement.swift; sourceTree = "<group>"; };
+		AD4000000000000000000012 /* InventoryBulkMovementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBulkMovementView.swift; sourceTree = "<group>"; };
+		AD4000000000000000000013 /* InventoryBulkMovementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryBulkMovementTests.swift; sourceTree = "<group>"; };
 		AC7700000000000000000002 /* InventoryMovementRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryMovementRecord.swift; sourceTree = "<group>"; };
 		AC7700000000000000000004 /* InventoryMovementHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryMovementHistory.swift; sourceTree = "<group>"; };
 		AC7700000000000000000006 /* InventoryMovementHistoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryMovementHistoryTests.swift; sourceTree = "<group>"; };
@@ -498,6 +504,7 @@
 		A10000000000000000000031 /* InventoryLogic */ = {
 			isa = PBXGroup;
 			children = (
+				AD4000000000000000000011 /* InventoryBulkMovement.swift */,
 				A10000000000000000000241 /* InventoryItemPlaceLink.swift */,
 				AC7700000000000000000004 /* InventoryMovementHistory.swift */,
 				A1000000000000000000018A /* InventoryReadableExportService.swift */,
@@ -576,6 +583,7 @@
 			isa = PBXGroup;
 			children = (
 				A100000000000000000000FA /* Form */,
+				AD4000000000000000000012 /* InventoryBulkMovementView.swift */,
 				A1000000000000000000017C /* InventoryCompactItemCard.swift */,
 				A100000000000000000000D6 /* ScopedInventoryItemsListView.swift */,
 				A100000000000000000000E6 /* InventoryItemNavigationCard.swift */,
@@ -685,6 +693,7 @@
 		A10000000000000000000053 /* HomeStuffInventoryAppTests */ = {
 			isa = PBXGroup;
 			children = (
+				AD4000000000000000000013 /* InventoryBulkMovementTests.swift */,
 				AC7700000000000000000006 /* InventoryMovementHistoryTests.swift */,
 				A10000000000000000000265 /* StoreKitClientTests.swift */,
 				A10000000000000000000273 /* StoreKitEntitlementServiceTests.swift */,
@@ -899,6 +908,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AD4000000000000000000001 /* InventoryBulkMovement.swift in Sources */,
+				AD4000000000000000000002 /* InventoryBulkMovementView.swift in Sources */,
 				AC7700000000000000000001 /* InventoryMovementRecord.swift in Sources */,
 				AC7700000000000000000003 /* InventoryMovementHistory.swift in Sources */,
 				A10000000000000000000260 /* StoreProductID.swift in Sources */,
@@ -1025,6 +1036,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AD4000000000000000000003 /* InventoryBulkMovementTests.swift in Sources */,
 				AC7700000000000000000005 /* InventoryMovementHistoryTests.swift in Sources */,
 				A10000000000000000000264 /* StoreKitClientTests.swift in Sources */,
 				A10000000000000000000272 /* StoreKitEntitlementServiceTests.swift in Sources */,

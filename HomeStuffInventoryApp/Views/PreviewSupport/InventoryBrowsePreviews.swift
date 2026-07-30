@@ -6,6 +6,7 @@ import SwiftUI
         InventoryListView(presentation: .compactInventory)
     }
     .modelContainer(try! InventoryModelContainer.makeSample())
+    .environment(PremiumAccessState(debugPreset: .lifetimePro))
     .preferredColorScheme(.light)
 }
 
@@ -14,6 +15,7 @@ import SwiftUI
         InventoryListView(presentation: .compactInventory)
     }
     .modelContainer(try! InventoryModelContainer.makeSample())
+    .environment(PremiumAccessState(debugPreset: .lifetimePro))
     .preferredColorScheme(.dark)
 }
 
@@ -22,6 +24,7 @@ import SwiftUI
         InventoryListView(presentation: .compactInventory)
     }
     .modelContainer(try! InventoryModelContainer.makeSample())
+    .environment(PremiumAccessState(debugPreset: .lifetimePro))
     .frame(width: 320)
     .preferredColorScheme(.light)
 }

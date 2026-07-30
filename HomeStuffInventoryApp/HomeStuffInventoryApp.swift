@@ -3,7 +3,9 @@ import SwiftUI
 
 @main
 struct HomeStuffInventoryApp: App {
+    @Environment(\.scenePhase) private var scenePhase
     @State private var bootstrap = InventoryAppBootstrapState()
+    @State private var entitlementService = StoreKitEntitlementService.live()
 #if DEBUG
     private let qaAppearance = InventoryQAAppearanceConfiguration(
         arguments: ProcessInfo.processInfo.arguments
@@ -14,6 +16,22 @@ struct HomeStuffInventoryApp: App {
     var body: some Scene {
         WindowGroup {
             InventoryAppBootstrapView(bootstrap: bootstrap)
+                .environment(entitlementService.premiumAccess)
+                .task {
+                    entitlementService.start()
+                }
+                .onChange(of: scenePhase) { _, phase in
+                    switch phase {
+                    case .active:
+                        entitlementService.start()
+                    case .background:
+                        entitlementService.stop()
+                    case .inactive:
+                        break
+                    @unknown default:
+                        break
+                    }
+                }
 #if DEBUG
                 .preferredColorScheme(qaAppearance.colorScheme)
                 .modifier(

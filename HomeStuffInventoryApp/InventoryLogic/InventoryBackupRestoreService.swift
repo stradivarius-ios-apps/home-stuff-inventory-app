@@ -127,6 +127,15 @@ struct InventoryBackupRestoreService: Sendable {
         _ snapshot: InventoryPortabilitySnapshotV1,
         in context: ModelContext
     ) throws {
+        do {
+            try InventoryPortabilityValidator.validate(
+                snapshot,
+                artifactType: .completeBackup,
+                invalidError: .invalidRelationships
+            )
+        } catch {
+            throw InventoryBackupRestoreError.invalidRelationships
+        }
         context.autosaveEnabled = false
         do {
             try context.transaction {
@@ -230,6 +239,7 @@ struct InventoryBackupRestoreService: Sendable {
             context.insert(InventoryPlace(
                 id: id,
                 locationID: locationID,
+                parentPlaceID: record.parentPlaceID.flatMap(UUID.init(uuidString:)),
                 name: record.name,
                 iconID: record.iconID,
                 createdAt: createdAt,

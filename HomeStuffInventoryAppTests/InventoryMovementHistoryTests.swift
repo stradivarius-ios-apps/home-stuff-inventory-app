@@ -695,7 +695,7 @@ struct InventoryMovementHistoryTests {
             prettyPrinted: false
         )
         let completeDocument = try InventoryPortabilityEncoder.decodeAndVerify(completeData)
-        #expect(completeDocument.schemaVersion == 3)
+        #expect(completeDocument.schemaVersion == 4)
         #expect(completeDocument.inventory.movementRecords?.count == 1)
         #expect(completeDocument.inventory.movementRecords?.first?.originStorageValue == "singleItem")
 
@@ -824,7 +824,7 @@ struct InventoryMovementHistoryTests {
             currentAppVersion: "1"
         )
 
-        #expect(plan.schemaVersion == 3)
+        #expect(plan.schemaVersion == 4)
         #expect(plan.document.inventory.movementRecords == [])
     }
 

@@ -22,7 +22,7 @@ module PublicSurfaceValidation
     "docs/data/portability-recovery-v1/unicode-readable-export-v1.json" =>
       "0ebefc5cb556d05ba21fd7f0d80d7a9215da634e1cf785908c3a97b44c5a7350",
     "docs/data/portability-recovery-v1/unsupported-newer-backup-v2.json" =>
-      "f3ec18543ffb7f20db2324f4048065a741c8a17a8654b7260f7c9765441f7e9b"
+      "e47e88af545cfc6f7e4a81c331367e926d100bf85ca152fe4e69f7ad0141374a"
   }.freeze
   APPROVED_SYNTHETIC_DATA_FILES = APPROVED_SYNTHETIC_DATA_SHA256.keys.to_set.freeze
 

@@ -18,7 +18,7 @@ enum InventoryPortabilityCodecError: Error, Equatable, Sendable {
 
 enum InventoryPortabilityEncoder {
     static let formatIdentifier = "com.stradivarius23.home-stuff-inventory.portability"
-    static let schemaVersion = 2
+    static let schemaVersion = 3
 
     static func encode(
         snapshot: InventoryPortabilitySnapshotV1,
@@ -29,7 +29,11 @@ enum InventoryPortabilityEncoder {
     ) throws -> Data {
         do {
             try InventoryPortabilityLimitValidator.validate(snapshot, limits: limits)
-            try InventoryPortabilityValidator.validate(snapshot, artifactType: artifactType)
+            try InventoryPortabilityValidator.validate(
+                snapshot,
+                artifactType: artifactType,
+                schemaVersion: schemaVersion
+            )
             var inventory = try jsonObject(snapshot) as! [String: Any]
             if artifactType == .readableExport {
                 inventory.removeValue(forKey: "places")
@@ -97,7 +101,7 @@ enum InventoryPortabilityEncoder {
         if version.intValue > schemaVersion {
             throw InventoryPortabilityCodecError.unsupportedNewerVersion
         }
-        guard version.intValue == 1 || version.intValue == schemaVersion else {
+        guard [1, 2, schemaVersion].contains(version.intValue) else {
             throw InventoryPortabilityCodecError.invalidSchema
         }
         guard let integrity = root.removeValue(forKey: "integrity") as? [String: Any],
@@ -127,6 +131,7 @@ enum InventoryPortabilityEncoder {
             try InventoryPortabilityValidator.validate(
                 document.inventory,
                 artifactType: document.artifactType,
+                schemaVersion: document.schemaVersion,
                 invalidError: .invalidRelationships
             )
             try InventoryPortabilityLimitValidator.validate(document.inventory, limits: limits)

@@ -15,6 +15,11 @@ enum InventoryPortabilityShapeValidator {
     ]
     private static let placeKeys: Set<String> = ["id", "locationID", "name", "iconID", "createdAt", "updatedAt"]
     private static let eventKeys: Set<String> = ["id", "itemID", "viewedAt"]
+    private static let movementKeys: Set<String> = [
+        "id", "operationID", "itemID", "occurredAt", "originStorageValue", "reversedOperationID",
+        "sourceLocationID", "sourceLocationName", "sourcePlaceID", "sourcePlaceName",
+        "destinationLocationID", "destinationLocationName", "destinationPlaceID", "destinationPlaceName"
+    ]
 
     static func validate(_ root: [String: Any], artifactType: String, schemaVersion: Int) throws {
         try requireOnly(root, keys: rootKeys)
@@ -30,6 +35,9 @@ enum InventoryPortabilityShapeValidator {
         if artifactType == InventoryPortabilityArtifactType.completeBackup.rawValue {
             inventoryKeys.insert("recentItemViewEvents")
         }
+        if schemaVersion >= 3 {
+            inventoryKeys.insert("movementRecords")
+        }
         try requireOnly(inventory, keys: inventoryKeys)
         try validateRecords(inventory["locations"], keys: locationKeys)
         try validateRecords(inventory["customCategories"], keys: categoryKeys)
@@ -39,6 +47,9 @@ enum InventoryPortabilityShapeValidator {
         }
         if artifactType == InventoryPortabilityArtifactType.completeBackup.rawValue {
             try validateRecords(inventory["recentItemViewEvents"], keys: eventKeys)
+        }
+        if schemaVersion >= 3 {
+            try validateRecords(inventory["movementRecords"], keys: movementKeys)
         }
     }
 
@@ -61,6 +72,7 @@ enum InventoryPortabilityValidator {
     static func validate(
         _ snapshot: InventoryPortabilitySnapshotV1,
         artifactType: InventoryPortabilityArtifactType,
+        schemaVersion: Int = InventoryPortabilityEncoder.schemaVersion,
         invalidError: InventoryPortabilityCodecError = .invalidSchema
     ) throws {
         switch artifactType {
@@ -69,6 +81,11 @@ enum InventoryPortabilityValidator {
                   snapshot.items.allSatisfy({ $0.placeID == nil }) else { throw invalidError }
         case .completeBackup:
             guard snapshot.recentItemViewEvents != nil else { throw invalidError }
+        }
+        if schemaVersion >= 3 {
+            guard snapshot.movementRecords != nil else { throw invalidError }
+        } else if snapshot.movementRecords != nil {
+            throw invalidError
         }
 
         var allIDs = Set<String>()
@@ -154,6 +171,47 @@ enum InventoryPortabilityValidator {
             _ = try validatedIDs([event.id], allIDs: &allIDs, invalidError: invalidError)
             guard canonicalUUID(event.itemID), itemIDs.contains(event.itemID) else { throw invalidError }
             _ = try date(event.viewedAt, invalidError: invalidError)
+        }
+
+        var operationFacts: [String: (occurredAt: String, origin: String, reversed: String?, itemIDs: Set<String>)] = [:]
+        for record in snapshot.movementRecords ?? [] {
+            _ = try validatedIDs([record.id], allIDs: &allIDs, invalidError: invalidError)
+            guard canonicalUUID(record.operationID),
+                  canonicalUUID(record.itemID),
+                  itemIDs.contains(record.itemID),
+                  !record.originStorageValue.isEmpty
+            else { throw invalidError }
+            if let reversedOperationID = record.reversedOperationID,
+               !canonicalUUID(reversedOperationID) {
+                throw invalidError
+            }
+            for snapshotID in [
+                record.sourceLocationID,
+                record.sourcePlaceID,
+                record.destinationLocationID,
+                record.destinationPlaceID
+            ] {
+                if let snapshotID, !canonicalUUID(snapshotID) {
+                    throw invalidError
+                }
+            }
+            _ = try date(record.occurredAt, invalidError: invalidError)
+
+            if var facts = operationFacts[record.operationID] {
+                guard facts.occurredAt == record.occurredAt,
+                      facts.origin == record.originStorageValue,
+                      facts.reversed == record.reversedOperationID,
+                      facts.itemIDs.insert(record.itemID).inserted
+                else { throw invalidError }
+                operationFacts[record.operationID] = facts
+            } else {
+                operationFacts[record.operationID] = (
+                    record.occurredAt,
+                    record.originStorageValue,
+                    record.reversedOperationID,
+                    [record.itemID]
+                )
+            }
         }
     }
 

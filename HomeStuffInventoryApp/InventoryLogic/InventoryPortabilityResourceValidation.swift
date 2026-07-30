@@ -57,7 +57,8 @@ enum InventoryPortabilityLimitValidator {
         else { throw InventoryPortabilityCodecError.invalidSchema }
         let places = inventory["places"] as? [Any] ?? []
         let events = inventory["recentItemViewEvents"] as? [Any] ?? []
-        try validateCounts(locations: locations.count, places: places.count, categories: categories.count, items: items.count, events: events.count, limits: limits)
+        let movements = inventory["movementRecords"] as? [Any] ?? []
+        try validateCounts(locations: locations.count, places: places.count, categories: categories.count, items: items.count, events: events.count, movements: movements.count, limits: limits)
         for item in items {
             guard let tags = (item as? [String: Any])?["tags"] as? [Any] else { throw InventoryPortabilityCodecError.invalidSchema }
             guard tags.count <= limits.maximumTagsPerItem else { throw InventoryPortabilityCodecError.resourceLimitExceeded }
@@ -66,7 +67,8 @@ enum InventoryPortabilityLimitValidator {
 
     static func validate(_ snapshot: InventoryPortabilitySnapshotV1, limits: InventoryPortabilityLimits) throws {
         let events = snapshot.recentItemViewEvents ?? []
-        try validateCounts(locations: snapshot.locations.count, places: snapshot.places.count, categories: snapshot.customCategories.count, items: snapshot.items.count, events: events.count, limits: limits)
+        let movements = snapshot.movementRecords ?? []
+        try validateCounts(locations: snapshot.locations.count, places: snapshot.places.count, categories: snapshot.customCategories.count, items: snapshot.items.count, events: events.count, movements: movements.count, limits: limits)
         var strings: [String?] = []
         strings += snapshot.locations.flatMap { [$0.id, $0.name, $0.iconID, $0.notes, $0.createdAt, $0.updatedAt] }
         strings += snapshot.customCategories.flatMap { [$0.id, $0.name, $0.createdAt, $0.updatedAt] }
@@ -76,12 +78,25 @@ enum InventoryPortabilityLimitValidator {
             strings += item.tags
         }
         strings += events.flatMap { [$0.id, $0.itemID, $0.viewedAt] }
+        strings += movements.flatMap {
+            [
+                $0.id, $0.operationID, $0.itemID, $0.occurredAt, $0.originStorageValue,
+                $0.reversedOperationID, $0.sourceLocationID, $0.sourceLocationName,
+                $0.sourcePlaceID, $0.sourcePlaceName, $0.destinationLocationID,
+                $0.destinationLocationName, $0.destinationPlaceID, $0.destinationPlaceName
+            ]
+        }
         for value in strings where (value?.lengthOfBytes(using: .utf8) ?? 0) > limits.maximumUTF8BytesPerString { throw InventoryPortabilityCodecError.resourceLimitExceeded }
         for item in snapshot.items where item.tags.count > limits.maximumTagsPerItem { throw InventoryPortabilityCodecError.resourceLimitExceeded }
     }
 
-    private static func validateCounts(locations: Int, places: Int, categories: Int, items: Int, events: Int, limits: InventoryPortabilityLimits) throws {
-        guard locations <= limits.maximumLocations, places <= limits.maximumPlaces, categories <= limits.maximumCustomCategories, items <= limits.maximumItems, events <= limits.maximumRecentItemViewEvents, locations + places + categories + items + events <= limits.maximumTotalRecords else { throw InventoryPortabilityCodecError.resourceLimitExceeded }
+    private static func validateCounts(locations: Int, places: Int, categories: Int, items: Int, events: Int, movements: Int, limits: InventoryPortabilityLimits) throws {
+        guard locations <= limits.maximumLocations, places <= limits.maximumPlaces,
+              categories <= limits.maximumCustomCategories, items <= limits.maximumItems,
+              events <= limits.maximumRecentItemViewEvents,
+              movements <= limits.maximumMovementRecords,
+              locations + places + categories + items + events + movements <= limits.maximumTotalRecords
+        else { throw InventoryPortabilityCodecError.resourceLimitExceeded }
     }
 
     private static func validateStrings(_ value: Any, limits: InventoryPortabilityLimits) throws {

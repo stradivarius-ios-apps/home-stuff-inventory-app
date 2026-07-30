@@ -213,6 +213,8 @@ struct InventoryListView: View {
                     }
                 } label: {
                     Image(systemName: "plus")
+                } primaryAction: {
+                    isShowingItemForm = true
                 }
                 .inventoryPrimaryActionTint()
                 .accessibilityLabel("inventory.action.addItem.accessibilityLabel")

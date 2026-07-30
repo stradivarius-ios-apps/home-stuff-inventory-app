@@ -73,8 +73,7 @@ enum InventoryPlaceReconciler {
 
                 if let linkedPlaceID = item.placeID,
                    let linkedPlace = placesByID[linkedPlaceID],
-                   linkedPlace.locationID == location.id,
-                   InventoryNormalizedName.place(linkedPlace.name) == placeName {
+                   linkedPlace.locationID == location.id {
                     continue
                 }
 

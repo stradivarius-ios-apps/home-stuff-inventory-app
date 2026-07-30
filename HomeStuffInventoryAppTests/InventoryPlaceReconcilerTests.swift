@@ -271,6 +271,36 @@ struct InventoryPlaceReconcilerTests {
         )
     }
 
+    @Test func validNestedStableLinkWinsOverStaleCompatibilityText() throws {
+        let context = try makeContext()
+        let location = StorageLocation(name: "Home")
+        let parent = InventoryPlace(locationID: location.id, name: "Cabinet")
+        let child = InventoryPlace(locationID: location.id, parentPlaceID: parent.id, name: "Current drawer")
+        let item = InventoryItem(
+            name: "Cable",
+            locationName: location.name,
+            containerName: "Former drawer",
+            placeID: child.id
+        )
+        context.insert(location)
+        [parent, child].forEach(context.insert)
+        context.insert(item)
+        try context.save()
+
+        let firstReport = try InventoryPlaceReconciler.reconcile(in: context)
+        let secondReport = try InventoryPlaceReconciler.reconcile(in: context)
+        let places = try context.fetch(FetchDescriptor<InventoryPlace>())
+
+        #expect(firstReport == InventoryPlaceRepairReport())
+        #expect(secondReport == InventoryPlaceRepairReport())
+        #expect(places.count == 2)
+        #expect(Set(places.map(\.id)) == [parent.id, child.id])
+        #expect(child.parentPlaceID == parent.id)
+        #expect(item.placeID == child.id)
+        #expect(item.containerName == "Former drawer")
+        #expect(item.locationName == "Home")
+    }
+
     @Test func failedHierarchyRepairSaveRestoresPersistedLinksAndItems() throws {
         let context = try makeContext()
         let location = StorageLocation(name: "Home")

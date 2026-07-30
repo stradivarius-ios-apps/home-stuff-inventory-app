@@ -96,6 +96,7 @@ enum InventoryBackupSnapshotter {
             InventoryPortabilityPlaceV1(
                 id: place.id.inventoryPortabilityString,
                 locationID: place.locationID.inventoryPortabilityString,
+                parentPlaceID: place.parentPlaceID?.inventoryPortabilityString,
                 name: place.name,
                 iconID: PlaceIconCatalog.normalizedIconID(place.iconID),
                 createdAt: InventoryPortabilityDate.string(from: place.createdAt),

@@ -192,7 +192,7 @@ private actor StoreKit2Bridge {
 
         switch try await product.purchase() {
         case let .success(result):
-            return .success(capture(result))
+            return .success(capture(result, retainHandledTransaction: true))
         case .pending:
             return .pending
         case .userCancelled:
@@ -207,7 +207,7 @@ private actor StoreKit2Bridge {
             let task = Task {
                 for await result in Transaction.currentEntitlements {
                     guard !Task.isCancelled else { break }
-                    continuation.yield(capture(result))
+                    continuation.yield(capture(result, retainHandledTransaction: false))
                 }
                 continuation.finish()
             }
@@ -222,7 +222,7 @@ private actor StoreKit2Bridge {
             let task = Task {
                 for await result in Transaction.updates {
                     guard !Task.isCancelled else { break }
-                    continuation.yield(capture(result))
+                    continuation.yield(capture(result, retainHandledTransaction: true))
                 }
                 continuation.finish()
             }
@@ -240,11 +240,15 @@ private actor StoreKit2Bridge {
     }
 
     private func capture(
-        _ result: VerificationResult<Transaction>
+        _ result: VerificationResult<Transaction>,
+        retainHandledTransaction: Bool
     ) -> StoreKitTransactionVerification {
         switch result {
         case let .verified(transaction):
-            transactionsByID[transaction.id] = transaction
+            if retainHandledTransaction,
+               transaction.productID == StoreProductID.lifetimePro.rawValue {
+                transactionsByID[transaction.id] = transaction
+            }
             return .verified(snapshot(of: transaction))
         case let .unverified(transaction, _):
             return .unverified(snapshot(of: transaction))

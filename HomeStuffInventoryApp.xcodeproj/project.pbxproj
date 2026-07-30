@@ -13,6 +13,8 @@
 		A10000000000000000000260 /* StoreProductID.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000261 /* StoreProductID.swift */; };
 		A10000000000000000000262 /* StoreKitClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000263 /* StoreKitClient.swift */; };
 		A10000000000000000000264 /* StoreKitClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000265 /* StoreKitClientTests.swift */; };
+		A10000000000000000000270 /* StoreKitEntitlementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000271 /* StoreKitEntitlementService.swift */; };
+		A10000000000000000000272 /* StoreKitEntitlementServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000273 /* StoreKitEntitlementServiceTests.swift */; };
 		A10000000000000000000267 /* HomeStuffInventory.storekit in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000266 /* HomeStuffInventory.storekit */; };
 		A10000000000000000000240 /* InventoryItemPlaceLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000241 /* InventoryItemPlaceLink.swift */; };
 		A10000000000000000000242 /* InventoryItemPlaceSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000243 /* InventoryItemPlaceSelectionView.swift */; };
@@ -215,6 +217,8 @@
 		A10000000000000000000261 /* StoreProductID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreProductID.swift; sourceTree = "<group>"; };
 		A10000000000000000000263 /* StoreKitClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitClient.swift; sourceTree = "<group>"; };
 		A10000000000000000000265 /* StoreKitClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitClientTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000271 /* StoreKitEntitlementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitEntitlementService.swift; sourceTree = "<group>"; };
+		A10000000000000000000273 /* StoreKitEntitlementServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitEntitlementServiceTests.swift; sourceTree = "<group>"; };
 		A10000000000000000000266 /* HomeStuffInventory.storekit */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = HomeStuffInventory.storekit; sourceTree = "<group>"; };
 		A10000000000000000000241 /* InventoryItemPlaceLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemPlaceLink.swift; sourceTree = "<group>"; };
 		A10000000000000000000243 /* InventoryItemPlaceSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemPlaceSelectionView.swift; sourceTree = "<group>"; };
@@ -466,6 +470,7 @@
 				A100000000000000000001A3 /* PremiumAccess.swift */,
 				A10000000000000000000261 /* StoreProductID.swift */,
 				A10000000000000000000263 /* StoreKitClient.swift */,
+				A10000000000000000000271 /* StoreKitEntitlementService.swift */,
 			);
 			path = Monetization;
 			sourceTree = "<group>";
@@ -682,6 +687,7 @@
 			children = (
 				AC7700000000000000000006 /* InventoryMovementHistoryTests.swift */,
 				A10000000000000000000265 /* StoreKitClientTests.swift */,
+				A10000000000000000000273 /* StoreKitEntitlementServiceTests.swift */,
 				A100000000000000000001A9 /* PrivacyManifestTests.swift */,
 				A100000000000000000001A7 /* InventoryFreeDowngradeRegressionGateTests.swift */,
 				A100000000000000000001A5 /* PremiumAccessTests.swift */,
@@ -897,6 +903,7 @@
 				AC7700000000000000000003 /* InventoryMovementHistory.swift in Sources */,
 				A10000000000000000000260 /* StoreProductID.swift in Sources */,
 				A10000000000000000000262 /* StoreKitClient.swift in Sources */,
+				A10000000000000000000270 /* StoreKitEntitlementService.swift in Sources */,
 				A10000000000000000000200 /* InventoryPortabilityResourceValidation.swift in Sources */,
 				A10000000000000000000202 /* InventoryPortabilitySchemaValidation.swift in Sources */,
 				A10000000000000000000204 /* InventoryRFC8785Canonicalizer.swift in Sources */,
@@ -1020,6 +1027,7 @@
 			files = (
 				AC7700000000000000000005 /* InventoryMovementHistoryTests.swift in Sources */,
 				A10000000000000000000264 /* StoreKitClientTests.swift in Sources */,
+				A10000000000000000000272 /* StoreKitEntitlementServiceTests.swift in Sources */,
 				A100000000000000000001A8 /* PrivacyManifestTests.swift in Sources */,
 				A100000000000000000001A6 /* InventoryFreeDowngradeRegressionGateTests.swift in Sources */,
 				A100000000000000000001A4 /* PremiumAccessTests.swift in Sources */,

@@ -17,6 +17,7 @@ class CodeQLAdvancedSetupTest < Minitest::Test
   def test_trigger_and_transition_gate_preserve_scanning
     events = @workflow["on"] || @workflow[true] || {}
 
+    assert_equal "Advanced CodeQL", @workflow.fetch("name")
     assert_equal ["main"], events.dig("push", "branches")
     assert events.key?("pull_request")
     assert events.key?("schedule")

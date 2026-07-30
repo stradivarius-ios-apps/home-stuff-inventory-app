@@ -139,9 +139,9 @@ enum InventoryMovementHistory {
     @MainActor
     static func undoLatest(
         records _: [InventoryMovementRecord],
-        items: [InventoryItem],
-        locations: [StorageLocation],
-        places: [InventoryPlace],
+        items _: [InventoryItem],
+        locations _: [StorageLocation],
+        places _: [InventoryPlace],
         entitlements: InventoryEntitlements,
         in modelContext: ModelContext,
         operationID: UUID = UUID(),
@@ -151,22 +151,22 @@ enum InventoryMovementHistory {
         policy: PremiumAccessPolicy = PremiumAccessPolicy(),
         persist: (() throws -> Void)? = nil
     ) -> InventoryMovementUndoOutcome {
-        let authoritativeRecords: [InventoryMovementRecord]
+        let authoritativeState: UndoState
         do {
-            authoritativeRecords = try modelContext.fetch(FetchDescriptor<InventoryMovementRecord>())
+            authoritativeState = try undoState(in: modelContext)
         } catch {
             return .failed
         }
         let availability = undoAvailability(
-            records: authoritativeRecords,
-            items: items,
-            locations: locations,
-            places: places,
+            records: authoritativeState.records,
+            items: authoritativeState.items,
+            locations: authoritativeState.locations,
+            places: authoritativeState.places,
             entitlements: entitlements,
             policy: policy
         )
         guard case let .available(targetOperationID) = availability,
-              let target = latestOperation(in: authoritativeRecords),
+              let target = latestOperation(in: authoritativeState.records),
               target.id == targetOperationID
         else {
             return switch availability {
@@ -177,20 +177,19 @@ enum InventoryMovementHistory {
             }
         }
 
-        let itemsByID = Dictionary(items.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         do {
-            let commitRecords = try modelContext.fetch(FetchDescriptor<InventoryMovementRecord>())
+            let commitState = try undoState(in: modelContext)
             let commitAvailability = undoAvailability(
-                records: commitRecords,
-                items: items,
-                locations: locations,
-                places: places,
+                records: commitState.records,
+                items: commitState.items,
+                locations: commitState.locations,
+                places: commitState.places,
                 entitlements: entitlements,
                 policy: policy
             )
             guard case let .available(commitTargetOperationID) = commitAvailability,
                   commitTargetOperationID == targetOperationID,
-                  let commitTarget = latestOperation(in: commitRecords),
+                  let commitTarget = latestOperation(in: commitState.records),
                   commitTarget.id == targetOperationID
             else {
                 return switch commitAvailability {
@@ -201,6 +200,10 @@ enum InventoryMovementHistory {
                 }
             }
 
+            let itemsByID = Dictionary(
+                commitState.items.map { ($0.id, $0) },
+                uniquingKeysWith: { first, _ in first }
+            )
             for (index, record) in commitTarget.records.enumerated() {
                 guard let item = itemsByID[record.itemID] else {
                     modelContext.rollback()
@@ -231,6 +234,16 @@ enum InventoryMovementHistory {
             modelContext.rollback()
             return .failed
         }
+    }
+
+    @MainActor
+    private static func undoState(in modelContext: ModelContext) throws -> UndoState {
+        UndoState(
+            records: try modelContext.fetch(FetchDescriptor<InventoryMovementRecord>()),
+            items: try modelContext.fetch(FetchDescriptor<InventoryItem>()),
+            locations: try modelContext.fetch(FetchDescriptor<StorageLocation>()),
+            places: try modelContext.fetch(FetchDescriptor<InventoryPlace>())
+        )
     }
 
     static func records(
@@ -279,6 +292,13 @@ enum InventoryMovementHistory {
                 return $0.id.uuidString > $1.id.uuidString
             }
             .first
+    }
+
+    private struct UndoState {
+        let records: [InventoryMovementRecord]
+        let items: [InventoryItem]
+        let locations: [StorageLocation]
+        let places: [InventoryPlace]
     }
 
     private static func isRestorable(

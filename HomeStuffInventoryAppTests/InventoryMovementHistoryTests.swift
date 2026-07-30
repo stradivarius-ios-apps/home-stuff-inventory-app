@@ -313,6 +313,106 @@ struct InventoryMovementHistoryTests {
         #expect(newerItem.locationName == "Office")
     }
 
+    @Test func undoRejectsDeletedSourceDespiteStaleCallerCatalogs() throws {
+        let context = try makeContext()
+        let office = StorageLocation(name: "Office")
+        let garage = StorageLocation(name: "Garage")
+        let shelf = InventoryPlace(locationID: office.id, name: "Shelf")
+        let item = InventoryItem(
+            name: "Cable",
+            locationName: office.name,
+            containerName: shelf.name,
+            placeID: shelf.id
+        )
+        context.insert(office)
+        context.insert(garage)
+        context.insert(shelf)
+        context.insert(item)
+        try context.save()
+        let records = try InventoryMovementHistory.move(
+            [
+                .init(
+                    item: item,
+                    expectedSource: InventoryMovementEndpointSnapshot(
+                        item: item,
+                        locations: [office, garage]
+                    ),
+                    destination: .init(
+                        locationID: garage.id,
+                        locationName: garage.name,
+                        placeID: nil,
+                        placeName: nil
+                    )
+                )
+            ],
+            origin: .singleItem,
+            in: context,
+            locations: [office, garage]
+        )
+        context.delete(shelf)
+        context.delete(office)
+        try context.save()
+
+        let outcome = InventoryMovementHistory.undoLatest(
+            records: records,
+            items: [item],
+            locations: [office, garage],
+            places: [shelf],
+            entitlements: .init(ownsLifetimePro: true, hasActiveFamilySubscription: false),
+            in: context
+        )
+
+        #expect(outcome == .unsafeRestoration)
+        #expect(item.locationName == "Garage")
+        #expect(try context.fetch(FetchDescriptor<InventoryMovementRecord>()).count == 1)
+    }
+
+    @Test func undoRejectsDeletedItemDespiteStaleCallerItems() throws {
+        let context = try makeContext()
+        let office = StorageLocation(name: "Office")
+        let garage = StorageLocation(name: "Garage")
+        let item = item(id: UUID(), name: "Cable")
+        context.insert(office)
+        context.insert(garage)
+        context.insert(item)
+        try context.save()
+        let records = try InventoryMovementHistory.move(
+            [
+                .init(
+                    item: item,
+                    expectedSource: InventoryMovementEndpointSnapshot(
+                        item: item,
+                        locations: [office, garage]
+                    ),
+                    destination: .init(
+                        locationID: garage.id,
+                        locationName: garage.name,
+                        placeID: nil,
+                        placeName: nil
+                    )
+                )
+            ],
+            origin: .singleItem,
+            in: context,
+            locations: [office, garage]
+        )
+        context.delete(item)
+        try context.save()
+
+        let outcome = InventoryMovementHistory.undoLatest(
+            records: records,
+            items: [item],
+            locations: [office, garage],
+            places: [],
+            entitlements: .init(ownsLifetimePro: true, hasActiveFamilySubscription: false),
+            in: context
+        )
+
+        #expect(outcome == .currentStateChanged)
+        #expect(try context.fetch(FetchDescriptor<InventoryMovementRecord>()).count == 1)
+        #expect(try context.fetch(FetchDescriptor<InventoryItem>()).isEmpty)
+    }
+
     @Test func freeUndoExplainsIncompatibilityBeforeRequiringAccess() throws {
         let context = try makeContext()
         let office = StorageLocation(name: "Office")

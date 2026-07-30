@@ -160,6 +160,14 @@ struct StoreKitClientTests {
         #expect(await recorder.finishedTransactionIDs == [verified.id])
     }
 
+    @Test func synchronizeDelegatesToTheInjectableBackend() async throws {
+        let recorder = StoreKitBackendRecorder()
+
+        try await recorder.client.synchronize()
+
+        #expect(await recorder.synchronizeCallCount == 1)
+    }
+
     private func transaction(
         id: UInt64,
         productID: String = StoreProductID.lifetimePro.rawValue
@@ -185,6 +193,7 @@ private actor StoreKitBackendRecorder {
 
     private(set) var requestedProductIDs: Set<String> = []
     private(set) var finishedTransactionIDs: [UInt64] = []
+    private(set) var synchronizeCallCount = 0
 
     init(
         products: [StoreProductInfo] = [],
@@ -217,6 +226,9 @@ private actor StoreKitBackendRecorder {
                     guard let self else { return AsyncStream { $0.finish() } }
                     return await self.updates()
                 },
+                synchronize: { [weak self] in
+                    await self?.synchronize()
+                },
                 finish: { [weak self] transactionID in
                     await self?.finish(transactionID: transactionID)
                 }
@@ -243,6 +255,10 @@ private actor StoreKitBackendRecorder {
 
     private func finish(transactionID: UInt64) {
         finishedTransactionIDs.append(transactionID)
+    }
+
+    private func synchronize() {
+        synchronizeCallCount += 1
     }
 
     private func stream(

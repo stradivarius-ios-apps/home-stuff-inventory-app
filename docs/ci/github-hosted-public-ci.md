@@ -40,11 +40,11 @@ and the [`macos-26` image inventory](https://github.com/actions/runner-images/bl
 same-repository and external-fork pull requests with read-only `GITHUB_TOKEN`
 permissions and no repository or environment secrets. It also supports explicit manual
 dispatch. It does not run again on a push to protected `main`: the required pull-request
-check validates GitHub's merge ref, while the separate `CodeQL` workflow performs
-pull-request, post-merge, and weekly security analysis. `PR UI Screenshots` is
-manual-only so routine pull requests do not consume a separate macOS runner; dispatch
-it with a pull-request number, branch, tag, or full commit SHA when visual review is
-needed.
+check validates GitHub's merge ref, while the separate `Advanced CodeQL` workflow
+performs pull-request, post-merge, and weekly security analysis. `PR UI Screenshots`
+is manual-only so routine pull requests do not consume a separate macOS runner;
+dispatch it with a pull-request number, branch, tag, or full commit SHA when visual
+review is needed.
 
 ## CodeQL advanced setup
 
@@ -79,7 +79,8 @@ covered:
    not scan evidence.
 2. Confirm Default Setup successfully analyzed the merge SHA.
 3. Disable Default Setup, set `ADVANCED_CODEQL_ENABLED` to `true`, manually dispatch
-   `CodeQL` on that same `main` SHA, and require all four language jobs to succeed.
+   `Advanced CodeQL` on that same `main` SHA, and require all four language jobs to
+   succeed.
 4. Keep the variable enabled for future `main` pushes and weekly scans.
 
 For rollback, first set the variable to `false`, enable Default Setup, and confirm its
@@ -141,8 +142,8 @@ release verification:
 | Validation | Locked Fastlane smoke test |
 | Validation | Build and test |
 | Validation | Code coverage |
-| CodeQL | CodeQL (actions), CodeQL (python), CodeQL (ruby) |
-| CodeQL | CodeQL (swift) |
+| Advanced CodeQL | CodeQL (actions), CodeQL (python), CodeQL (ruby) |
+| Advanced CodeQL | CodeQL (swift) |
 | Full Test Validation | Full Test Suite |
 | PR UI Screenshots | Capture PR UI screenshots |
 | Release App Store Screenshots | Capture release App Store screenshots |

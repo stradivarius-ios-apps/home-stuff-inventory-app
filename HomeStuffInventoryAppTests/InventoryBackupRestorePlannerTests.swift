@@ -25,13 +25,13 @@ struct InventoryBackupRestorePlannerTests: InventoryBackupRestoreTestCase {
             maximumLocations: 10, maximumCustomCategories: 10, maximumItems: 10, maximumRecentItemViewEvents: 10,
             maximumTagsPerItem: 10, maximumUTF8BytesPerString: 100, maximumTotalRecords: 10)
         let plan = try await InventoryBackupRestorePlanner(limits: compatible).plan(data: data)
-        #expect(plan.schemaVersion == 3)
+        #expect(plan.schemaVersion == 4)
     }
     @Test func versionOneBackupSynthesizesScopedPlacesAndLinksBeforeRestore() async throws {
         let data = try Data(contentsOf: fixtureURL("ordinary-complete-backup-v1.json"))
         let plan = try await InventoryBackupRestorePlanner().plan(data: data)
 
-        #expect(plan.schemaVersion == 3)
+        #expect(plan.schemaVersion == 4)
         #expect(plan.document.inventory.places.map(\.name) == ["Desk drawer", "Memory box"])
         #expect(plan.document.inventory.places.allSatisfy { $0.iconID == PlaceIconCatalog.defaultIconID })
         #expect(plan.document.inventory.items.allSatisfy { $0.placeID != nil })
@@ -47,7 +47,7 @@ struct InventoryBackupRestorePlannerTests: InventoryBackupRestoreTestCase {
             try await planner.plan(data: data.dropLast(data.count / 2))
         }
 
-        let newer = try mutate(data, reseal: false) { $0["schemaVersion"] = 4 }
+        let newer = try mutate(data, reseal: false) { $0["schemaVersion"] = 5 }
         await #expect(throws: InventoryBackupRestoreError.unsupportedNewerVersion) {
             try await planner.plan(data: newer)
         }
@@ -155,6 +155,81 @@ struct InventoryBackupRestorePlannerTests: InventoryBackupRestoreTestCase {
             }
         }
     }
+    @Test func nestedHierarchyDecodesForwardReferencesAndRejectsEveryInvalidTreeShape() async throws {
+        let data = try backupData(snapshot: nestedSnapshot())
+        let plan = try await InventoryBackupRestorePlanner().plan(data: data)
+
+        #expect(plan.document.inventory == nestedSnapshot())
+        #expect(plan.document.inventory.places.map(\.parentPlaceID) == [
+            "50000000-0000-0000-0000-000000000002",
+            "50000000-0000-0000-0000-000000000003",
+            nil
+        ])
+
+        let missingParent = try mutate(data, reseal: true) { root in
+            var inventory = root["inventory"] as! [String: Any]
+            var places = inventory["places"] as! [[String: Any]]
+            places[0]["parentPlaceID"] = "50000000-0000-0000-0000-000000000099"
+            inventory["places"] = places
+            root["inventory"] = inventory
+        }
+        let cycle = try mutate(data, reseal: true) { root in
+            var inventory = root["inventory"] as! [String: Any]
+            var places = inventory["places"] as! [[String: Any]]
+            places[2]["parentPlaceID"] = places[0]["id"]
+            inventory["places"] = places
+            root["inventory"] = inventory
+        }
+        let crossLocation = try mutate(data, reseal: true) { root in
+            var inventory = root["inventory"] as! [String: Any]
+            var locations = inventory["locations"] as! [[String: Any]]
+            var second = locations[0]
+            second["id"] = "10000000-0000-0000-0000-000000000002"
+            second["name"] = "Garage"
+            locations.append(second)
+            var places = inventory["places"] as! [[String: Any]]
+            places[2]["locationID"] = second["id"]
+            inventory["locations"] = locations
+            inventory["places"] = places
+            root["inventory"] = inventory
+        }
+        let siblingCollision = try mutate(data, reseal: true) { root in
+            var inventory = root["inventory"] as! [String: Any]
+            var places = inventory["places"] as! [[String: Any]]
+            var duplicate = places[0]
+            duplicate["id"] = "50000000-0000-0000-0000-000000000099"
+            duplicate["name"] = "  CABLE BOX "
+            places.append(duplicate)
+            inventory["places"] = places
+            root["inventory"] = inventory
+        }
+
+        for invalidTree in [missingParent, cycle, crossLocation, siblingCollision] {
+            await #expect(throws: InventoryBackupRestoreError.invalidRelationships) {
+                try await InventoryBackupRestorePlanner().plan(data: invalidTree)
+            }
+        }
+    }
+    @Test func versionThreeFlatBackupMigratesWithoutInventingParents() async throws {
+        let versionFour = try backupData(snapshot: unicodeSnapshot())
+        let versionThree = try mutate(versionFour, reseal: true) { root in
+            root["schemaVersion"] = 3
+            var inventory = root["inventory"] as! [String: Any]
+            var places = inventory["places"] as! [[String: Any]]
+            for index in places.indices {
+                places[index].removeValue(forKey: "parentPlaceID")
+            }
+            inventory["places"] = places
+            root["inventory"] = inventory
+        }
+
+        let plan = try await InventoryBackupRestorePlanner().plan(data: versionThree)
+
+        #expect(plan.schemaVersion == 4)
+        #expect(plan.document.inventory.places.count == 1)
+        #expect(plan.document.inventory.places.allSatisfy { $0.parentPlaceID == nil })
+        #expect(plan.document.inventory.items.first?.placeID == plan.document.inventory.places.first?.id)
+    }
     @Test func placeResourceLimitAndCanonicalOrderingAreDeterministic() throws {
         let snapshot = unicodeSnapshot()
         let first = try InventoryPortabilityEncoder.encode(
@@ -225,7 +300,7 @@ struct InventoryBackupRestorePlannerTests: InventoryBackupRestoreTestCase {
 
         #expect(plan.backupDate == date)
         #expect(plan.appVersion == "9.0")
-        #expect(plan.schemaVersion == 3)
+        #expect(plan.schemaVersion == 4)
         #expect(plan.counts == InventoryBackupRestoreCounts(
             items: 1,
             locations: 1,

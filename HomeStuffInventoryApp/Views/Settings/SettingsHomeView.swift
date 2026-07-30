@@ -24,6 +24,7 @@ struct SettingsHomeView: View {
     @Query private var items: [InventoryItem]
     @Query private var locations: [StorageLocation]
     @Query private var customCategories: [InventoryCustomCategory]
+    @Query private var places: [InventoryPlace]
     @Query private var movementRecords: [InventoryMovementRecord]
 
     @State private var workflow = InventoryDataTransferWorkflow()
@@ -271,6 +272,7 @@ struct SettingsHomeView: View {
                         items: items,
                         locations: locations,
                         customCategories: customCategories,
+                        places: places,
                         movementRecords: movementRecords
                     )
                 },
@@ -315,6 +317,7 @@ struct SettingsHomeView: View {
             items: items,
             locations: locations,
             customCategories: customCategories,
+            places: places,
             movementRecords: movementRecords,
             context: modelContext
         )

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AD6500000000000000000001 /* InventoryPlaceMutationPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD6500000000000000000002 /* InventoryPlaceMutationPersistence.swift */; };
+		AD6500000000000000000003 /* InventoryPlaceMutationPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD6500000000000000000004 /* InventoryPlaceMutationPersistenceTests.swift */; };
 		AC7700000000000000000001 /* InventoryMovementRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7700000000000000000002 /* InventoryMovementRecord.swift */; };
 		AC7700000000000000000003 /* InventoryMovementHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7700000000000000000004 /* InventoryMovementHistory.swift */; };
 		AC7700000000000000000005 /* InventoryMovementHistoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7700000000000000000006 /* InventoryMovementHistoryTests.swift */; };
@@ -209,6 +211,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		AD6500000000000000000002 /* InventoryPlaceMutationPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPlaceMutationPersistence.swift; sourceTree = "<group>"; };
+		AD6500000000000000000004 /* InventoryPlaceMutationPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPlaceMutationPersistenceTests.swift; sourceTree = "<group>"; };
 		AC7700000000000000000002 /* InventoryMovementRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryMovementRecord.swift; sourceTree = "<group>"; };
 		AC7700000000000000000004 /* InventoryMovementHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryMovementHistory.swift; sourceTree = "<group>"; };
 		AC7700000000000000000006 /* InventoryMovementHistoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryMovementHistoryTests.swift; sourceTree = "<group>"; };
@@ -661,6 +665,7 @@
 				A100000000000000000001E5 /* InventoryItemFormPersistence.swift */,
 				A10000000000000000000215 /* InventoryItemMutationPersistence.swift */,
 				A10000000000000000000213 /* InventoryListManagementPersistence.swift */,
+				AD6500000000000000000002 /* InventoryPlaceMutationPersistence.swift */,
 				A100000000000000000001E7 /* InventorySelectionValueStore.swift */,
 			);
 			path = Persistence;
@@ -680,6 +685,7 @@
 		A10000000000000000000053 /* HomeStuffInventoryAppTests */ = {
 			isa = PBXGroup;
 			children = (
+				AD6500000000000000000004 /* InventoryPlaceMutationPersistenceTests.swift */,
 				AC7700000000000000000006 /* InventoryMovementHistoryTests.swift */,
 				A10000000000000000000265 /* StoreKitClientTests.swift */,
 				A100000000000000000001A9 /* PrivacyManifestTests.swift */,
@@ -893,6 +899,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AD6500000000000000000001 /* InventoryPlaceMutationPersistence.swift in Sources */,
 				AC7700000000000000000001 /* InventoryMovementRecord.swift in Sources */,
 				AC7700000000000000000003 /* InventoryMovementHistory.swift in Sources */,
 				A10000000000000000000260 /* StoreProductID.swift in Sources */,
@@ -1018,6 +1025,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AD6500000000000000000003 /* InventoryPlaceMutationPersistenceTests.swift in Sources */,
 				AC7700000000000000000005 /* InventoryMovementHistoryTests.swift in Sources */,
 				A10000000000000000000264 /* StoreKitClientTests.swift in Sources */,
 				A100000000000000000001A8 /* PrivacyManifestTests.swift in Sources */,

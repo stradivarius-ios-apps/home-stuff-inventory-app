@@ -25,6 +25,7 @@ struct InventoryFreeDowngradeRegressionGateTests {
             .moveSelectedItems,
             .movePlaceContents,
             .extendedMovementUndo,
+            .storageHierarchyEditing,
             .inventoryInboxBatchCleanup
         ]
 

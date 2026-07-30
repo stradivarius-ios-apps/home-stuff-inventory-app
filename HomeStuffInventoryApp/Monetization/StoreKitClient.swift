@@ -84,6 +84,10 @@ struct StoreKitClient: Sendable {
         return outcomes
     }
 
+    func synchronize() async throws {
+        try await backend.synchronize()
+    }
+
     func transactionUpdates() async -> AsyncStream<StoreTransactionOutcome> {
         let source = await backend.transactionUpdates()
         return AsyncStream { continuation in
@@ -144,6 +148,7 @@ struct StoreKitBackend: Sendable {
     let purchase: @Sendable (String) async throws -> StoreKitBackendPurchaseResult
     let currentEntitlements: @Sendable () async -> AsyncStream<StoreKitTransactionVerification>
     let transactionUpdates: @Sendable () async -> AsyncStream<StoreKitTransactionVerification>
+    let synchronize: @Sendable () async throws -> Void
     let finish: @Sendable (UInt64) async -> Void
 
     static func storeKit2() -> StoreKitBackend {
@@ -153,6 +158,7 @@ struct StoreKitBackend: Sendable {
             purchase: { try await bridge.purchase(productID: $0) },
             currentEntitlements: { await bridge.currentEntitlements() },
             transactionUpdates: { await bridge.transactionUpdates() },
+            synchronize: { try await AppStore.sync() },
             finish: { await bridge.finish(transactionID: $0) }
         )
     }

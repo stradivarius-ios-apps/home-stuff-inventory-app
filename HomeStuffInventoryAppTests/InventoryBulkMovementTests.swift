@@ -447,6 +447,141 @@ struct InventoryBulkMovementTests {
         #expect(try context.fetch(FetchDescriptor<InventoryMovementRecord>()).isEmpty)
     }
 
+    @Test func destinationReparentAfterPreflightIsRejectedWithoutMutation() throws {
+        let context = try makeContext()
+        let office = StorageLocation(name: "Office")
+        let garage = StorageLocation(name: "Garage")
+        let cabinet = InventoryPlace(locationID: garage.id, name: "Cabinet")
+        let shelf = InventoryPlace(locationID: garage.id, name: "Shelf")
+        let drawer = InventoryPlace(
+            locationID: garage.id,
+            parentPlaceID: cabinet.id,
+            name: "Drawer"
+        )
+        let item = InventoryItem(name: "Cable", locationName: office.name)
+        [office, garage].forEach(context.insert)
+        [cabinet, shelf, drawer].forEach(context.insert)
+        context.insert(item)
+        try context.save()
+        let access = PremiumAccessState(
+            entitlements: .init(ownsLifetimePro: true, hasActiveFamilySubscription: false)
+        )
+        let destination = try #require(
+            InventoryBulkMovementDestinationDirectory.destinations(
+                locations: [office, garage],
+                places: [cabinet, shelf, drawer]
+            )
+            .first { $0.id == .place(drawer.id) }
+        )
+        let preflight = try #require(
+            readyPreflight(
+                InventoryBulkMovement.prepare(
+                    selectedItemIDs: [item.id],
+                    items: [item],
+                    locations: [office, garage],
+                    places: [cabinet, shelf, drawer],
+                    destination: destination,
+                    access: access
+                )
+            )
+        )
+        drawer.parentPlaceID = shelf.id
+        try context.save()
+
+        #expect(
+            InventoryBulkMovement.commit(preflight, access: access, in: context)
+                == .invalidDestination
+        )
+        #expect(item.locationName == "Office")
+        #expect(item.placeID == nil)
+        #expect(try context.fetch(FetchDescriptor<InventoryMovementRecord>()).isEmpty)
+    }
+
+    @Test func destinationDeletionAfterPreflightIsRejectedWithoutMutation() throws {
+        let context = try makeContext()
+        let office = StorageLocation(name: "Office")
+        let garage = StorageLocation(name: "Garage")
+        let drawer = InventoryPlace(locationID: garage.id, name: "Drawer")
+        let item = InventoryItem(name: "Cable", locationName: office.name)
+        [office, garage].forEach(context.insert)
+        context.insert(drawer)
+        context.insert(item)
+        try context.save()
+        let access = PremiumAccessState(
+            entitlements: .init(ownsLifetimePro: true, hasActiveFamilySubscription: false)
+        )
+        let destination = try #require(
+            InventoryBulkMovementDestinationDirectory.destinations(
+                locations: [office, garage],
+                places: [drawer]
+            )
+            .first { $0.id == .place(drawer.id) }
+        )
+        let preflight = try #require(
+            readyPreflight(
+                InventoryBulkMovement.prepare(
+                    selectedItemIDs: [item.id],
+                    items: [item],
+                    locations: [office, garage],
+                    places: [drawer],
+                    destination: destination,
+                    access: access
+                )
+            )
+        )
+        context.delete(drawer)
+        try context.save()
+
+        #expect(
+            InventoryBulkMovement.commit(preflight, access: access, in: context)
+                == .invalidDestination
+        )
+        #expect(item.locationName == "Office")
+        #expect(item.placeID == nil)
+        #expect(try context.fetch(FetchDescriptor<InventoryMovementRecord>()).isEmpty)
+    }
+
+    @Test func incompleteDestinationPathIsExcludedAndCannotPrepare() throws {
+        let location = StorageLocation(name: "Garage")
+        let missingParentID = id("20000000-0000-0000-0000-000000000099")
+        let orphan = InventoryPlace(
+            locationID: location.id,
+            parentPlaceID: missingParentID,
+            name: "Drawer"
+        )
+        let item = InventoryItem(name: "Cable", locationName: "Office")
+        let access = PremiumAccessState(
+            entitlements: .init(ownsLifetimePro: true, hasActiveFamilySubscription: false)
+        )
+
+        let destinations = InventoryBulkMovementDestinationDirectory.destinations(
+            locations: [location],
+            places: [orphan]
+        )
+        #expect(destinations.map(\.id) == [.location(location.id)])
+
+        let invalidDestination = InventoryBulkMovementDestination(
+            id: .place(orphan.id),
+            locationID: location.id,
+            locationName: location.name,
+            placeID: orphan.id,
+            placeName: orphan.name,
+            displayPath: "Garage › Drawer",
+            placePathIDs: [orphan.id],
+            placePathComponents: [orphan.name]
+        )
+        #expect(
+            InventoryBulkMovement.prepare(
+                selectedItemIDs: [item.id],
+                items: [item],
+                locations: [location],
+                places: [orphan],
+                destination: invalidDestination,
+                access: access
+            ) == .invalidDestination
+        )
+    }
+
     private func readyPreflight(
         _ outcome: InventoryBulkMovementPreparationOutcome
     ) -> InventoryBulkMovementPreflight? {

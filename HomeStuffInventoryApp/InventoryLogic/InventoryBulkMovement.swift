@@ -67,6 +67,28 @@ struct InventoryBulkMovementDestination: Equatable, Identifiable, Sendable {
     let placeID: UUID?
     let placeName: String?
     let displayPath: String
+    let placePathIDs: [UUID]
+    let placePathComponents: [String]
+
+    init(
+        id: Identity,
+        locationID: UUID,
+        locationName: String,
+        placeID: UUID?,
+        placeName: String?,
+        displayPath: String,
+        placePathIDs: [UUID] = [],
+        placePathComponents: [String] = []
+    ) {
+        self.id = id
+        self.locationID = locationID
+        self.locationName = locationName
+        self.placeID = placeID
+        self.placeName = placeName
+        self.displayPath = displayPath
+        self.placePathIDs = placePathIDs
+        self.placePathComponents = placePathComponents
+    }
 
     var endpoint: InventoryMovementEndpointSnapshot {
         InventoryMovementEndpointSnapshot(
@@ -106,7 +128,9 @@ enum InventoryBulkMovementDestinationDirectory {
                             locationName: location.name,
                             placeID: place.id,
                             placeName: place.name,
-                            displayPath: ([location.name] + path.components).joined(separator: " › ")
+                            displayPath: ([location.name] + path.components).joined(separator: " › "),
+                            placePathIDs: path.placeIDs,
+                            placePathComponents: path.components
                         )
                     }
                     .sorted(by: destinationSort)
@@ -324,6 +348,8 @@ enum InventoryBulkMovement {
 
         guard let placeID = destination.placeID else {
             return destination.placeName == nil
+                && destination.placePathIDs.isEmpty
+                && destination.placePathComponents.isEmpty
         }
         guard let place = places.first(where: { $0.id == placeID }),
               place.locationID == location.id,
@@ -332,7 +358,15 @@ enum InventoryBulkMovement {
         else {
             return false
         }
-        return InventoryPlaceHierarchy.path(for: place, places: places).status == .complete
+        let path = InventoryPlaceHierarchy.path(for: place, places: places)
+        guard path.status == .complete,
+              path.placeIDs == destination.placePathIDs,
+              path.components.map({ InventoryNormalizedName.place($0) })
+                == destination.placePathComponents.map({ InventoryNormalizedName.place($0) })
+        else {
+            return false
+        }
+        return true
     }
 
     private static func summarize(

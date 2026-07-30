@@ -245,6 +245,167 @@ struct InventoryMovementHistoryTests {
         #expect(try context.fetch(FetchDescriptor<InventoryMovementRecord>()).contains { $0.origin == .undo })
     }
 
+    @Test func undoUsesAuthoritativeContextWhenCallerRecordsOmitNewerOperation() throws {
+        let context = try makeContext()
+        let office = StorageLocation(name: "Office")
+        let garage = StorageLocation(name: "Garage")
+        let olderItem = item(id: UUID(), name: "Cable")
+        let newerItem = item(id: UUID(), name: "Tape")
+        context.insert(office)
+        context.insert(garage)
+        context.insert(olderItem)
+        context.insert(newerItem)
+        try context.save()
+        let destination = InventoryMovementEndpointSnapshot(
+            locationID: garage.id,
+            locationName: garage.name,
+            placeID: nil,
+            placeName: nil
+        )
+        let olderRecords = try InventoryMovementHistory.move(
+            [
+                .init(
+                    item: olderItem,
+                    expectedSource: InventoryMovementEndpointSnapshot(
+                        item: olderItem,
+                        locations: [office, garage]
+                    ),
+                    destination: destination
+                )
+            ],
+            origin: .singleItem,
+            in: context,
+            locations: [office, garage],
+            operationID: id("40000000-0000-0000-0000-000000000030"),
+            occurredAt: Date(timeIntervalSince1970: 30)
+        )
+        let newerRecords = try InventoryMovementHistory.move(
+            [
+                .init(
+                    item: newerItem,
+                    expectedSource: InventoryMovementEndpointSnapshot(
+                        item: newerItem,
+                        locations: [office, garage]
+                    ),
+                    destination: destination
+                )
+            ],
+            origin: .singleItem,
+            in: context,
+            locations: [office, garage],
+            operationID: id("40000000-0000-0000-0000-000000000031"),
+            occurredAt: Date(timeIntervalSince1970: 31)
+        )
+
+        let outcome = InventoryMovementHistory.undoLatest(
+            records: olderRecords,
+            items: [olderItem, newerItem],
+            locations: [office, garage],
+            places: [],
+            entitlements: .init(ownsLifetimePro: true, hasActiveFamilySubscription: false),
+            in: context,
+            operationID: id("40000000-0000-0000-0000-000000000032"),
+            occurredAt: Date(timeIntervalSince1970: 32)
+        )
+
+        #expect(outcome == .undone(operationID: newerRecords[0].operationID))
+        #expect(olderItem.locationName == "Garage")
+        #expect(newerItem.locationName == "Office")
+    }
+
+    @Test func freeUndoExplainsIncompatibilityBeforeRequiringAccess() throws {
+        let context = try makeContext()
+        let office = StorageLocation(name: "Office")
+        let garage = StorageLocation(name: "Garage")
+        let item = item(id: UUID(), name: "Cable")
+        context.insert(office)
+        context.insert(garage)
+        context.insert(item)
+        try context.save()
+
+        #expect(
+            InventoryMovementHistory.undoAvailability(
+                records: [],
+                items: [item],
+                locations: [office, garage],
+                places: [],
+                entitlements: .free
+            ) == .unavailable
+        )
+        #expect(
+            InventoryMovementHistory.undoLatest(
+                records: [],
+                items: [item],
+                locations: [office, garage],
+                places: [],
+                entitlements: .free,
+                in: context
+            ) == .unavailable
+        )
+
+        let source = InventoryMovementEndpointSnapshot(item: item, locations: [office, garage])
+        let destination = InventoryMovementEndpointSnapshot(
+            locationID: garage.id,
+            locationName: garage.name,
+            placeID: nil,
+            placeName: nil
+        )
+        let records = try InventoryMovementHistory.move(
+            [.init(item: item, expectedSource: source, destination: destination)],
+            origin: .singleItem,
+            in: context,
+            locations: [office, garage]
+        )
+        item.applyMovement(
+            .init(locationID: nil, locationName: "Kitchen", placeID: nil, placeName: nil)
+        )
+
+        #expect(
+            InventoryMovementHistory.undoAvailability(
+                records: records,
+                items: [item],
+                locations: [office, garage],
+                places: [],
+                entitlements: .free
+            ) == .currentStateChanged
+        )
+        #expect(
+            InventoryMovementHistory.undoLatest(
+                records: records,
+                items: [item],
+                locations: [office, garage],
+                places: [],
+                entitlements: .free,
+                in: context
+            ) == .currentStateChanged
+        )
+
+        item.applyMovement(destination)
+        records[0].sourceLocationID = office.id
+        records[0].sourcePlaceID = UUID()
+
+        #expect(
+            InventoryMovementHistory.undoAvailability(
+                records: records,
+                items: [item],
+                locations: [office, garage],
+                places: [],
+                entitlements: .free
+            ) == .unsafeRestoration
+        )
+        #expect(
+            InventoryMovementHistory.undoLatest(
+                records: records,
+                items: [item],
+                locations: [office, garage],
+                places: [],
+                entitlements: .free,
+                in: context
+            ) == .unsafeRestoration
+        )
+        #expect(item.locationName == "Garage")
+    }
+
     @Test func conflictingEditAndMissingSourcePlaceDisableUndoWithoutMutation() throws {
         let context = try makeContext()
         let office = StorageLocation(name: "Office")

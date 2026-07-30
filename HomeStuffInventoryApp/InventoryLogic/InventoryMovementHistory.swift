@@ -111,9 +111,6 @@ enum InventoryMovementHistory {
         entitlements: InventoryEntitlements,
         policy: PremiumAccessPolicy = PremiumAccessPolicy()
     ) -> InventoryMovementUndoAvailability {
-        guard policy.availability(of: .extendedMovementUndo, entitlements: entitlements) == .available else {
-            return .accessRequired
-        }
         guard let operation = latestOperation(in: records),
               operation.records.allSatisfy({ $0.origin != .undo })
         else {
@@ -132,13 +129,16 @@ enum InventoryMovementHistory {
         }) else {
             return .unsafeRestoration
         }
+        guard policy.availability(of: .extendedMovementUndo, entitlements: entitlements) == .available else {
+            return .accessRequired
+        }
 
         return .available(operationID: operation.id)
     }
 
     @MainActor
     static func undoLatest(
-        records: [InventoryMovementRecord],
+        records _: [InventoryMovementRecord],
         items: [InventoryItem],
         locations: [StorageLocation],
         places: [InventoryPlace],
@@ -151,8 +151,14 @@ enum InventoryMovementHistory {
         policy: PremiumAccessPolicy = PremiumAccessPolicy(),
         persist: (() throws -> Void)? = nil
     ) -> InventoryMovementUndoOutcome {
+        let authoritativeRecords: [InventoryMovementRecord]
+        do {
+            authoritativeRecords = try modelContext.fetch(FetchDescriptor<InventoryMovementRecord>())
+        } catch {
+            return .failed
+        }
         let availability = undoAvailability(
-            records: records,
+            records: authoritativeRecords,
             items: items,
             locations: locations,
             places: places,
@@ -160,7 +166,7 @@ enum InventoryMovementHistory {
             policy: policy
         )
         guard case let .available(targetOperationID) = availability,
-              let target = latestOperation(in: records),
+              let target = latestOperation(in: authoritativeRecords),
               target.id == targetOperationID
         else {
             return switch availability {
@@ -173,7 +179,29 @@ enum InventoryMovementHistory {
 
         let itemsByID = Dictionary(items.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         do {
-            for (index, record) in target.records.enumerated() {
+            let commitRecords = try modelContext.fetch(FetchDescriptor<InventoryMovementRecord>())
+            let commitAvailability = undoAvailability(
+                records: commitRecords,
+                items: items,
+                locations: locations,
+                places: places,
+                entitlements: entitlements,
+                policy: policy
+            )
+            guard case let .available(commitTargetOperationID) = commitAvailability,
+                  commitTargetOperationID == targetOperationID,
+                  let commitTarget = latestOperation(in: commitRecords),
+                  commitTarget.id == targetOperationID
+            else {
+                return switch commitAvailability {
+                case .accessRequired: .accessRequired
+                case .currentStateChanged: .currentStateChanged
+                case .unsafeRestoration: .unsafeRestoration
+                case .available, .unavailable: .unavailable
+                }
+            }
+
+            for (index, record) in commitTarget.records.enumerated() {
                 guard let item = itemsByID[record.itemID] else {
                     modelContext.rollback()
                     return .currentStateChanged

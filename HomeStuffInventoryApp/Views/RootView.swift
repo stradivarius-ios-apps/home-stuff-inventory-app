@@ -123,5 +123,13 @@ private extension View {
 #Preview {
     RootView()
         .modelContainer(try! InventoryModelContainer.makeSample())
+        .environment(
+            PremiumAccessState(
+                entitlements: .init(
+                    ownsLifetimePro: true,
+                    hasActiveFamilySubscription: false
+                )
+            )
+        )
 }
 #endif

@@ -233,6 +233,14 @@ private struct PlaceDetailPreviewSurface: View {
             PlaceItemsListView(place: place, items: items, recentViewEvents: [])
         }
         .modelContainer(try! InventoryModelContainer.make(inMemory: true))
+        .environment(
+            PremiumAccessState(
+                entitlements: .init(
+                    ownsLifetimePro: true,
+                    hasActiveFamilySubscription: false
+                )
+            )
+        )
     }
 }
 #endif

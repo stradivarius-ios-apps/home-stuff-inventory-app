@@ -3,10 +3,16 @@ import SwiftUI
 struct InventoryItemRowView: View {
     let item: InventoryItem
     let matchContext: InventorySearch.MatchContext?
+    let showsChevron: Bool
 
-    init(item: InventoryItem, matchContext: InventorySearch.MatchContext? = nil) {
+    init(
+        item: InventoryItem,
+        matchContext: InventorySearch.MatchContext? = nil,
+        showsChevron: Bool = true
+    ) {
         self.item = item
         self.matchContext = matchContext
+        self.showsChevron = showsChevron
     }
 
     var body: some View {
@@ -36,8 +42,10 @@ struct InventoryItemRowView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .layoutPriority(1)
 
-                InventoryRowChevron()
-                    .padding(.top, 7)
+                if showsChevron {
+                    InventoryRowChevron()
+                        .padding(.top, 7)
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }

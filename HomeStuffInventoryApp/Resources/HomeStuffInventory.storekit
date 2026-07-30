@@ -1,0 +1,43 @@
+{
+  "identifier" : "B956F78D-A15D-46FD-82EF-A1423841C7FD",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "19.99",
+      "familyShareable" : false,
+      "internalID" : "AA0F4D37-FA54-4BEA-86EB-7D2A2792092F",
+      "localizations" : [
+        {
+          "description" : "Advanced local inventory workflows.",
+          "displayName" : "Home Stuff Pro",
+          "locale" : "en_US"
+        },
+        {
+          "description" : "Розширені локальні робочі процеси інвентарю.",
+          "displayName" : "Home Stuff Pro",
+          "locale" : "uk_UA"
+        }
+      ],
+      "productID" : "com.stradivarius23.HomeStuffInventoryApp.pro.lifetime",
+      "referenceName" : "Home Stuff Pro Lifetime",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+
+    ]
+  },
+  "subscriptionGroups" : [
+
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}

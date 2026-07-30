@@ -149,6 +149,64 @@ struct InventoryHierarchyBrowseIntegrationTests {
         #expect(resolved.placeID == topLevelTray.id)
     }
 
+    @Test func sameNameLegacyItemStaysOutOfNestedDirectAndContainedViews() {
+        let location = StorageLocation(id: locationID, name: "Office")
+        let places = hierarchyPlaces()
+        let legacyTrayItem = InventoryItem(
+            name: "Unlinked adapter",
+            locationName: location.name,
+            containerName: "Tray",
+            placeID: nil
+        )
+        let locationSummary = InventoryBrowseSummaries.locationSummaries(
+            from: [legacyTrayItem],
+            storageLocations: [location]
+        )[0]
+        let locationPlaces = InventoryBrowseSummaries.placeSummaries(
+            in: [legacyTrayItem],
+            matching: locationSummary,
+            places: places
+        )
+        let legacySummary = locationPlaces.first {
+            $0.placeID == nil && $0.name == "Tray"
+        }
+        let nestedSummary = InventoryBrowseSummaries.PlaceSummary(
+            id: leafID.uuidString,
+            placeID: leafID,
+            parentPlaceID: childID,
+            name: "Tray",
+            itemCount: 0,
+            locationID: locationSummary.id,
+            locationName: location.name,
+            isMissingLocation: false,
+            isMissingPlace: false,
+            pathComponents: ["Cabinet", "Shelf", "Tray"]
+        )
+
+        #expect(legacySummary != nil)
+        #expect(
+            InventoryBrowseSummaries.items(
+                in: [legacyTrayItem],
+                matching: nestedSummary
+            ).isEmpty
+        )
+        #expect(
+            InventoryBrowseSummaries.containedItems(
+                in: [legacyTrayItem],
+                matching: nestedSummary,
+                places: places
+            ).isEmpty
+        )
+        #expect(
+            legacySummary.map {
+                InventoryBrowseSummaries.items(
+                    in: [legacyTrayItem],
+                    matching: $0
+                ).map(\.id)
+            } == [legacyTrayItem.id]
+        )
+    }
+
     private func hierarchyPlaces(
         rootName: String = "Cabinet",
         childName: String = "Shelf",

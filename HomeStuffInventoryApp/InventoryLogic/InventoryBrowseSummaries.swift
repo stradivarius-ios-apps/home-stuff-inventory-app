@@ -272,9 +272,11 @@ enum InventoryBrowseSummaries {
         items.filter { item in
             if let placeID = place.placeID {
                 // Legacy Items remain visible with their linked Place while the form offers
-                // an explicit migration choice; never include another linked Place by text.
+                // an explicit migration choice; nested Places require stable identity because
+                // a leaf name alone cannot identify a path.
                 if item.placeID == placeID { return true }
                 guard item.placeID == nil else { return false }
+                guard place.parentPlaceID == nil else { return false }
             }
             return normalizedLocationName(for: item, vocabulary: vocabulary).matches(name: place.locationName, isMissing: place.isMissingLocation)
                 && normalizedPlaceName(for: item, vocabulary: vocabulary).matches(name: place.name, isMissing: place.isMissingPlace)

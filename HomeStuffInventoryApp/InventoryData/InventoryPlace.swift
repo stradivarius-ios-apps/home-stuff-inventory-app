@@ -7,6 +7,7 @@ final class InventoryPlace {
     @Attribute(.unique)
     var id: UUID
     var locationID: UUID
+    var parentPlaceID: UUID?
     var name: String
     var iconID: String?
     var createdAt: Date
@@ -15,6 +16,7 @@ final class InventoryPlace {
     init(
         id: UUID = UUID(),
         locationID: UUID,
+        parentPlaceID: UUID? = nil,
         name: String,
         iconID: String? = nil,
         createdAt: Date = .now,
@@ -22,6 +24,7 @@ final class InventoryPlace {
     ) {
         self.id = id
         self.locationID = locationID
+        self.parentPlaceID = parentPlaceID
         self.name = InventoryNormalizedName.place(name).displayName
         self.iconID = PlaceIconCatalog.normalizedIconID(iconID)
         self.createdAt = createdAt

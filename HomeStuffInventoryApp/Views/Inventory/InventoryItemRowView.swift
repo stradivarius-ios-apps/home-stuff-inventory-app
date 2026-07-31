@@ -64,9 +64,6 @@ struct InventoryItemRowView: View {
     }
 
     private var containerName: String {
-        if let placePath, !placePath.isEmpty {
-            return placePath
-        }
         guard let name = item.containerName?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty else {
             return InventoryLocalization.noContainer
         }

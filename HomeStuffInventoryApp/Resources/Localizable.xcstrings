@@ -1838,6 +1838,48 @@
         "uk" : { "stringUnit" : { "state" : "translated", "value" : "Речі" } }
       }
     },
+    "locations.placeDetail.allContainedItems" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "All Contained Items" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Усі вкладені речі" } }
+      }
+    },
+    "locations.placeDetail.childPlacesCount" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Direct Storage Places" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Безпосередні місця зберігання" } }
+      }
+    },
+    "locations.placeDetail.childPlacesSection" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Storage Places" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Місця зберігання" } }
+      }
+    },
+    "locations.placeDetail.containedItemsCount" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "All Contained Items" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Усі вкладені речі" } }
+      }
+    },
+    "locations.placeDetail.directItemsCount" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Direct Items" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Безпосередні речі" } }
+      }
+    },
+    "locations.placeDetail.directItemsSection" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Direct Items" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Безпосередні речі" } }
+      }
+    },
+    "locations.placeDetail.path.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Storage path: %@" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Шлях зберігання: %@" } }
+      }
+    },
     "locations.itemsAccess.allItemsAction.accessibilityLabel" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Show all items in %@" } },

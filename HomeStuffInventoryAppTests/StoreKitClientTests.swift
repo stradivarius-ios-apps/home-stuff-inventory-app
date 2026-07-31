@@ -23,11 +23,82 @@ struct StoreKitClientTests {
         )
         let products = try #require(root["products"] as? [[String: Any]])
         let product = try #require(products.first)
+        let localizations = try #require(product["localizations"] as? [[String: Any]])
 
         #expect(products.count == 1)
         #expect(product["productID"] as? String == StoreProductID.lifetimePro.rawValue)
+        #expect(product["referenceName"] as? String == "Home Stuff Pro Lifetime")
         #expect(product["type"] as? String == "NonConsumable")
+        #expect(product["familyShareable"] as? Bool == false)
+        #expect(Set(localizations.compactMap { $0["locale"] as? String }) == ["en_US", "uk_UA"])
+        #expect(
+            localizations.contains {
+                $0["locale"] as? String == "en_US"
+                    && $0["displayName"] as? String == "Home Stuff Pro"
+                    && $0["description"] as? String
+                        == "Advanced local inventory workflows."
+            }
+        )
+        #expect(
+            localizations.contains {
+                $0["locale"] as? String == "uk_UA"
+                    && $0["displayName"] as? String == "Home Stuff Pro"
+                    && $0["description"] as? String
+                        == "Розширені локальні робочі процеси інвентарю."
+            }
+        )
+        #expect((root["subscriptionGroups"] as? [Any])?.isEmpty == true)
+        #expect((root["nonRenewingSubscriptions"] as? [Any])?.isEmpty == true)
     }
+
+    @Test func sharedSchemeResolvesTheStoreKitFixtureFromTestAndLaunchActions() throws {
+        let repositoryRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let schemeURL = repositoryRoot
+            .appendingPathComponent("HomeStuffInventoryApp.xcodeproj")
+            .appendingPathComponent("xcshareddata")
+            .appendingPathComponent("xcschemes")
+            .appendingPathComponent("HomeStuffInventoryApp.xcscheme")
+        let scheme = try String(contentsOf: schemeURL, encoding: .utf8)
+        let reference =
+            "../../../HomeStuffInventoryApp/Resources/HomeStuffInventory.storekit"
+        let resolvedFixtureURL = schemeURL
+            .deletingLastPathComponent()
+            .appendingPathComponent(reference)
+            .standardizedFileURL
+        let canonicalFixtureURL = repositoryRoot
+            .appendingPathComponent("HomeStuffInventoryApp")
+            .appendingPathComponent("Resources")
+            .appendingPathComponent("HomeStuffInventory.storekit")
+            .standardizedFileURL
+
+        #expect(scheme.components(separatedBy: reference).count - 1 == 2)
+        #expect(resolvedFixtureURL == canonicalFixtureURL)
+        #expect(FileManager.default.fileExists(atPath: resolvedFixtureURL.path))
+    }
+
+#if DEBUG
+    @Test func qaProductFixtureRequiresExplicitNamePriceAndEnableArguments() {
+        #expect(InventoryQAStoreProductFixture.product(arguments: []) == nil)
+        #expect(
+            InventoryQAStoreProductFixture.product(
+                arguments: ["--qa-storekit-product-fixture"]
+            ) == nil
+        )
+
+        let product = InventoryQAStoreProductFixture.product(arguments: [
+            "--qa-storekit-product-fixture",
+            "--qa-storekit-product-name",
+            "Injected Product",
+            "--qa-storekit-product-price",
+            "Injected Price"
+        ])
+        #expect(product?.id == StoreProductID.lifetimePro.rawValue)
+        #expect(product?.displayName == "Injected Product")
+        #expect(product?.displayPrice == "Injected Price")
+    }
+#endif
 
     @Test func lifetimeProductUsesTheCentralizedIdentifier() async throws {
         let recorder = StoreKitBackendRecorder(
@@ -52,6 +123,25 @@ struct StoreKitClientTests {
 
         await #expect(throws: StoreKitClientError.productUnavailable(.lifetimePro)) {
             try await recorder.client.loadLifetimeProduct()
+        }
+    }
+
+    @Test func productionSwiftSourcesDoNotHardcodeTheFixturePrice() throws {
+        let repositoryRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let sourceRoot = repositoryRoot.appendingPathComponent("HomeStuffInventoryApp")
+        let enumerator = try #require(
+            FileManager.default.enumerator(
+                at: sourceRoot,
+                includingPropertiesForKeys: [.isRegularFileKey]
+            )
+        )
+
+        for case let url as URL in enumerator where url.pathExtension == "swift" {
+            let source = try String(contentsOf: url, encoding: .utf8)
+            #expect(!source.contains("19.99"), "Hardcoded fixture price in \(url.lastPathComponent)")
+            #expect(!source.contains("$19.99"), "Hardcoded fixture price in \(url.lastPathComponent)")
         }
     }
 

@@ -25,3 +25,15 @@ release process, so neither is part of this metadata directory.
 Credentialed comparison with App Store Connect, publication, verification, and
 recovery are maintainer-only operations in a separate private release control plane.
 Credentials and private operational details do not belong in this public repository.
+
+## In-App Purchase boundary
+
+The metadata lane does not create or configure In-App Purchases. It does not
+manage product identifiers, product type, localized IAP metadata, price,
+storefront availability, Family Sharing, review screenshots, or submission
+attachment. The checked-in StoreKit configuration is a local test fixture, not
+an App Store Connect manifest.
+
+Complete and verify the maintainer-owned product steps in
+[`docs/release/lifetime-pro-launch-readiness.md`](../docs/release/lifetime-pro-launch-readiness.md)
+before submitting the first app version that exposes Home Stuff Pro.

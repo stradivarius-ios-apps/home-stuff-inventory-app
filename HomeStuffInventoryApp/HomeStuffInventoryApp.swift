@@ -5,7 +5,7 @@ import SwiftUI
 struct HomeStuffInventoryApp: App {
     @Environment(\.scenePhase) private var scenePhase
     @State private var bootstrap = InventoryAppBootstrapState()
-    @State private var entitlementService = StoreKitEntitlementService.live()
+    @State private var entitlementService: StoreKitEntitlementService
     @State private var upgradeCoordinator: PremiumUpgradeCoordinator
 #if DEBUG
     private let qaAppearance = InventoryQAAppearanceConfiguration(
@@ -15,9 +15,22 @@ struct HomeStuffInventoryApp: App {
 #endif
 
     init() {
-        let service = StoreKitEntitlementService.live()
+        let service = Self.makeEntitlementService(
+            arguments: ProcessInfo.processInfo.arguments
+        )
         _entitlementService = State(initialValue: service)
         _upgradeCoordinator = State(initialValue: PremiumUpgradeCoordinator(service: service))
+    }
+
+    private static func makeEntitlementService(
+        arguments: [String]
+    ) -> StoreKitEntitlementService {
+#if DEBUG
+        if let product = InventoryQAStoreProductFixture.product(arguments: arguments) {
+            return .qaProductFixture(product: product)
+        }
+#endif
+        return .live()
     }
 
     var body: some Scene {
@@ -84,6 +97,58 @@ struct HomeStuffInventoryApp: App {
         )
     }
 }
+
+#if DEBUG
+struct InventoryQAStoreProductFixture {
+    private static let enableArgument = "--qa-storekit-product-fixture"
+    private static let nameArgument = "--qa-storekit-product-name"
+    private static let priceArgument = "--qa-storekit-product-price"
+
+    static func product(arguments: [String]) -> StoreProductInfo? {
+        guard arguments.contains(enableArgument),
+              let displayName = value(after: nameArgument, in: arguments),
+              let displayPrice = value(after: priceArgument, in: arguments),
+              !displayName.isEmpty,
+              !displayPrice.isEmpty else {
+            return nil
+        }
+        return StoreProductInfo(
+            id: StoreProductID.lifetimePro.rawValue,
+            displayName: displayName,
+            description: "Deterministic local UI test product.",
+            displayPrice: displayPrice
+        )
+    }
+
+    private static func value(after key: String, in arguments: [String]) -> String? {
+        guard let index = arguments.firstIndex(of: key),
+              arguments.indices.contains(index + 1) else {
+            return nil
+        }
+        return arguments[index + 1]
+    }
+}
+
+private extension StoreKitEntitlementService {
+    static func qaProductFixture(
+        product: StoreProductInfo
+    ) -> StoreKitEntitlementService {
+        let client = StoreKitEntitlementClient(
+            loadLifetimeProduct: { product },
+            purchaseLifetime: { .cancelled },
+            currentEntitlements: { [] },
+            transactionUpdates: { AsyncStream { $0.finish() } },
+            synchronize: {}
+        )
+        let cache = LifetimeAccessCache(
+            load: { nil },
+            store: { _ in },
+            remove: {}
+        )
+        return StoreKitEntitlementService(client: client, cache: cache)
+    }
+}
+#endif
 
 #if DEBUG
 private struct InventoryQAAppearanceConfiguration {

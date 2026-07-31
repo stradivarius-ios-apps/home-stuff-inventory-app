@@ -79,7 +79,7 @@
          </TestableReference>
       </Testables>
       <StoreKitConfigurationFileReference
-         identifier = "../../HomeStuffInventoryApp/Resources/HomeStuffInventory.storekit">
+         identifier = "../../../HomeStuffInventoryApp/Resources/HomeStuffInventory.storekit">
       </StoreKitConfigurationFileReference>
    </TestAction>
    <LaunchAction
@@ -103,7 +103,7 @@
          </BuildableReference>
       </BuildableProductRunnable>
       <StoreKitConfigurationFileReference
-         identifier = "../../HomeStuffInventoryApp/Resources/HomeStuffInventory.storekit">
+         identifier = "../../../HomeStuffInventoryApp/Resources/HomeStuffInventory.storekit">
       </StoreKitConfigurationFileReference>
    </LaunchAction>
    <ProfileAction

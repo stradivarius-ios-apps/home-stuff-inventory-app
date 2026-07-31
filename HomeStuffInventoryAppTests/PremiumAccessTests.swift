@@ -11,6 +11,15 @@ struct PremiumAccessTests {
 
     @Test func featureSetContainsOnlyTheApprovedLaunchBundleAndPlaceholders() {
         #expect(PremiumFeature.lifetimeLaunchBundle.count == 5)
+        #expect(
+            PremiumFeature.lifetimeLaunchBundle == [
+                .roomSweep,
+                .moveSelectedItems,
+                .movePlaceContents,
+                .extendedMovementUndo,
+                .storageHierarchyEditing
+            ]
+        )
         #expect(PremiumFeature.allCases.count == 7)
         #expect(Set(PremiumFeature.allCases) == localFeatures.union(subscriptionFeatures))
     }

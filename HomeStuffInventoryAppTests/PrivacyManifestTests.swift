@@ -36,16 +36,38 @@ struct PrivacyManifestTests {
         }
     }
 
+    @Test func sourceProjectDeclaresNoSensitiveCapabilitiesOrUsageDescriptions() throws {
+        let project = try String(
+            contentsOf: repositoryRoot
+                .appendingPathComponent("HomeStuffInventoryApp.xcodeproj")
+                .appendingPathComponent("project.pbxproj"),
+            encoding: .utf8
+        )
+
+        #expect(!project.contains("CODE_SIGN_ENTITLEMENTS"))
+        #expect(!project.contains("SystemCapabilities"))
+        #expect(!project.contains("XCRemoteSwiftPackageReference"))
+        #expect(!project.contains("INFOPLIST_KEY_NS"))
+        #expect(
+            project.components(
+                separatedBy: "INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;"
+            ).count - 1 == 2
+        )
+    }
+
     private func sourceManifest() throws -> [String: Any] {
-        let repositoryRoot = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
         let url = repositoryRoot
             .appendingPathComponent("HomeStuffInventoryApp")
             .appendingPathComponent("Resources")
             .appendingPathComponent("PrivacyInfo.xcprivacy")
         let value = try PropertyListSerialization.propertyList(from: Data(contentsOf: url), format: nil)
         return try #require(value as? [String: Any])
+    }
+
+    private var repositoryRoot: URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
     }
 
     private func manifest(entries: [[String: Any]]) -> [String: Any] {

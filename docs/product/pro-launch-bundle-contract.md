@@ -1,10 +1,15 @@
 # Home Stuff Pro Launch-Bundle Contract
 
-Status: Canonical repository contract; implementation and release activation deferred
+Status: Canonical implemented scope contract; release activation gated
 
 ## Purpose and authority
 
-This document freezes the complete initial `Home Stuff Pro` lifetime-unlock bundle before entitlement policy, StoreKit, feature gates, purchase surfaces, or bundle workflows are implemented. It refines the approved [monetization model](monetization-model.md) and must be read together with the canonical [Free capability contract](free-capability-contract.md).
+This document freezes the complete initial `Home Stuff Pro` lifetime-unlock
+bundle implemented in the canonical source. It refines the approved
+[monetization model](monetization-model.md), must be read together with the
+canonical [Free capability contract](free-capability-contract.md), and uses
+the [launch-readiness gate](../release/lifetime-pro-launch-readiness.md) for
+candidate validation and App Store activation.
 
 The bundle contains exactly five local capabilities:
 
@@ -14,7 +19,14 @@ The bundle contains exactly five local capabilities:
 4. movement history with bounded extended Undo;
 5. nested Storage Places.
 
-This contract authorizes only separately scoped implementation work. It does not claim that any capability ships today, add a trial or allowance, create an App Store Connect product, or authorize a visible paywall. The planned non-consumable product identifier is `com.stradivarius23.HomeStuffInventoryApp.pro.lifetime`; USD 19.99 is a planning hypothesis, never hardcoded product copy.
+The canonical source contains these five workflows, centralized access policy,
+verified StoreKit purchase and restore handling, and one contextual upgrade
+surface. Their presence in source does not create an App Store Connect
+product, authorize an upload or release, or prove the manual launch gate.
+There is no trial or allowance. The non-consumable product identifier is
+`com.stradivarius23.HomeStuffInventoryApp.pro.lifetime`; the checked-in
+StoreKit price is only a local test fixture and is never repository-approved
+product copy.
 
 ## Entitlement and gate vocabulary
 
@@ -27,16 +39,28 @@ Local Pro access is `ownsLifetimePro || hasActiveFamilySubscription`. Sync and s
 
 The centralized feature policy owns access decisions. StoreKit adapters provide verified state; SwiftData models, persistence queries, Search, and feature views do not infer ownership. Each operation asks policy about its specific capability before creating selection state, presenting an editable Pro flow, or mutating data.
 
-Two release states apply:
+Two activation states apply:
 
-- **Before launch activation:** all five production entry points and contextual upgrade presentations remain absent or release-disabled for every entitlement state. Documentation, policy fixtures, and deterministic test hosts do not make a capability available.
-- **After launch activation:** a user with local Pro access enters the requested workflow. A Free user intentionally invoking an approved visible action is routed to the one centralized contextual upgrade coordinator. The invocation creates no draft, selection, movement, history, or other inventory mutation. Dismissal or purchase cancellation returns to the unchanged source surface.
+- **Source candidate:** all five entry points and the contextual upgrade
+  presentation exist for review, but upload, App Store product activation,
+  submission, and release remain blocked until the launch-readiness gate is
+  complete for the exact candidate.
+- **Released activation:** a user with local Pro access enters the requested
+  workflow. A Free user intentionally invoking an approved visible action is
+  routed to the one centralized contextual upgrade coordinator. The
+  invocation creates no draft, selection, movement, history, or other
+  inventory mutation. Dismissal or purchase cancellation returns to the
+  unchanged source surface.
 
 There is no first-launch paywall and no automatic interruption of ordinary Free work.
 
 ## Frozen capability matrix
 
-The owner paths below are the required responsibility boundaries for their implementation tasks. `Existing` means the path is present in the repository at contract approval; `planned new` means the path is a future owner, not a statement of shipped behavior. A task may split a listed owner into smaller focused files in the same layer, but it must not move access policy into inventory data, Search, or persistence filtering, or grow an unrelated coordinating view to absorb feature logic.
+The owner paths below describe the implemented responsibility boundaries.
+Focused presentation, policy, logic, persistence, and StoreKit owners may be
+split further in the same layer, but access policy must not move into inventory
+data, Search, or persistence filtering, and unrelated coordinating views must
+not absorb feature logic.
 
 | Capability and task | Entry point and flow | Free invocation | Entitlement | Data created or changed | Downgrade visibility | Offline behavior | Failure and cancellation | Owner files |
 |---|---|---|---|---|---|---|---|---|
@@ -99,7 +123,11 @@ StoreKit purchase/restore lifecycle and contextual presentation remain separate 
 
 ## Localization and accessibility gate
 
-Every user-facing title, description, count, destination summary, button, menu action, status, validation message, error, empty explanation, accessibility label, and help text introduced by later tasks must have English and Ukrainian values in `HomeStuffInventoryApp/Resources/Localizable.xcstrings`. Store product display name and price come from StoreKit localization and are never hardcoded.
+Every user-facing title, description, count, destination summary, button, menu
+action, status, validation message, error, empty explanation, accessibility
+label, and help text has English and Ukrainian values in
+`HomeStuffInventoryApp/Resources/Localizable.xcstrings`. Store product display
+name and price come from StoreKit localization and are never hardcoded.
 
 Every affected flow must pass:
 
@@ -111,19 +139,31 @@ Every affected flow must pass:
 - Reduce Motion, Reduce Transparency, and Increase Contrast;
 - status and selection communication that does not rely on color alone.
 
-This documentation task adds no strings or UI. These requirements become release blockers for their implementation tasks.
+Automated localization and focused UI coverage enforce the source catalog.
+Manual visual and assistive-technology evidence remains a release blocker in
+the launch-readiness gate.
 
 ## Privacy and App Store boundary
 
 The five launch capabilities are local SwiftData workflows. They require no new account, backend, network upload, analytics, ads, tracking, CloudKit, Photos, Camera, microphone, contacts, location service, notification permission, or new sensitive-data permission. Their records remain part of the user's local Inventory and its Free export/backup/restore path.
 
-StoreKit implementation later requires the In-App Purchase capability, a configured non-consumable, verified transactions, Restore Purchases, localized IAP metadata, and App Review notes/test steps. The final release assessment must confirm the privacy manifest and App Store privacy disclosures still match actual behavior. Public privacy/support pages remain in their separate public repository.
+The implementation uses StoreKit 2 for the exact non-consumable, verified
+transactions, explicit Restore Purchases, entitlement updates, and cached
+last-known verified lifetime ownership in the system Keychain. It sends no
+inventory or transaction data to a developer backend. App Store Connect
+product configuration, localized IAP metadata, review screenshot, and
+submission attachment are manual maintainer-owned steps. The final release
+assessment must confirm the privacy manifest and App Store privacy disclosures
+still match actual behavior. Public privacy/support pages remain in their
+separate public repository.
 
 Marketing, screenshots, release notes, review notes, and support copy may describe only capabilities that pass the launch gate. They must not hardcode price, use the planning USD hypothesis as a claim, advertise Family & Sync, or imply that any deferred Pro idea ships.
 
 ## Frozen launch gate
 
-No production Pro feature entry point, contextual paywall, Settings purchase row, IAP marketing, App Store screenshot, or release claim may ship until all of the following are complete and independently reviewed:
+No upload, App Store product activation, submission, screenshot publication,
+marketing claim, or release may proceed until all of the following are
+complete and independently reviewed for the exact candidate:
 
 1. this contract and the protected Free capability policy;
 2. centralized independent entitlement state and per-feature access policy;
@@ -139,9 +179,11 @@ Passing only StoreKit or one bundle feature does not open the gate. DEBUG/test p
 
 ## Schema compatibility, release, and rollback
 
-This contract itself changes no source, schema, persisted model, permission, capability, or shipped behavior and needs no migration.
-
-Later movement/history and hierarchy work must provide backward-compatible schemas and migrations for existing Items and exact `containerName` compatibility values. Room Sweep results use ordinary Item data. Every persisted addition must remain readable by the release that created it and covered by versioned backup/restore/export rules.
+The implemented movement/history and hierarchy models use backward-compatible
+schemas and migrations for existing Items and exact `containerName`
+compatibility values. Room Sweep results use ordinary Item data. Persisted
+additions remain covered by versioned readable export, backup, restore, and
+legacy-store tests.
 
 Activation is staged only after the frozen launch gate passes. A rollback may hide or disable new Pro operation entry points and purchase presentation in a follow-up release. It must not:
 
@@ -151,7 +193,9 @@ Activation is staged only after the frozen launch gate passes. A rollback may hi
 - silently downgrade or destructively rewrite the persistence schema;
 - prevent a valid lifetime purchase from being restorable when the purchase path returns.
 
-Any persisted schema that an older rollback build cannot safely read blocks that rollback build; the implementation task must instead supply a compatible reader/migration or roll forward with entry points disabled.
+Any persisted schema that an older rollback build cannot safely read blocks
+that rollback build. Roll forward with entry points disabled unless a
+compatible reader or migration is independently reviewed.
 
 ## Explicitly deferred and not authorized
 

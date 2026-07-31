@@ -6,10 +6,26 @@ These notes capture the current implemented app behavior. Recheck them before ea
 
 ## Current data flows
 
-- Item, Inventory, Location, Storage Place, Category, Quantity, Notes, tags, list-management values, settings screens, search state, and recent item view events are stored locally through SwiftData.
+- Item, Inventory, Location, nested Storage Place relationships, movement
+  history, Category, Quantity, Notes, tags, list-management values, settings
+  screens, search state, and recent item view events are stored locally through
+  SwiftData.
 - Recent item view events contain local item identifiers and view timestamps for on-device ranking only. They are not transmitted off device.
-- Readable export and complete backup are plaintext JSON files. Home Stuff does not encrypt or password-protect either file; before it creates one, it explains this boundary and the data each file can contain. After a user saves or shares a file, protection and retention depend on the selected Files location, cloud provider, application, or recipient.
+- Movement records contain local identifiers, prior and new Storage Place
+  snapshots, operation origin, and timestamps for local history and Undo. They
+  are not transmitted off device.
+- Readable export and complete backup are plaintext JSON files, including
+  nested Storage Place relationships and movement history. Home Stuff does not
+  encrypt or password-protect either file; before it creates one, it explains
+  this boundary and the data each file can contain. After a user saves or
+  shares a file, protection and retention depend on the selected Files
+  location, cloud provider, application, or recipient.
 - Compatible restore is a user-initiated local file workflow and does not create or transmit a new export file. The app does not upload restore contents to the developer or a backend.
+- StoreKit communicates with Apple to load, purchase, restore, and verify the
+  optional lifetime In-App Purchase. The app caches only its last verified
+  lifetime ownership evidence in the system Keychain for offline access; it
+  does not send transaction or inventory data to the developer or a developer
+  backend.
 - DEBUG sample data is compiled behind `#if DEBUG`; Release builds do not compile the sample-data launch argument or environment flag gate.
 
 ## Current App Store Connect answers
@@ -22,7 +38,12 @@ These notes capture the current implemented app behavior. Recheck them before ea
 
 ## Verified absence for the current release
 
-- No account system, backend service, analytics SDK, advertising SDK, tracking SDK, CloudKit/iCloud sync, arbitrary import, app-managed sharing service, barcode scanning, AI, Photos, Camera, Contacts, Location Services, or network-based feature is present in the Release app target. Readable export and complete backup/restore remain local user-initiated file workflows.
+- No account system, developer backend service, analytics SDK, advertising SDK,
+  tracking SDK, CloudKit/iCloud sync, arbitrary import, app-managed sharing
+  service, barcode scanning, AI, Photos, Camera, Contacts, Location Services,
+  or app-owned network service is present in the Release app target. StoreKit
+  purchase and restore use Apple’s App Store service. Readable export and
+  complete backup/restore remain local user-initiated file workflows.
 - No app entitlements file or sensitive capability is configured.
 - No third-party package manager dependency is present in the project.
 - No current app target usage was found for custom/proprietary encryption, app-level standard encryption algorithms, CryptoKit, CommonCrypto, SecKey, CCCrypt, custom AES/RSA/ECC implementation, secure messaging, VPN/tunneling, or third-party cryptography libraries.

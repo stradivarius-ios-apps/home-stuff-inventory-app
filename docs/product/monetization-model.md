@@ -304,9 +304,10 @@ The approved high-level sequence is:
 
 ### Phase 2 — coherent Lifetime Pro launch
 
-- select a valuable initial local feature bundle;
-- implement each feature through a separate issue and PR;
-- add contextual paywalls only when the bundle is ready;
+- the exact five-capability local launch bundle, StoreKit 2 lifecycle, and
+  contextual upgrade surfaces are implemented in canonical source;
+- release activation remains gated by the exact-candidate automated evidence,
+  manual accessibility and Sandbox checks, and App Store Connect setup;
 - preserve the Free core contract.
 
 ### Phase 3 — local Pro expansion
@@ -331,22 +332,14 @@ The approved high-level sequence is:
 - define household ownership, invitations, roles, removal, transfer, expiry, and recovery;
 - preserve export and local access safeguards.
 
-## Initial pricing hypotheses
+## Pricing authority
 
-The initial planning hypotheses are:
-
-```text
-Home Stuff Pro Lifetime: USD 19.99 equivalent tier
-Family & Sync Annual: USD 9.99 equivalent tier
-```
-
-These values:
-
-- are not committed launch prices;
-- do not authorize App Store Connect product creation;
-- require regional tier review and product-value validation;
-- may be revised before implementation or submission;
-- must never be hardcoded into application copy.
+There is no repository-approved numeric launch price. The maintainer must
+select and review the actual base country or region, price, tax category, and
+storefront availability in App Store Connect before submission. The numeric
+value in the checked-in StoreKit configuration is only a deterministic local
+test fixture; it does not authorize App Store Connect product creation and
+must never appear as hardcoded application or marketing copy.
 
 The application must display StoreKit-localized pricing when products exist.
 

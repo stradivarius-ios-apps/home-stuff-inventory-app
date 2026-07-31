@@ -13,6 +13,7 @@ struct InventoryItemDetailView: View {
     @Environment(\.modelContext) private var modelContext
 
     let item: InventoryItem
+    @Query(sort: \InventoryPlace.name) private var places: [InventoryPlace]
 
     @State private var isShowingItemForm = false
     @State private var isShowingDeleteConfirmation = false
@@ -22,7 +23,7 @@ struct InventoryItemDetailView: View {
     @State private var hasRecordedRecentView = false
 
     private var viewModel: InventoryItemDetailViewModel {
-        InventoryItemDetailViewModel(item: item)
+        InventoryItemDetailViewModel(item: item, places: places)
     }
 
     var body: some View {

@@ -12,10 +12,10 @@ struct InventoryItemPlaceSelectionView: View {
     @State private var isShowingCreateSheet = false
     @State private var searchText = ""
 
-    private var scopedPlaces: [InventoryPlace] {
-        InventoryItemPlaceLink.places(in: location, from: places).filter {
+    private var scopedPlaces: [InventoryItemPlaceLink.DestinationOption] {
+        InventoryItemPlaceLink.destinationOptions(in: location, from: places).filter {
             searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                || $0.name.localizedCaseInsensitiveContains(searchText)
+                || $0.pathText.localizedCaseInsensitiveContains(searchText)
         }
     }
 
@@ -45,10 +45,20 @@ struct InventoryItemPlaceSelectionView: View {
                             HStack {
                                 Image(systemName: PlaceIconCatalog.symbolName(for: place.iconID))
                                     .foregroundStyle(InventoryDesign.ContentRole.place.color)
-                                InventorySelectionRow(verbatim: place.name, isSelected: selection == place.id)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    InventorySelectionRow(verbatim: place.name, isSelected: selection == place.id)
+                                    if place.depth > 0 {
+                                        Text(verbatim: place.pathText)
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                            .fixedSize(horizontal: false, vertical: true)
+                                    }
+                                }
                             }
                         }
                         .buttonStyle(.plain)
+                        .accessibilityLabel(Text(place.pathText))
+                        .accessibilityHint("inventory.placeSelection.option.accessibilityHint")
                         .accessibilityIdentifier("inventory.placeSelection.option.\(place.id.uuidString)")
                     }
                 }

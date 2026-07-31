@@ -3,10 +3,16 @@ import SwiftUI
 struct InventoryItemRowView: View {
     let item: InventoryItem
     let matchContext: InventorySearch.MatchContext?
+    let placePath: String?
 
-    init(item: InventoryItem, matchContext: InventorySearch.MatchContext? = nil) {
+    init(
+        item: InventoryItem,
+        matchContext: InventorySearch.MatchContext? = nil,
+        placePath: String? = nil
+    ) {
         self.item = item
         self.matchContext = matchContext
+        self.placePath = placePath
     }
 
     var body: some View {
@@ -53,6 +59,9 @@ struct InventoryItemRowView: View {
     }
 
     private var containerName: String {
+        if let placePath, !placePath.isEmpty {
+            return placePath
+        }
         guard let name = item.containerName?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty else {
             return InventoryLocalization.noContainer
         }

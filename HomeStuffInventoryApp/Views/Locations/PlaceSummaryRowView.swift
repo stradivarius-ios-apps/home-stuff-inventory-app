@@ -23,6 +23,14 @@ struct PlaceSummaryRowView: View {
 
             VStack(alignment: .leading, spacing: 3) {
                 titleAndCount
+                if place.childPlaceCount > 0 {
+                    Label(
+                        InventoryLocalization.placeCount(place.childPlaceCount),
+                        systemImage: "shippingbox"
+                    )
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                }
                 categoryRow
             }
             .frame(maxWidth: .infinity, alignment: .leading)

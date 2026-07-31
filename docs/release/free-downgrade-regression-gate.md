@@ -4,7 +4,7 @@ Status: Mandatory release gate
 
 ## Purpose
 
-Run this gate before activating, changing, or releasing any monetization behavior. It enforces the canonical [Free capability contract](../product/free-capability-contract.md) across all six entitlement states and verifies that results created by future premium workflows remain ordinary user-owned Inventory data after downgrade.
+Run this gate before activating, changing, or releasing any monetization behavior. It enforces the canonical [Free capability contract](../product/free-capability-contract.md) across all six entitlement states and verifies that results created by premium workflows remain ordinary user-owned Inventory data after downgrade.
 
 The gate is deterministic and offline. It must not use live StoreKit, App Store, CloudKit, accounts, or network fixtures.
 
@@ -33,9 +33,18 @@ xcodebuild test \
   -only-testing:HomeStuffInventoryAppTests/PremiumAccessTests \
   -only-testing:HomeStuffInventoryAppTests/InventoryReadableExportServiceTests \
   -only-testing:HomeStuffInventoryAppTests/InventoryBackupTests \
-  -only-testing:HomeStuffInventoryAppTests/InventoryBackupRestoreTests \
+  -only-testing:HomeStuffInventoryAppTests/InventoryPortabilityCodecTests \
+  -only-testing:HomeStuffInventoryAppTests/InventoryBackupRestorePlannerTests \
+  -only-testing:HomeStuffInventoryAppTests/InventoryBackupRestoreServiceTests \
+  -only-testing:HomeStuffInventoryAppTests/InventoryBackupRecoveryTests \
+  -only-testing:HomeStuffInventoryAppTests/InventoryBackupRecoveryArtifactProtectionTests \
+  -only-testing:HomeStuffInventoryAppTests/InventoryBackupLegacyMigrationTests \
+  -only-testing:HomeStuffInventoryAppTests/InventoryBackupFileReaderTests \
   -only-testing:HomeStuffInventoryAppTests/PrivacyManifestTests \
-  -only-testing:HomeStuffInventoryAppTests/LocalizationTests
+  -only-testing:HomeStuffInventoryAppTests/LocalizationCatalogTests \
+  -only-testing:HomeStuffInventoryAppTests/InventoryLocalizationFormattingTests \
+  -only-testing:HomeStuffInventoryAppTests/InventoryListManagementLocalizationTests \
+  -only-testing:HomeStuffInventoryAppTests/InventoryItemIconLocalizationTests
 ```
 
 Run the focused UI gate:

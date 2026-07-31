@@ -401,7 +401,7 @@ authorize:
 - analytics, ads, or tracking;
 - changing the current privacy claims;
 - changing App Store metadata to advertise deferred features;
-- adding public legal or support pages to the private source repository.
+- adding public legal or support pages to this application source repository.
 
 A future business or warehouse product with employees, asset checkout, procurement, audit logs, or a web dashboard would be a different product decision and is outside Home Stuff Inventory's personal household scope.
 

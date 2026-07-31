@@ -94,8 +94,13 @@ xcodebuild test \
   -only-testing:HomeStuffInventoryAppTests/InventoryHierarchyBrowseIntegrationTests \
   -only-testing:HomeStuffInventoryAppTests/InventoryReadableExportServiceTests \
   -only-testing:HomeStuffInventoryAppTests/InventoryBackupTests \
-  -only-testing:HomeStuffInventoryAppTests/InventoryBackupRestoreTests \
+  -only-testing:HomeStuffInventoryAppTests/InventoryPortabilityCodecTests \
+  -only-testing:HomeStuffInventoryAppTests/InventoryBackupRestorePlannerTests \
   -only-testing:HomeStuffInventoryAppTests/InventoryBackupRestoreServiceTests \
+  -only-testing:HomeStuffInventoryAppTests/InventoryBackupRecoveryTests \
+  -only-testing:HomeStuffInventoryAppTests/InventoryBackupRecoveryArtifactProtectionTests \
+  -only-testing:HomeStuffInventoryAppTests/InventoryBackupLegacyMigrationTests \
+  -only-testing:HomeStuffInventoryAppTests/InventoryBackupFileReaderTests \
   -only-testing:HomeStuffInventoryAppTests/InventoryFreeDowngradeRegressionGateTests \
   -only-testing:HomeStuffInventoryAppTests/PrivacyManifestTests \
   -only-testing:HomeStuffInventoryAppTests/LocalizationCatalogTests

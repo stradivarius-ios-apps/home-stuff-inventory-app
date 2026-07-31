@@ -67,7 +67,11 @@ struct InventoryMovementHistoryView: View {
                             .disabled(!isUndoEnabled)
                             .accessibilityIdentifier("premium.history.undo")
                         } footer: {
-                            Text("premium.history.undo.footer")
+                            if let undoDisabledReasonKey {
+                                Text(LocalizedStringKey(undoDisabledReasonKey))
+                            } else {
+                                Text("premium.history.undo.footer")
+                            }
                         }
                     }
                 }
@@ -133,7 +137,11 @@ struct InventoryMovementHistoryView: View {
     }
 
     private var isUndoEnabled: Bool {
-        undoAction == .confirm || undoAction == .upgrade
+        InventoryMovementHistoryPresentation.isUndoEnabled(for: undoAction)
+    }
+
+    private var undoDisabledReasonKey: String? {
+        InventoryMovementHistoryPresentation.disabledReasonKey(for: undoAction)
     }
 
     private func itemName(for record: InventoryMovementRecord) -> String {
@@ -201,6 +209,23 @@ enum InventoryMovementHistoryPresentation {
         case unsafeRestoration
     }
 
+    static func disabledReasonKey(for action: UndoAction) -> String? {
+        switch action {
+        case .unavailable:
+            "premium.history.outcome.unavailable"
+        case .currentStateChanged:
+            "premium.history.outcome.changed"
+        case .unsafeRestoration:
+            "premium.history.outcome.unsafe"
+        case .hidden, .confirm, .upgrade:
+            nil
+        }
+    }
+
+    static func isUndoEnabled(for action: UndoAction) -> Bool {
+        action == .confirm || action == .upgrade
+    }
+
     static func records(
         _ records: [InventoryMovementRecord],
         for itemID: UUID?
@@ -212,10 +237,10 @@ enum InventoryMovementHistoryPresentation {
     static func latestAffectedItemCount(
         in records: [InventoryMovementRecord]
     ) -> Int {
-        guard let operationID = records.first?.operationID else {
+        guard let operation = InventoryMovementHistory.latestOperation(in: records) else {
             return 0
         }
-        return Set(records.filter { $0.operationID == operationID }.map(\.itemID)).count
+        return Set(operation.records.map(\.itemID)).count
     }
 
     static func undoAction(

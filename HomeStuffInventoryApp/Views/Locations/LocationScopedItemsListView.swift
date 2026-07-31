@@ -32,6 +32,7 @@ struct PlaceItemsListView: View {
     let items: [InventoryItem]
     let recentViewEvents: [InventoryItemViewEvent]
     @Query private var places: [InventoryPlace]
+    @Query private var locations: [StorageLocation]
 
     @State private var isShowingItemForm = false
     @State private var isShowingContentsMovement = false
@@ -204,6 +205,26 @@ struct PlaceItemsListView: View {
     }
 
     private func presentContentsMovement(placeID: UUID) {
+        guard let sourcePlace = places.first(where: { $0.id == placeID }),
+              let sourceLocation = locations.first(where: { $0.id == sourcePlace.locationID })
+        else {
+            contentsMovementMessage = InventoryLocalization.string(
+                "locations.placeMove.sourceChanged.message",
+                defaultValue: "This Storage Place changed. Review it again."
+            )
+            return
+        }
+        guard !InventoryPlaceContentsMovement.hasLegacyDirectItems(
+            in: items,
+            sourcePlace: sourcePlace,
+            sourceLocation: sourceLocation
+        ) else {
+            contentsMovementMessage = InventoryLocalization.string(
+                "locations.placeMove.legacyReviewRequired.message",
+                defaultValue: "Some items still need this Storage Place confirmed. Open each item and confirm its Storage Place before moving all contents."
+            )
+            return
+        }
         let hasDirectItems = items.contains { $0.placeID == placeID }
         guard hasDirectItems else {
             contentsMovementMessage = InventoryLocalization.string(

@@ -162,6 +162,11 @@ struct InventoryPlaceContentsMovementView: View {
                 "locations.placeMove.empty.message",
                 defaultValue: "This Storage Place has no items to move."
             )
+        case .legacyReviewRequired:
+            outcomeMessage = InventoryLocalization.string(
+                "locations.placeMove.legacyReviewRequired.message",
+                defaultValue: "Some items still need this Storage Place confirmed. Open each item and confirm its Storage Place before moving all contents."
+            )
         case .accessRequired:
             outcomeMessage = InventoryLocalization.string(
                 "locations.placeMove.accessRequired.message",
@@ -188,6 +193,11 @@ struct InventoryPlaceContentsMovementView: View {
         ) {
         case .moved, .unchanged:
             dismiss()
+        case .legacyReviewRequired:
+            outcomeMessage = InventoryLocalization.string(
+                "locations.placeMove.legacyReviewRequired.message",
+                defaultValue: "Some items still need this Storage Place confirmed. Open each item and confirm its Storage Place before moving all contents."
+            )
         case .accessRequired:
             outcomeMessage = InventoryLocalization.string(
                 "locations.placeMove.accessRequired.message",

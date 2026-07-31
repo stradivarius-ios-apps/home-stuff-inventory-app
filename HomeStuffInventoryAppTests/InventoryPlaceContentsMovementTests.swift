@@ -79,6 +79,90 @@ struct InventoryPlaceContentsMovementTests {
         #expect(try fixture.context.fetch(FetchDescriptor<InventoryMovementRecord>()).isEmpty)
     }
 
+    @Test func legacyOnlyAndMixedDirectRowsRequireReviewBeforeEmptyOrAccess() throws {
+        let legacyOnly = try makeFixture()
+        legacyOnly.first.applyMovement(
+            InventoryMovementEndpointSnapshot(
+                locationID: legacyOnly.office.id,
+                locationName: legacyOnly.office.name,
+                placeID: legacyOnly.child.id,
+                placeName: legacyOnly.child.name
+            )
+        )
+        legacyOnly.second.applyMovement(
+            InventoryMovementEndpointSnapshot(
+                locationID: legacyOnly.office.id,
+                locationName: legacyOnly.office.name,
+                placeID: legacyOnly.child.id,
+                placeName: legacyOnly.child.name
+            )
+        )
+        let legacyItem = InventoryItem(
+            name: "Legacy cable",
+            locationName: legacyOnly.office.name,
+            containerName: legacyOnly.source.name
+        )
+        let free = access(lifetime: false)
+
+        #expect(
+            InventoryPlaceContentsMovement.prepare(
+                sourcePlaceID: legacyOnly.source.id,
+                items: legacyOnly.items + [legacyItem],
+                locations: legacyOnly.locations,
+                places: legacyOnly.places,
+                destination: legacyOnly.destination,
+                access: free
+            ) == .legacyReviewRequired
+        )
+        #expect(legacyItem.placeID == nil)
+        #expect(try legacyOnly.context.fetch(FetchDescriptor<InventoryMovementRecord>()).isEmpty)
+
+        let mixed = try makeFixture()
+        let mixedLegacyItem = InventoryItem(
+            name: "Legacy adapter",
+            locationName: mixed.office.name,
+            containerName: mixed.source.name
+        )
+        #expect(
+            InventoryPlaceContentsMovement.prepare(
+                sourcePlaceID: mixed.source.id,
+                items: mixed.items + [mixedLegacyItem],
+                locations: mixed.locations,
+                places: mixed.places,
+                destination: mixed.destination,
+                access: free
+            ) == .legacyReviewRequired
+        )
+        #expect(mixed.first.placeID == mixed.source.id)
+        #expect(mixedLegacyItem.placeID == nil)
+        #expect(try mixed.context.fetch(FetchDescriptor<InventoryMovementRecord>()).isEmpty)
+    }
+
+    @Test func legacyRowAddedAfterReviewBlocksCommitWithoutPartialMovement() throws {
+        let fixture = try makeFixture()
+        let pro = access(lifetime: true)
+        let preflight = try #require(ready(prepare(fixture, access: pro)))
+        let legacyItem = InventoryItem(
+            name: "Late legacy item",
+            locationName: fixture.office.name,
+            containerName: fixture.source.name
+        )
+        fixture.context.insert(legacyItem)
+        try fixture.context.save()
+
+        #expect(
+            InventoryPlaceContentsMovement.commit(
+                preflight,
+                access: pro,
+                in: fixture.context
+            ) == .legacyReviewRequired
+        )
+        #expect(fixture.first.placeID == fixture.source.id)
+        #expect(fixture.second.placeID == fixture.source.id)
+        #expect(legacyItem.placeID == nil)
+        #expect(try fixture.context.fetch(FetchDescriptor<InventoryMovementRecord>()).isEmpty)
+    }
+
     @Test(arguments: [SourceMutation.add, .remove, .change])
     func commitRejectsEveryDirectMembershipChange(mutation: SourceMutation) throws {
         let fixture = try makeFixture()

@@ -13,6 +13,7 @@ struct InventoryPlaceContentsMovementPreflight: Equatable {
 enum InventoryPlaceContentsMovementPreparationOutcome: Equatable {
     case ready(InventoryPlaceContentsMovementPreflight)
     case emptyPlace
+    case legacyReviewRequired
     case accessRequired
     case invalidSource
     case invalidDestination
@@ -21,6 +22,7 @@ enum InventoryPlaceContentsMovementPreparationOutcome: Equatable {
 enum InventoryPlaceContentsMovementCommitOutcome: Equatable {
     case moved(operationID: UUID, itemCount: Int)
     case unchanged
+    case legacyReviewRequired
     case accessRequired
     case sourceChanged
     case invalidDestination
@@ -44,6 +46,18 @@ enum InventoryPlaceContentsMovement {
         )
         guard let source = directory.first(where: { $0.id == .place(sourcePlaceID) }) else {
             return .invalidSource
+        }
+        guard let sourcePlace = places.first(where: { $0.id == sourcePlaceID }),
+              let sourceLocation = locations.first(where: { $0.id == sourcePlace.locationID })
+        else {
+            return .invalidSource
+        }
+        guard !hasLegacyDirectItems(
+            in: items,
+            sourcePlace: sourcePlace,
+            sourceLocation: sourceLocation
+        ) else {
+            return .legacyReviewRequired
         }
 
         let directItemIDs = Set(
@@ -114,6 +128,18 @@ enum InventoryPlaceContentsMovement {
             guard case let .place(sourcePlaceID) = preflight.source.id else {
                 return .sourceChanged
             }
+            guard let sourcePlace = places.first(where: { $0.id == sourcePlaceID }),
+                  let sourceLocation = locations.first(where: { $0.id == sourcePlace.locationID })
+            else {
+                return .sourceChanged
+            }
+            guard !hasLegacyDirectItems(
+                in: items,
+                sourcePlace: sourcePlace,
+                sourceLocation: sourceLocation
+            ) else {
+                return .legacyReviewRequired
+            }
             let currentDirectItemIDs = Set(
                 items.lazy
                     .filter { $0.placeID == sourcePlaceID }
@@ -151,6 +177,22 @@ enum InventoryPlaceContentsMovement {
             }
         } catch {
             return .failed
+        }
+    }
+
+    static func hasLegacyDirectItems(
+        in items: [InventoryItem],
+        sourcePlace: InventoryPlace,
+        sourceLocation: StorageLocation
+    ) -> Bool {
+        items.contains {
+            InventoryBrowseSummaries.isLegacyDirectItem(
+                $0,
+                locationName: sourceLocation.name,
+                placeName: sourcePlace.name,
+                parentPlaceID: sourcePlace.parentPlaceID,
+                vocabulary: .localized
+            )
         }
     }
 }

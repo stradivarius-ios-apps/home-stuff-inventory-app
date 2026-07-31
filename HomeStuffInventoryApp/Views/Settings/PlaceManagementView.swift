@@ -163,8 +163,22 @@ struct PlaceManagementView: View {
     }
 
     private func requestUndo() {
-        upgradeCoordinator.request(.nestedStoragePlaceRestructure) {
+        switch InventoryPlaceMutationPersistence.undoLatestAvailability(
+            entitlements: premiumAccess.entitlements,
+            in: modelContext
+        ) {
+        case .available:
             dialog = .undo
+        case .accessRequired:
+            upgradeCoordinator.request(.extendedMovementUndo) {
+                requestUndo()
+            }
+        case .currentStateChanged:
+            dialog = .message("inventory.places.hierarchy.error.changed")
+        case .unsafeRestoration:
+            dialog = .message("inventory.places.hierarchy.error.invalidDestination")
+        case .unavailable:
+            dialog = .message("inventory.places.hierarchy.error.persistence")
         }
     }
 

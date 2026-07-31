@@ -422,6 +422,39 @@ struct InventoryPlaceDirectoryPresentationTests {
         #expect(preflight.descendantPlaceCount == 2)
         #expect(preflight.containedItemCount == 1)
         #expect(preflight.sourceExpectation.id == root.id)
+        #expect(Set(preflight.descendantExpectations.map(\.id)) == [child.id, leaf.id])
+        #expect(preflight.affectedItemIDs == [item.id])
+
+        let replacementChild = InventoryPlace(
+            locationID: office.id,
+            parentPlaceID: root.id,
+            name: child.name
+        )
+        leaf.parentPlaceID = replacementChild.id
+        #expect(
+            !InventoryPlaceHierarchyManagement.isValid(
+                preflight,
+                locations: locations,
+                places: [root, replacementChild, leaf, target],
+                items: [item]
+            )
+        )
+        leaf.parentPlaceID = child.id
+
+        let replacementItem = InventoryItem(
+            name: item.name,
+            locationName: item.locationName,
+            containerName: item.containerName,
+            placeID: item.placeID
+        )
+        #expect(
+            !InventoryPlaceHierarchyManagement.isValid(
+                preflight,
+                locations: locations,
+                places: places,
+                items: [replacementItem]
+            )
+        )
 
         target.parentPlaceID = nil
         target.name = "Changed workbench"

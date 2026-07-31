@@ -46,8 +46,23 @@ enum InventoryPlaceHierarchyManagement {
         let destination: Destination
         let sourcePath: String
         let destinationPath: String
-        let descendantPlaceCount: Int
-        let containedItemCount: Int
+        let contentsExpectation: InventoryPlaceSubtreeContentsExpectation
+
+        var descendantExpectations: [InventoryPlaceMutationExpectation] {
+            contentsExpectation.descendants
+        }
+
+        var affectedItemIDs: [UUID] {
+            contentsExpectation.affectedItemIDs
+        }
+
+        var descendantPlaceCount: Int {
+            descendantExpectations.count
+        }
+
+        var containedItemCount: Int {
+            affectedItemIDs.count
+        }
 
         var movedPlaceCount: Int {
             descendantPlaceCount + 1
@@ -186,7 +201,11 @@ enum InventoryPlaceHierarchyManagement {
             places: places
         )
         let descendantIDs = subtreeIDs.subtracting([source.id])
-        let containedItemCount = items.filter { item in
+        let descendantExpectations = places
+            .filter { descendantIDs.contains($0.id) }
+            .map(InventoryPlaceMutationExpectation.init)
+            .sorted { $0.id.uuidString < $1.id.uuidString }
+        let affectedItemIDs = items.filter { item in
             if let placeID = item.placeID {
                 return subtreeIDs.contains(placeID)
             }
@@ -195,7 +214,9 @@ enum InventoryPlaceHierarchyManagement {
                     == InventoryNormalizedName.location(sourceLocation.name)
                 && InventoryNormalizedName.place(item.containerName)
                     == InventoryNormalizedName.place(source.name)
-        }.count
+        }
+        .map(\.id)
+        .sorted { $0.uuidString < $1.uuidString }
 
         return .ready(
             MovePreflight(
@@ -204,8 +225,10 @@ enum InventoryPlaceHierarchyManagement {
                 sourcePath: ([sourceLocation.name] + sourcePath.components)
                     .joined(separator: " › "),
                 destinationPath: destination.displayPath,
-                descendantPlaceCount: descendantIDs.count,
-                containedItemCount: containedItemCount
+                contentsExpectation: InventoryPlaceSubtreeContentsExpectation(
+                    descendants: descendantExpectations,
+                    affectedItemIDs: affectedItemIDs
+                )
             )
         )
     }

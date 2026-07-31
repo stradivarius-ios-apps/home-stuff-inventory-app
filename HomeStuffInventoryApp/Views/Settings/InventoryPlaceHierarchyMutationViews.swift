@@ -657,7 +657,8 @@ struct InventoryPlaceHierarchyMoveView: View {
                 toLocationID: preflight.destination.locationID,
                 parentPlaceID: preflight.destination.parentPlaceID,
                 entitlements: premiumAccess.entitlements,
-                in: modelContext
+                in: modelContext,
+                contentsExpectation: preflight.contentsExpectation
             )
             dismiss()
         } catch let mutationError as InventoryPlaceMutationError {

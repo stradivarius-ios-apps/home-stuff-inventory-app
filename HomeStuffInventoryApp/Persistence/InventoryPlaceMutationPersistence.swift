@@ -60,6 +60,11 @@ struct InventoryPlaceMutationExpectation: Equatable {
     }
 }
 
+struct InventoryPlaceSubtreeContentsExpectation: Equatable {
+    let descendants: [InventoryPlaceMutationExpectation]
+    let affectedItemIDs: [UUID]
+}
+
 enum InventoryPlaceMutationPersistence {
     static let defaultRetainedOperationLimit = 50
 
@@ -186,6 +191,7 @@ enum InventoryPlaceMutationPersistence {
         parentPlaceID destinationParentPlaceID: UUID?,
         entitlements: InventoryEntitlements,
         in modelContext: ModelContext,
+        contentsExpectation: InventoryPlaceSubtreeContentsExpectation? = nil,
         operationID: UUID = UUID(),
         occurredAt: Date = .now,
         retainedOperationLimit: Int = defaultRetainedOperationLimit,
@@ -207,6 +213,15 @@ enum InventoryPlaceMutationPersistence {
 
             let subtree = subtreeRooted(at: root.id, places: state.places)
             let subtreeIDs = Set(subtree.map(\.id))
+            if let contentsExpectation {
+                let currentDescendants = subtree
+                    .filter { $0.id != root.id }
+                    .map(InventoryPlaceMutationExpectation.init)
+                    .sorted { $0.id.uuidString < $1.id.uuidString }
+                guard currentDescendants == contentsExpectation.descendants else {
+                    throw InventoryPlaceMutationError.staleState
+                }
+            }
             for place in subtree {
                 try validateCompleteAncestry(
                     of: place,
@@ -247,6 +262,14 @@ enum InventoryPlaceMutationPersistence {
             let movingItems = state.items.filter { item in
                 item.placeID.map(subtreeIDs.contains) == true
                     || legacyItem(item, directlyUses: root, locationsByID: state.locationsByID)
+            }
+            if let contentsExpectation {
+                let currentAffectedItemIDs = movingItems
+                    .map(\.id)
+                    .sorted { $0.uuidString < $1.uuidString }
+                guard currentAffectedItemIDs == contentsExpectation.affectedItemIDs else {
+                    throw InventoryPlaceMutationError.staleState
+                }
             }
             let before = InventoryPlaceMutationSnapshot(
                 rootPlaceID: root.id,
@@ -352,12 +375,6 @@ enum InventoryPlaceMutationPersistence {
             guard let record = try latestActiveRecord(in: modelContext) else {
                 return .unavailable
             }
-            guard PremiumAccessPolicy().availability(
-                of: .extendedMovementUndo,
-                entitlements: entitlements
-            ) == .available else {
-                return .accessRequired
-            }
             guard let after = record.afterSnapshot,
                   let before = record.beforeSnapshot
             else {
@@ -369,6 +386,12 @@ enum InventoryPlaceMutationPersistence {
             }
             guard restorationIsSafe(before, state: state) else {
                 return .unsafeRestoration
+            }
+            guard PremiumAccessPolicy().availability(
+                of: .extendedMovementUndo,
+                entitlements: entitlements
+            ) == .available else {
+                return .accessRequired
             }
             return .available(operationID: record.id)
         } catch {

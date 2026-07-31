@@ -403,5 +403,6 @@ enum InventoryListManagementScope {
         InventoryListManagementView()
     }
     .modelContainer(try! InventoryModelContainer.makeSample())
+    .environment(PremiumAccessState(debugPreset: .lifetimePro))
 }
 #endif

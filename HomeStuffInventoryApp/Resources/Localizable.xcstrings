@@ -770,6 +770,192 @@
         "uk" : { "stringUnit" : { "state" : "translated", "value" : "Назва місця зберігання" } }
       }
     },
+    "inventory.bulkMove.accessRequired.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Pro access is required to move selected items." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Для переміщення вибраних речей потрібен доступ Pro." } }
+      }
+    },
+    "inventory.bulkMove.accessRequired.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Pro Access Required" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Потрібен доступ Pro" } }
+      }
+    },
+    "inventory.bulkMove.back" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Back" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Назад" } }
+      }
+    },
+    "inventory.bulkMove.cancel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cancel" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Скасувати" } }
+      }
+    },
+    "inventory.bulkMove.cancelled.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The move was cancelled. No items were changed." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Переміщення скасовано. Жодну річ не змінено." } }
+      }
+    },
+    "inventory.bulkMove.changedCount" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Items to Move" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Речей для переміщення" } }
+      }
+    },
+    "inventory.bulkMove.confirm.action" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Move Items" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Перемістити речі" } }
+      }
+    },
+    "inventory.bulkMove.destination.empty.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add a Location before moving selected items." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Додайте локацію, перш ніж переміщувати вибрані речі." } }
+      }
+    },
+    "inventory.bulkMove.destination.empty.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No Destinations" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Немає місць призначення" } }
+      }
+    },
+    "inventory.bulkMove.destination.none" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose a destination" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Виберіть місце призначення" } }
+      }
+    },
+    "inventory.bulkMove.destination.picker" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Destination" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Місце призначення" } }
+      }
+    },
+    "inventory.bulkMove.destination.section" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Move To" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Перемістити до" } }
+      }
+    },
+    "inventory.bulkMove.destination.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose Destination" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Виберіть місце призначення" } }
+      }
+    },
+    "inventory.bulkMove.done" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Done" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Готово" } }
+      }
+    },
+    "inventory.bulkMove.emptySelection.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Select at least one item to move." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Виберіть принаймні одну річ для переміщення." } }
+      }
+    },
+    "inventory.bulkMove.failed.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No items were moved. Try again." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Жодну річ не переміщено. Спробуйте ще раз." } }
+      }
+    },
+    "inventory.bulkMove.from.section" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "From" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Звідки" } }
+      }
+    },
+    "inventory.bulkMove.invalidDestination.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "That destination is no longer available." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Це місце призначення більше недоступне." } }
+      }
+    },
+    "inventory.bulkMove.move.action" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Move" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Перемістити" } }
+      }
+    },
+    "inventory.bulkMove.result.ok" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "OK" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Гаразд" } }
+      }
+    },
+    "inventory.bulkMove.result.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Couldn’t Move Items" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося перемістити речі" } }
+      }
+    },
+    "inventory.bulkMove.review.action" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Review Move" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Перевірити переміщення" } }
+      }
+    },
+    "inventory.bulkMove.review.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Review Move" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Перевірка переміщення" } }
+      }
+    },
+    "inventory.bulkMove.select.action" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Select Items" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вибрати речі" } }
+      }
+    },
+    "inventory.bulkMove.select.hint" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Starts selecting items to move together." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Починає вибір речей для спільного переміщення." } }
+      }
+    },
+    "inventory.bulkMove.selectAll" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Select All Shown" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вибрати всі показані" } }
+      }
+    },
+    "inventory.bulkMove.selectedCount" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Selected Items" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вибрано речей" } }
+      }
+    },
+    "inventory.bulkMove.staleSelection.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The selected items changed. Close this sheet and select them again." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вибрані речі змінилися. Закрийте це вікно та виберіть їх знову." } }
+      }
+    },
+    "inventory.bulkMove.summary.section" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Summary" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Підсумок" } }
+      }
+    },
+    "inventory.bulkMove.to.section" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "To" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Куди" } }
+      }
+    },
+    "inventory.bulkMove.unchanged.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "All selected items are already at this destination. No history entry will be created." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Усі вибрані речі вже в цьому місці. Запис історії не створюватиметься." } }
+      }
+    },
     "inventory.placeSelection.option.accessibilityHint" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Selects this existing Storage Place as the Item destination." } },

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ScopedInventoryItemsListView<Header: View>: View {
     @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
+    @Environment(PremiumAccessState.self) private var premiumAccess
 
     enum AccessibilityContext {
         case scoped
@@ -39,6 +40,9 @@ struct ScopedInventoryItemsListView<Header: View>: View {
 
     @State private var selectedItemID: UUID?
     @State private var isShowingNavigationTitle = false
+    @State private var bulkSelection = InventoryBulkSelectionState()
+    @State private var bulkMovementRequest: InventoryBulkMovementSheetRequest?
+    @State private var isShowingBulkAccessRequired = false
     @Namespace private var itemNavigationNamespace
 
     init(
@@ -67,7 +71,12 @@ struct ScopedInventoryItemsListView<Header: View>: View {
 
     var body: some View {
         Group {
-            if items.isEmpty {
+            if bulkSelection.isActive {
+                InventoryBulkSelectionList(
+                    items: items,
+                    selectedItemIDs: bulkSelectionBinding
+                )
+            } else if items.isEmpty {
                 itemsEmptyState
                     .inventoryHeroNavigationTitleVisibilityObserver(
                         isShowingNavigationTitle: $isShowingNavigationTitle
@@ -84,6 +93,58 @@ struct ScopedInventoryItemsListView<Header: View>: View {
         }
         .navigationTitle(navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            if bulkSelection.isActive {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("inventory.bulkMove.cancel") {
+                        bulkSelection.cancel()
+                    }
+                    .accessibilityIdentifier("inventory.scopedBulkSelection.cancelButton")
+                }
+
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("inventory.bulkMove.move.action") {
+                        presentBulkMovement()
+                    }
+                    .disabled(bulkSelection.selectedCount == 0)
+                    .accessibilityIdentifier("inventory.scopedBulkSelection.moveButton")
+                }
+
+                ToolbarItem(placement: .bottomBar) {
+                    Button("inventory.bulkMove.selectAll") {
+                        bulkSelection.selectAll(visibleItemIDs: items.map(\.id))
+                    }
+                    .accessibilityIdentifier("inventory.scopedBulkSelection.selectAllButton")
+                }
+            } else if !items.isEmpty {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        beginBulkSelection()
+                    } label: {
+                        Image(systemName: "checklist")
+                    }
+                    .accessibilityLabel("inventory.bulkMove.select.action")
+                    .accessibilityHint("inventory.bulkMove.select.hint")
+                    .accessibilityIdentifier("inventory.scopedBulkSelection.startButton")
+                }
+            }
+        }
+        .sheet(item: $bulkMovementRequest, onDismiss: {
+            bulkSelection.cancel()
+        }) { request in
+            InventoryBulkMovementView(selectedItemIDs: request.selectedItemIDs)
+        }
+        .alert(
+            "inventory.bulkMove.accessRequired.title",
+            isPresented: $isShowingBulkAccessRequired
+        ) {
+            Button("inventory.bulkMove.result.ok", role: .cancel) {}
+        } message: {
+            Text("inventory.bulkMove.accessRequired.message")
+        }
+        .onChange(of: items.map(\.id)) { _, itemIDs in
+            bulkSelection.reconcile(availableItemIDs: itemIDs)
+        }
     }
 
     private var itemsList: some View {
@@ -153,6 +214,18 @@ struct ScopedInventoryItemsListView<Header: View>: View {
         Header.self != EmptyView.self
     }
 
+    private var bulkSelectionBinding: Binding<Set<UUID>> {
+        Binding(
+            get: { bulkSelection.selectedItemIDs },
+            set: {
+                bulkSelection.replaceSelection(
+                    with: $0,
+                    visibleItemIDs: items.map(\.id)
+                )
+            }
+        )
+    }
+
     private var navigationTitle: String {
         guard hasHeader else {
             return title
@@ -171,6 +244,26 @@ struct ScopedInventoryItemsListView<Header: View>: View {
                     reduceMotion: accessibilityReduceMotion
                 )
         }
+    }
+
+    private func beginBulkSelection() {
+        let outcome = bulkSelection.begin(
+            visibleItemIDs: items.map(\.id),
+            availability: premiumAccess.availability(of: .moveSelectedItems)
+        )
+        isShowingBulkAccessRequired = outcome == .accessRequired
+    }
+
+    private func presentBulkMovement() {
+        guard premiumAccess.availability(of: .moveSelectedItems) == .available else {
+            bulkSelection.cancel()
+            isShowingBulkAccessRequired = true
+            return
+        }
+        guard !bulkSelection.selectedItemIDs.isEmpty else { return }
+        bulkMovementRequest = InventoryBulkMovementSheetRequest(
+            selectedItemIDs: bulkSelection.selectedItemIDs
+        )
     }
 }
 

@@ -133,6 +133,89 @@ struct InventoryPlaceMutationPersistenceTests {
         #expect(item.placeID == child.id)
     }
 
+    @Test func flatRenameClaimsMatchingLegacyItemWithoutTouchingAnotherLocation() throws {
+        let context = try modelContext()
+        let office = StorageLocation(name: "Office")
+        let garage = StorageLocation(name: "Garage")
+        let place = InventoryPlace(locationID: office.id, name: "Cabinet")
+        let matchingLegacyItem = InventoryItem(
+            name: "Cable",
+            locationName: " office ",
+            containerName: " cabinet ",
+            placeID: nil
+        )
+        let otherLocationItem = InventoryItem(
+            name: "Tape",
+            locationName: garage.name,
+            containerName: place.name,
+            placeID: nil
+        )
+        for model in [office, garage] {
+            context.insert(model)
+        }
+        context.insert(place)
+        context.insert(matchingLegacyItem)
+        context.insert(otherLocationItem)
+        try context.save()
+
+        try InventoryPlaceMutationPersistence.rename(
+            .init(place: place),
+            to: "Supply Cabinet",
+            iconID: "cabinet",
+            entitlements: .free,
+            in: context
+        )
+
+        #expect(matchingLegacyItem.placeID == place.id)
+        #expect(matchingLegacyItem.containerName == "Supply Cabinet")
+        #expect(otherLocationItem.placeID == nil)
+        #expect(otherLocationItem.containerName == "Cabinet")
+    }
+
+    @Test func legacyFlatItemMovesWithPlaceAndUndoRestoresUnboundCompatibilityState() throws {
+        let context = try modelContext()
+        let office = StorageLocation(name: "Office")
+        let garage = StorageLocation(name: "Garage")
+        let place = InventoryPlace(locationID: office.id, name: "Cabinet")
+        let legacyItem = InventoryItem(
+            name: "Cable",
+            locationName: " office ",
+            containerName: " cabinet ",
+            placeID: nil
+        )
+        for model in [office, garage] {
+            context.insert(model)
+        }
+        context.insert(place)
+        context.insert(legacyItem)
+        try context.save()
+
+        let record = try #require(
+            try InventoryPlaceMutationPersistence.moveSubtree(
+                .init(place: place),
+                toLocationID: garage.id,
+                parentPlaceID: nil,
+                entitlements: pro,
+                in: context
+            )
+        )
+
+        #expect(place.locationID == garage.id)
+        #expect(legacyItem.locationName == "Garage")
+        #expect(legacyItem.containerName == place.name)
+        #expect(legacyItem.placeID == place.id)
+        #expect(
+            InventoryPlaceMutationPersistence.undoLatest(
+                entitlements: pro,
+                in: context
+            ) == .undone(operationID: record.id)
+        )
+        #expect(place.locationID == office.id)
+        #expect(legacyItem.locationName == " office ")
+        #expect(legacyItem.containerName == " cabinet ")
+        #expect(legacyItem.placeID == nil)
+    }
+
     @Test func freeKeepsEveryTreeParticipantStructurallyReadOnlyButFlatDeleteEditable() throws {
         let context = try modelContext()
         let location = StorageLocation(name: "Office")

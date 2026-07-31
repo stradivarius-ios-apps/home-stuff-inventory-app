@@ -65,15 +65,23 @@ enum InventorySearch {
         in items: [InventoryItem],
         query: String,
         filters: Filters = Filters(),
+        places: [InventoryPlace] = [],
         vocabulary: InventoryBrowseVocabulary = .default
     ) -> [InventoryItem] {
-        matchingResults(in: items, query: query, filters: filters, vocabulary: vocabulary).map(\.item)
+        matchingResults(
+            in: items,
+            query: query,
+            filters: filters,
+            places: places,
+            vocabulary: vocabulary
+        ).map(\.item)
     }
 
     static func matchingResults(
         in items: [InventoryItem],
         query: String,
         filters: Filters = Filters(),
+        places: [InventoryPlace] = [],
         vocabulary: InventoryBrowseVocabulary = .default
     ) -> [Result] {
         let normalizedQuery = InventorySearchNormalization.normalize(query)
@@ -90,7 +98,12 @@ enum InventorySearch {
         }
 
         return filteredItems.compactMap { item in
-            result(for: item, normalizedQuery: normalizedQuery, vocabulary: vocabulary)
+            result(
+                for: item,
+                normalizedQuery: normalizedQuery,
+                places: places,
+                vocabulary: vocabulary
+            )
         }
         .sorted(by: rankedItemOrder)
     }
@@ -310,9 +323,10 @@ enum InventorySearch {
     private static func result(
         for item: InventoryItem,
         normalizedQuery: InventorySearchNormalization.Query,
+        places: [InventoryPlace],
         vocabulary: InventoryBrowseVocabulary
     ) -> Result? {
-        let fields = SearchableFields(item: item, vocabulary: vocabulary)
+        let fields = SearchableFields(item: item, places: places, vocabulary: vocabulary)
         var score = 0
         var matchedTag: String?
         var matchedInNotes = false
@@ -388,12 +402,13 @@ enum InventorySearch {
 }
 
 private enum SearchField: Int {
-    case name, place, location, category, tag, notes
+    case name, place, ancestorPlace, location, category, tag, notes
 
     var weight: Int {
         switch self {
         case .name: 100
         case .place: 70
+        case .ancestorPlace: 55
         case .location: 60
         case .category: 50
         case .tag: 45
@@ -403,7 +418,7 @@ private enum SearchField: Int {
 
     var isVisibleInRow: Bool {
         switch self {
-        case .name, .place, .location, .category: true
+        case .name, .place, .ancestorPlace, .location, .category: true
         case .tag, .notes: false
         }
     }
@@ -422,7 +437,15 @@ private struct SearchableFields {
     let name: NormalizedSearchField
     let fields: [NormalizedSearchField]
 
-    init(item: InventoryItem, vocabulary: InventoryBrowseVocabulary) {
+    init(item: InventoryItem, places: [InventoryPlace], vocabulary: InventoryBrowseVocabulary) {
+        let pathComponents: [String]
+        if let placeID = item.placeID,
+           let place = places.first(where: { $0.id == placeID }) {
+            pathComponents = InventoryPlaceHierarchy.path(for: place, places: places).components
+        } else {
+            pathComponents = []
+        }
+        let ancestorComponents = pathComponents.dropLast()
         name = NormalizedSearchField(field: .name, value: InventorySearchNormalization.normalize(item.name).fullText, originalValue: nil)
         fields = [
             name,
@@ -430,7 +453,13 @@ private struct SearchableFields {
             NormalizedSearchField(field: .location, value: InventorySearchNormalization.normalize(InventorySearch.searchableLocationName(for: item, vocabulary: vocabulary)).fullText, originalValue: nil),
             NormalizedSearchField(field: .category, value: InventorySearchNormalization.normalize(InventorySearch.displayCategory(for: item, vocabulary: vocabulary)).fullText, originalValue: nil),
             NormalizedSearchField(field: .notes, value: InventorySearchNormalization.normalize(item.notes).fullText, originalValue: nil)
-        ] + item.tags.map {
+        ] + ancestorComponents.map {
+            NormalizedSearchField(
+                field: .ancestorPlace,
+                value: InventorySearchNormalization.normalize($0).fullText,
+                originalValue: nil
+            )
+        } + item.tags.map {
             NormalizedSearchField(field: .tag, value: InventorySearchNormalization.normalize($0).fullText, originalValue: $0)
         }
     }

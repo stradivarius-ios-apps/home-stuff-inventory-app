@@ -37,6 +37,7 @@ extension InventoryBrowseSummaries {
     }
 
     struct LocationSummary: Equatable, Identifiable {
+        let storageLocationID: UUID?
         let name: String
         let iconID: String?
         let itemCount: Int
@@ -52,6 +53,7 @@ extension InventoryBrowseSummaries {
         }
 
         init(
+            storageLocationID: UUID? = nil,
             name: String,
             iconID: String? = nil,
             itemCount: Int,
@@ -62,6 +64,7 @@ extension InventoryBrowseSummaries {
             hiddenPlaceCount: Int = 0,
             previewGroups: [PreviewGroup]? = nil
         ) {
+            self.storageLocationID = storageLocationID
             self.name = name
             self.iconID = iconID
             self.itemCount = itemCount
@@ -92,8 +95,13 @@ extension InventoryBrowseSummaries {
         let id: String
         /// Stable identity when this summary represents one reusable Place.
         let placeID: UUID?
+        let parentPlaceID: UUID?
         let name: String
         let itemCount: Int
+        let directItemCount: Int
+        let recursiveItemCount: Int
+        let childPlaceCount: Int
+        let pathComponents: [String]
         let locationID: String
         let locationName: String
         let isMissingLocation: Bool
@@ -107,8 +115,13 @@ extension InventoryBrowseSummaries {
         init(
             id: String,
             placeID: UUID? = nil,
+            parentPlaceID: UUID? = nil,
             name: String,
             itemCount: Int,
+            directItemCount: Int? = nil,
+            recursiveItemCount: Int? = nil,
+            childPlaceCount: Int = 0,
+            pathComponents: [String]? = nil,
             locationID: String,
             locationName: String,
             isMissingLocation: Bool,
@@ -120,8 +133,13 @@ extension InventoryBrowseSummaries {
         ) {
             self.id = id
             self.placeID = placeID
+            self.parentPlaceID = parentPlaceID
             self.name = name
             self.itemCount = itemCount
+            self.directItemCount = directItemCount ?? itemCount
+            self.recursiveItemCount = recursiveItemCount ?? itemCount
+            self.childPlaceCount = childPlaceCount
+            self.pathComponents = pathComponents ?? [name]
             self.locationID = locationID
             self.locationName = locationName
             self.isMissingLocation = isMissingLocation

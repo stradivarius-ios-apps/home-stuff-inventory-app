@@ -956,6 +956,12 @@
         "uk" : { "stringUnit" : { "state" : "translated", "value" : "Усі вибрані речі вже в цьому місці. Запис історії не створюватиметься." } }
       }
     },
+    "inventory.placeSelection.option.accessibilityHint" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Selects this existing Storage Place as the Item destination." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вибирає це наявне місце зберігання як призначення для речі." } }
+      }
+    },
     "inventory.category.batteries" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Batteries" } },

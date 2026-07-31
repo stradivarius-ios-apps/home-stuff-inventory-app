@@ -4,15 +4,18 @@ struct InventoryItemRowView: View {
     let item: InventoryItem
     let matchContext: InventorySearch.MatchContext?
     let showsChevron: Bool
+    let placePath: String?
 
     init(
         item: InventoryItem,
         matchContext: InventorySearch.MatchContext? = nil,
-        showsChevron: Bool = true
+        showsChevron: Bool = true,
+        placePath: String? = nil
     ) {
         self.item = item
         self.matchContext = matchContext
         self.showsChevron = showsChevron
+        self.placePath = placePath
     }
 
     var body: some View {

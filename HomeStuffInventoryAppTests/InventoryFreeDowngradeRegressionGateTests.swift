@@ -20,14 +20,8 @@ struct InventoryFreeDowngradeRegressionGateTests {
 
         let freePolicy = InventoryFreeAccessPolicy()
         let premiumPolicy = PremiumAccessPolicy()
-        let localFeatures: Set<PremiumFeature> = [
-            .roomSweep,
-            .moveSelectedItems,
-            .movePlaceContents,
-            .extendedMovementUndo,
-            .storageHierarchyEditing,
-            .inventoryInboxBatchCleanup
-        ]
+        let localFeatures = PremiumFeature.lifetimeLaunchBundle
+        #expect(localFeatures.count == 5)
 
         for fixture in states {
             for capability in InventoryFreeCapability.allCases {
@@ -259,7 +253,8 @@ struct InventoryFreeDowngradeRegressionGateTests {
             (Self.id("30000000-0000-0000-0000-000000000001"), "Room Sweep premium result", "Sweep shelf"),
             (Self.id("30000000-0000-0000-0000-000000000002"), "Selected move premium result", "Moved drawer"),
             (Self.id("30000000-0000-0000-0000-000000000003"), "Place move premium result", "Moved cabinet"),
-            (Self.id("30000000-0000-0000-0000-000000000004"), "Inbox cleanup premium result", "Sorted box")
+            (Self.id("30000000-0000-0000-0000-000000000004"), "Movement history premium result", "History shelf"),
+            (Self.id("30000000-0000-0000-0000-000000000005"), "Nested place premium result", "Nested box")
         ]
 
         for (index, result) in results.enumerated() {
@@ -290,10 +285,10 @@ struct InventoryFreeDowngradeRegressionGateTests {
     }
 
     private func fixtureSnapshot() -> FixtureSnapshot {
-        let itemIDs = Set((1...4).map {
+        let itemIDs = Set((1...5).map {
             Self.id(String(format: "30000000-0000-0000-0000-%012d", $0))
         })
-        let viewEventIDs = Set((1...4).map {
+        let viewEventIDs = Set((1...5).map {
             Self.id(String(format: "40000000-0000-0000-0000-%012d", $0))
         })
         let timestamp = Date(timeIntervalSince1970: 1_752_489_000)
@@ -301,7 +296,8 @@ struct InventoryFreeDowngradeRegressionGateTests {
             ("Room Sweep premium result", "Sweep shelf"),
             ("Selected move premium result", "Moved drawer"),
             ("Place move premium result", "Moved cabinet"),
-            ("Inbox cleanup premium result", "Sorted box")
+            ("Movement history premium result", "History shelf"),
+            ("Nested place premium result", "Nested box")
         ]
         return FixtureSnapshot(
             itemIDs: itemIDs,

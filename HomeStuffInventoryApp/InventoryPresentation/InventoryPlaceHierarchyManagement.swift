@@ -210,6 +210,21 @@ enum InventoryPlaceHierarchyManagement {
         )
     }
 
+    static func isValid(
+        _ preflight: MovePreflight,
+        locations: [StorageLocation],
+        places: [InventoryPlace],
+        items: [InventoryItem]
+    ) -> Bool {
+        prepareMove(
+            sourcePlaceID: preflight.sourceExpectation.id,
+            destinationID: preflight.destination.id,
+            locations: locations,
+            places: places,
+            items: items
+        ) == .ready(preflight)
+    }
+
     private static func row(
         for place: InventoryPlace,
         depth: Int,

@@ -422,5 +422,16 @@ struct InventoryPlaceDirectoryPresentationTests {
         #expect(preflight.descendantPlaceCount == 2)
         #expect(preflight.containedItemCount == 1)
         #expect(preflight.sourceExpectation.id == root.id)
+
+        target.parentPlaceID = nil
+        target.name = "Changed workbench"
+        #expect(
+            !InventoryPlaceHierarchyManagement.isValid(
+                preflight,
+                locations: locations,
+                places: places,
+                items: [item]
+            )
+        )
     }
 }

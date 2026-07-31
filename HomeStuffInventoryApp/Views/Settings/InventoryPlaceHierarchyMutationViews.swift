@@ -621,6 +621,16 @@ struct InventoryPlaceHierarchyMoveView: View {
     private func commit(
         _ preflight: InventoryPlaceHierarchyManagement.MovePreflight
     ) {
+        guard InventoryPlaceHierarchyManagement.isValid(
+            preflight,
+            locations: locations,
+            places: places,
+            items: items
+        ) else {
+            error = .staleState
+            self.preflight = nil
+            return
+        }
         do {
             _ = try InventoryPlaceMutationPersistence.moveSubtree(
                 preflight.sourceExpectation,

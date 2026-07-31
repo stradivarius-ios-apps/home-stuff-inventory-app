@@ -26,6 +26,37 @@ struct InventoryPlacePath: Equatable {
 }
 
 enum InventoryPlaceHierarchy {
+    static func children(
+        of parentPlaceID: UUID?,
+        locationID: UUID,
+        places: [InventoryPlace]
+    ) -> [InventoryPlace] {
+        places
+            .filter { $0.locationID == locationID && $0.parentPlaceID == parentPlaceID }
+            .sorted(by: InventoryPlace.deterministicOrder)
+    }
+
+    static func descendantIDs(
+        of placeID: UUID,
+        places: [InventoryPlace]
+    ) -> Set<UUID> {
+        let childrenByParent = Dictionary(grouping: places.compactMap { place -> (UUID, UUID)? in
+            guard let parentID = place.parentPlaceID else { return nil }
+            return (parentID, place.id)
+        }, by: \.0)
+        var result: Set<UUID> = [placeID]
+        var pending = [placeID]
+
+        while let current = pending.popLast() {
+            for childID in childrenByParent[current, default: []].map(\.1)
+                where result.insert(childID).inserted {
+                pending.append(childID)
+            }
+        }
+
+        return result
+    }
+
     static func validatePlacement(
         of place: InventoryPlace,
         under parentPlaceID: UUID?,

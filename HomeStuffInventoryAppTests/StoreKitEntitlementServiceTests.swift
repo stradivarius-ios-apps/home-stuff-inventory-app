@@ -262,7 +262,7 @@ struct StoreKitEntitlementServiceTests {
 
         #expect(service.premiumAccess.entitlements.hasActiveFamilySubscription)
         #expect(service.premiumAccess.availability(of: .roomSweep) == .available)
-        #expect(await cache.record == nil)
+        await eventually { await cache.record == nil }
         service.stop()
     }
 

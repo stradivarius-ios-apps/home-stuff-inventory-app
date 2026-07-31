@@ -4,6 +4,12 @@ struct InventoryCompactItemCard: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     let item: InventoryItem
+    let placePath: String?
+
+    init(item: InventoryItem, placePath: String? = nil) {
+        self.item = item
+        self.placePath = placePath
+    }
 
     var body: some View {
         HStack(alignment: .top, spacing: InventoryDesign.rowSpacing) {
@@ -139,6 +145,9 @@ struct InventoryCompactItemCard: View {
     }
 
     private var placeName: String {
+        if let placePath, !placePath.isEmpty {
+            return placePath
+        }
         guard let name = item.containerName?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty else {
             return InventoryLocalization.noContainer
         }

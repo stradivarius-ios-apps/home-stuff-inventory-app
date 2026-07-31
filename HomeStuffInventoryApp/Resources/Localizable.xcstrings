@@ -770,6 +770,12 @@
         "uk" : { "stringUnit" : { "state" : "translated", "value" : "Назва місця зберігання" } }
       }
     },
+    "inventory.placeSelection.option.accessibilityHint" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Selects this existing Storage Place as the Item destination." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вибирає це наявне місце зберігання як призначення для речі." } }
+      }
+    },
     "inventory.category.batteries" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Batteries" } },
@@ -1644,6 +1650,48 @@
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Items" } },
         "uk" : { "stringUnit" : { "state" : "translated", "value" : "Речі" } }
+      }
+    },
+    "locations.placeDetail.allContainedItems" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "All Contained Items" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Усі вкладені речі" } }
+      }
+    },
+    "locations.placeDetail.childPlacesCount" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Direct Storage Places" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Безпосередні місця зберігання" } }
+      }
+    },
+    "locations.placeDetail.childPlacesSection" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Storage Places" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Місця зберігання" } }
+      }
+    },
+    "locations.placeDetail.containedItemsCount" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "All Contained Items" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Усі вкладені речі" } }
+      }
+    },
+    "locations.placeDetail.directItemsCount" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Direct Items" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Безпосередні речі" } }
+      }
+    },
+    "locations.placeDetail.directItemsSection" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Direct Items" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Безпосередні речі" } }
+      }
+    },
+    "locations.placeDetail.path.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Storage path: %@" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Шлях зберігання: %@" } }
       }
     },
     "locations.itemsAccess.allItemsAction.accessibilityLabel" : {

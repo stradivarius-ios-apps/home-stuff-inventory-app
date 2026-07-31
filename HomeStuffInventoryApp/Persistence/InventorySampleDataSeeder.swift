@@ -304,6 +304,85 @@ enum InventoryPlaceManagementFixture {
     }
 }
 
+enum InventoryHierarchyManagementFixture {
+    static let launchArgument = "--qa-hierarchy-management-fixture"
+    static let locationID = UUID(uuidString: "B1F0A001-EE01-4E10-9000-000000000501")!
+    static let secondLocationID = UUID(uuidString: "B1F0A001-EE01-4E10-9000-000000000502")!
+    static let rootID = UUID(uuidString: "B1F0A001-EE01-4E10-9000-000000000503")!
+    static let childID = UUID(uuidString: "B1F0A001-EE01-4E10-9000-000000000504")!
+    static let leafID = UUID(uuidString: "B1F0A001-EE01-4E10-9000-000000000505")!
+    static let targetID = UUID(uuidString: "B1F0A001-EE01-4E10-9000-000000000506")!
+
+    static func isEnabled(arguments: [String]) -> Bool {
+        arguments.contains(launchArgument)
+    }
+
+    static func seed(in context: ModelContext) throws {
+        let existingLocations = try context.fetch(FetchDescriptor<StorageLocation>())
+        let location = existingLocations.first { $0.id == locationID }
+            ?? StorageLocation(id: locationID, name: "Hierarchy Office")
+        let secondLocation = existingLocations.first { $0.id == secondLocationID }
+            ?? StorageLocation(id: secondLocationID, name: "Hierarchy Garage")
+        if !existingLocations.contains(where: { $0.id == locationID }) {
+            context.insert(location)
+        }
+        if !existingLocations.contains(where: { $0.id == secondLocationID }) {
+            context.insert(secondLocation)
+        }
+
+        let existingPlaces = try context.fetch(FetchDescriptor<InventoryPlace>())
+        let root = existingPlaces.first { $0.id == rootID }
+            ?? InventoryPlace(
+                id: rootID,
+                locationID: locationID,
+                name: "Hierarchy Cabinet",
+                iconID: "cabinet"
+            )
+        let child = existingPlaces.first { $0.id == childID }
+            ?? InventoryPlace(
+                id: childID,
+                locationID: locationID,
+                parentPlaceID: rootID,
+                name: "Hierarchy Drawer",
+                iconID: "drawer"
+            )
+        let leaf = existingPlaces.first { $0.id == leafID }
+            ?? InventoryPlace(
+                id: leafID,
+                locationID: locationID,
+                parentPlaceID: childID,
+                name: "Hierarchy Cable box",
+                iconID: "box"
+            )
+        let target = existingPlaces.first { $0.id == targetID }
+            ?? InventoryPlace(
+                id: targetID,
+                locationID: secondLocationID,
+                name: "Hierarchy Workbench",
+                iconID: "shelf"
+            )
+        for place in [root, child, leaf, target]
+            where !existingPlaces.contains(where: { $0.id == place.id }) {
+            context.insert(place)
+        }
+
+        let itemID = UUID(uuidString: "B1F0A001-EE01-4E10-9000-000000000507")!
+        if !(try context.fetch(FetchDescriptor<InventoryItem>()))
+            .contains(where: { $0.id == itemID }) {
+            context.insert(
+                InventoryItem(
+                    id: itemID,
+                    name: "Hierarchy fixture adapter",
+                    locationName: location.name,
+                    containerName: leaf.name,
+                    placeID: leaf.id
+                )
+            )
+        }
+        try context.save()
+    }
+}
+
 enum InventoryMovementHistoryFixture {
     static let launchArgument = "--qa-movement-history-fixture"
     static let recordID = UUID(uuidString: "B1F0A001-EE01-4E10-9000-000000000501")!

@@ -110,6 +110,9 @@ enum InventoryModelContainer {
         if InventoryPlaceManagementFixture.isEnabled(arguments: ProcessInfo.processInfo.arguments) {
             try InventoryPlaceManagementFixture.seed(in: context)
         }
+        if InventoryHierarchyManagementFixture.isEnabled(arguments: ProcessInfo.processInfo.arguments) {
+            try InventoryHierarchyManagementFixture.seed(in: context)
+        }
         try runMaintenance(on: container)
         if InventoryMovementHistoryFixture.isEnabled(arguments: ProcessInfo.processInfo.arguments) {
             try InventoryMovementHistoryFixture.seed(in: context)

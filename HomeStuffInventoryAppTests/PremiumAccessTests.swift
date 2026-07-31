@@ -2,13 +2,7 @@ import Testing
 @testable import HomeStuffInventoryApp
 
 struct PremiumAccessTests {
-    private let localFeatures: Set<PremiumFeature> = [
-        .roomSweep,
-        .moveSelectedItems,
-        .movePlaceContents,
-        .extendedMovementUndo,
-        .storageHierarchyEditing
-    ]
+    private let localFeatures = PremiumFeature.lifetimeLaunchBundle
 
     private let subscriptionFeatures: Set<PremiumFeature> = [
         .personalSync,
@@ -16,6 +10,7 @@ struct PremiumAccessTests {
     ]
 
     @Test func featureSetContainsOnlyTheApprovedLaunchBundleAndPlaceholders() {
+        #expect(PremiumFeature.lifetimeLaunchBundle.count == 5)
         #expect(PremiumFeature.allCases.count == 7)
         #expect(Set(PremiumFeature.allCases) == localFeatures.union(subscriptionFeatures))
     }

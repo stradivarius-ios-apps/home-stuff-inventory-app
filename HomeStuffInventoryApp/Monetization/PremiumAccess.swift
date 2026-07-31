@@ -46,6 +46,14 @@ enum PremiumFeature: CaseIterable, Hashable, Sendable {
     // Policy placeholders only. They do not activate or expose a production feature.
     case personalSync
     case householdSharing
+
+    static let lifetimeLaunchBundle: Set<Self> = [
+        .roomSweep,
+        .moveSelectedItems,
+        .movePlaceContents,
+        .extendedMovementUndo,
+        .storageHierarchyEditing
+    ]
 }
 
 struct PremiumAccessPolicy: Sendable {

@@ -2,6 +2,90 @@ import XCTest
 
 @MainActor
 final class InventorySettingsUITests: InventoryUITestCase {
+    func testFreeHierarchyDirectoryStaysReadableAndRoutesOnlyIntentionalStructuralActionsToUpgrade() {
+        launchStartupApp(
+            arguments: [
+                "--use-sample-inventory-data",
+                "--qa-hierarchy-management-fixture"
+            ],
+            contentSizeCategory: "UICTContentSizeCategoryAccessibilityXXXL",
+            locale: "en"
+        )
+
+        app.tabBars.buttons["Settings"].tap()
+        let placesLink = app.buttons["settings.lists.placesLink"]
+        scrollToElement(placesLink)
+        placesLink.tap()
+
+        let rootID = "B1F0A001-EE01-4E10-9000-000000000503"
+        let childID = "B1F0A001-EE01-4E10-9000-000000000504"
+        let leafID = "B1F0A001-EE01-4E10-9000-000000000505"
+        let rootRow = element(identifier: "settings.places.hierarchy.row.\(rootID)")
+        let childRow = element(identifier: "settings.places.hierarchy.row.\(childID)")
+        let leafRow = element(identifier: "settings.places.hierarchy.row.\(leafID)")
+        scrollToElement(rootRow)
+        XCTAssertTrue(element(identifier: "settings.places.hierarchy.readOnly.\(rootID)").exists)
+        XCTAssertFalse(element(identifier: "premium.upgrade").exists)
+
+        let rootActions = element(identifier: "settings.places.hierarchy.actions.\(rootID)")
+        scrollToElement(rootActions)
+        rootActions.tap()
+        XCTAssertFalse(app.buttons["Edit"].exists)
+        XCTAssertFalse(app.buttons["Delete"].exists)
+        app.buttons["Add Nested Storage Place"].tap()
+        XCTAssertTrue(element(identifier: "premium.upgrade").waitForExistence(timeout: 3))
+        XCTAssertFalse(element(identifier: "settings.places.hierarchy.nameField").exists)
+        app.buttons["premium.dismiss"].tap()
+
+        rootActions.tap()
+        app.buttons["Restructure"].tap()
+        XCTAssertTrue(element(identifier: "premium.upgrade").waitForExistence(timeout: 3))
+        XCTAssertFalse(element(identifier: "settings.places.hierarchy.move.review").exists)
+        app.buttons["premium.dismiss"].tap()
+
+        scrollToElement(childRow)
+        XCTAssertTrue(element(identifier: "settings.places.hierarchy.readOnly.\(childID)").exists)
+        scrollToElement(leafRow)
+        XCTAssertTrue(element(identifier: "settings.places.hierarchy.readOnly.\(leafID)").exists)
+        XCTAssertFalse(element(identifier: "premium.upgrade").exists)
+    }
+
+    func testUkrainianHierarchyReadOnlyStateAndContextualUpgradeRemainAccessible() {
+        launchStartupApp(
+            arguments: [
+                "--use-sample-inventory-data",
+                "--qa-hierarchy-management-fixture",
+                "--qa-force-dark-appearance",
+                "--qa-increase-contrast",
+                "--qa-reduce-transparency"
+            ],
+            contentSizeCategory: "UICTContentSizeCategoryAccessibilityXXXL",
+            locale: "uk"
+        )
+
+        app.tabBars.buttons["Налаштування"].tap()
+        let placesLink = app.buttons["settings.lists.placesLink"]
+        scrollToElement(placesLink)
+        placesLink.tap()
+
+        let rootID = "B1F0A001-EE01-4E10-9000-000000000503"
+        let rootRow = element(identifier: "settings.places.hierarchy.row.\(rootID)")
+        let readOnly = app.staticTexts[
+            "settings.places.hierarchy.readOnly.\(rootID)"
+        ]
+        scrollToElement(rootRow)
+        XCTAssertTrue(readOnly.exists)
+        XCTAssertTrue(readOnly.label.contains("лише для читання"))
+
+        let actions = element(identifier: "settings.places.hierarchy.actions.\(rootID)")
+        scrollToElement(actions)
+        actions.tap()
+        app.buttons["Додати вкладене місце"].tap()
+        XCTAssertTrue(element(identifier: "premium.upgrade").waitForExistence(timeout: 3))
+        XCTAssertTrue(app.navigationBars["Home Stuff Pro"].exists)
+        XCTAssertTrue(app.staticTexts["Створіть вкладене місце зберігання"].exists)
+    }
+
     func testPlaceDirectoryGroupsPlaceRowsUnderQuietLocationContextAndSupportsScopedEditor() {
         launchStartupApp(
             arguments: ["--use-sample-inventory-data", "--qa-force-dark-appearance", "--qa-increase-contrast", "--qa-reduce-transparency"],
@@ -22,7 +106,14 @@ final class InventorySettingsUITests: InventoryUITestCase {
         let row = app.staticTexts["inventory.lists.valueTitle"].firstMatch
         XCTAssertTrue(row.waitForExistence(timeout: 3))
         XCTAssertGreaterThanOrEqual(row.frame.height, 44)
-        XCTAssertTrue(app.buttons["inventory.lists.valueActions"].firstMatch.exists)
+        XCTAssertTrue(
+            app.buttons.matching(
+                NSPredicate(
+                    format: "identifier BEGINSWITH %@",
+                    "settings.places.hierarchy.actions."
+                )
+            ).firstMatch.exists
+        )
         add(attachment(named: "place-directory-en-dark-high-contrast-reduce-transparency-accessibility"))
 
         app.buttons["settings.places.addButton"].tap()
@@ -53,7 +144,13 @@ final class InventorySettingsUITests: InventoryUITestCase {
         let sharedBoxes = app.staticTexts.matching(NSPredicate(format: "label == %@", "Shared box")).allElementsBoundByIndex
         XCTAssertGreaterThanOrEqual(sharedBoxes.count, 2)
 
-        let viewItems = viewItemsButton(inManagedValueRowNamed: "Shared box")
+        let viewItems = app.buttons.matching(
+            NSPredicate(
+                format: "identifier == %@ AND label == %@",
+                "inventory.lists.viewItems",
+                "View items in Shared box at Fixture Garage, 1 item"
+            )
+        ).firstMatch
         XCTAssertEqual(viewItems.label, "View items in Shared box at Fixture Garage, 1 item")
         scrollToElement(viewItems); viewItems.tap()
         XCTAssertTrue(app.buttons["inventory.itemRow.Scoped Place fixture Item"].waitForExistence(timeout: 3))
@@ -78,7 +175,10 @@ final class InventorySettingsUITests: InventoryUITestCase {
             NSPredicate(format: "identifier == %@ AND label == %@", "inventory.lists.viewItems", "View items in Shared box at Fixture Garage, 1 item")
         ).firstMatch
         scrollToElement(fixtureViewItems)
-        let placeActions = actionsButton(alignedWith: fixtureViewItems)
+        let fixturePlaceID = "B1F0A001-EE01-4E10-9000-000000000403"
+        let placeActions = app.buttons[
+            "settings.places.hierarchy.actions.\(fixturePlaceID)"
+        ]
         scrollToElement(placeActions); placeActions.tap(); app.buttons["Delete"].tap(); app.buttons["Delete"].tap()
         XCTAssertTrue(app.buttons["View Items"].waitForExistence(timeout: 3))
         app.buttons["View Items"].tap()

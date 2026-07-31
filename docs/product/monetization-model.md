@@ -157,12 +157,13 @@ The annual plan is the only planned launch subscription. A monthly option is def
 
 Do not represent monetization with one ambiguous `isPremium` flag.
 
-Future implementation should model at least two independent facts:
+The current centralized entitlement policy models two independent facts:
 
 - whether the user owns the non-consumable Lifetime Pro purchase;
 - whether the user has an active Family & Sync subscription.
 
-The intended access matrix is:
+The implemented local-access matrix, with subscription states reserved for
+future Family & Sync work, is:
 
 | State | Local Pro features | Sync | Shared household |
 |---|---:|---:|---:|
@@ -173,12 +174,12 @@ The intended access matrix is:
 | Subscription expired, Lifetime Pro owned | Yes | No | No |
 | Subscription expired, no Lifetime Pro | No | No | No |
 
-Conceptually:
+The production access relationship is:
 
 ```swift
 struct InventoryEntitlements: Equatable {
-    var ownsLifetimePro: Bool
-    var hasActiveFamilySubscription: Bool
+    let ownsLifetimePro: Bool
+    let hasActiveFamilySubscription: Bool
 
     var hasLocalProFeatures: Bool {
         ownsLifetimePro || hasActiveFamilySubscription
@@ -190,15 +191,19 @@ struct InventoryEntitlements: Equatable {
 }
 ```
 
-This example communicates the access relationship only. It is not approved production code or a required final API.
+The Lifetime Pro fact is derived only from verified StoreKit transactions and
+its separately cached verified ownership evidence. The Family subscription
+fact remains a dormant policy boundary; no subscription product, sync, or
+sharing UI is implemented.
 
 ## Data ownership and downgrade safety
 
 A paywall, cancelled purchase, billing issue, refund, or expired subscription must never delete or hide user-created data.
 
-Future implementation must preserve these rules:
+The implemented Lifetime Pro workflows preserve these rules:
 
-- no Item, Location, Storage Place, hierarchy relationship, photo, movement record, quantity record, backup, or shared record is deleted only because access changes;
+- no Item, Location, Storage Place, hierarchy relationship, movement record, or
+  backup is deleted only because access changes;
 - existing records remain readable; nested hierarchy structure becomes read-only without verified local Pro access;
 - the user's personal local inventory remains usable;
 - export and recovery remain available;
@@ -207,6 +212,10 @@ Future implementation must preserve these rules:
 - restoring a valid purchase restores corresponding access without requiring a destructive migration;
 - loss of network access must not make the local personal inventory unusable;
 - subscription expiry must not silently replace the user's real inventory with an empty store.
+
+Any future photo, quantity-history, sync, or shared-household implementation
+must extend the same non-destructive ownership boundary through its own
+approved contract.
 
 Family & Sync expiry and household lifecycle require a detailed implementation contract. It must preserve these approved boundaries:
 
@@ -376,17 +385,18 @@ The application must display StoreKit-localized pricing when products exist.
 
 ## Non-goals
 
-This concept does not authorize:
+This model and the implemented Lifetime Pro scope do not additionally
+authorize:
 
 - a separate paid application;
 - a new Bundle ID;
 - a hard first-launch paywall;
 - a retroactive Item-count limit;
-- StoreKit implementation;
 - App Store Connect product creation;
 - CloudKit or account infrastructure;
 - household sharing;
-- premium feature implementation;
+- subscription implementation or presentation;
+- any premium capability outside the exact five-item launch contract;
 - UI redesign;
 - analytics, ads, or tracking;
 - changing the current privacy claims;
@@ -406,7 +416,8 @@ The following require later product and technical decisions:
 - whether a monthly Family & Sync option is offered after launch;
 - personal sync data model and migration;
 - household identity, ownership, roles, and invitation model;
-- refund and revocation UX;
+- subscription-specific refund and revocation UX beyond the implemented
+  Lifetime Pro reconciliation boundary;
 - grace-period and billing-retry behavior;
 - subscription expiry behavior for shared households;
 - premium feature availability across future Apple platforms;

@@ -40,6 +40,7 @@ struct PremiumUpgradeView: View {
                         coordinator.dismiss()
                         dismiss()
                     }
+                    .accessibilityIdentifier("premium.dismiss")
                 }
             }
             .task {
@@ -86,8 +87,14 @@ struct PremiumUpgradeView: View {
                     Text("premium.productUnavailable")
                         .foregroundStyle(.secondary)
                 case .error:
-                    Text("premium.offline")
-                        .foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("premium.offline")
+                            .foregroundStyle(.secondary)
+                        Button("premium.retry") {
+                            Task { await coordinator.reloadProduct() }
+                        }
+                        .frame(minHeight: 44)
+                    }
                 }
             }
 

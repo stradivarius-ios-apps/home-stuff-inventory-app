@@ -132,7 +132,15 @@ struct ScopedInventoryItemsListView<Header: View>: View {
         .sheet(item: $bulkMovementRequest, onDismiss: {
             bulkSelection.cancel()
         }) { request in
-            InventoryBulkMovementView(selectedItemIDs: request.selectedItemIDs)
+            InventoryBulkMovementView(
+                selectedItemIDs: request.selectedItemIDs,
+                onAccessRequired: {
+                    bulkMovementRequest = nil
+                    upgradeCoordinator.request(.selectedItemMovement) {
+                        presentBulkMovement()
+                    }
+                }
+            )
         }
         .onChange(of: items.map(\.id)) { _, itemIDs in
             bulkSelection.reconcile(availableItemIDs: itemIDs)

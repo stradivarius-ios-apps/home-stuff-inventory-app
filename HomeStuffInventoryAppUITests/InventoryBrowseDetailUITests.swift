@@ -2,6 +2,13 @@ import XCTest
 
 @MainActor
 final class InventoryBrowseDetailUITests: InventoryUITestCase {
+    func testFirstLaunchDoesNotPresentProUpgrade() {
+        launchApp()
+
+        XCTAssertFalse(element(identifier: "premium.upgrade").exists)
+        XCTAssertTrue(element(identifier: "inventory.list").waitForExistence(timeout: 3))
+    }
+
     func testCompactInventoryRowPreservesRetrievalOrderAndTapTarget() {
         launchApp()
 
@@ -92,16 +99,17 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
         launchApp()
         openPlaceDetail(location: "Office", place: "Desk drawer")
 
+        let actions = app.buttons["locations.placeDetail.proActions"]
+        XCTAssertTrue(actions.waitForExistence(timeout: 3))
+        actions.tap()
         let moveContents = app.buttons["locations.placeDetail.moveContentsButton"]
         XCTAssertTrue(moveContents.waitForExistence(timeout: 3))
         XCTAssertEqual(moveContents.label, "Move Place Contents")
         moveContents.tap()
-        XCTAssertTrue(
-            app.staticTexts[
-                "Moving all items from a Storage Place requires additional access."
-            ].waitForExistence(timeout: 3)
-        )
-        app.buttons["OK"].tap()
+        XCTAssertTrue(element(identifier: "premium.upgrade").waitForExistence(timeout: 3))
+        XCTAssertTrue(app.buttons["premium.purchase"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["premium.restore"].waitForExistence(timeout: 3))
+        app.buttons["premium.dismiss"].tap()
 
         tapBackButton()
         tapBackButton()
@@ -112,6 +120,7 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
         XCTAssertTrue(confirmDelete.waitForExistence(timeout: 3))
         confirmDelete.tap()
 
+        app.buttons["locations.placeDetail.proActions"].tap()
         let emptyMoveContents = app.buttons["locations.placeDetail.moveContentsButton"]
         XCTAssertTrue(emptyMoveContents.waitForExistence(timeout: 3))
         emptyMoveContents.tap()
@@ -121,10 +130,38 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
             ].waitForExistence(timeout: 3)
         )
         XCTAssertFalse(
-            app.staticTexts[
-                "Moving all items from a Storage Place requires additional access."
-            ].exists
+            element(identifier: "premium.upgrade").exists
         )
+    }
+
+    func testScopedRoomSweepUsesSharedUpgradeWithoutBlockingOrdinaryAddItem() {
+        launchApp()
+        openPlaceDetail(location: "Office", place: "Desk drawer")
+
+        app.buttons["locations.placeDetail.proActions"].tap()
+        let roomSweep = app.buttons["locations.placeDetail.roomSweep"]
+        XCTAssertTrue(roomSweep.waitForExistence(timeout: 3))
+        roomSweep.tap()
+        XCTAssertTrue(element(identifier: "premium.upgrade").waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Continue with Room Sweep"].exists)
+        app.buttons["premium.dismiss"].tap()
+
+        app.buttons["locations.placeDetail.addItemButton"].tap()
+        XCTAssertTrue(app.buttons["inventory.itemForm.cancelButton"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.buttons["inventory.itemForm.locationPicker"].label.contains("Office"))
+        assertSelectedPlace(named: "Desk drawer")
+    }
+
+    func testItemDetailMovementHistoryIsReadableWithoutUpgrade() {
+        launchApp()
+        openItem(named: "USB-C to HDMI adapter")
+
+        let history = app.buttons["inventory.itemDetail.movementHistory"]
+        scrollToElement(history)
+        history.tap()
+
+        XCTAssertTrue(app.staticTexts["Movement History"].waitForExistence(timeout: 3))
+        XCTAssertFalse(element(identifier: "premium.upgrade").exists)
     }
     func testOpeningItemDetailKeepsHeroAndRevealsNavigationTitleAfterScroll() {
         launchApp(); openItemFromSearch(named: "USB-C to HDMI adapter"); let detail = element(identifier: "inventory.itemDetail"); XCTAssertTrue(detail.waitForExistence(timeout: 3)); let hero = element(identifier: "inventory.itemDetail.hero"); XCTAssertTrue(hero.waitForExistence(timeout: 3)); XCTAssertTrue(hero.label.contains("USB-C to HDMI adapter")); XCTAssertTrue(hero.label.contains("Category: Cables & Adapters")); XCTAssertFalse(hero.label.contains("Last updated")); XCTAssertFalse(hero.label.contains("Office")); XCTAssertFalse(hero.label.contains("Desk drawer")); let title = element(identifier: "inventory.itemDetail.title"); XCTAssertTrue(title.waitForExistence(timeout: 3)); XCTAssertEqual(title.label, "USB-C to HDMI adapter"); let storage = element(identifier: "inventory.itemDetail.storage"); XCTAssertTrue(storage.waitForExistence(timeout: 3)); let location = element(identifier: "inventory.itemDetail.location"); XCTAssertTrue(location.waitForExistence(timeout: 3)); XCTAssertTrue(location.label.contains("Office")); let place = element(identifier: "inventory.itemDetail.place"); XCTAssertTrue(place.waitForExistence(timeout: 3)); XCTAssertTrue(place.label.contains("Desk drawer")); let quantity = element(identifier: "inventory.itemDetail.quantity"); XCTAssertTrue(quantity.waitForExistence(timeout: 3)); XCTAssertTrue(quantity.label.contains("Quantity")); let condition = element(identifier: "inventory.itemDetail.condition"); XCTAssertTrue(condition.waitForExistence(timeout: 3)); XCTAssertTrue(condition.label.contains("Condition")); XCTAssertTrue(condition.label.contains("Good")); XCTAssertNotEqual(detail.value as? String, "USB-C to HDMI adapter"); XCTAssertTrue(hero.isHittable); XCTAssertTrue(waitForDetailNavigationTitleValue("USB-C to HDMI adapter"))

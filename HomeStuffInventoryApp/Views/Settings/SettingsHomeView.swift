@@ -80,9 +80,7 @@ struct SettingsHomeView: View {
                 .accessibilityIdentifier("settings.pro.restore")
 
                 Button {
-                    upgradeCoordinator.request(.extendedMovementUndo) {
-                        isShowingMovementHistory = true
-                    }
+                    isShowingMovementHistory = true
                 } label: {
                     InventorySettingsNavigationRow(
                         "premium.history.title",

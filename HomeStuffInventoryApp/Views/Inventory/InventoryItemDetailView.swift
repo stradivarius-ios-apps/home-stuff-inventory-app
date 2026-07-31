@@ -21,6 +21,7 @@ struct InventoryItemDetailView: View {
     @State private var isShowingNotesEditor = false
     @State private var isShowingNavigationTitle = false
     @State private var hasRecordedRecentView = false
+    @State private var isShowingMovementHistory = false
 
     private var viewModel: InventoryItemDetailViewModel {
         InventoryItemDetailViewModel(item: item, places: places)
@@ -46,6 +47,16 @@ struct InventoryItemDetailView: View {
                         }
 
                         InventoryDetailDatesCard(viewModel: viewModel)
+
+                        Button {
+                            isShowingMovementHistory = true
+                        } label: {
+                            Label("premium.history.title", systemImage: "clock.arrow.circlepath")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.large)
+                        .accessibilityIdentifier("inventory.itemDetail.movementHistory")
 
                         Button(role: .destructive) {
                             isShowingDeleteConfirmation = true
@@ -95,6 +106,9 @@ struct InventoryItemDetailView: View {
                 .presentationDetents([.medium])
                 .presentationDragIndicator(.visible)
                 .presentationContentInteraction(.scrolls)
+        }
+        .sheet(isPresented: $isShowingMovementHistory) {
+            InventoryMovementHistoryView(itemID: item.id)
         }
         .alert("inventory.alert.delete.title", isPresented: $isShowingDeleteConfirmation) {
             Button("inventory.action.delete", role: .destructive) {

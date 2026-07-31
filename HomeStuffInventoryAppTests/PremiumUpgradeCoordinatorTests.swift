@@ -162,6 +162,149 @@ struct PremiumUpgradeCoordinatorTests {
         #expect(failure.outcome == .failure)
     }
 
+    @Test func itemHistoryRemainsReadableAndLatestGroupReportsAffectedCount() {
+        let operationID = UUID()
+        let firstItemID = UUID()
+        let secondItemID = UUID()
+        let source = InventoryMovementEndpointSnapshot(
+            locationID: nil,
+            locationName: "Office",
+            placeID: nil,
+            placeName: nil
+        )
+        let destination = InventoryMovementEndpointSnapshot(
+            locationID: nil,
+            locationName: "Garage",
+            placeID: nil,
+            placeName: nil
+        )
+        let records = [
+            InventoryMovementRecord(
+                operationID: operationID,
+                itemID: firstItemID,
+                occurredAt: .now,
+                origin: .selectedItems,
+                source: source,
+                destination: destination
+            ),
+            InventoryMovementRecord(
+                operationID: operationID,
+                itemID: secondItemID,
+                occurredAt: .now,
+                origin: .selectedItems,
+                source: source,
+                destination: destination
+            )
+        ]
+
+        #expect(InventoryMovementHistoryPresentation.records(records, for: firstItemID).count == 1)
+        #expect(InventoryMovementHistoryPresentation.latestAffectedItemCount(in: records) == 2)
+    }
+
+    @Test func historyUndoPresentationMatchesVisibleScopeAndCompatibilityBeforeUpgrade() {
+        let sourceLocation = StorageLocation(name: "Office")
+        let destinationLocation = StorageLocation(name: "Garage")
+        let item = InventoryItem(
+            name: "Adapter",
+            locationName: destinationLocation.name
+        )
+        let source = InventoryMovementEndpointSnapshot(
+            locationID: sourceLocation.id,
+            locationName: sourceLocation.name,
+            placeID: nil,
+            placeName: nil
+        )
+        let destination = InventoryMovementEndpointSnapshot(
+            locationID: destinationLocation.id,
+            locationName: destinationLocation.name,
+            placeID: nil,
+            placeName: nil
+        )
+        let record = InventoryMovementRecord(
+            operationID: UUID(),
+            itemID: item.id,
+            origin: .singleItem,
+            source: source,
+            destination: destination
+        )
+        let locations = [sourceLocation, destinationLocation]
+
+        #expect(
+            undoAction(records: [], items: [item], locations: locations) == .unavailable
+        )
+        #expect(
+            undoAction(records: [record], items: [item], locations: locations) == .upgrade
+        )
+        #expect(
+            undoAction(
+                records: [record],
+                items: [item],
+                locations: locations,
+                entitlements: InventoryEntitlements(
+                    ownsLifetimePro: true,
+                    hasActiveFamilySubscription: false
+                )
+            ) == .confirm
+        )
+
+        item.locationName = sourceLocation.name
+        #expect(
+            undoAction(records: [record], items: [item], locations: locations) == .currentStateChanged
+        )
+        item.locationName = destinationLocation.name
+        #expect(
+            undoAction(records: [record], items: [item], locations: [destinationLocation]) == .unsafeRestoration
+        )
+
+        let undoRecord = InventoryMovementRecord(
+            operationID: UUID(),
+            itemID: item.id,
+            occurredAt: record.occurredAt.addingTimeInterval(1),
+            origin: .undo,
+            source: destination,
+            destination: source
+        )
+        #expect(
+            undoAction(records: [undoRecord, record], items: [item], locations: locations) == .unavailable
+        )
+
+        let unrelatedItemID = UUID()
+        let unrelatedRecord = InventoryMovementRecord(
+            operationID: UUID(),
+            itemID: unrelatedItemID,
+            occurredAt: record.occurredAt.addingTimeInterval(2),
+            origin: .singleItem,
+            source: source,
+            destination: destination
+        )
+        #expect(
+            InventoryMovementHistoryPresentation.undoAction(
+                itemID: item.id,
+                records: [unrelatedRecord, record],
+                items: [item],
+                locations: locations,
+                places: [],
+                entitlements: .free
+            ) == .hidden
+        )
+    }
+
+    private func undoAction(
+        records: [InventoryMovementRecord],
+        items: [InventoryItem],
+        locations: [StorageLocation],
+        entitlements: InventoryEntitlements = .free
+    ) -> InventoryMovementHistoryPresentation.UndoAction {
+        InventoryMovementHistoryPresentation.undoAction(
+            itemID: nil,
+            records: records,
+            items: items,
+            locations: locations,
+            places: [],
+            entitlements: entitlements
+        )
+    }
+
     private enum ProductFixture {
         case success(StoreProductInfo)
         case productUnavailable

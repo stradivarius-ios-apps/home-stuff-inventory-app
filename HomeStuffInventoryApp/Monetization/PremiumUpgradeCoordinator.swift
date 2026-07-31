@@ -125,6 +125,10 @@ final class PremiumUpgradeCoordinator {
         await service.loadLifetimeProduct()
     }
 
+    func reloadProduct() async {
+        await service.loadLifetimeProduct()
+    }
+
     func purchase() async {
         outcome = .none
         await service.purchaseLifetime(intendedAction: pendingAction)

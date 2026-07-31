@@ -278,10 +278,23 @@ struct InventoryListView: View {
         .sheet(item: $bulkMovementRequest, onDismiss: {
             bulkSelection.cancel()
         }) { request in
-            InventoryBulkMovementView(selectedItemIDs: request.selectedItemIDs)
+            InventoryBulkMovementView(
+                selectedItemIDs: request.selectedItemIDs,
+                onAccessRequired: {
+                    bulkMovementRequest = nil
+                    upgradeCoordinator.request(.selectedItemMovement) {
+                        presentBulkMovement()
+                    }
+                }
+            )
         }
         .sheet(isPresented: $isShowingRoomSweep) {
-            InventoryRoomSweepView()
+            InventoryRoomSweepView {
+                isShowingRoomSweep = false
+                upgradeCoordinator.request(.roomSweep) {
+                    isShowingRoomSweep = true
+                }
+            }
         }
         .onChange(of: selectedLocationName) { _, _ in
             reconcilePlaceSelection()

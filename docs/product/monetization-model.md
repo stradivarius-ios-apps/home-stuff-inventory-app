@@ -1,12 +1,25 @@
 # Home Stuff Inventory Monetization Model
 
-Status: Approved product concept; premium implementation deferred; protected Free portability implemented
+Status: Lifetime Pro implemented in source and release-gated; protected Free
+portability implemented; Family & Sync deferred
 
 ## Purpose
 
-This document records the approved monetization and premium-access model for Home Stuff Inventory before StoreKit, paywalls, CloudKit, subscriptions, or premium features are implemented. The protected Free core, including readable export, complete manual backup, and compatible atomic restore, is implemented independently of that deferred premium work.
+This document records the approved monetization and premium-access model for
+Home Stuff Inventory. The exact five-capability Lifetime Pro bundle, StoreKit
+2 lifecycle, and contextual upgrade surface are implemented in canonical
+source but remain gated from release activation. The protected Free core,
+including readable export, complete manual backup, and compatible atomic
+restore, is implemented independently. CloudKit, subscriptions, and Family &
+Sync remain deferred.
 
-It is a product and architecture guardrail. Its StoreKit, paywall, CloudKit, subscription, and premium-feature sections describe deferred functionality and do not authorize implementation by themselves; the Free core section describes the protected behavior already present in the repository. Every future premium capability requires a separate issue with explicit product behavior, data rules, privacy impact, localization, accessibility, validation, and release scope.
+It is a product and architecture guardrail. The Lifetime Pro and Free sections
+describe implemented source behavior; the launch-readiness gate separately
+controls App Store activation. CloudKit, subscription, Family & Sync, and
+later-feature sections remain deferred and do not authorize implementation by
+themselves. Every future premium capability requires a separate approved scope
+with explicit product behavior, data rules, privacy impact, localization,
+accessibility, validation, and release boundaries.
 
 ## Product decision
 
@@ -20,7 +33,7 @@ Home Stuff Inventory remains one iOS application with:
 
 Do not create a separate `Home Stuff Pro` application.
 
-The planned product structure is:
+The approved product structure is:
 
 ```text
 Home Stuff Inventory
@@ -29,7 +42,10 @@ Home Stuff Inventory
 └── Family & Sync — future auto-renewable subscription
 ```
 
-The structural decision is approved. The premium features, StoreKit products, prices, and rollout dates remain unimplemented until separately approved.
+The structural decision and Lifetime Pro source implementation are complete.
+The App Store Connect non-consumable, price, storefront availability, manual
+evidence, submission, and rollout date remain maintainer-owned and unapproved.
+Family & Sync remains unimplemented.
 
 ## Guiding principles
 
@@ -85,7 +101,11 @@ Free may show discoverable premium actions, but invoking those actions must neve
 
 ## Home Stuff Pro — lifetime unlock
 
-`Home Stuff Pro` is planned as an individual non-consumable In-App Purchase inside the existing application, using product identifier `com.stradivarius23.HomeStuffInventoryApp.pro.lifetime`. It does not use Apple Family Sharing.
+`Home Stuff Pro` is implemented in source as an individual non-consumable
+In-App Purchase inside the existing application, using product identifier
+`com.stradivarius23.HomeStuffInventoryApp.pro.lifetime`. It does not use Apple
+Family Sharing. App Store Connect product creation and release activation
+remain manual gated steps.
 
 It represents advanced local workflows whose value does not depend on an ongoing hosted service. A valid lifetime purchase permanently grants local Pro access for the purchasing Apple account under StoreKit rules.
 
@@ -206,15 +226,19 @@ Family & Sync expiry and household lifecycle require a detailed implementation c
 
 The default model is contextual freemium, not a first-launch hard paywall.
 
-A future paywall should appear when the user:
+The implemented Lifetime Pro upgrade surface appears when the user:
 
 - intentionally invokes a premium workflow;
-- exceeds a clearly communicated free allowance for a premium feature trial;
-- opens the upgrade surface in Settings;
+- opens the upgrade surface in Settings.
+
+Future subscription surfaces may also appear only after separately authorized
+implementation when the user:
+
 - enables sync;
 - attempts to create or join a shared household.
 
-A future paywall must:
+The implemented Lifetime Pro surface, and any future separately authorized
+subscription surface, must:
 
 - explain the concrete result of the selected feature;
 - distinguish Lifetime Pro from Family & Sync;
@@ -237,9 +261,10 @@ A paywall must not interrupt:
 
 Paywall copy should describe the outcome, for example `Move several items at once`, rather than relying on vague labels such as `Unlock Premium`.
 
-## Future technical architecture direction
+## Technical architecture direction
 
-When implementation is separately approved, use StoreKit 2 in the existing application.
+The Lifetime Pro implementation uses StoreKit 2 in the existing application.
+Future subscription work must extend these boundaries rather than bypass them.
 
 Expected responsibility boundaries include:
 
@@ -251,10 +276,11 @@ Monetization/
   InventoryEntitlements
   PremiumFeature
   PremiumAccessPolicy
-  PaywallContext
+  PremiumUpgradeCoordinator
 ```
 
-The exact file names and types remain subject to implementation design, but the separation of concerns is required:
+The implemented file names may evolve through reviewed refactoring, but the
+separation of concerns is required:
 
 - StoreKit integration loads products, performs purchases, observes updates, restores purchases, and validates transactions;
 - entitlement state derives from verified StoreKit transactions rather than a user-editable local boolean;
@@ -265,11 +291,16 @@ The exact file names and types remain subject to implementation design, but the 
 - deterministic StoreKit configuration and DEBUG test states support UI and integration testing;
 - focused tests use abstractions or test StoreKit sessions rather than requiring live purchases.
 
-Future premium capability checks should express a specific feature, such as `bulkMove` or `householdSharing`, rather than a broad premium boolean scattered throughout SwiftUI views.
+Premium capability checks express a specific feature, such as selected-Item
+movement or household sharing, rather than a broad premium boolean scattered
+throughout SwiftUI views.
 
 ## Privacy and release implications
 
-The current application is local-only and declares no developer-side data collection. The concept document does not change that shipped behavior.
+The current application keeps inventory and Lifetime Pro workflows local and
+declares no developer-side data collection. StoreKit communicates with Apple
+for product, purchase, restore, and verification; the app has no developer
+backend for inventory or transaction data.
 
 Every future capability must re-evaluate privacy, permissions, entitlements, App Store metadata, and release evidence.
 
@@ -289,13 +320,13 @@ App Store screenshots, promotional text, release notes, privacy disclosures, and
 
 The approved high-level sequence is:
 
-### Phase 0 — concept initialization
+### Phase 0 — concept initialization (complete)
 
 - document this product model;
-- create no feature implementation tasks yet;
-- make no application or App Store Connect changes.
+- preserve the initial product decision history;
+- make no App Store Connect change from documentation alone.
 
-### Phase 1 — future StoreKit foundation
+### Phase 1 — StoreKit foundation (implemented in source)
 
 - define products and entitlement semantics;
 - introduce StoreKit 2 infrastructure without gating existing behavior;

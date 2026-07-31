@@ -25,6 +25,7 @@ struct InventoryFreeDowngradeRegressionGateTests {
             .moveSelectedItems,
             .movePlaceContents,
             .extendedMovementUndo,
+            .storageHierarchyEditing,
             .inventoryInboxBatchCleanup
         ]
 
@@ -125,6 +126,110 @@ struct InventoryFreeDowngradeRegressionGateTests {
         let premiumBaseline = try #require(stateResults[.lifetimeProWithActiveFamilySubscription])
         for downgradedState in [InventoryEntitlementState.free, .expiredFamilySubscription] {
             #expect(stateResults[downgradedState] == premiumBaseline)
+        }
+    }
+
+    @Test func nestedStorageTreeRemainsPersistedBrowsableAndBackedUpAfterDowngrade() throws {
+        for fixture in states {
+            let container = try InventoryModelContainer.make(inMemory: true)
+            let writeContext = ModelContext(container)
+            let location = StorageLocation(name: "Workshop")
+            let root = InventoryPlace(locationID: location.id, name: "Cabinet")
+            let child = InventoryPlace(
+                locationID: location.id,
+                parentPlaceID: root.id,
+                name: "Drawer"
+            )
+            let grandchild = InventoryPlace(
+                locationID: location.id,
+                parentPlaceID: child.id,
+                name: "Parts box"
+            )
+            let item = InventoryItem(
+                name: "Spare hinge",
+                locationName: location.name,
+                containerName: grandchild.name,
+                placeID: grandchild.id
+            )
+            writeContext.insert(location)
+            writeContext.insert(root)
+            writeContext.insert(child)
+            writeContext.insert(grandchild)
+            writeContext.insert(item)
+            try writeContext.save()
+
+            let context = ModelContext(container)
+            let places = try context.fetch(FetchDescriptor<InventoryPlace>())
+            let items = try context.fetch(FetchDescriptor<InventoryItem>())
+            let locations = try context.fetch(FetchDescriptor<StorageLocation>())
+            let persistedGrandchild = try #require(
+                places.first { $0.id == grandchild.id }
+            )
+            let path = InventoryPlaceHierarchy.path(
+                for: persistedGrandchild,
+                places: places
+            )
+            #expect(path.status == .complete)
+            #expect(path.placeIDs == [root.id, child.id, grandchild.id])
+            #expect(path.components == ["Cabinet", "Drawer", "Parts box"])
+
+            let locationSummary = try #require(
+                InventoryBrowseSummaries.locationSummaries(
+                    from: items,
+                    storageLocations: locations
+                ).first { $0.name == "Workshop" }
+            )
+            let browseRoots = InventoryBrowseSummaries.placeSummaries(
+                in: items,
+                matching: locationSummary,
+                places: places
+            )
+            let browseChildren = InventoryBrowseSummaries.placeSummaries(
+                in: items,
+                matching: locationSummary,
+                places: places,
+                parentPlaceID: root.id
+            )
+            let browseGrandchildren = InventoryBrowseSummaries.placeSummaries(
+                in: items,
+                matching: locationSummary,
+                places: places,
+                parentPlaceID: child.id
+            )
+            #expect(browseRoots.map(\.placeID) == [root.id])
+            #expect(browseRoots.first?.recursiveItemCount == 1)
+            #expect(browseChildren.map(\.placeID) == [child.id])
+            #expect(browseGrandchildren.map(\.placeID) == [grandchild.id])
+            #expect(browseGrandchildren.first?.pathComponents == ["Cabinet", "Drawer", "Parts box"])
+            #expect(
+                InventoryBrowseSummaries.items(
+                    in: items,
+                    matching: try #require(browseGrandchildren.first)
+                ).map(\.id) == [item.id]
+            )
+
+            let backup = try InventoryBackupSnapshotter.capture(in: context)
+            #expect(
+                backup.places.first { $0.id == child.id.inventoryPortabilityString }?
+                    .parentPlaceID == root.id.inventoryPortabilityString
+            )
+            #expect(
+                backup.places.first { $0.id == grandchild.id.inventoryPortabilityString }?
+                    .parentPlaceID == child.id.inventoryPortabilityString
+            )
+            #expect(
+                backup.items.first { $0.id == item.id.inventoryPortabilityString }?
+                    .placeID == grandchild.id.inventoryPortabilityString
+            )
+
+            let entitlements = InventoryEntitlements(state: fixture.state)
+            #expect(
+                PremiumAccessPolicy().availability(
+                    of: .storageHierarchyEditing,
+                    entitlements: entitlements
+                ) == (fixture.localPro ? .available : .unavailable)
+            )
+            #expect(items.map(\.id) == [item.id])
         }
     }
 

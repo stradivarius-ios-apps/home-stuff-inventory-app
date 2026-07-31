@@ -27,12 +27,15 @@ struct LocationItemsListView: View {
 
 struct PlaceItemsListView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(PremiumAccessState.self) private var premiumAccess
     let place: InventoryBrowseSummaries.PlaceSummary
     let items: [InventoryItem]
     let recentViewEvents: [InventoryItemViewEvent]
     @Query private var places: [InventoryPlace]
 
     @State private var isShowingItemForm = false
+    @State private var isShowingContentsMovement = false
+    @State private var contentsMovementMessage: String?
     @State private var openRegistration = InventoryPlaceOpenRegistration()
 
     private var detailPlace: InventoryBrowseSummaries.PlaceSummary {
@@ -66,6 +69,19 @@ struct PlaceItemsListView: View {
             )
         }
         .toolbar {
+            if let placeID = place.placeID {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        presentContentsMovement(placeID: placeID)
+                    } label: {
+                        Image(systemName: "arrow.right")
+                    }
+                    .accessibilityLabel("locations.placeMove.action")
+                    .accessibilityHint("locations.placeMove.action.hint")
+                    .accessibilityIdentifier("locations.placeDetail.moveContentsButton")
+                }
+            }
+
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     isShowingItemForm = true
@@ -79,6 +95,25 @@ struct PlaceItemsListView: View {
         }
         .sheet(isPresented: $isShowingItemForm) {
             InventoryItemFormView(createContext: createContext)
+        }
+        .sheet(isPresented: $isShowingContentsMovement) {
+            if let placeID = place.placeID {
+                InventoryPlaceContentsMovementView(sourcePlaceID: placeID)
+            }
+        }
+        .alert(
+            InventoryLocalization.string(
+                "locations.placeMove.notice.title",
+                defaultValue: "Move Place Contents"
+            ),
+            isPresented: Binding(
+                get: { contentsMovementMessage != nil },
+                set: { if !$0 { contentsMovementMessage = nil } }
+            )
+        ) {
+            Button("locations.placeMove.result.ok", role: .cancel) {}
+        } message: {
+            Text(contentsMovementMessage ?? "")
         }
         .task {
             // This state object belongs to one navigation destination instance; repeated
@@ -104,6 +139,25 @@ struct PlaceItemsListView: View {
 
     private var placeIconSystemName: String {
         InventoryPlaceIconPresentation.symbolName(placeID: place.placeID, isMissingPlace: place.isMissingPlace, places: places)
+    }
+
+    private func presentContentsMovement(placeID: UUID) {
+        let hasDirectItems = items.contains { $0.placeID == placeID }
+        guard hasDirectItems else {
+            contentsMovementMessage = InventoryLocalization.string(
+                "locations.placeMove.empty.message",
+                defaultValue: "This Storage Place has no items to move."
+            )
+            return
+        }
+        guard premiumAccess.availability(of: .movePlaceContents) == .available else {
+            contentsMovementMessage = InventoryLocalization.string(
+                "locations.placeMove.accessRequired.message",
+                defaultValue: "Moving all items from a Storage Place requires additional access."
+            )
+            return
+        }
+        isShowingContentsMovement = true
     }
 }
 

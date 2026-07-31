@@ -29,6 +29,7 @@ struct SettingsHomeView: View {
     @Query private var movementRecords: [InventoryMovementRecord]
 
     @State private var workflow = InventoryDataTransferWorkflow()
+    @State private var isShowingMovementHistory = false
 #if DEBUG
     @State private var exportInvocationCompleted = false
     @State private var backupInvocationCompleted = false
@@ -77,6 +78,20 @@ struct SettingsHomeView: View {
                 }
                 .frame(minHeight: 44)
                 .accessibilityIdentifier("settings.pro.restore")
+
+                Button {
+                    upgradeCoordinator.request(.extendedMovementUndo) {
+                        isShowingMovementHistory = true
+                    }
+                } label: {
+                    InventorySettingsNavigationRow(
+                        "premium.history.title",
+                        systemImage: "clock.arrow.circlepath"
+                    )
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.pro.history")
             } header: {
                 Text("premium.settings.section")
             }
@@ -192,6 +207,9 @@ struct SettingsHomeView: View {
             InventoryActivityShareView(url: artifact.url) { result in
                 workflow.completeShare(result)
             }
+        }
+        .sheet(isPresented: $isShowingMovementHistory) {
+            InventoryMovementHistoryView()
         }
         .fileExporter(
             isPresented: $workflow.isBackupExporterPresented,

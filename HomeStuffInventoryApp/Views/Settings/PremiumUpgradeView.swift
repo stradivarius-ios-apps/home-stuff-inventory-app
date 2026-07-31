@@ -31,6 +31,7 @@ struct PremiumUpgradeView: View {
                 productSection
                 outcomeSection
             }
+            .accessibilityIdentifier("premium.upgrade")
             .navigationTitle("premium.title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -59,8 +60,10 @@ struct PremiumUpgradeView: View {
                 case let .available(product):
                     LabeledContent {
                         Text(product.displayPrice)
+                            .accessibilityIdentifier("premium.price")
                     } label: {
                         Text(product.displayName)
+                            .accessibilityIdentifier("premium.productName")
                     }
 
                     Text("premium.oneTime")

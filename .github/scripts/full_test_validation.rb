@@ -61,12 +61,14 @@ SHARDS = {
     InventoryManagedValueRowUITests/testMaximumDynamicTypeKeepsManagedRowIdentityBeforeActions
     InventoryManagedValueRowUITests/testUkrainianStandardSizeKeepsThreeAndSixItemRowsStructurallyStable
     InventorySettingsUITests/testPlaceDirectoryGroupsPlaceRowsUnderQuietLocationContextAndSupportsScopedEditor
+    InventorySettingsUITests/testFreeHierarchyDirectoryStaysReadableAndRoutesOnlyIntentionalStructuralActionsToUpgrade
   ],
   "09" => %w[
     InventorySettingsUITests/testPlaceDirectoryIsLocalizedInUkrainianAndLeavesLocationCategorySemanticsUntouched
     InventorySettingsUITests/testPlaceDirectoryKeepsSameNamePlacesScopedAndRoutesExactUsedPlaceItems
     InventorySettingsUITests/testEmptyPlaceDirectoryExplainsLocationPrerequisiteAndRoutesToLocations
     InventorySettingsUITests/testUsedPlaceDeleteKeepsScopeAndLocationDeleteShowsBlockedGuidance
+    InventorySettingsUITests/testUkrainianHierarchyReadOnlyStateAndContextualUpgradeRemainAccessible
   ],
   "10" => %w[
     InventorySettingsUITests/testBlockedLocationDeleteUsesUkrainianGuidance

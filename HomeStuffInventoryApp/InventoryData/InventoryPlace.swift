@@ -31,3 +31,11 @@ final class InventoryPlace {
         self.updatedAt = updatedAt ?? createdAt
     }
 }
+
+extension InventoryPlace {
+    static func deterministicOrder(_ lhs: InventoryPlace, _ rhs: InventoryPlace) -> Bool {
+        let comparison = lhs.name.localizedCaseInsensitiveCompare(rhs.name)
+        guard comparison == .orderedSame else { return comparison == .orderedAscending }
+        return lhs.id.uuidString < rhs.id.uuidString
+    }
+}

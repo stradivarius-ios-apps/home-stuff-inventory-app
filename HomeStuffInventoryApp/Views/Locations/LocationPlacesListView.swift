@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 
 struct LocationPlacesListView: View {
@@ -7,6 +8,7 @@ struct LocationPlacesListView: View {
     let location: InventoryBrowseSummaries.LocationSummary
     let items: [InventoryItem]
     let recentViewEvents: [InventoryItemViewEvent]
+    @Query(sort: \InventoryPlace.name) private var places: [InventoryPlace]
 
     @State private var isAllItemsPresented = false
     @State private var selectedPlace: SelectedPlace?
@@ -19,6 +21,7 @@ struct LocationPlacesListView: View {
         InventoryBrowseSummaries.placeSummaries(
             in: items,
             matching: location,
+            places: places,
             recentViewEvents: recentViewEvents,
             vocabulary: .localized
         )

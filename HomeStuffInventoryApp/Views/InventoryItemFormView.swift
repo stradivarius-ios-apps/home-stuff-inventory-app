@@ -402,7 +402,7 @@ struct InventoryItemFormView: View {
 
     private var selectedPlaceDisplayName: String {
         if let id = draft.placeID, let place = places.first(where: { $0.id == id }) {
-            return place.name
+            return InventoryPlaceHierarchy.path(for: place, places: places).displayName
         }
         let trimmed = draft.containerName.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmed.isEmpty ? InventoryLocalization.noContainer : trimmed
@@ -422,6 +422,7 @@ struct InventoryItemFormView: View {
             let persistedPlaces = try modelContext.fetch(FetchDescriptor<InventoryPlace>())
             guard let place = persistedPlaces.first(where: {
                 $0.locationID == location.id
+                    && $0.parentPlaceID == nil
                     && InventoryNormalizedName.place($0.name) == InventoryNormalizedName.place(name)
             }) else { return .failure(valueCreationSaveErrorMessage) }
             draft.placeID = place.id

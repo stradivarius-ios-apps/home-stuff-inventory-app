@@ -10,6 +10,7 @@
 		AC7700000000000000000001 /* InventoryMovementRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7700000000000000000002 /* InventoryMovementRecord.swift */; };
 		AC7700000000000000000003 /* InventoryMovementHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7700000000000000000004 /* InventoryMovementHistory.swift */; };
 		AC7700000000000000000005 /* InventoryMovementHistoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7700000000000000000006 /* InventoryMovementHistoryTests.swift */; };
+		AB3400000000000000000001 /* InventoryHierarchyBrowseIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3400000000000000000002 /* InventoryHierarchyBrowseIntegrationTests.swift */; };
 		A10000000000000000000260 /* StoreProductID.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000261 /* StoreProductID.swift */; };
 		A10000000000000000000262 /* StoreKitClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000263 /* StoreKitClient.swift */; };
 		A10000000000000000000264 /* StoreKitClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000265 /* StoreKitClientTests.swift */; };
@@ -214,6 +215,7 @@
 		AC7700000000000000000002 /* InventoryMovementRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryMovementRecord.swift; sourceTree = "<group>"; };
 		AC7700000000000000000004 /* InventoryMovementHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryMovementHistory.swift; sourceTree = "<group>"; };
 		AC7700000000000000000006 /* InventoryMovementHistoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryMovementHistoryTests.swift; sourceTree = "<group>"; };
+		AB3400000000000000000002 /* InventoryHierarchyBrowseIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryHierarchyBrowseIntegrationTests.swift; sourceTree = "<group>"; };
 		A10000000000000000000261 /* StoreProductID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreProductID.swift; sourceTree = "<group>"; };
 		A10000000000000000000263 /* StoreKitClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitClient.swift; sourceTree = "<group>"; };
 		A10000000000000000000265 /* StoreKitClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitClientTests.swift; sourceTree = "<group>"; };
@@ -686,6 +688,7 @@
 			isa = PBXGroup;
 			children = (
 				AC7700000000000000000006 /* InventoryMovementHistoryTests.swift */,
+				AB3400000000000000000002 /* InventoryHierarchyBrowseIntegrationTests.swift */,
 				A10000000000000000000265 /* StoreKitClientTests.swift */,
 				A10000000000000000000273 /* StoreKitEntitlementServiceTests.swift */,
 				A100000000000000000001A9 /* PrivacyManifestTests.swift */,
@@ -1026,6 +1029,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AC7700000000000000000005 /* InventoryMovementHistoryTests.swift in Sources */,
+				AB3400000000000000000001 /* InventoryHierarchyBrowseIntegrationTests.swift in Sources */,
 				A10000000000000000000264 /* StoreKitClientTests.swift in Sources */,
 				A10000000000000000000272 /* StoreKitEntitlementServiceTests.swift in Sources */,
 				A100000000000000000001A8 /* PrivacyManifestTests.swift in Sources */,

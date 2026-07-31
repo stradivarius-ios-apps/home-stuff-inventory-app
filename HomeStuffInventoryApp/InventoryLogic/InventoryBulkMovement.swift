@@ -350,6 +350,7 @@ enum InventoryBulkMovement {
             return destination.placeName == nil
                 && destination.placePathIDs.isEmpty
                 && destination.placePathComponents.isEmpty
+                && destination.displayPath == location.name
         }
         guard let place = places.first(where: { $0.id == placeID }),
               place.locationID == location.id,
@@ -361,8 +362,9 @@ enum InventoryBulkMovement {
         let path = InventoryPlaceHierarchy.path(for: place, places: places)
         guard path.status == .complete,
               path.placeIDs == destination.placePathIDs,
-              path.components.map({ InventoryNormalizedName.place($0) })
-                == destination.placePathComponents.map({ InventoryNormalizedName.place($0) })
+              path.components == destination.placePathComponents,
+              destination.displayPath
+                == ([location.name] + path.components).joined(separator: " › ")
         else {
             return false
         }

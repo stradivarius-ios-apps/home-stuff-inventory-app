@@ -20,6 +20,7 @@ SHARDS = {
     InventoryBrowseDetailUITests/testInventorySearchAndEmptyStateSurfaces
     InventoryBrowseDetailUITests/testLocationAndPlaceDetailContextualAddAndHeroQA
     InventoryBrowseDetailUITests/testDeletingLastPlaceItemKeepsEmptyPlaceContext
+    InventoryBrowseDetailUITests/testPlaceContentsMovementActionDistinguishesAccessGateFromEmptyState
     InventoryBrowseDetailUITests/testOpeningItemDetailKeepsHeroAndRevealsNavigationTitleAfterScroll
   ],
   "03" => %w[

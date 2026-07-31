@@ -275,12 +275,31 @@ enum InventoryBrowseSummaries {
                 // an explicit migration choice; nested Places require stable identity because
                 // a leaf name alone cannot identify a path.
                 if item.placeID == placeID { return true }
-                guard item.placeID == nil else { return false }
-                guard place.parentPlaceID == nil else { return false }
+                return isLegacyDirectItem(
+                    item,
+                    locationName: place.locationName,
+                    placeName: place.name,
+                    parentPlaceID: place.parentPlaceID,
+                    vocabulary: vocabulary
+                )
             }
             return normalizedLocationName(for: item, vocabulary: vocabulary).matches(name: place.locationName, isMissing: place.isMissingLocation)
                 && normalizedPlaceName(for: item, vocabulary: vocabulary).matches(name: place.name, isMissing: place.isMissingPlace)
         }
+    }
+
+    static func isLegacyDirectItem(
+        _ item: InventoryItem,
+        locationName: String,
+        placeName: String,
+        parentPlaceID: UUID?,
+        vocabulary: InventoryBrowseVocabulary = .default
+    ) -> Bool {
+        guard item.placeID == nil, parentPlaceID == nil else { return false }
+        return normalizedLocationName(for: item, vocabulary: vocabulary)
+            .matches(name: locationName, isMissing: false)
+            && normalizedPlaceName(for: item, vocabulary: vocabulary)
+                .matches(name: placeName, isMissing: false)
     }
 
     static func containedItems(

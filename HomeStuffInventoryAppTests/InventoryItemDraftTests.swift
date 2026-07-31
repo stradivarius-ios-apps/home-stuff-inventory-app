@@ -160,6 +160,50 @@ struct InventoryItemDraftTests {
         #expect(workflow.reviewPlaceAfterLocationChange(locationName: "Garage", placeName: "Desk drawer") == nil)
     }
 
+    @Test func roomSweepRetainsDestinationAndResetsEveryItemSpecificField() {
+        let placeID = UUID()
+        var workflow = InventoryRoomSweepWorkflow(
+            createContext: .init(
+                locationName: "Office",
+                placeName: "Top drawer",
+                placeID: placeID
+            )
+        )
+        workflow.draft.name = "Cable"
+        workflow.draft.category = InventoryCategory.cablesAndAdapters.rawValue
+        workflow.draft.quantity = 4
+        workflow.draft.condition = InventoryCondition.good.rawValue
+        workflow.draft.tagsText = "usb-c"
+        workflow.draft.notes = "Spare"
+
+        workflow.didSaveItem()
+
+        #expect(workflow.savedCount == 1)
+        #expect(workflow.draft.locationName == "Office")
+        #expect(workflow.draft.containerName == "Top drawer")
+        #expect(workflow.draft.placeID == placeID)
+        #expect(workflow.draft.name.isEmpty)
+        #expect(workflow.draft.category == InventoryCategory.miscellaneous.rawValue)
+        #expect(workflow.draft.quantity == 1)
+        #expect(workflow.draft.condition == InventoryCondition.unknown.rawValue)
+        #expect(workflow.draft.tagsText.isEmpty)
+        #expect(workflow.draft.notes.isEmpty)
+        #expect(!workflow.isSaveEnabled)
+    }
+
+    @Test func roomSweepUsesTheOrdinaryOneNameMinimum() {
+        var workflow = InventoryRoomSweepWorkflow(
+            createContext: .init(locationName: "Office")
+        )
+        #expect(!workflow.isSaveEnabled)
+
+        workflow.draft.name = "  Cable  "
+        #expect(workflow.isSaveEnabled)
+
+        workflow.draft.tagsText = "12345678901234567"
+        #expect(!workflow.isSaveEnabled)
+    }
+
     @Test func tagsAllowSixteenCharacters() throws {
         var draft = InventoryItemDraft()
         draft.name = "USB-C Adapter"

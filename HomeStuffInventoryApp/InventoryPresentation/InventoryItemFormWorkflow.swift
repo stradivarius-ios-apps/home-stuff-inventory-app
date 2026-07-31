@@ -31,3 +31,26 @@ struct InventoryItemFormWorkflow: Equatable {
         )
     }
 }
+
+struct InventoryRoomSweepWorkflow: Equatable {
+    var draft: InventoryItemDraft
+    private(set) var savedCount = 0
+
+    init(createContext: InventoryItemCreateContext = .global) {
+        draft = InventoryItemDraft(createContext: createContext)
+    }
+
+    var isSaveEnabled: Bool {
+        draft.isNameValid && draft.isTagsValid
+    }
+
+    mutating func didSaveItem() {
+        let retainedContext = InventoryItemCreateContext(
+            locationName: draft.locationName,
+            placeName: draft.containerName,
+            placeID: draft.placeID
+        )
+        draft = InventoryItemDraft(createContext: retainedContext)
+        savedCount += 1
+    }
+}

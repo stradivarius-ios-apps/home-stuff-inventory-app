@@ -245,6 +245,170 @@ struct InventoryItemFormPersistenceTests {
         #expect(item.placeID == box.id)
     }
 
+    @Test func roomSweepSavesConsecutiveDuplicateNamesAsOrdinaryItems() throws {
+        let container = try InventoryModelContainer.make(inMemory: true)
+        let context = ModelContext(container)
+        let location = StorageLocation(name: "Office")
+        let place = InventoryPlace(locationID: location.id, name: "Top drawer")
+        context.insert(location)
+        context.insert(place)
+        try context.save()
+        let access = PremiumAccessState(
+            entitlements: .init(ownsLifetimePro: true, hasActiveFamilySubscription: false)
+        )
+        var workflow = InventoryRoomSweepWorkflow(
+            createContext: .init(
+                locationName: location.name,
+                placeName: place.name,
+                placeID: place.id
+            )
+        )
+
+        for _ in 0..<2 {
+            workflow.draft.name = "USB-C cable"
+            #expect(
+                InventoryRoomSweepPersistence.save(
+                    draft: workflow.draft,
+                    access: access,
+                    locations: [location],
+                    places: [place],
+                    in: context
+                ) == .saved
+            )
+            workflow.didSaveItem()
+        }
+
+        let savedItems = try context.fetch(FetchDescriptor<InventoryItem>())
+        #expect(savedItems.count == 2)
+        #expect(savedItems.allSatisfy { $0.name == "USB-C cable" })
+        #expect(savedItems.allSatisfy { $0.locationName == location.name })
+        #expect(savedItems.allSatisfy { $0.placeID == place.id })
+        #expect(workflow.savedCount == 2)
+        #expect(workflow.draft.name.isEmpty)
+    }
+
+    @Test func roomSweepCancellationLeavesSavedItemsAndNeverPersistsTheCurrentDraft() throws {
+        let container = try InventoryModelContainer.make(inMemory: true)
+        let context = ModelContext(container)
+        let access = PremiumAccessState(
+            entitlements: .init(ownsLifetimePro: true, hasActiveFamilySubscription: false)
+        )
+        var workflow = InventoryRoomSweepWorkflow(createContext: .init(locationName: "Office"))
+        workflow.draft.name = "Saved cable"
+
+        #expect(
+            InventoryRoomSweepPersistence.save(
+                draft: workflow.draft,
+                access: access,
+                locations: [],
+                places: [],
+                in: context
+            ) == .saved
+        )
+        workflow.didSaveItem()
+        workflow.draft.name = "Unsaved tape"
+
+        let savedItems = try context.fetch(FetchDescriptor<InventoryItem>())
+        #expect(savedItems.map(\.name) == ["Saved cable"])
+    }
+
+    @Test func roomSweepFailureRollsBackTheCurrentItemAndKeepsEarlierSaves() throws {
+        let container = try InventoryModelContainer.make(inMemory: true)
+        let context = ModelContext(container)
+        let access = PremiumAccessState(
+            entitlements: .init(ownsLifetimePro: true, hasActiveFamilySubscription: false)
+        )
+        var firstDraft = InventoryItemDraft(createContext: .init(locationName: "Office"))
+        firstDraft.name = "Saved cable"
+        #expect(
+            InventoryRoomSweepPersistence.save(
+                draft: firstDraft,
+                access: access,
+                locations: [],
+                places: [],
+                in: context
+            ) == .saved
+        )
+        var failingDraft = InventoryItemDraft(createContext: .init(locationName: "Office"))
+        failingDraft.name = "Failed tape"
+
+        #expect(
+            InventoryRoomSweepPersistence.save(
+                draft: failingDraft,
+                access: access,
+                locations: [],
+                places: [],
+                in: context,
+                persist: { throw PersistenceFailure.expected }
+            ) == .saveFailed
+        )
+
+        #expect(try context.fetch(FetchDescriptor<InventoryItem>()).map(\.name) == ["Saved cable"])
+    }
+
+    @Test func roomSweepChecksCurrentEntitlementBeforeEveryMutationAndDowngradeKeepsItemsVisible() throws {
+        let container = try InventoryModelContainer.make(inMemory: true)
+        let context = ModelContext(container)
+        let access = PremiumAccessState(
+            entitlements: .init(ownsLifetimePro: true, hasActiveFamilySubscription: false)
+        )
+        var draft = InventoryItemDraft(createContext: .init(locationName: "Office"))
+        draft.name = "Cable"
+        #expect(
+            InventoryRoomSweepPersistence.save(
+                draft: draft,
+                access: access,
+                locations: [],
+                places: [],
+                in: context
+            ) == .saved
+        )
+
+        access.apply(.verified(.free))
+        var blockedDraft = InventoryItemDraft(createContext: .init(locationName: "Office"))
+        blockedDraft.name = "Tape"
+        #expect(
+            InventoryRoomSweepPersistence.save(
+                draft: blockedDraft,
+                access: access,
+                locations: [],
+                places: [],
+                in: context
+            ) == .accessRequired
+        )
+
+        let ordinaryItems = try context.fetch(FetchDescriptor<InventoryItem>())
+        #expect(ordinaryItems.map(\.name) == ["Cable"])
+        #expect(ordinaryItems.allSatisfy { _ in
+            InventoryFreeAccessPolicy().availability(
+                of: .viewItem,
+                entitlementState: .free
+            ) == .available
+        })
+    }
+
+    @Test func roomSweepCreationDoesNotFabricateRelocationHistory() throws {
+        let container = try InventoryModelContainer.make(inMemory: true)
+        let context = ModelContext(container)
+        let access = PremiumAccessState(
+            entitlements: .init(ownsLifetimePro: true, hasActiveFamilySubscription: false)
+        )
+        var draft = InventoryItemDraft(createContext: .init(locationName: "Office"))
+        draft.name = "Cable"
+
+        #expect(
+            InventoryRoomSweepPersistence.save(
+                draft: draft,
+                access: access,
+                locations: [],
+                places: [],
+                in: context
+            ) == .saved
+        )
+
+        #expect(try context.fetch(FetchDescriptor<InventoryMovementRecord>()).isEmpty)
+    }
+
     private enum PersistenceFailure: Error {
         case expected
     }

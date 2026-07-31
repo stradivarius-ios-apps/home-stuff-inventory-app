@@ -117,6 +117,77 @@ struct InventoryBackupRestoreTestSupport {
         )
     }
 
+    func nestedSnapshot() -> InventoryPortabilitySnapshotV1 {
+        let locationID = "10000000-0000-0000-0000-000000000001"
+        let rootID = "50000000-0000-0000-0000-000000000003"
+        let childID = "50000000-0000-0000-0000-000000000002"
+        let leafID = "50000000-0000-0000-0000-000000000001"
+        let itemID = "30000000-0000-0000-0000-000000000001"
+        let timestamp = InventoryPortabilityDate.string(from: date)
+        return InventoryPortabilitySnapshotV1(
+            locations: [
+                InventoryPortabilityLocationV1(
+                    id: locationID,
+                    name: "Workshop",
+                    iconID: "hammer",
+                    notes: "",
+                    createdAt: timestamp,
+                    updatedAt: timestamp
+                )
+            ],
+            customCategories: [],
+            items: [
+                InventoryPortabilityItemV1(
+                    id: itemID,
+                    name: "Adapter",
+                    categoryStorageValue: InventoryCategory.miscellaneous.rawValue,
+                    customCategoryID: nil,
+                    locationName: "Workshop",
+                    locationID: locationID,
+                    placeName: "Cable box",
+                    placeID: leafID,
+                    iconID: nil,
+                    quantity: 1,
+                    conditionStorageValue: InventoryCondition.good.rawValue,
+                    tags: [],
+                    notes: "",
+                    createdAt: timestamp,
+                    updatedAt: timestamp
+                )
+            ],
+            places: [
+                InventoryPortabilityPlaceV1(
+                    id: leafID,
+                    locationID: locationID,
+                    parentPlaceID: childID,
+                    name: "Cable box",
+                    iconID: "box",
+                    createdAt: timestamp,
+                    updatedAt: timestamp
+                ),
+                InventoryPortabilityPlaceV1(
+                    id: childID,
+                    locationID: locationID,
+                    parentPlaceID: rootID,
+                    name: "Top drawer",
+                    iconID: "drawer",
+                    createdAt: timestamp,
+                    updatedAt: timestamp
+                ),
+                InventoryPortabilityPlaceV1(
+                    id: rootID,
+                    locationID: locationID,
+                    name: "Tool cabinet",
+                    iconID: "cabinet",
+                    createdAt: timestamp,
+                    updatedAt: timestamp
+                )
+            ],
+            recentItemViewEvents: [],
+            movementRecords: []
+        )
+    }
+
     func makeTargetContext() throws -> ModelContext {
         let container = try InventoryModelContainer.make(inMemory: true)
         let context = ModelContext(container)
@@ -186,6 +257,7 @@ extension InventoryBackupRestoreTestCase {
     func makeRecoveryStore() throws -> InventoryBackupRecoveryStore { try support.makeRecoveryStore() }
     func backupData(snapshot: InventoryPortabilitySnapshotV1, appVersion: String = "1.0") throws -> Data { try support.backupData(snapshot: snapshot, appVersion: appVersion) }
     func unicodeSnapshot() -> InventoryPortabilitySnapshotV1 { support.unicodeSnapshot() }
+    func nestedSnapshot() -> InventoryPortabilitySnapshotV1 { support.nestedSnapshot() }
     func makeTargetContext() throws -> ModelContext { try support.makeTargetContext() }
     func mutate(_ data: Data, reseal: Bool, mutation: (inout [String: Any]) -> Void) throws -> Data { try support.mutate(data, reseal: reseal, mutation: mutation) }
     func fixtureURL(_ name: String) throws -> URL { try support.fixtureURL(name) }

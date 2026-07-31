@@ -13,7 +13,9 @@ enum InventoryPortabilityShapeValidator {
         "id", "name", "categoryStorageValue", "customCategoryID", "locationName", "locationID",
         "placeName", "placeID", "iconID", "quantity", "conditionStorageValue", "tags", "notes", "createdAt", "updatedAt"
     ]
-    private static let placeKeys: Set<String> = ["id", "locationID", "name", "iconID", "createdAt", "updatedAt"]
+    private static let placeKeys: Set<String> = [
+        "id", "locationID", "parentPlaceID", "name", "iconID", "createdAt", "updatedAt"
+    ]
     private static let eventKeys: Set<String> = ["id", "itemID", "viewedAt"]
     private static let movementKeys: Set<String> = [
         "id", "operationID", "itemID", "occurredAt", "originStorageValue", "reversedOperationID",
@@ -29,7 +31,8 @@ enum InventoryPortabilityShapeValidator {
         try requireOnly(integrity, keys: integrityKeys)
 
         var inventoryKeys: Set<String> = ["locations", "customCategories", "items"]
-        if schemaVersion >= 2 && artifactType == InventoryPortabilityArtifactType.completeBackup.rawValue {
+        if schemaVersion >= 2
+            && (artifactType == InventoryPortabilityArtifactType.completeBackup.rawValue || schemaVersion >= 4) {
             inventoryKeys.insert("places")
         }
         if artifactType == InventoryPortabilityArtifactType.completeBackup.rawValue {
@@ -42,8 +45,10 @@ enum InventoryPortabilityShapeValidator {
         try validateRecords(inventory["locations"], keys: locationKeys)
         try validateRecords(inventory["customCategories"], keys: categoryKeys)
         try validateRecords(inventory["items"], keys: schemaVersion >= 2 ? itemKeys : itemKeys.subtracting(["placeID"]))
-        if schemaVersion >= 2 && artifactType == InventoryPortabilityArtifactType.completeBackup.rawValue {
-            try validateRecords(inventory["places"], keys: placeKeys)
+        if schemaVersion >= 2
+            && (artifactType == InventoryPortabilityArtifactType.completeBackup.rawValue || schemaVersion >= 4) {
+            let keys = schemaVersion >= 4 ? placeKeys : placeKeys.subtracting(["parentPlaceID"])
+            try validateRecords(inventory["places"], keys: keys)
         }
         if artifactType == InventoryPortabilityArtifactType.completeBackup.rawValue {
             try validateRecords(inventory["recentItemViewEvents"], keys: eventKeys)
@@ -77,8 +82,12 @@ enum InventoryPortabilityValidator {
     ) throws {
         switch artifactType {
         case .readableExport:
-            guard snapshot.recentItemViewEvents == nil, snapshot.places.isEmpty,
-                  snapshot.items.allSatisfy({ $0.placeID == nil }) else { throw invalidError }
+            guard snapshot.recentItemViewEvents == nil else { throw invalidError }
+            if schemaVersion < 4 {
+                guard snapshot.places.isEmpty,
+                      snapshot.items.allSatisfy({ $0.placeID == nil })
+                else { throw invalidError }
+            }
         case .completeBackup:
             guard snapshot.recentItemViewEvents != nil else { throw invalidError }
         }
@@ -130,10 +139,26 @@ enum InventoryPortabilityValidator {
             guard locationIDs.contains(place.locationID),
                   PlaceIconCatalog.normalizedIconID(place.iconID) == place.iconID
             else { throw invalidError }
+            if schemaVersion < 4, place.parentPlaceID != nil {
+                throw invalidError
+            }
+            if let parentPlaceID = place.parentPlaceID {
+                guard parentPlaceID != place.id,
+                      let parent = placesByID[parentPlaceID],
+                      parent.locationID == place.locationID
+                else { throw invalidError }
+            }
             try validateRequiredName(place.name, invalidError: invalidError)
             try validateDates(createdAt: place.createdAt, updatedAt: place.updatedAt, invalidError: invalidError)
-            let scope = "\(place.locationID)\u{1F}\(InventoryNormalizedName.place(place.name).comparisonKey)"
+            let scope = [
+                place.locationID,
+                place.parentPlaceID ?? "",
+                InventoryNormalizedName.place(place.name).comparisonKey
+            ].joined(separator: "\u{1F}")
             guard placeScopes.insert(scope).inserted else { throw invalidError }
+        }
+        if schemaVersion >= 4 {
+            try validateAcyclicHierarchy(placesByID, invalidError: invalidError)
         }
         for item in snapshot.items {
             try validateRequiredName(item.name, invalidError: invalidError)
@@ -212,6 +237,25 @@ enum InventoryPortabilityValidator {
                     [record.itemID]
                 )
             }
+        }
+    }
+
+    private static func validateAcyclicHierarchy(
+        _ placesByID: [String: InventoryPortabilityPlaceV1],
+        invalidError: InventoryPortabilityCodecError
+    ) throws {
+        var validated = Set<String>()
+        for startingPlaceID in placesByID.keys where !validated.contains(startingPlaceID) {
+            var path: [String] = []
+            var pathIDs = Set<String>()
+            var currentPlaceID: String? = startingPlaceID
+
+            while let placeID = currentPlaceID, !validated.contains(placeID) {
+                guard pathIDs.insert(placeID).inserted else { throw invalidError }
+                path.append(placeID)
+                currentPlaceID = placesByID[placeID]?.parentPlaceID
+            }
+            validated.formUnion(path)
         }
     }
 

@@ -20,13 +20,18 @@ struct InventoryItemDetailViewModel: Equatable {
     let hasContainer: Bool
     let hasNotes: Bool
 
-    init(item: InventoryItem) {
+    init(item: InventoryItem, places: [InventoryPlace] = []) {
         name = item.name
         iconID = ItemIconCatalog.normalizedIconID(item.iconID)
         iconSymbolName = ItemIconCatalog.symbolName(for: item.iconID)
         iconDisplayName = ItemIconCatalog.displayName(for: item.iconID)
         locationName = Self.displayText(item.locationName, fallback: InventoryLocalization.noLocation)
-        containerName = Self.displayText(item.containerName, fallback: InventoryLocalization.noContainer)
+        if let placeID = item.placeID,
+           let place = places.first(where: { $0.id == placeID }) {
+            containerName = InventoryPlaceHierarchy.path(for: place, places: places).displayName
+        } else {
+            containerName = Self.displayText(item.containerName, fallback: InventoryLocalization.noContainer)
+        }
         category = InventoryCategory.displayName(forStoredValue: item.category)
         quantityText = item.quantity.formatted()
         quantityBadgeText = InventoryLocalization.itemCount(item.quantity)

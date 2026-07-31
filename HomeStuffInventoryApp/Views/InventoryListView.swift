@@ -24,6 +24,7 @@ struct InventoryListView: View {
 
     @Query(sort: \InventoryItem.name) private var items: [InventoryItem]
     @Query(sort: \StorageLocation.name) private var locations: [StorageLocation]
+    @Query(sort: \InventoryPlace.name) private var places: [InventoryPlace]
 
     init(searchText: Binding<String> = .constant(""), presentation: InventoryListPresentation) {
         _searchText = searchText
@@ -31,7 +32,13 @@ struct InventoryListView: View {
     }
 
     private var filteredResults: [InventorySearch.Result] {
-        InventorySearch.matchingResults(in: items, query: searchText, filters: filters, vocabulary: .localized)
+        InventorySearch.matchingResults(
+            in: items,
+            query: searchText,
+            filters: filters,
+            places: places,
+            vocabulary: .localized
+        )
     }
 
     private var filteredItems: [InventoryItem] { filteredResults.map(\.item) }

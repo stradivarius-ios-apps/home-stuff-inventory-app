@@ -4,15 +4,18 @@ struct InventoryItemRowView: View {
     let item: InventoryItem
     let matchContext: InventorySearch.MatchContext?
     let showsChevron: Bool
+    let placePath: String?
 
     init(
         item: InventoryItem,
         matchContext: InventorySearch.MatchContext? = nil,
-        showsChevron: Bool = true
+        showsChevron: Bool = true,
+        placePath: String? = nil
     ) {
         self.item = item
         self.matchContext = matchContext
         self.showsChevron = showsChevron
+        self.placePath = placePath
     }
 
     var body: some View {
@@ -61,6 +64,9 @@ struct InventoryItemRowView: View {
     }
 
     private var containerName: String {
+        if let placePath, !placePath.isEmpty {
+            return placePath
+        }
         guard let name = item.containerName?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty else {
             return InventoryLocalization.noContainer
         }

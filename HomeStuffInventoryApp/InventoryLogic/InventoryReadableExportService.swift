@@ -59,6 +59,7 @@ struct InventoryReadableExportService {
         items: [InventoryItem],
         locations: [StorageLocation],
         customCategories: [InventoryCustomCategory],
+        places: [InventoryPlace] = [],
         movementRecords: [InventoryMovementRecord] = [],
         createdAt: Date = .now,
         artifactID: UUID = UUID()
@@ -67,6 +68,7 @@ struct InventoryReadableExportService {
             items: items,
             locations: locations,
             customCategories: customCategories,
+            places: places,
             movementRecords: movementRecords
         )
         let metadata = InventoryPortabilityMetadataV1(
@@ -119,6 +121,7 @@ struct InventoryReadableExportService {
         items: [InventoryItem],
         locations: [StorageLocation],
         customCategories: [InventoryCustomCategory],
+        places: [InventoryPlace] = [],
         movementRecords: [InventoryMovementRecord] = []
     ) -> InventoryPortabilitySnapshotV1 {
         let locationRecords = locations.map {
@@ -145,8 +148,22 @@ struct InventoryReadableExportService {
         let categoriesByName = categoryRecords.reduce(into: [String: String]()) {
             $0[nameKey($1.name)] = $1.id
         }
+        let placeRecords = places.map {
+            InventoryPortabilityPlaceV1(
+                id: $0.id.inventoryPortabilityString,
+                locationID: $0.locationID.inventoryPortabilityString,
+                parentPlaceID: $0.parentPlaceID?.inventoryPortabilityString,
+                name: $0.name,
+                iconID: PlaceIconCatalog.normalizedIconID($0.iconID),
+                createdAt: InventoryPortabilityDate.string(from: $0.createdAt),
+                updatedAt: InventoryPortabilityDate.string(from: $0.updatedAt)
+            )
+        }
+        let placesByID = Dictionary(uniqueKeysWithValues: placeRecords.map { ($0.id, $0) })
         let itemRecords = items.map { item in
             let trimmedPlace = item.containerName?.trimmingCharacters(in: .whitespacesAndNewlines)
+            let placeID = item.placeID?.inventoryPortabilityString
+            let linkedPlace = placeID.flatMap { placesByID[$0] }
             return InventoryPortabilityItemV1(
                 id: item.id.inventoryPortabilityString,
                 name: item.name,
@@ -154,8 +171,8 @@ struct InventoryReadableExportService {
                 customCategoryID: categoriesByName[nameKey(item.category)],
                 locationName: item.locationName,
                 locationID: locationsByName[nameKey(item.locationName)],
-                placeName: trimmedPlace?.isEmpty == false ? trimmedPlace : nil,
-                placeID: nil,
+                placeName: linkedPlace?.name ?? (trimmedPlace?.isEmpty == false ? trimmedPlace : nil),
+                placeID: linkedPlace?.id,
                 iconID: item.iconID,
                 quantity: item.quantity,
                 conditionStorageValue: item.condition,
@@ -191,6 +208,7 @@ struct InventoryReadableExportService {
             locations: locationRecords,
             customCategories: categoryRecords,
             items: itemRecords,
+            places: placeRecords,
             movementRecords: movementPortabilityRecords
         )
     }

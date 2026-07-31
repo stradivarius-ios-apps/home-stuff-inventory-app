@@ -127,6 +127,7 @@ struct InventoryPlaceHierarchyDirectoryView: View {
                 Text(verbatim: row.name)
                     .font(.body)
                     .foregroundStyle(.primary)
+                    .accessibilityIdentifier("inventory.lists.valueTitle")
                 if row.depth > 0 {
                     Text(verbatim: row.pathText)
                         .font(.caption)
@@ -153,59 +154,78 @@ struct InventoryPlaceHierarchyDirectoryView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            Menu {
+            if row.directItemCount > 0 {
                 Button {
                     onViewItems(row.placeID)
                 } label: {
-                    Label("inventory.lists.viewItems", systemImage: "tray.full")
+                    Image(systemName: "tray.full")
+                        .frame(width: 44, height: 44)
                 }
-
-                Button {
-                    onCreateChild(row.placeID)
-                } label: {
-                    Label(
-                        "inventory.places.hierarchy.addChild.action",
-                        systemImage: "rectangle.stack.badge.plus"
-                    )
-                }
-                .disabled(!row.hasCompletePath)
-
-                Button {
-                    onRestructure(row.placeID)
-                } label: {
-                    Label(
-                        "inventory.places.hierarchy.restructure.action",
-                        systemImage: "arrow.triangle.branch"
-                    )
-                }
-                .disabled(!row.hasCompletePath)
-
-                if isEditable {
-                    Button {
-                        onEdit(row.placeID)
-                    } label: {
-                        Label("inventory.action.edit", systemImage: "pencil")
-                    }
-
-                    Button(role: .destructive) {
-                        onDelete(row.placeID)
-                    } label: {
-                        Label("inventory.action.delete", systemImage: "trash")
-                    }
-                }
-            } label: {
-                Image(systemName: "ellipsis.circle")
-                    .frame(width: 44, height: 44)
-            }
-            .accessibilityLabel(
-                Text(
-                    InventoryLocalization.formatted(
-                        "inventory.places.hierarchy.actions.accessibilityLabel",
-                        defaultValue: "Actions for %@",
-                        row.pathText
+                .buttonStyle(.borderless)
+                .accessibilityLabel(
+                    Text(
+                        InventoryLocalization.formatted(
+                            "inventory.places.viewItems.accessibilityLabel",
+                            defaultValue: "View items in %@ at %@, %@",
+                            row.name,
+                            locations.first(where: { $0.id == row.locationID })?.name ?? "",
+                            InventoryLocalization.itemCount(row.directItemCount)
+                        )
                     )
                 )
-            )
+                .accessibilityIdentifier("inventory.lists.viewItems")
+            }
+
+            Group {
+                Menu {
+                    Button {
+                        onCreateChild(row.placeID)
+                    } label: {
+                        Label(
+                            "inventory.places.hierarchy.addChild.action",
+                            systemImage: "rectangle.stack.badge.plus"
+                        )
+                    }
+                    .disabled(!row.hasCompletePath)
+
+                    Button {
+                        onRestructure(row.placeID)
+                    } label: {
+                        Label(
+                            "inventory.places.hierarchy.restructure.action",
+                            systemImage: "arrow.triangle.branch"
+                        )
+                    }
+                    .disabled(!row.hasCompletePath)
+
+                    if isEditable {
+                        Button {
+                            onEdit(row.placeID)
+                        } label: {
+                            Label("inventory.action.edit", systemImage: "pencil")
+                        }
+
+                        Button(role: .destructive) {
+                            onDelete(row.placeID)
+                        } label: {
+                            Label("inventory.action.delete", systemImage: "trash")
+                        }
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                        .frame(width: 44, height: 44)
+                }
+                .accessibilityLabel(
+                    Text(
+                        InventoryLocalization.formatted(
+                            "inventory.places.hierarchy.actions.accessibilityLabel",
+                            defaultValue: "Actions for %@",
+                            row.pathText
+                        )
+                    )
+                )
+                .accessibilityIdentifier("inventory.lists.valueActions")
+            }
             .accessibilityIdentifier(
                 "settings.places.hierarchy.actions.\(row.placeID.uuidString)"
             )

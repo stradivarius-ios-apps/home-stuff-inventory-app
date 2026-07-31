@@ -2954,6 +2954,24 @@
         "uk" : { "stringUnit" : { "state" : "translated", "value" : "Атомарно відновлює останнє сумісне переміщення ієрархії та розташування речей." } }
       }
     },
+    "inventory.places.hierarchy.undo.confirm.action" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Undo Structural Move" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Скасувати структурне переміщення" } }
+      }
+    },
+    "inventory.places.hierarchy.undo.confirm.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Restore the latest compatible Storage Place subtree and its Item locations?" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Відновити останнє сумісне піддерево місць зберігання та розташування його речей?" } }
+      }
+    },
+    "inventory.places.hierarchy.undo.confirm.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Undo Latest Structural Move?" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Скасувати останнє структурне переміщення?" } }
+      }
+    },
     "premium.bundle.placeContentsMovement" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Move a Storage Place’s direct contents" } },

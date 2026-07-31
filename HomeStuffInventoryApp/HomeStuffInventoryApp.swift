@@ -6,6 +6,7 @@ struct HomeStuffInventoryApp: App {
     @Environment(\.scenePhase) private var scenePhase
     @State private var bootstrap = InventoryAppBootstrapState()
     @State private var entitlementService = StoreKitEntitlementService.live()
+    @State private var upgradeCoordinator: PremiumUpgradeCoordinator
 #if DEBUG
     private let qaAppearance = InventoryQAAppearanceConfiguration(
         arguments: ProcessInfo.processInfo.arguments
@@ -13,12 +14,26 @@ struct HomeStuffInventoryApp: App {
     private let qaAccessibility = InventoryQAAccessibilityConfiguration.current
 #endif
 
+    init() {
+        let service = StoreKitEntitlementService.live()
+        _entitlementService = State(initialValue: service)
+        _upgradeCoordinator = State(initialValue: PremiumUpgradeCoordinator(service: service))
+    }
+
     var body: some Scene {
         WindowGroup {
             InventoryAppBootstrapView(bootstrap: bootstrap)
                 .environment(entitlementService.premiumAccess)
+                .environment(upgradeCoordinator)
+                .sheet(item: upgradeContext) { context in
+                    PremiumUpgradeView(context: context)
+                        .environment(upgradeCoordinator)
+                }
                 .task {
                     entitlementService.start()
+                }
+                .onChange(of: entitlementService.operationState) { _, state in
+                    upgradeCoordinator.handle(state)
                 }
                 .onChange(of: scenePhase) { _, phase in
                     switch phase {
@@ -55,6 +70,13 @@ struct HomeStuffInventoryApp: App {
                 }
 #endif
         }
+    }
+
+    private var upgradeContext: Binding<PremiumUpgradeContext?> {
+        Binding(
+            get: { upgradeCoordinator.presentedContext },
+            set: { if $0 == nil { upgradeCoordinator.dismiss() } }
+        )
     }
 }
 

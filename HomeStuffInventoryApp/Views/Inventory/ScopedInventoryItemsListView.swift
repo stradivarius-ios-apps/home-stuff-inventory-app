@@ -3,6 +3,7 @@ import SwiftUI
 struct ScopedInventoryItemsListView<Header: View>: View {
     @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
     @Environment(PremiumAccessState.self) private var premiumAccess
+    @Environment(PremiumUpgradeCoordinator.self) private var upgradeCoordinator
 
     enum AccessibilityContext {
         case scoped
@@ -42,7 +43,6 @@ struct ScopedInventoryItemsListView<Header: View>: View {
     @State private var isShowingNavigationTitle = false
     @State private var bulkSelection = InventoryBulkSelectionState()
     @State private var bulkMovementRequest: InventoryBulkMovementSheetRequest?
-    @State private var isShowingBulkAccessRequired = false
     @Namespace private var itemNavigationNamespace
 
     init(
@@ -133,14 +133,6 @@ struct ScopedInventoryItemsListView<Header: View>: View {
             bulkSelection.cancel()
         }) { request in
             InventoryBulkMovementView(selectedItemIDs: request.selectedItemIDs)
-        }
-        .alert(
-            "inventory.bulkMove.accessRequired.title",
-            isPresented: $isShowingBulkAccessRequired
-        ) {
-            Button("inventory.bulkMove.result.ok", role: .cancel) {}
-        } message: {
-            Text("inventory.bulkMove.accessRequired.message")
         }
         .onChange(of: items.map(\.id)) { _, itemIDs in
             bulkSelection.reconcile(availableItemIDs: itemIDs)
@@ -247,17 +239,19 @@ struct ScopedInventoryItemsListView<Header: View>: View {
     }
 
     private func beginBulkSelection() {
-        let outcome = bulkSelection.begin(
-            visibleItemIDs: items.map(\.id),
-            availability: premiumAccess.availability(of: .moveSelectedItems)
-        )
-        isShowingBulkAccessRequired = outcome == .accessRequired
+        upgradeCoordinator.request(.selectedItemMovement) {
+            _ = bulkSelection.begin(
+                visibleItemIDs: items.map(\.id),
+                availability: .available
+            )
+        }
     }
 
     private func presentBulkMovement() {
         guard premiumAccess.availability(of: .moveSelectedItems) == .available else {
-            bulkSelection.cancel()
-            isShowingBulkAccessRequired = true
+            upgradeCoordinator.request(.selectedItemMovement) {
+                presentBulkMovement()
+            }
             return
         }
         guard !bulkSelection.selectedItemIDs.isEmpty else { return }

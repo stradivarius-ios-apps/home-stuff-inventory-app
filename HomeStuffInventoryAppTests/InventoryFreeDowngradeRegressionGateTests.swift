@@ -25,7 +25,7 @@ struct InventoryFreeDowngradeRegressionGateTests {
             .moveSelectedItems,
             .movePlaceContents,
             .extendedMovementUndo,
-            .inventoryInboxBatchCleanup
+            .nestedStoragePlaces
         ]
 
         for fixture in states {

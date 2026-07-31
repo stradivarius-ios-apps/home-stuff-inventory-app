@@ -7,7 +7,7 @@ struct PremiumAccessTests {
         .moveSelectedItems,
         .movePlaceContents,
         .extendedMovementUndo,
-        .inventoryInboxBatchCleanup
+        .nestedStoragePlaces
     ]
 
     private let subscriptionFeatures: Set<PremiumFeature> = [

@@ -2675,6 +2675,228 @@
         "uk" : { "stringUnit" : { "state" : "translated", "value" : "Потрібен Home Stuff Pro" } }
       }
     },
+    "premium.bundle.extendedMovementUndo" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Movement history and extended Undo" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Історія переміщень і розширене скасування" } }
+      }
+    },
+    "premium.bundle.nestedStoragePlaces" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Nested Storage Places" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вкладені місця зберігання" } }
+      }
+    },
+    "premium.bundle.placeContentsMovement" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Move a Storage Place’s direct contents" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Переміщення вмісту місця зберігання" } }
+      }
+    },
+    "premium.bundle.roomSweep" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Room Sweep" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Швидкий облік" } }
+      }
+    },
+    "premium.bundle.section" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Five Pro capabilities" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "П’ять можливостей Pro" } }
+      }
+    },
+    "premium.bundle.selectedItemMovement" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Move selected Items together" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Спільне переміщення вибраних речей" } }
+      }
+    },
+    "premium.context.nestedCreate.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Create a Storage Place inside another after unlocking Home Stuff Pro." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Розміщуйте місце зберігання всередині іншого після придбання Home Stuff Pro." } }
+      }
+    },
+    "premium.context.nestedCreate.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Create a Nested Storage Place" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Створіть вкладене місце зберігання" } }
+      }
+    },
+    "premium.context.nestedRestructure.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Restructure Storage Places into a hierarchy after unlocking Home Stuff Pro." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Упорядковуйте місця зберігання в ієрархію після придбання Home Stuff Pro." } }
+      }
+    },
+    "premium.context.nestedRestructure.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Restructure Storage Places" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Змініть ієрархію місць зберігання" } }
+      }
+    },
+    "premium.context.placeContents.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Move every Item stored directly in this Storage Place in one step." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Перемістіть усі речі безпосередньо з цього місця зберігання за одну дію." } }
+      }
+    },
+    "premium.context.placeContents.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Move This Storage Place’s Contents" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Перемістіть вміст цього місця" } }
+      }
+    },
+    "premium.context.roomSweep.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Save several Items quickly while keeping the same destination." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Швидко збережіть кілька речей, не змінюючи місце." } }
+      }
+    },
+    "premium.context.roomSweep.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Continue with Room Sweep" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Продовжте швидкий облік" } }
+      }
+    },
+    "premium.context.selectedItems.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Select several Items and move them together after unlocking Home Stuff Pro." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Виберіть кілька речей і перемістіть їх разом після придбання Home Stuff Pro." } }
+      }
+    },
+    "premium.context.selectedItems.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Move Selected Items Together" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Перемістіть вибрані речі разом" } }
+      }
+    },
+    "premium.context.settings.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Unlock five focused inventory workflows with one purchase." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Відкрийте п’ять зручних сценаріїв інвентарю однією покупкою." } }
+      }
+    },
+    "premium.context.settings.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro" } }
+      }
+    },
+    "premium.context.undo.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Review movement history and undo the latest compatible move." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Переглядайте історію переміщень і скасовуйте останнє сумісне переміщення." } }
+      }
+    },
+    "premium.context.undo.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Use Movement History and Undo" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Скористайтеся історією та скасуванням" } }
+      }
+    },
+    "premium.dismiss" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Close" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Закрити" } }
+      }
+    },
+    "premium.loading" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Loading purchase…" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Завантаження покупки…" } }
+      }
+    },
+    "premium.offline" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Can’t connect to the App Store. Check your connection and try again." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося підключитися до App Store. Перевірте з’єднання та повторіть спробу." } }
+      }
+    },
+    "premium.oneTime" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "One-time purchase for your Apple Account." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Одноразова покупка для вашого облікового запису Apple." } }
+      }
+    },
+    "premium.outcome.failure" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The purchase couldn’t be completed. Try again." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося завершити покупку. Повторіть спробу." } }
+      }
+    },
+    "premium.outcome.noPurchase" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No previous Home Stuff Pro purchase was found." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Попередню покупку Home Stuff Pro не знайдено." } }
+      }
+    },
+    "premium.outcome.pending" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The purchase is pending approval. You can return here later." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Покупка очікує підтвердження. Ви можете повернутися сюди пізніше." } }
+      }
+    },
+    "premium.outcome.restored" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro was restored." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro відновлено." } }
+      }
+    },
+    "premium.owned" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro is active" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro активовано" } }
+      }
+    },
+    "premium.productUnavailable" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro isn’t available from the App Store right now." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro зараз недоступний в App Store." } }
+      }
+    },
+    "premium.purchase" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Purchase Home Stuff Pro" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Придбати Home Stuff Pro" } }
+      }
+    },
+    "premium.restore" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Restore Purchases" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Відновити покупки" } }
+      }
+    },
+    "premium.settings.available" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Available" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Доступно" } }
+      }
+    },
+    "premium.settings.hint" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Shows Home Stuff Pro purchase details." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Показує відомості про покупку Home Stuff Pro." } }
+      }
+    },
+    "premium.settings.owned" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Owned" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Придбано" } }
+      }
+    },
+    "premium.settings.section" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro" } }
+      }
+    },
+    "premium.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro" } }
+      }
+    },
     "settings.title" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Settings" } },

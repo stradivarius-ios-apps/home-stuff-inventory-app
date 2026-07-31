@@ -25,17 +25,20 @@ SHARDS = {
   ],
   "03" => %w[
     InventoryBrowseDetailUITests/testItemDetailBoundsAndExpandsManyTagsAfterNotes
+    InventoryBrowseDetailUITests/testItemDetailMovementHistoryIsReadableWithoutUpgrade
     InventoryBrowseDetailUITests/testItemDetailPlacesLabeledDatesAfterNotesAndTags
     InventoryBrowseDetailUITests/testItemDetailStorageFitsUkrainianAccessibilityWithReducedTransparency
     InventoryBrowseDetailUITests/testExistingNotesEditorLifecycleSupportsDismissDiscardAndSave
   ],
   "04" => %w[
     InventoryBrowseDetailUITests/testEmptyNotesCardOpensNotesEditor
+    InventoryBrowseDetailUITests/testScopedRoomSweepUsesSharedUpgradeWithoutBlockingOrdinaryAddItem
     InventoryItemFormUITests/testNewItemFormInitiallyFocusesNameWhileEditFormDoesNotForceFocus
     InventoryItemFormUITests/testPreScopedNewItemFormInitiallyFocusesName
     InventoryItemFormUITests/testReturningFromItemFormPickersDoesNotRestoreNameFocus
   ],
   "05" => %w[
+    InventoryBrowseDetailUITests/testFirstLaunchDoesNotPresentProUpgrade
     InventoryItemFormUITests/testAddNewPlaceUsesLocalizedScopedPickerAndDefaultIcon
     InventoryItemFormUITests/testPrimaryActionCreationMatrixRendersInDarkHighContrastAccessibility
     InventoryItemFormUITests/testAddLocationCreationSurfaceRendersAtAccessibilitySize
@@ -69,6 +72,7 @@ SHARDS = {
     InventorySettingsUITests/testBlockedLocationDeleteUsesUkrainianGuidance
     InventorySettingsUITests/testSettingsShowsAlwaysAvailableManualBackupAction
     InventorySettingsUITests/testSettingsRestoreRowIsAlwaysAvailableAndInvokesTheImporterAction
+    InventorySettingsUITests/testFreeGlobalHistoryPresentsExtendedUndoUpgradeFromCurrentSheet
     InventorySettingsUITests/testListManagementEditorTextFieldSavesFromSettings
   ],
   "11" => %w[

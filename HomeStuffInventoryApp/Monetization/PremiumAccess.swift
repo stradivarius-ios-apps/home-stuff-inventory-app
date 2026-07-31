@@ -42,7 +42,6 @@ enum PremiumFeature: CaseIterable, Hashable, Sendable {
     case movePlaceContents
     case extendedMovementUndo
     case storageHierarchyEditing
-    case inventoryInboxBatchCleanup
 
     // Policy placeholders only. They do not activate or expose a production feature.
     case personalSync
@@ -59,8 +58,7 @@ struct PremiumAccessPolicy: Sendable {
              .moveSelectedItems,
              .movePlaceContents,
              .extendedMovementUndo,
-             .storageHierarchyEditing,
-             .inventoryInboxBatchCleanup:
+             .storageHierarchyEditing:
             entitlements.hasLocalProFeatures ? .available : .unavailable
         case .personalSync, .householdSharing:
             entitlements.hasSyncAndSharing ? .available : .unavailable

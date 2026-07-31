@@ -7,8 +7,7 @@ struct PremiumAccessTests {
         .moveSelectedItems,
         .movePlaceContents,
         .extendedMovementUndo,
-        .storageHierarchyEditing,
-        .inventoryInboxBatchCleanup
+        .storageHierarchyEditing
     ]
 
     private let subscriptionFeatures: Set<PremiumFeature> = [
@@ -17,7 +16,7 @@ struct PremiumAccessTests {
     ]
 
     @Test func featureSetContainsOnlyTheApprovedLaunchBundleAndPlaceholders() {
-        #expect(PremiumFeature.allCases.count == 8)
+        #expect(PremiumFeature.allCases.count == 7)
         #expect(Set(PremiumFeature.allCases) == localFeatures.union(subscriptionFeatures))
     }
 

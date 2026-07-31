@@ -21,6 +21,7 @@ private enum InventorySettingsAlert: Identifiable {
 
 struct SettingsHomeView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(PremiumUpgradeCoordinator.self) private var upgradeCoordinator
     @Query private var items: [InventoryItem]
     @Query private var locations: [StorageLocation]
     @Query private var customCategories: [InventoryCustomCategory]
@@ -28,6 +29,7 @@ struct SettingsHomeView: View {
     @Query private var movementRecords: [InventoryMovementRecord]
 
     @State private var workflow = InventoryDataTransferWorkflow()
+    @State private var isShowingMovementHistory = false
 #if DEBUG
     @State private var exportInvocationCompleted = false
     @State private var backupInvocationCompleted = false
@@ -46,6 +48,52 @@ struct SettingsHomeView: View {
                         .foregroundStyle(.secondary)
                 }
             }
+
+            Section {
+                Button {
+                    upgradeCoordinator.request(.settings)
+                } label: {
+                    HStack(spacing: 12) {
+                        InventorySettingsNavigationRow(
+                            "premium.title",
+                            systemImage: "sparkles"
+                        )
+                        Spacer()
+                        Text(
+                            upgradeCoordinator.premiumAccess.entitlements.hasLocalProFeatures
+                                ? "premium.settings.owned"
+                                : "premium.settings.available"
+                        )
+                        .foregroundStyle(.secondary)
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityHint("premium.settings.hint")
+                .accessibilityIdentifier("settings.pro")
+
+                Button("premium.restore") {
+                    upgradeCoordinator.request(.settings)
+                    Task { await upgradeCoordinator.restore() }
+                }
+                .frame(minHeight: 44)
+                .accessibilityIdentifier("settings.pro.restore")
+
+                Button {
+                    isShowingMovementHistory = true
+                } label: {
+                    InventorySettingsNavigationRow(
+                        "premium.history.title",
+                        systemImage: "clock.arrow.circlepath"
+                    )
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.pro.history")
+            } header: {
+                Text("premium.settings.section")
+            }
+            .inventoryFormRowSurface()
 
             Section {
                 NavigationLink {
@@ -157,6 +205,9 @@ struct SettingsHomeView: View {
             InventoryActivityShareView(url: artifact.url) { result in
                 workflow.completeShare(result)
             }
+        }
+        .sheet(isPresented: $isShowingMovementHistory) {
+            InventoryMovementHistoryView()
         }
         .fileExporter(
             isPresented: $workflow.isBackupExporterPresented,

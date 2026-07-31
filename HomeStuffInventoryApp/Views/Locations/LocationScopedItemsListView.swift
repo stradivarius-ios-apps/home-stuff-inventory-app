@@ -28,6 +28,7 @@ struct LocationItemsListView: View {
 struct PlaceItemsListView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(PremiumAccessState.self) private var premiumAccess
+    @Environment(PremiumUpgradeCoordinator.self) private var upgradeCoordinator
     let place: InventoryBrowseSummaries.PlaceSummary
     let items: [InventoryItem]
     let recentViewEvents: [InventoryItemViewEvent]
@@ -35,6 +36,7 @@ struct PlaceItemsListView: View {
     @Query private var locations: [StorageLocation]
 
     @State private var isShowingItemForm = false
+    @State private var isShowingRoomSweep = false
     @State private var isShowingContentsMovement = false
     @State private var contentsMovementMessage: String?
     @State private var openRegistration = InventoryPlaceOpenRegistration()
@@ -133,14 +135,26 @@ struct PlaceItemsListView: View {
         .toolbar {
             if let placeID = place.placeID {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        presentContentsMovement(placeID: placeID)
+                    Menu {
+                        Button {
+                            requestRoomSweep(placeID: placeID)
+                        } label: {
+                            Label("inventory.roomSweep.action", systemImage: "square.stack.3d.up")
+                        }
+                        .accessibilityIdentifier("locations.placeDetail.roomSweep")
+
+                        Button {
+                            presentContentsMovement(placeID: placeID)
+                        } label: {
+                            Label("locations.placeMove.action", systemImage: "arrow.right")
+                        }
+                        .accessibilityIdentifier("locations.placeDetail.moveContentsButton")
                     } label: {
-                        Image(systemName: "arrow.right")
+                        Image(systemName: "ellipsis.circle")
                     }
-                    .accessibilityLabel("locations.placeMove.action")
-                    .accessibilityHint("locations.placeMove.action.hint")
-                    .accessibilityIdentifier("locations.placeDetail.moveContentsButton")
+                    .accessibilityLabel("locations.placeDetail.actions")
+                    .accessibilityHint("locations.placeDetail.actions.hint")
+                    .accessibilityIdentifier("locations.placeDetail.proActions")
                 }
             }
 
@@ -154,13 +168,30 @@ struct PlaceItemsListView: View {
                 .accessibilityLabel("inventory.action.addItem.accessibilityLabel")
                 .accessibilityIdentifier("locations.placeDetail.addItemButton")
             }
+
         }
         .sheet(isPresented: $isShowingItemForm) {
             InventoryItemFormView(createContext: createContext)
         }
+        .sheet(isPresented: $isShowingRoomSweep) {
+            InventoryRoomSweepView(createContext: createContext) {
+                isShowingRoomSweep = false
+                upgradeCoordinator.request(.roomSweep) {
+                    isShowingRoomSweep = true
+                }
+            }
+        }
         .sheet(isPresented: $isShowingContentsMovement) {
             if let placeID = place.placeID {
-                InventoryPlaceContentsMovementView(sourcePlaceID: placeID)
+                InventoryPlaceContentsMovementView(
+                    sourcePlaceID: placeID,
+                    onAccessRequired: {
+                        isShowingContentsMovement = false
+                        upgradeCoordinator.request(.placeContentsMovement) {
+                            isShowingContentsMovement = true
+                        }
+                    }
+                )
             }
         }
         .alert(
@@ -233,14 +264,25 @@ struct PlaceItemsListView: View {
             )
             return
         }
-        guard premiumAccess.availability(of: .movePlaceContents) == .available else {
+        upgradeCoordinator.request(.placeContentsMovement) {
+            isShowingContentsMovement = true
+        }
+    }
+
+    private func requestRoomSweep(placeID: UUID) {
+        guard let sourcePlace = places.first(where: { $0.id == placeID }),
+              locations.contains(where: { $0.id == sourcePlace.locationID })
+        else {
             contentsMovementMessage = InventoryLocalization.string(
-                "locations.placeMove.accessRequired.message",
-                defaultValue: "Moving all items from a Storage Place requires additional access."
+                "locations.placeMove.sourceChanged.message",
+                defaultValue: "This Storage Place changed. Review it again."
             )
             return
         }
-        isShowingContentsMovement = true
+
+        upgradeCoordinator.request(.roomSweep) {
+            isShowingRoomSweep = true
+        }
     }
 }
 

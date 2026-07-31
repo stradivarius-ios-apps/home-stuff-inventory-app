@@ -109,6 +109,12 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
         XCTAssertTrue(element(identifier: "premium.upgrade").waitForExistence(timeout: 3))
         XCTAssertTrue(app.buttons["premium.purchase"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["premium.restore"].waitForExistence(timeout: 3))
+        let productName = app.staticTexts["premium.productName"]
+        let productPrice = app.staticTexts["premium.price"]
+        XCTAssertTrue(productName.waitForExistence(timeout: 3))
+        XCTAssertTrue(productPrice.waitForExistence(timeout: 3))
+        XCTAssertFalse(productName.label.isEmpty)
+        XCTAssertFalse(productPrice.label.isEmpty)
         app.buttons["premium.dismiss"].tap()
 
         tapBackButton()

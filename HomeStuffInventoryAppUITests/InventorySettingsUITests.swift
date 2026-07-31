@@ -196,6 +196,29 @@ final class InventorySettingsUITests: InventoryUITestCase {
         restoreAction.tap(); XCTAssertTrue(element(identifier: "settings.restore.invocationCompleted").waitForExistence(timeout: 3))
     }
 
+    func testFreeGlobalHistoryPresentsExtendedUndoUpgradeFromCurrentSheet() {
+        launchStartupApp(
+            arguments: [
+                "--use-sample-inventory-data",
+                "--qa-movement-history-fixture"
+            ]
+        )
+        app.tabBars.buttons["Settings"].tap()
+
+        let history = app.buttons["settings.pro.history"]
+        XCTAssertTrue(history.waitForExistence(timeout: 3))
+        history.tap()
+
+        let undo = app.buttons["premium.history.undo"]
+        XCTAssertTrue(undo.waitForExistence(timeout: 3))
+        XCTAssertTrue(undo.isEnabled)
+        undo.tap()
+
+        XCTAssertTrue(element(identifier: "premium.upgrade").waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Use Extended Undo"].exists)
+        XCTAssertTrue(app.buttons["premium.restore"].exists)
+    }
+
     func testListManagementEditorTextFieldSavesFromSettings() {
         launchApp(); openManagedLocations(); let managedLocationName = "Managed \(uniqueTestSuffix())"; tapVisibleButton(identifier: "inventory.lists.addLocationButton")
         let valueField = app.textFields["inventory.lists.valueField"]; XCTAssertTrue(valueField.waitForExistence(timeout: 3)); valueField.tap(); valueField.typeText(managedLocationName)

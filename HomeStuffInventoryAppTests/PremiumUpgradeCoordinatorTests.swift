@@ -52,6 +52,38 @@ struct PremiumUpgradeCoordinatorTests {
         #expect(coordinator.outcome == .none)
     }
 
+    @Test func movementHistoryOwnsItsContextualUpgradePresentation() {
+        let coordinator = makeCoordinator()
+
+        coordinator.request(
+            .extendedMovementUndo,
+            presentationHost: .movementHistory
+        )
+
+        #expect(coordinator.presentedContext(for: .root) == nil)
+        #expect(
+            coordinator.presentedContext(for: .movementHistory)
+                == .extendedMovementUndo
+        )
+    }
+
+    @Test func purchaseAndRestoreActionsDisableTogetherDuringEitherActiveOperation() {
+        for operationState in [
+            StoreKitEntitlementOperationState.purchasing,
+            .restoring
+        ] {
+            let availability = PremiumUpgradeActionAvailability(
+                operationState: operationState
+            )
+            #expect(!availability.purchaseEnabled)
+            #expect(!availability.restoreEnabled)
+        }
+
+        let idleAvailability = PremiumUpgradeActionAvailability(operationState: .idle)
+        #expect(idleAvailability.purchaseEnabled)
+        #expect(idleAvailability.restoreEnabled)
+    }
+
     @Test(arguments: [
         InventoryEntitlements(ownsLifetimePro: true, hasActiveFamilySubscription: false),
         InventoryEntitlements(ownsLifetimePro: false, hasActiveFamilySubscription: true),
@@ -201,6 +233,85 @@ struct PremiumUpgradeCoordinatorTests {
         #expect(InventoryMovementHistoryPresentation.latestAffectedItemCount(in: records) == 2)
     }
 
+    @Test func historyCountAndUndoUseTheSameCanonicalLatestOperationTieBreak() {
+        let olderLexicalOperationID = UUID(
+            uuidString: "00000000-0000-0000-0000-000000000001"
+        )!
+        let newerLexicalOperationID = UUID(
+            uuidString: "00000000-0000-0000-0000-000000000002"
+        )!
+        let occurredAt = Date(timeIntervalSince1970: 1_750_000_000)
+        let sourceLocation = StorageLocation(name: "Office")
+        let destinationLocation = StorageLocation(name: "Garage")
+        let firstItem = InventoryItem(
+            name: "Adapter",
+            locationName: destinationLocation.name
+        )
+        let secondItem = InventoryItem(
+            name: "Cable",
+            locationName: destinationLocation.name
+        )
+        let source = InventoryMovementEndpointSnapshot(
+            locationID: sourceLocation.id,
+            locationName: sourceLocation.name,
+            placeID: nil,
+            placeName: nil
+        )
+        let destination = InventoryMovementEndpointSnapshot(
+            locationID: destinationLocation.id,
+            locationName: destinationLocation.name,
+            placeID: nil,
+            placeName: nil
+        )
+        let records = [
+            InventoryMovementRecord(
+                operationID: olderLexicalOperationID,
+                itemID: firstItem.id,
+                occurredAt: occurredAt,
+                origin: .singleItem,
+                source: source,
+                destination: destination
+            ),
+            InventoryMovementRecord(
+                operationID: newerLexicalOperationID,
+                itemID: firstItem.id,
+                occurredAt: occurredAt,
+                origin: .selectedItems,
+                source: source,
+                destination: destination
+            ),
+            InventoryMovementRecord(
+                operationID: newerLexicalOperationID,
+                itemID: secondItem.id,
+                occurredAt: occurredAt,
+                origin: .selectedItems,
+                source: source,
+                destination: destination
+            )
+        ]
+
+        #expect(
+            InventoryMovementHistory.latestOperation(in: records)?.id
+                == newerLexicalOperationID
+        )
+        #expect(
+            InventoryMovementHistoryPresentation.latestAffectedItemCount(in: records)
+                == 2
+        )
+        #expect(
+            InventoryMovementHistory.undoAvailability(
+                records: records,
+                items: [firstItem, secondItem],
+                locations: [sourceLocation, destinationLocation],
+                places: [],
+                entitlements: InventoryEntitlements(
+                    ownsLifetimePro: true,
+                    hasActiveFamilySubscription: false
+                )
+            ) == .available(operationID: newerLexicalOperationID)
+        )
+    }
+
     @Test func historyUndoPresentationMatchesVisibleScopeAndCompatibilityBeforeUpgrade() {
         let sourceLocation = StorageLocation(name: "Office")
         let destinationLocation = StorageLocation(name: "Garage")
@@ -229,12 +340,16 @@ struct PremiumUpgradeCoordinatorTests {
         )
         let locations = [sourceLocation, destinationLocation]
 
+        let unavailable = undoAction(records: [], items: [item], locations: locations)
+        #expect(unavailable == .unavailable)
+        #expect(!InventoryMovementHistoryPresentation.isUndoEnabled(for: unavailable))
         #expect(
-            undoAction(records: [], items: [item], locations: locations) == .unavailable
+            InventoryMovementHistoryPresentation.disabledReasonKey(for: unavailable)
+                == "premium.history.outcome.unavailable"
         )
-        #expect(
-            undoAction(records: [record], items: [item], locations: locations) == .upgrade
-        )
+        let upgrade = undoAction(records: [record], items: [item], locations: locations)
+        #expect(upgrade == .upgrade)
+        #expect(InventoryMovementHistoryPresentation.isUndoEnabled(for: upgrade))
         #expect(
             undoAction(
                 records: [record],
@@ -248,12 +363,28 @@ struct PremiumUpgradeCoordinatorTests {
         )
 
         item.locationName = sourceLocation.name
+        let currentStateChanged = undoAction(
+            records: [record],
+            items: [item],
+            locations: locations
+        )
+        #expect(currentStateChanged == .currentStateChanged)
+        #expect(!InventoryMovementHistoryPresentation.isUndoEnabled(for: currentStateChanged))
         #expect(
-            undoAction(records: [record], items: [item], locations: locations) == .currentStateChanged
+            InventoryMovementHistoryPresentation.disabledReasonKey(for: currentStateChanged)
+                == "premium.history.outcome.changed"
         )
         item.locationName = destinationLocation.name
+        let unsafeRestoration = undoAction(
+            records: [record],
+            items: [item],
+            locations: [destinationLocation]
+        )
+        #expect(unsafeRestoration == .unsafeRestoration)
+        #expect(!InventoryMovementHistoryPresentation.isUndoEnabled(for: unsafeRestoration))
         #expect(
-            undoAction(records: [record], items: [item], locations: [destinationLocation]) == .unsafeRestoration
+            InventoryMovementHistoryPresentation.disabledReasonKey(for: unsafeRestoration)
+                == "premium.history.outcome.unsafe"
         )
 
         let undoRecord = InventoryMovementRecord(

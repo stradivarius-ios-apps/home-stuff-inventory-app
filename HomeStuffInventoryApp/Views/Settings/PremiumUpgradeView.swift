@@ -79,7 +79,12 @@ struct PremiumUpgradeView: View {
                             isProgressing: coordinator.operationState == .purchasing
                         )
                     }
-                    .disabled(coordinator.operationState == .purchasing)
+                    .disabled(!actionAvailability.purchaseEnabled)
+                    .accessibilityLabel(
+                        coordinator.operationState == .purchasing
+                            ? "premium.purchase.inProgress"
+                            : "premium.purchase"
+                    )
                     .accessibilityIdentifier("premium.purchase")
                 case .idle, .loading:
                     ProgressView("premium.loading")
@@ -106,9 +111,18 @@ struct PremiumUpgradeView: View {
                     isProgressing: coordinator.operationState == .restoring
                 )
             }
-            .disabled(coordinator.operationState == .restoring)
+            .disabled(!actionAvailability.restoreEnabled)
+            .accessibilityLabel(
+                coordinator.operationState == .restoring
+                    ? "premium.restore.inProgress"
+                    : "premium.restore"
+            )
             .accessibilityIdentifier("premium.restore")
         }
+    }
+
+    private var actionAvailability: PremiumUpgradeActionAvailability {
+        PremiumUpgradeActionAvailability(operationState: coordinator.operationState)
     }
 
     @ViewBuilder
@@ -157,6 +171,22 @@ struct PremiumUpgradeView: View {
         }
         .frame(minHeight: 44)
         .contentShape(Rectangle())
+    }
+}
+
+struct PremiumUpgradeActionAvailability: Equatable {
+    let purchaseEnabled: Bool
+    let restoreEnabled: Bool
+
+    init(operationState: StoreKitEntitlementOperationState) {
+        let isBusy = switch operationState {
+        case .purchasing, .restoring:
+            true
+        default:
+            false
+        }
+        purchaseEnabled = !isBusy
+        restoreEnabled = !isBusy
     }
 }
 

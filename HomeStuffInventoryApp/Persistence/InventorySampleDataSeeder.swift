@@ -382,4 +382,55 @@ enum InventoryHierarchyManagementFixture {
         try context.save()
     }
 }
+
+enum InventoryMovementHistoryFixture {
+    static let launchArgument = "--qa-movement-history-fixture"
+    static let recordID = UUID(uuidString: "B1F0A001-EE01-4E10-9000-000000000501")!
+    static let operationID = UUID(uuidString: "B1F0A001-EE01-4E10-9000-000000000502")!
+
+    static func isEnabled(arguments: [String]) -> Bool {
+        arguments.contains(launchArgument)
+    }
+
+    static func seed(in context: ModelContext) throws {
+        let existingRecords = try context.fetch(FetchDescriptor<InventoryMovementRecord>())
+        guard !existingRecords.contains(where: { $0.id == recordID }) else { return }
+
+        let items = try context.fetch(FetchDescriptor<InventoryItem>())
+        let locations = try context.fetch(FetchDescriptor<StorageLocation>())
+        guard let item = items.first(where: { $0.name == "USB-C to HDMI adapter" }),
+              let sourceLocation = locations.first(where: {
+                  InventoryNormalizedName.location($0.name)
+                      != InventoryNormalizedName.location(item.locationName)
+              })
+        else {
+            throw InventoryMovementHistoryFixtureError.missingSampleData
+        }
+
+        context.insert(
+            InventoryMovementRecord(
+                id: recordID,
+                operationID: operationID,
+                itemID: item.id,
+                occurredAt: Date(timeIntervalSince1970: 1_750_000_000),
+                origin: .singleItem,
+                source: InventoryMovementEndpointSnapshot(
+                    locationID: sourceLocation.id,
+                    locationName: sourceLocation.name,
+                    placeID: nil,
+                    placeName: nil
+                ),
+                destination: InventoryMovementEndpointSnapshot(
+                    item: item,
+                    locations: locations
+                )
+            )
+        )
+        try context.save()
+    }
+}
+
+enum InventoryMovementHistoryFixtureError: Error {
+    case missingSampleData
+}
 #endif

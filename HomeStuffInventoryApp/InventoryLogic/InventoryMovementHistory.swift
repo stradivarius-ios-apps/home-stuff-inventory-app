@@ -277,7 +277,7 @@ enum InventoryMovementHistory {
         records.filter { !retainedIDs.contains($0.operationID) }.forEach(delete)
     }
 
-    private static func latestOperation(
+    static func latestOperation(
         in records: [InventoryMovementRecord]
     ) -> (id: UUID, records: [InventoryMovementRecord])? {
         let grouped = Dictionary(grouping: records, by: \.operationID)

@@ -488,11 +488,15 @@ struct InventoryRoomSweepView: View {
 
     @State private var workflow: InventoryRoomSweepWorkflow
     @State private var isShowingSaveError = false
-    @State private var isShowingAccessRequired = false
     @FocusState private var isNameFocused: Bool
+    private let onAccessRequired: () -> Void
 
-    init(createContext: InventoryItemCreateContext = .global) {
+    init(
+        createContext: InventoryItemCreateContext = .global,
+        onAccessRequired: @escaping () -> Void = {}
+    ) {
         _workflow = State(initialValue: InventoryRoomSweepWorkflow(createContext: createContext))
+        self.onAccessRequired = onAccessRequired
     }
 
     var body: some View {
@@ -539,11 +543,6 @@ struct InventoryRoomSweepView: View {
                 Button("inventory.action.ok", role: .cancel) { }
             } message: {
                 Text("inventory.alert.saveError.message")
-            }
-            .alert("inventory.roomSweep.upgrade.title", isPresented: $isShowingAccessRequired) {
-                Button("inventory.action.ok", role: .cancel) { }
-            } message: {
-                Text("inventory.roomSweep.upgrade.message")
             }
         }
     }
@@ -679,7 +678,8 @@ struct InventoryRoomSweepView: View {
             workflow.didSaveItem()
             isNameFocused = true
         case .accessRequired:
-            isShowingAccessRequired = true
+            dismiss()
+            onAccessRequired()
         case .invalidDraft:
             return
         case .saveFailed:

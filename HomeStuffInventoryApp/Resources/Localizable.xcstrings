@@ -1838,6 +1838,18 @@
         "uk" : { "stringUnit" : { "state" : "translated", "value" : "Речі" } }
       }
     },
+    "locations.placeDetail.actions" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Storage Place Actions" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Дії з місцем зберігання" } }
+      }
+    },
+    "locations.placeDetail.actions.hint" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Shows Room Sweep and movement actions." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Показує швидке додавання та дії переміщення." } }
+      }
+    },
     "locations.placeDetail.allContainedItems" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "All Contained Items" } },
@@ -2816,6 +2828,18 @@
         "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вкладені місця зберігання" } }
       }
     },
+    "premium.bundle.extendedMovementUndo" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Extended Undo for the latest compatible move" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Розширене скасування останнього сумісного переміщення" } }
+      }
+    },
+    "premium.bundle.nestedStoragePlaces" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Nested Storage Places" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вкладені місця зберігання" } }
+      }
+    },
     "inventory.places.hierarchy.move.destination" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Destination" } },
@@ -2930,6 +2954,294 @@
         "uk" : { "stringUnit" : { "state" : "translated", "value" : "Атомарно відновлює останнє сумісне переміщення ієрархії та розташування речей." } }
       }
     },
+    "premium.bundle.placeContentsMovement" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Move a Storage Place’s direct contents" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Переміщення вмісту місця зберігання" } }
+      }
+    },
+    "premium.bundle.roomSweep" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Room Sweep" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Швидкий облік" } }
+      }
+    },
+    "premium.bundle.section" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Five Pro capabilities" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "П’ять можливостей Pro" } }
+      }
+    },
+    "premium.bundle.selectedItemMovement" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Move selected Items together" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Спільне переміщення вибраних речей" } }
+      }
+    },
+    "premium.context.nestedCreate.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Create a Storage Place inside another after unlocking Home Stuff Pro." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Розміщуйте місце зберігання всередині іншого після придбання Home Stuff Pro." } }
+      }
+    },
+    "premium.context.nestedCreate.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Create a Nested Storage Place" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Створіть вкладене місце зберігання" } }
+      }
+    },
+    "premium.context.nestedRestructure.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Restructure Storage Places into a hierarchy after unlocking Home Stuff Pro." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Упорядковуйте місця зберігання в ієрархію після придбання Home Stuff Pro." } }
+      }
+    },
+    "premium.context.nestedRestructure.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Restructure Storage Places" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Змініть ієрархію місць зберігання" } }
+      }
+    },
+    "premium.context.placeContents.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Move every Item stored directly in this Storage Place in one step." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Перемістіть усі речі безпосередньо з цього місця зберігання за одну дію." } }
+      }
+    },
+    "premium.context.placeContents.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Move This Storage Place’s Contents" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Перемістіть вміст цього місця" } }
+      }
+    },
+    "premium.context.roomSweep.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Save several Items quickly while keeping the same destination." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Швидко збережіть кілька речей, не змінюючи місце." } }
+      }
+    },
+    "premium.context.roomSweep.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Continue with Room Sweep" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Продовжте швидкий облік" } }
+      }
+    },
+    "premium.context.selectedItems.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Select several Items and move them together after unlocking Home Stuff Pro." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Виберіть кілька речей і перемістіть їх разом після придбання Home Stuff Pro." } }
+      }
+    },
+    "premium.context.selectedItems.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Move Selected Items Together" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Перемістіть вибрані речі разом" } }
+      }
+    },
+    "premium.context.settings.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Unlock five focused inventory workflows with one purchase." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Відкрийте п’ять зручних сценаріїв інвентарю однією покупкою." } }
+      }
+    },
+    "premium.context.settings.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro" } }
+      }
+    },
+    "premium.context.undo.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Undo the latest compatible move from Movement History." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Скасуйте останнє сумісне переміщення з історії переміщень." } }
+      }
+    },
+    "premium.context.undo.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Use Extended Undo" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Скористайтеся розширеним скасуванням" } }
+      }
+    },
+    "premium.dismiss" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Close" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Закрити" } }
+      }
+    },
+    "premium.loading" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Loading purchase…" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Завантаження покупки…" } }
+      }
+    },
+    "premium.offline" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Can’t connect to the App Store. Check your connection and try again." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося підключитися до App Store. Перевірте з’єднання та повторіть спробу." } }
+      }
+    },
+    "premium.oneTime" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "One-time purchase for your Apple Account." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Одноразова покупка для вашого облікового запису Apple." } }
+      }
+    },
+    "premium.outcome.failure" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The purchase couldn’t be completed. Try again." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося завершити покупку. Повторіть спробу." } }
+      }
+    },
+    "premium.outcome.noPurchase" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No previous Home Stuff Pro purchase was found." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Попередню покупку Home Stuff Pro не знайдено." } }
+      }
+    },
+    "premium.outcome.pending" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The purchase is pending approval. You can return here later." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Покупка очікує підтвердження. Ви можете повернутися сюди пізніше." } }
+      }
+    },
+    "premium.outcome.restored" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro was restored." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro відновлено." } }
+      }
+    },
+    "premium.owned" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro is active" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro активовано" } }
+      }
+    },
+    "premium.productUnavailable" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro isn’t available from the App Store right now." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro зараз недоступний в App Store." } }
+      }
+    },
+    "premium.purchase" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Purchase Home Stuff Pro" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Придбати Home Stuff Pro" } }
+      }
+    },
+    "premium.retry" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Try Again" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Спробувати ще раз" } }
+      }
+    },
+    "premium.restore" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Restore Purchases" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Відновити покупки" } }
+      }
+    },
+    "premium.settings.available" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Available" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Доступно" } }
+      }
+    },
+    "premium.settings.hint" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Shows Home Stuff Pro purchase details." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Показує відомості про покупку Home Stuff Pro." } }
+      }
+    },
+    "premium.settings.owned" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Owned" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Придбано" } }
+      }
+    },
+    "premium.settings.section" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro" } }
+      }
+    },
+    "premium.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro" } }
+      }
+    },
+    "premium.history.empty.message" : { "localizations" : {
+      "en" : { "stringUnit" : { "state" : "translated", "value" : "Item moves will appear here." } },
+      "uk" : { "stringUnit" : { "state" : "translated", "value" : "Тут з’являтимуться переміщення речей." } }
+    } },
+    "premium.history.empty.title" : { "localizations" : {
+      "en" : { "stringUnit" : { "state" : "translated", "value" : "No Movement History" } },
+      "uk" : { "stringUnit" : { "state" : "translated", "value" : "Історія переміщень порожня" } }
+    } },
+    "premium.history.outcome.access" : { "localizations" : {
+      "en" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro access is no longer active." } },
+      "uk" : { "stringUnit" : { "state" : "translated", "value" : "Доступ до Home Stuff Pro більше не активний." } }
+    } },
+    "premium.history.outcome.changed" : { "localizations" : {
+      "en" : { "stringUnit" : { "state" : "translated", "value" : "The latest Items changed after this move, so it can’t be undone." } },
+      "uk" : { "stringUnit" : { "state" : "translated", "value" : "Після переміщення речі змінилися, тому його не можна скасувати." } }
+    } },
+    "premium.history.outcome.failed" : { "localizations" : {
+      "en" : { "stringUnit" : { "state" : "translated", "value" : "The move wasn’t undone. Try again." } },
+      "uk" : { "stringUnit" : { "state" : "translated", "value" : "Переміщення не скасовано. Повторіть спробу." } }
+    } },
+    "premium.history.outcome.title" : { "localizations" : {
+      "en" : { "stringUnit" : { "state" : "translated", "value" : "Undo Movement" } },
+      "uk" : { "stringUnit" : { "state" : "translated", "value" : "Скасування переміщення" } }
+    } },
+    "premium.history.outcome.undone" : { "localizations" : {
+      "en" : { "stringUnit" : { "state" : "translated", "value" : "The latest compatible move was undone." } },
+      "uk" : { "stringUnit" : { "state" : "translated", "value" : "Останнє сумісне переміщення скасовано." } }
+    } },
+    "premium.history.outcome.unavailable" : { "localizations" : {
+      "en" : { "stringUnit" : { "state" : "translated", "value" : "There is no compatible move to undo." } },
+      "uk" : { "stringUnit" : { "state" : "translated", "value" : "Немає сумісного переміщення для скасування." } }
+    } },
+    "premium.history.outcome.unsafe" : { "localizations" : {
+      "en" : { "stringUnit" : { "state" : "translated", "value" : "The original destination no longer exists, so this move can’t be undone safely." } },
+      "uk" : { "stringUnit" : { "state" : "translated", "value" : "Початкового місця більше немає, тому безпечно скасувати переміщення неможливо." } }
+    } },
+    "premium.history.section" : { "localizations" : {
+      "en" : { "stringUnit" : { "state" : "translated", "value" : "Recent Movements" } },
+      "uk" : { "stringUnit" : { "state" : "translated", "value" : "Останні переміщення" } }
+    } },
+    "premium.history.title" : { "localizations" : {
+      "en" : { "stringUnit" : { "state" : "translated", "value" : "Movement History" } },
+      "uk" : { "stringUnit" : { "state" : "translated", "value" : "Історія переміщень" } }
+    } },
+    "premium.history.undo" : { "localizations" : {
+      "en" : { "stringUnit" : { "state" : "translated", "value" : "Undo Latest Move" } },
+      "uk" : { "stringUnit" : { "state" : "translated", "value" : "Скасувати останнє переміщення" } }
+    } },
+    "premium.history.undo.confirm.action" : { "localizations" : {
+      "en" : { "stringUnit" : { "state" : "translated", "value" : "Undo Move" } },
+      "uk" : { "stringUnit" : { "state" : "translated", "value" : "Скасувати переміщення" } }
+    } },
+    "premium.history.undo.confirm.message" : { "localizations" : {
+      "en" : { "stringUnit" : { "state" : "translated", "value" : "Move %d affected Items back to their previous Storage Places?" } },
+      "uk" : { "stringUnit" : { "state" : "translated", "value" : "Повернути %d зачеплених речей до попередніх місць зберігання?" } }
+    } },
+    "premium.history.undo.confirm.title" : { "localizations" : {
+      "en" : { "stringUnit" : { "state" : "translated", "value" : "Undo Latest Move?" } },
+      "uk" : { "stringUnit" : { "state" : "translated", "value" : "Скасувати останнє переміщення?" } }
+    } },
+    "premium.history.undo.count" : { "localizations" : {
+      "en" : { "stringUnit" : { "state" : "translated", "value" : "Undo Latest Move (%d Items)" } },
+      "uk" : { "stringUnit" : { "state" : "translated", "value" : "Скасувати останнє переміщення (%d речей)" } }
+    } },
+    "premium.history.undo.footer" : { "localizations" : {
+      "en" : { "stringUnit" : { "state" : "translated", "value" : "Undo is available only while the Items and original Storage Places are unchanged." } },
+      "uk" : { "stringUnit" : { "state" : "translated", "value" : "Скасування доступне, лише доки речі та початкові місця зберігання не змінилися." } }
+    } },
+    "premium.history.unknownItem" : { "localizations" : {
+      "en" : { "stringUnit" : { "state" : "translated", "value" : "Removed Item" } },
+      "uk" : { "stringUnit" : { "state" : "translated", "value" : "Видалена річ" } }
+    } },
     "settings.title" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Settings" } },

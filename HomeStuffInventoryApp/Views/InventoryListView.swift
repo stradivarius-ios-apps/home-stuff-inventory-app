@@ -9,9 +9,9 @@ enum InventoryListPresentation {
 struct InventoryListView: View {
     @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
     @Environment(PremiumAccessState.self) private var premiumAccess
+    @Environment(PremiumUpgradeCoordinator.self) private var upgradeCoordinator
     @State private var isShowingItemForm = false
     @State private var isShowingRoomSweep = false
-    @State private var isShowingRoomSweepUpgrade = false
     @Binding private var searchText: String
     @State private var selectedItemID: UUID?
     @State private var selectedCategory: String?
@@ -19,7 +19,6 @@ struct InventoryListView: View {
     @State private var selectedPlace: InventorySearch.PlaceFilter?
     @State private var bulkSelection = InventoryBulkSelectionState()
     @State private var bulkMovementRequest: InventoryBulkMovementSheetRequest?
-    @State private var isShowingBulkAccessRequired = false
     @Namespace private var itemNavigationNamespace
 
     private let presentation: InventoryListPresentation
@@ -279,23 +278,23 @@ struct InventoryListView: View {
         .sheet(item: $bulkMovementRequest, onDismiss: {
             bulkSelection.cancel()
         }) { request in
-            InventoryBulkMovementView(selectedItemIDs: request.selectedItemIDs)
-        }
-        .alert(
-            "inventory.bulkMove.accessRequired.title",
-            isPresented: $isShowingBulkAccessRequired
-        ) {
-            Button("inventory.bulkMove.result.ok", role: .cancel) {}
-        } message: {
-            Text("inventory.bulkMove.accessRequired.message")
+            InventoryBulkMovementView(
+                selectedItemIDs: request.selectedItemIDs,
+                onAccessRequired: {
+                    bulkMovementRequest = nil
+                    upgradeCoordinator.request(.selectedItemMovement) {
+                        presentBulkMovement()
+                    }
+                }
+            )
         }
         .sheet(isPresented: $isShowingRoomSweep) {
-            InventoryRoomSweepView()
-        }
-        .alert("inventory.roomSweep.upgrade.title", isPresented: $isShowingRoomSweepUpgrade) {
-            Button("inventory.action.ok", role: .cancel) { }
-        } message: {
-            Text("inventory.roomSweep.upgrade.message")
+            InventoryRoomSweepView {
+                isShowingRoomSweep = false
+                upgradeCoordinator.request(.roomSweep) {
+                    isShowingRoomSweep = true
+                }
+            }
         }
         .onChange(of: selectedLocationName) { _, _ in
             reconcilePlaceSelection()
@@ -371,11 +370,9 @@ struct InventoryListView: View {
     }
 
     private func requestRoomSweep() {
-        guard premiumAccess.availability(of: .roomSweep) == .available else {
-            isShowingRoomSweepUpgrade = true
-            return
+        upgradeCoordinator.request(.roomSweep) {
+            isShowingRoomSweep = true
         }
-        isShowingRoomSweep = true
     }
 
     private func reconcilePlaceSelection() {
@@ -388,17 +385,19 @@ struct InventoryListView: View {
     }
 
     private func beginBulkSelection() {
-        let outcome = bulkSelection.begin(
-            visibleItemIDs: filteredItems.map(\.id),
-            availability: premiumAccess.availability(of: .moveSelectedItems)
-        )
-        isShowingBulkAccessRequired = outcome == .accessRequired
+        upgradeCoordinator.request(.selectedItemMovement) {
+            _ = bulkSelection.begin(
+                visibleItemIDs: filteredItems.map(\.id),
+                availability: .available
+            )
+        }
     }
 
     private func presentBulkMovement() {
         guard premiumAccess.availability(of: .moveSelectedItems) == .available else {
-            bulkSelection.cancel()
-            isShowingBulkAccessRequired = true
+            upgradeCoordinator.request(.selectedItemMovement) {
+                presentBulkMovement()
+            }
             return
         }
         guard !bulkSelection.selectedItemIDs.isEmpty else { return }

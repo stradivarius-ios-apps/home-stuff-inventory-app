@@ -33,10 +33,19 @@ struct InventoryBulkMovementView: View {
     @Query(sort: \InventoryPlace.name) private var places: [InventoryPlace]
 
     let selectedItemIDs: Set<UUID>
+    let onAccessRequired: () -> Void
 
     @State private var selectedDestinationID: InventoryBulkMovementDestination.Identity?
     @State private var preflight: InventoryBulkMovementPreflight?
     @State private var outcomeMessage: String?
+
+    init(
+        selectedItemIDs: Set<UUID>,
+        onAccessRequired: @escaping () -> Void = {}
+    ) {
+        self.selectedItemIDs = selectedItemIDs
+        self.onAccessRequired = onAccessRequired
+    }
 
     private var destinations: [InventoryBulkMovementDestination] {
         InventoryBulkMovementDestinationDirectory.destinations(
@@ -203,10 +212,7 @@ struct InventoryBulkMovementView: View {
         case let .ready(preflight):
             self.preflight = preflight
         case .accessRequired:
-            outcomeMessage = InventoryLocalization.string(
-                "inventory.bulkMove.accessRequired.message",
-                defaultValue: "Pro access is required to move selected items."
-            )
+            dismissForUpgrade()
         case .emptySelection:
             outcomeMessage = InventoryLocalization.string(
                 "inventory.bulkMove.emptySelection.message",
@@ -234,10 +240,7 @@ struct InventoryBulkMovementView: View {
         case .moved, .unchanged:
             dismiss()
         case .accessRequired:
-            outcomeMessage = InventoryLocalization.string(
-                "inventory.bulkMove.accessRequired.message",
-                defaultValue: "Pro access is required to move selected items."
-            )
+            dismissForUpgrade()
         case .staleSelection:
             outcomeMessage = InventoryLocalization.string(
                 "inventory.bulkMove.staleSelection.message",
@@ -270,5 +273,10 @@ struct InventoryBulkMovementView: View {
             return locationName
         }
         return "\(locationName) › \(place)"
+    }
+
+    private func dismissForUpgrade() {
+        dismiss()
+        onAccessRequired()
     }
 }

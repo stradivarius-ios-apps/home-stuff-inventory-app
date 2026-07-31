@@ -11,10 +11,19 @@ struct InventoryPlaceContentsMovementView: View {
     @Query(sort: \InventoryPlace.name) private var places: [InventoryPlace]
 
     let sourcePlaceID: UUID
+    let onAccessRequired: () -> Void
 
     @State private var selectedDestinationID: InventoryBulkMovementDestination.Identity?
     @State private var preflight: InventoryPlaceContentsMovementPreflight?
     @State private var outcomeMessage: String?
+
+    init(
+        sourcePlaceID: UUID,
+        onAccessRequired: @escaping () -> Void = {}
+    ) {
+        self.sourcePlaceID = sourcePlaceID
+        self.onAccessRequired = onAccessRequired
+    }
 
     private var destinations: [InventoryBulkMovementDestination] {
         InventoryBulkMovementDestinationDirectory.destinations(
@@ -168,10 +177,7 @@ struct InventoryPlaceContentsMovementView: View {
                 defaultValue: "Some items still need this Storage Place confirmed. Open each item and confirm its Storage Place before moving all contents."
             )
         case .accessRequired:
-            outcomeMessage = InventoryLocalization.string(
-                "locations.placeMove.accessRequired.message",
-                defaultValue: "Moving all items from a Storage Place requires additional access."
-            )
+            dismissForUpgrade()
         case .invalidSource:
             outcomeMessage = InventoryLocalization.string(
                 "locations.placeMove.sourceChanged.message",
@@ -199,10 +205,7 @@ struct InventoryPlaceContentsMovementView: View {
                 defaultValue: "Some items still need this Storage Place confirmed. Open each item and confirm its Storage Place before moving all contents."
             )
         case .accessRequired:
-            outcomeMessage = InventoryLocalization.string(
-                "locations.placeMove.accessRequired.message",
-                defaultValue: "Moving all items from a Storage Place requires additional access."
-            )
+            dismissForUpgrade()
         case .sourceChanged:
             outcomeMessage = InventoryLocalization.string(
                 "locations.placeMove.sourceChanged.message",
@@ -224,5 +227,10 @@ struct InventoryPlaceContentsMovementView: View {
                 defaultValue: "No items were moved. Try again."
             )
         }
+    }
+
+    private func dismissForUpgrade() {
+        dismiss()
+        onAccessRequired()
     }
 }

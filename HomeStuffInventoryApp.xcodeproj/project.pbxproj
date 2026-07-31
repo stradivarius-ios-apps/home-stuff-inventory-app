@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		AD6580000000000000000001 /* InventoryPlaceHierarchyManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD6580000000000000000002 /* InventoryPlaceHierarchyManagement.swift */; };
 		AD6580000000000000000003 /* InventoryPlaceHierarchyMutationViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD6580000000000000000004 /* InventoryPlaceHierarchyMutationViews.swift */; };
+		AF7000000000000000000001 /* PremiumUpgradeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF7000000000000000000011 /* PremiumUpgradeCoordinator.swift */; };
+		AF7000000000000000000002 /* PremiumUpgradeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF7000000000000000000012 /* PremiumUpgradeView.swift */; };
+		AF7000000000000000000003 /* PremiumUpgradeCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF7000000000000000000013 /* PremiumUpgradeCoordinatorTests.swift */; };
+		AF7000000000000000000004 /* InventoryMovementHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF7000000000000000000014 /* InventoryMovementHistoryView.swift */; };
 		AE5000000000000000000001 /* InventoryPlaceContentsMovement.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE5000000000000000000011 /* InventoryPlaceContentsMovement.swift */; };
 		AE5000000000000000000002 /* InventoryPlaceContentsMovementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE5000000000000000000012 /* InventoryPlaceContentsMovementView.swift */; };
 		AE5000000000000000000003 /* InventoryPlaceContentsMovementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE5000000000000000000013 /* InventoryPlaceContentsMovementTests.swift */; };
@@ -223,6 +227,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		AF7000000000000000000011 /* PremiumUpgradeCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumUpgradeCoordinator.swift; sourceTree = "<group>"; };
+		AF7000000000000000000012 /* PremiumUpgradeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumUpgradeView.swift; sourceTree = "<group>"; };
+		AF7000000000000000000013 /* PremiumUpgradeCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumUpgradeCoordinatorTests.swift; sourceTree = "<group>"; };
+		AF7000000000000000000014 /* InventoryMovementHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryMovementHistoryView.swift; sourceTree = "<group>"; };
 		AE5000000000000000000011 /* InventoryPlaceContentsMovement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPlaceContentsMovement.swift; sourceTree = "<group>"; };
 		AE5000000000000000000012 /* InventoryPlaceContentsMovementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPlaceContentsMovementView.swift; sourceTree = "<group>"; };
 		AE5000000000000000000013 /* InventoryPlaceContentsMovementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPlaceContentsMovementTests.swift; sourceTree = "<group>"; };
@@ -495,6 +503,7 @@
 				A10000000000000000000261 /* StoreProductID.swift */,
 				A10000000000000000000263 /* StoreKitClient.swift */,
 				A10000000000000000000271 /* StoreKitEntitlementService.swift */,
+				AF7000000000000000000011 /* PremiumUpgradeCoordinator.swift */,
 			);
 			path = Monetization;
 			sourceTree = "<group>";
@@ -682,6 +691,8 @@
 				A10000000000000000000194 /* InventoryBackupDocument.swift */,
 				A1000000000000000000019A /* InventoryBackupRestorePreflightView.swift */,
 				A100000000000000000000BE /* SettingsHomeView.swift */,
+				AF7000000000000000000012 /* PremiumUpgradeView.swift */,
+				AF7000000000000000000014 /* InventoryMovementHistoryView.swift */,
 				A10000000000000000000253 /* PlaceManagementView.swift */,
 				AD6580000000000000000004 /* InventoryPlaceHierarchyMutationViews.swift */,
 			);
@@ -717,6 +728,7 @@
 		A10000000000000000000053 /* HomeStuffInventoryAppTests */ = {
 			isa = PBXGroup;
 			children = (
+				AF7000000000000000000013 /* PremiumUpgradeCoordinatorTests.swift */,
 				AE5000000000000000000013 /* InventoryPlaceContentsMovementTests.swift */,
 				AD6500000000000000000004 /* InventoryPlaceMutationPersistenceTests.swift */,
 				AD4000000000000000000013 /* InventoryBulkMovementTests.swift */,
@@ -935,6 +947,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AF7000000000000000000001 /* PremiumUpgradeCoordinator.swift in Sources */,
+				AF7000000000000000000002 /* PremiumUpgradeView.swift in Sources */,
+				AF7000000000000000000004 /* InventoryMovementHistoryView.swift in Sources */,
 				AE5000000000000000000001 /* InventoryPlaceContentsMovement.swift in Sources */,
 				AE5000000000000000000002 /* InventoryPlaceContentsMovementView.swift in Sources */,
 				AD6500000000000000000001 /* InventoryPlaceMutationPersistence.swift in Sources */,
@@ -1069,6 +1084,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AF7000000000000000000003 /* PremiumUpgradeCoordinatorTests.swift in Sources */,
 				AE5000000000000000000003 /* InventoryPlaceContentsMovementTests.swift in Sources */,
 				AD6500000000000000000003 /* InventoryPlaceMutationPersistenceTests.swift in Sources */,
 				AD4000000000000000000003 /* InventoryBulkMovementTests.swift in Sources */,

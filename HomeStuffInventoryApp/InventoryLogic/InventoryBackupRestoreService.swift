@@ -170,6 +170,9 @@ struct InventoryBackupRestoreService: Sendable {
 
     @MainActor
     private static func deletePersonalDataset(in context: ModelContext) throws {
+        for record in try context.fetch(FetchDescriptor<InventoryPlaceMutationRecord>()) {
+            context.delete(record)
+        }
         for record in try context.fetch(FetchDescriptor<InventoryPlaceOpenRecord>()) {
             context.delete(record)
         }

@@ -74,6 +74,7 @@ enum InventoryModelContainer {
         let schema = Schema([
             InventoryItem.self,
             InventoryMovementRecord.self,
+            InventoryPlaceMutationRecord.self,
             InventoryItemViewEvent.self,
             InventoryPlaceOpenRecord.self,
             InventoryPlace.self,

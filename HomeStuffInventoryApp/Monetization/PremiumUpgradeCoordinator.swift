@@ -29,7 +29,7 @@ enum PremiumUpgradeContext: Equatable, Hashable, Identifiable, Sendable {
         case .selectedItemMovement: .moveSelectedItems
         case .placeContentsMovement: .movePlaceContents
         case .extendedMovementUndo: .extendedMovementUndo
-        case .nestedStoragePlaceCreation, .nestedStoragePlaceRestructure: .nestedStoragePlaces
+        case .nestedStoragePlaceCreation, .nestedStoragePlaceRestructure: .storageHierarchyEditing
         }
     }
 

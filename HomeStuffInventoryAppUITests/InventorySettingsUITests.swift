@@ -106,7 +106,14 @@ final class InventorySettingsUITests: InventoryUITestCase {
         let row = app.staticTexts["inventory.lists.valueTitle"].firstMatch
         XCTAssertTrue(row.waitForExistence(timeout: 3))
         XCTAssertGreaterThanOrEqual(row.frame.height, 44)
-        XCTAssertTrue(app.buttons["inventory.lists.valueActions"].firstMatch.exists)
+        XCTAssertTrue(
+            app.buttons.matching(
+                NSPredicate(
+                    format: "identifier BEGINSWITH %@",
+                    "settings.places.hierarchy.actions."
+                )
+            ).firstMatch.exists
+        )
         add(attachment(named: "place-directory-en-dark-high-contrast-reduce-transparency-accessibility"))
 
         app.buttons["settings.places.addButton"].tap()
@@ -137,7 +144,13 @@ final class InventorySettingsUITests: InventoryUITestCase {
         let sharedBoxes = app.staticTexts.matching(NSPredicate(format: "label == %@", "Shared box")).allElementsBoundByIndex
         XCTAssertGreaterThanOrEqual(sharedBoxes.count, 2)
 
-        let viewItems = viewItemsButton(inManagedValueRowNamed: "Shared box")
+        let viewItems = app.buttons.matching(
+            NSPredicate(
+                format: "identifier == %@ AND label == %@",
+                "inventory.lists.viewItems",
+                "View items in Shared box at Fixture Garage, 1 item"
+            )
+        ).firstMatch
         XCTAssertEqual(viewItems.label, "View items in Shared box at Fixture Garage, 1 item")
         scrollToElement(viewItems); viewItems.tap()
         XCTAssertTrue(app.buttons["inventory.itemRow.Scoped Place fixture Item"].waitForExistence(timeout: 3))
@@ -162,7 +175,10 @@ final class InventorySettingsUITests: InventoryUITestCase {
             NSPredicate(format: "identifier == %@ AND label == %@", "inventory.lists.viewItems", "View items in Shared box at Fixture Garage, 1 item")
         ).firstMatch
         scrollToElement(fixtureViewItems)
-        let placeActions = actionsButton(alignedWith: fixtureViewItems)
+        let fixturePlaceID = "B1F0A001-EE01-4E10-9000-000000000403"
+        let placeActions = app.buttons[
+            "settings.places.hierarchy.actions.\(fixturePlaceID)"
+        ]
         scrollToElement(placeActions); placeActions.tap(); app.buttons["Delete"].tap(); app.buttons["Delete"].tap()
         XCTAssertTrue(app.buttons["View Items"].waitForExistence(timeout: 3))
         app.buttons["View Items"].tap()

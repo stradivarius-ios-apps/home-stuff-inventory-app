@@ -49,11 +49,18 @@ struct LocalizationCatalogTests {
             contentsOf: root.appendingPathComponent("HomeStuffInventoryApp/Views/Settings/PlaceManagementView.swift"),
             encoding: .utf8
         )
+        let hierarchySource = try String(
+            contentsOf: root.appendingPathComponent(
+                "HomeStuffInventoryApp/Views/Settings/InventoryPlaceHierarchyMutationViews.swift"
+            ),
+            encoding: .utf8
+        )
 
         #expect(managedRowSource.contains("let editActionLabel: String"))
         #expect(listSource.contains("editActionLabel: localized(\"inventory.action.edit\""))
         #expect(listSource.contains("editActionLabel: localized(\"inventory.action.rename\""))
-        #expect(placeSource.contains("editActionLabel: String(localized: \"inventory.action.edit\""))
+        #expect(placeSource.contains("onEdit: presentHierarchyEditor"))
+        #expect(hierarchySource.contains("Label(\"inventory.action.edit\""))
     }
 
     @Test func ukrainianCoreStringsResolveFromCatalog() {

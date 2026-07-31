@@ -106,13 +106,13 @@ Verified ownership is the authority for enabling a Pro operation. The implementa
 
 | State or event | Required behavior |
 |---|---|
-| Entitlements loading or unavailable with no established verified ownership | Keep all Free workflows usable. Do not begin a Pro operation or mutate Pro state. Show only the later approved non-blocking contextual status when intentionally invoked. |
+| Entitlements loading or unavailable with no established verified ownership | Keep all Free workflows usable. Do not begin a Pro operation or mutate Pro state. Show only the implemented non-blocking contextual status when intentionally invoked. |
 | Verified Lifetime Pro | Permit all five local operations after the launch gate is active. No network is required for the workflows themselves. |
 | Verified active Family subscription | Permit the same local Pro operations. Sync/sharing remains a separate subscription-only policy and is not part of this bundle. |
 | Offline after verified ownership was established | Preserve local Pro access under the reconciliation rules approved by the StoreKit task. Queue no server work because these five workflows are local. |
 | Purchase pending | Keep the invoked context without starting the operation. Free data and navigation remain usable. Later verified success may enable continuation; pending state never grants access itself. |
 | Purchase cancelled | Dismiss or return quietly to the unchanged source context; no error alert and no mutation. |
-| Product load, purchase, verification, or restore failure | Explain the later approved actionable outcome without changing Inventory data or blocking Free. An unverified transaction never grants access. |
+| Product load, purchase, verification, or restore failure | Show the implemented localized failure outcome and retry action where available, without changing Inventory data or blocking Free. An unverified transaction never grants access. |
 | Refund or revocation | Reconcile access and disable new Pro operations when no other qualifying entitlement exists. Never hide or delete prior results or history. |
 | Restore succeeds | Recompute the two independent entitlement facts from verified transactions and restore corresponding access without data migration. |
 | Restore finds no qualifying purchase | Keep Free behavior and all records unchanged; do not describe this as data loss. |
@@ -157,7 +157,7 @@ assessment must confirm the privacy manifest and App Store privacy disclosures
 still match actual behavior. Public privacy/support pages remain in their
 separate public repository.
 
-Marketing, screenshots, release notes, review notes, and support copy may describe only capabilities that pass the launch gate. They must not hardcode price, use the planning USD hypothesis as a claim, advertise Family & Sync, or imply that any deferred Pro idea ships.
+Marketing, screenshots, release notes, review notes, and support copy may describe only capabilities that pass the launch gate. They must use StoreKit-localized pricing rather than hardcode or claim a numeric price, must not advertise Family & Sync, and must not imply that any deferred Pro idea ships.
 
 ## Frozen launch gate
 

@@ -4,7 +4,7 @@ Status: Canonical repository contract
 
 ## Purpose
 
-This document is the enforceable minimum for the Home Stuff Inventory Free tier. It refines the approved [monetization model](monetization-model.md) without changing shipped UI or claiming that deferred capabilities already exist.
+This document is the enforceable minimum for the Home Stuff Inventory Free tier. It refines the approved [monetization model](monetization-model.md) while keeping implemented Lifetime Pro behavior distinct from capabilities that remain deferred.
 
 Every capability in the matrix is protected from monetization gates. `InventoryFreeCapability` and `InventoryFreeAccessPolicy` are the production policy boundary; the policy is intentionally independent from StoreKit, SwiftData, Search, persistence filtering, and UI presentation.
 
@@ -70,7 +70,7 @@ Free policy resolution is deterministic:
 - recovery never silently substitutes an empty store, filters persisted records, or discards pending local data;
 - later entitlement recovery may restore premium access, but Free access never waits for that recovery.
 
-The personal local Inventory remains usable without an account or network connection. Future adapters may translate verified StoreKit state into `InventoryEntitlementState`; they must not introduce StoreKit types into this policy or its deterministic unit tests.
+The personal local Inventory remains usable without an account or network connection. The implemented StoreKit adapter translates verified StoreKit state into `InventoryEntitlementState`; StoreKit types remain outside this policy and its deterministic unit tests.
 
 ## Extension and change control
 
@@ -89,4 +89,4 @@ Code cleanup, StoreKit integration, paywall work, or a premium-feature issue can
 
 This contract adds no permission, entitlement, network access, data collection, tracking, privacy-manifest entry, App Store metadata, or visible UI. It does not require English or Ukrainian string changes and does not change accessibility behavior.
 
-Ship future gates only at capability boundaries outside inventory storage and retrieval. A rollback may turn off newly introduced premium creation, automation, bulk operations, or continuing services. It must preserve schema compatibility, local readability, export/recovery access, and all existing data. This task adds no persisted model or schema, so its policy and documentation can be rolled back without data migration; future implementations remain bound by the approved product contract until a product-decision issue changes it.
+Keep gates only at capability boundaries outside inventory storage and retrieval. A rollback may turn off premium creation, automation, bulk operations, or continuing services. It must preserve schema compatibility, local readability, export/recovery access, and all existing data. This policy has no persistence schema of its own; rolling back entitlement presentation must not roll back or make incompatible the implemented hierarchy and movement-history schemas. Current and future implementations remain bound by the approved product contract until a product-decision issue changes it.

@@ -123,5 +123,6 @@ private extension View {
 #Preview {
     RootView()
         .modelContainer(try! InventoryModelContainer.makeSample())
+        .environment(PremiumAccessState(debugPreset: .lifetimePro))
 }
 #endif

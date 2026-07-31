@@ -8,7 +8,10 @@ enum InventoryListPresentation {
 
 struct InventoryListView: View {
     @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
+    @Environment(PremiumAccessState.self) private var premiumAccess
     @State private var isShowingItemForm = false
+    @State private var isShowingRoomSweep = false
+    @State private var isShowingRoomSweepUpgrade = false
     @Binding private var searchText: String
     @State private var selectedItemID: UUID?
     @State private var selectedCategory: String?
@@ -203,10 +206,22 @@ struct InventoryListView: View {
             }
 
             ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    isShowingItemForm = true
+                Menu {
+                    Button {
+                        isShowingItemForm = true
+                    } label: {
+                        Label("inventory.action.addItem", systemImage: "plus")
+                    }
+
+                    Button {
+                        requestRoomSweep()
+                    } label: {
+                        Label("inventory.roomSweep.action", systemImage: "square.stack.3d.up")
+                    }
                 } label: {
                     Image(systemName: "plus")
+                } primaryAction: {
+                    isShowingItemForm = true
                 }
                 .inventoryPrimaryActionTint()
                 .accessibilityLabel("inventory.action.addItem.accessibilityLabel")
@@ -215,6 +230,14 @@ struct InventoryListView: View {
         }
         .sheet(isPresented: $isShowingItemForm) {
             InventoryItemFormView()
+        }
+        .sheet(isPresented: $isShowingRoomSweep) {
+            InventoryRoomSweepView()
+        }
+        .alert("inventory.roomSweep.upgrade.title", isPresented: $isShowingRoomSweepUpgrade) {
+            Button("inventory.action.ok", role: .cancel) { }
+        } message: {
+            Text("inventory.roomSweep.upgrade.message")
         }
         .onChange(of: selectedLocationName) { _, _ in
             reconcilePlaceSelection()
@@ -274,6 +297,14 @@ struct InventoryListView: View {
         selectedCategory = nil
         selectedLocationName = nil
         selectedPlace = nil
+    }
+
+    private func requestRoomSweep() {
+        guard premiumAccess.availability(of: .roomSweep) == .available else {
+            isShowingRoomSweepUpgrade = true
+            return
+        }
+        isShowingRoomSweep = true
     }
 
     private func reconcilePlaceSelection() {

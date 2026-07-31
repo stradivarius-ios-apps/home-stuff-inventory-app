@@ -1,12 +1,25 @@
 # Home Stuff Inventory Monetization Model
 
-Status: Approved product concept; premium implementation deferred; protected Free portability implemented
+Status: Lifetime Pro implemented in source and release-gated; protected Free
+portability implemented; Family & Sync deferred
 
 ## Purpose
 
-This document records the approved monetization and premium-access model for Home Stuff Inventory before StoreKit, paywalls, CloudKit, subscriptions, or premium features are implemented. The protected Free core, including readable export, complete manual backup, and compatible atomic restore, is implemented independently of that deferred premium work.
+This document records the approved monetization and premium-access model for
+Home Stuff Inventory. The exact five-capability Lifetime Pro bundle, StoreKit
+2 lifecycle, and contextual upgrade surface are implemented in canonical
+source but remain gated from release activation. The protected Free core,
+including readable export, complete manual backup, and compatible atomic
+restore, is implemented independently. CloudKit, subscriptions, and Family &
+Sync remain deferred.
 
-It is a product and architecture guardrail. Its StoreKit, paywall, CloudKit, subscription, and premium-feature sections describe deferred functionality and do not authorize implementation by themselves; the Free core section describes the protected behavior already present in the repository. Every future premium capability requires a separate issue with explicit product behavior, data rules, privacy impact, localization, accessibility, validation, and release scope.
+It is a product and architecture guardrail. The Lifetime Pro and Free sections
+describe implemented source behavior; the launch-readiness gate separately
+controls App Store activation. CloudKit, subscription, Family & Sync, and
+later-feature sections remain deferred and do not authorize implementation by
+themselves. Every future premium capability requires a separate approved scope
+with explicit product behavior, data rules, privacy impact, localization,
+accessibility, validation, and release boundaries.
 
 ## Product decision
 
@@ -20,7 +33,7 @@ Home Stuff Inventory remains one iOS application with:
 
 Do not create a separate `Home Stuff Pro` application.
 
-The planned product structure is:
+The approved product structure is:
 
 ```text
 Home Stuff Inventory
@@ -29,7 +42,10 @@ Home Stuff Inventory
 └── Family & Sync — future auto-renewable subscription
 ```
 
-The structural decision is approved. The premium features, StoreKit products, prices, and rollout dates remain unimplemented until separately approved.
+The structural decision and Lifetime Pro source implementation are complete.
+The App Store Connect non-consumable, price, storefront availability, manual
+evidence, submission, and rollout date remain maintainer-owned and unapproved.
+Family & Sync remains unimplemented.
 
 ## Guiding principles
 
@@ -85,7 +101,11 @@ Free may show discoverable premium actions, but invoking those actions must neve
 
 ## Home Stuff Pro — lifetime unlock
 
-`Home Stuff Pro` is planned as an individual non-consumable In-App Purchase inside the existing application, using product identifier `com.stradivarius23.HomeStuffInventoryApp.pro.lifetime`. It does not use Apple Family Sharing.
+`Home Stuff Pro` is implemented in source as an individual non-consumable
+In-App Purchase inside the existing application, using product identifier
+`com.stradivarius23.HomeStuffInventoryApp.pro.lifetime`. It does not use Apple
+Family Sharing. App Store Connect product creation and release activation
+remain manual gated steps.
 
 It represents advanced local workflows whose value does not depend on an ongoing hosted service. A valid lifetime purchase permanently grants local Pro access for the purchasing Apple account under StoreKit rules.
 
@@ -137,12 +157,13 @@ The annual plan is the only planned launch subscription. A monthly option is def
 
 Do not represent monetization with one ambiguous `isPremium` flag.
 
-Future implementation should model at least two independent facts:
+The current centralized entitlement policy models two independent facts:
 
 - whether the user owns the non-consumable Lifetime Pro purchase;
 - whether the user has an active Family & Sync subscription.
 
-The intended access matrix is:
+The implemented local-access matrix, with subscription states reserved for
+future Family & Sync work, is:
 
 | State | Local Pro features | Sync | Shared household |
 |---|---:|---:|---:|
@@ -153,12 +174,12 @@ The intended access matrix is:
 | Subscription expired, Lifetime Pro owned | Yes | No | No |
 | Subscription expired, no Lifetime Pro | No | No | No |
 
-Conceptually:
+The production access relationship is:
 
 ```swift
 struct InventoryEntitlements: Equatable {
-    var ownsLifetimePro: Bool
-    var hasActiveFamilySubscription: Bool
+    let ownsLifetimePro: Bool
+    let hasActiveFamilySubscription: Bool
 
     var hasLocalProFeatures: Bool {
         ownsLifetimePro || hasActiveFamilySubscription
@@ -170,15 +191,19 @@ struct InventoryEntitlements: Equatable {
 }
 ```
 
-This example communicates the access relationship only. It is not approved production code or a required final API.
+The Lifetime Pro fact is derived only from verified StoreKit transactions and
+its separately cached verified ownership evidence. The Family subscription
+fact remains a dormant policy boundary; no subscription product, sync, or
+sharing UI is implemented.
 
 ## Data ownership and downgrade safety
 
 A paywall, cancelled purchase, billing issue, refund, or expired subscription must never delete or hide user-created data.
 
-Future implementation must preserve these rules:
+The implemented Lifetime Pro workflows preserve these rules:
 
-- no Item, Location, Storage Place, hierarchy relationship, photo, movement record, quantity record, backup, or shared record is deleted only because access changes;
+- no Item, Location, Storage Place, hierarchy relationship, movement record, or
+  backup is deleted only because access changes;
 - existing records remain readable; nested hierarchy structure becomes read-only without verified local Pro access;
 - the user's personal local inventory remains usable;
 - export and recovery remain available;
@@ -187,6 +212,10 @@ Future implementation must preserve these rules:
 - restoring a valid purchase restores corresponding access without requiring a destructive migration;
 - loss of network access must not make the local personal inventory unusable;
 - subscription expiry must not silently replace the user's real inventory with an empty store.
+
+Any future photo, quantity-history, sync, or shared-household implementation
+must extend the same non-destructive ownership boundary through its own
+approved contract.
 
 Family & Sync expiry and household lifecycle require a detailed implementation contract. It must preserve these approved boundaries:
 
@@ -206,15 +235,19 @@ Family & Sync expiry and household lifecycle require a detailed implementation c
 
 The default model is contextual freemium, not a first-launch hard paywall.
 
-A future paywall should appear when the user:
+The implemented Lifetime Pro upgrade surface appears when the user:
 
 - intentionally invokes a premium workflow;
-- exceeds a clearly communicated free allowance for a premium feature trial;
-- opens the upgrade surface in Settings;
+- opens the upgrade surface in Settings.
+
+Future subscription surfaces may also appear only after separately authorized
+implementation when the user:
+
 - enables sync;
 - attempts to create or join a shared household.
 
-A future paywall must:
+The implemented Lifetime Pro surface, and any future separately authorized
+subscription surface, must:
 
 - explain the concrete result of the selected feature;
 - distinguish Lifetime Pro from Family & Sync;
@@ -237,9 +270,10 @@ A paywall must not interrupt:
 
 Paywall copy should describe the outcome, for example `Move several items at once`, rather than relying on vague labels such as `Unlock Premium`.
 
-## Future technical architecture direction
+## Technical architecture direction
 
-When implementation is separately approved, use StoreKit 2 in the existing application.
+The Lifetime Pro implementation uses StoreKit 2 in the existing application.
+Future subscription work must extend these boundaries rather than bypass them.
 
 Expected responsibility boundaries include:
 
@@ -251,10 +285,11 @@ Monetization/
   InventoryEntitlements
   PremiumFeature
   PremiumAccessPolicy
-  PaywallContext
+  PremiumUpgradeCoordinator
 ```
 
-The exact file names and types remain subject to implementation design, but the separation of concerns is required:
+The implemented file names may evolve through reviewed refactoring, but the
+separation of concerns is required:
 
 - StoreKit integration loads products, performs purchases, observes updates, restores purchases, and validates transactions;
 - entitlement state derives from verified StoreKit transactions rather than a user-editable local boolean;
@@ -265,11 +300,16 @@ The exact file names and types remain subject to implementation design, but the 
 - deterministic StoreKit configuration and DEBUG test states support UI and integration testing;
 - focused tests use abstractions or test StoreKit sessions rather than requiring live purchases.
 
-Future premium capability checks should express a specific feature, such as `bulkMove` or `householdSharing`, rather than a broad premium boolean scattered throughout SwiftUI views.
+Premium capability checks express a specific feature, such as selected-Item
+movement or household sharing, rather than a broad premium boolean scattered
+throughout SwiftUI views.
 
 ## Privacy and release implications
 
-The current application is local-only and declares no developer-side data collection. The concept document does not change that shipped behavior.
+The current application keeps inventory and Lifetime Pro workflows local and
+declares no developer-side data collection. StoreKit communicates with Apple
+for product, purchase, restore, and verification; the app has no developer
+backend for inventory or transaction data.
 
 Every future capability must re-evaluate privacy, permissions, entitlements, App Store metadata, and release evidence.
 
@@ -289,13 +329,13 @@ App Store screenshots, promotional text, release notes, privacy disclosures, and
 
 The approved high-level sequence is:
 
-### Phase 0 — concept initialization
+### Phase 0 — concept initialization (complete)
 
 - document this product model;
-- create no feature implementation tasks yet;
-- make no application or App Store Connect changes.
+- preserve the initial product decision history;
+- make no App Store Connect change from documentation alone.
 
-### Phase 1 — future StoreKit foundation
+### Phase 1 — StoreKit foundation (implemented in source)
 
 - define products and entitlement semantics;
 - introduce StoreKit 2 infrastructure without gating existing behavior;
@@ -304,9 +344,10 @@ The approved high-level sequence is:
 
 ### Phase 2 — coherent Lifetime Pro launch
 
-- select a valuable initial local feature bundle;
-- implement each feature through a separate issue and PR;
-- add contextual paywalls only when the bundle is ready;
+- the exact five-capability local launch bundle, StoreKit 2 lifecycle, and
+  contextual upgrade surfaces are implemented in canonical source;
+- release activation remains gated by the exact-candidate automated evidence,
+  manual accessibility and Sandbox checks, and App Store Connect setup;
 - preserve the Free core contract.
 
 ### Phase 3 — local Pro expansion
@@ -331,38 +372,31 @@ The approved high-level sequence is:
 - define household ownership, invitations, roles, removal, transfer, expiry, and recovery;
 - preserve export and local access safeguards.
 
-## Initial pricing hypotheses
+## Pricing authority
 
-The initial planning hypotheses are:
-
-```text
-Home Stuff Pro Lifetime: USD 19.99 equivalent tier
-Family & Sync Annual: USD 9.99 equivalent tier
-```
-
-These values:
-
-- are not committed launch prices;
-- do not authorize App Store Connect product creation;
-- require regional tier review and product-value validation;
-- may be revised before implementation or submission;
-- must never be hardcoded into application copy.
+There is no repository-approved numeric launch price. The maintainer must
+select and review the actual base country or region, price, tax category, and
+storefront availability in App Store Connect before submission. The numeric
+value in the checked-in StoreKit configuration is only a deterministic local
+test fixture; it does not authorize App Store Connect product creation and
+must never appear as hardcoded application or marketing copy.
 
 The application must display StoreKit-localized pricing when products exist.
 
 ## Non-goals
 
-This concept does not authorize:
+This model and the implemented Lifetime Pro scope do not additionally
+authorize:
 
 - a separate paid application;
 - a new Bundle ID;
 - a hard first-launch paywall;
 - a retroactive Item-count limit;
-- StoreKit implementation;
 - App Store Connect product creation;
 - CloudKit or account infrastructure;
 - household sharing;
-- premium feature implementation;
+- subscription implementation or presentation;
+- any premium capability outside the exact five-item launch contract;
 - UI redesign;
 - analytics, ads, or tracking;
 - changing the current privacy claims;
@@ -382,7 +416,8 @@ The following require later product and technical decisions:
 - whether a monthly Family & Sync option is offered after launch;
 - personal sync data model and migration;
 - household identity, ownership, roles, and invitation model;
-- refund and revocation UX;
+- subscription-specific refund and revocation UX beyond the implemented
+  Lifetime Pro reconciliation boundary;
 - grace-period and billing-retry behavior;
 - subscription expiry behavior for shared households;
 - premium feature availability across future Apple platforms;

@@ -96,7 +96,15 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
     }
 
     func testPlaceContentsMovementActionDistinguishesAccessGateFromEmptyState() {
-        launchApp()
+        launchStartupApp(arguments: [
+            "--use-sample-inventory-data",
+            "--qa-storekit-product-fixture",
+            "--qa-storekit-product-name",
+            "UI Test Pro Product",
+            "--qa-storekit-product-price",
+            "Localized UI Test Price"
+        ])
+        resetToInventoryList()
         openPlaceDetail(location: "Office", place: "Desk drawer")
 
         let actions = app.buttons["locations.placeDetail.proActions"]

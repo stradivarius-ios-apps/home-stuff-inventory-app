@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AD6580000000000000000001 /* InventoryPlaceHierarchyManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD6580000000000000000002 /* InventoryPlaceHierarchyManagement.swift */; };
+		AD6580000000000000000003 /* InventoryPlaceHierarchyMutationViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD6580000000000000000004 /* InventoryPlaceHierarchyMutationViews.swift */; };
 		AE5000000000000000000001 /* InventoryPlaceContentsMovement.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE5000000000000000000011 /* InventoryPlaceContentsMovement.swift */; };
 		AE5000000000000000000002 /* InventoryPlaceContentsMovementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE5000000000000000000012 /* InventoryPlaceContentsMovementView.swift */; };
 		AE5000000000000000000003 /* InventoryPlaceContentsMovementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE5000000000000000000013 /* InventoryPlaceContentsMovementTests.swift */; };
@@ -418,6 +420,8 @@
 		A100000000000000000000BE /* SettingsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsHomeView.swift; sourceTree = "<group>"; };
 		A10000000000000000000251 /* InventoryPlaceDirectoryPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPlaceDirectoryPresentation.swift; sourceTree = "<group>"; };
 		A10000000000000000000253 /* PlaceManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceManagementView.swift; sourceTree = "<group>"; };
+		AD6580000000000000000002 /* InventoryPlaceHierarchyManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPlaceHierarchyManagement.swift; sourceTree = "<group>"; };
+		AD6580000000000000000004 /* InventoryPlaceHierarchyMutationViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPlaceHierarchyMutationViews.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -569,6 +573,7 @@
 				A100000000000000000001E3 /* InventoryItemFormWorkflow.swift */,
 				A100000000000000000001F5 /* InventoryItemMutationFailure.swift */,
 				A10000000000000000000251 /* InventoryPlaceDirectoryPresentation.swift */,
+				AD6580000000000000000002 /* InventoryPlaceHierarchyManagement.swift */,
 			);
 			path = InventoryPresentation;
 			sourceTree = "<group>";
@@ -678,6 +683,7 @@
 				A1000000000000000000019A /* InventoryBackupRestorePreflightView.swift */,
 				A100000000000000000000BE /* SettingsHomeView.swift */,
 				A10000000000000000000253 /* PlaceManagementView.swift */,
+				AD6580000000000000000004 /* InventoryPlaceHierarchyMutationViews.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -1022,6 +1028,8 @@
 				A10000000000000000000107 /* LocationIconPickerView.swift in Sources */,
 				A100000000000000000000BD /* SettingsHomeView.swift in Sources */,
 				A10000000000000000000250 /* InventoryPlaceDirectoryPresentation.swift in Sources */,
+				AD6580000000000000000001 /* InventoryPlaceHierarchyManagement.swift in Sources */,
+				AD6580000000000000000003 /* InventoryPlaceHierarchyMutationViews.swift in Sources */,
 				A10000000000000000000252 /* PlaceManagementView.swift in Sources */,
 				A10000000000000000000028 /* InventoryEmptyStateView.swift in Sources */,
 				A100000000000000000000AF /* InventorySharedViews.swift in Sources */,

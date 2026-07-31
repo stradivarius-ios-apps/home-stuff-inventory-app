@@ -133,6 +133,98 @@ struct InventoryPlaceMutationPersistenceTests {
         #expect(item.placeID == child.id)
     }
 
+    @Test func freeKeepsEveryTreeParticipantStructurallyReadOnlyButFlatDeleteEditable() throws {
+        let context = try modelContext()
+        let location = StorageLocation(name: "Office")
+        let root = InventoryPlace(locationID: location.id, name: "Cabinet")
+        let child = InventoryPlace(
+            locationID: location.id,
+            parentPlaceID: root.id,
+            name: "Drawer"
+        )
+        let leaf = InventoryPlace(
+            locationID: location.id,
+            parentPlaceID: child.id,
+            name: "Cable box"
+        )
+        let flat = InventoryPlace(locationID: location.id, name: "Unused shelf")
+        context.insert(location)
+        context.insert(root)
+        context.insert(child)
+        context.insert(leaf)
+        context.insert(flat)
+        try context.save()
+
+        for place in [root, child, leaf] {
+            let original = InventoryPlaceMutationExpectation(place: place)
+            #expect(throws: InventoryPlaceMutationError.accessRequired) {
+                try InventoryPlaceMutationPersistence.rename(
+                    original,
+                    to: "\(place.name) changed",
+                    iconID: "drawer",
+                    entitlements: .free,
+                    in: context
+                )
+            }
+            #expect(InventoryPlaceMutationExpectation(place: place) == original)
+            #expect(throws: InventoryPlaceMutationError.accessRequired) {
+                try InventoryPlaceMutationPersistence.delete(
+                    original,
+                    entitlements: .free,
+                    in: context
+                )
+            }
+            #expect(InventoryPlaceMutationExpectation(place: place) == original)
+        }
+
+        try InventoryPlaceMutationPersistence.delete(
+            .init(place: flat),
+            entitlements: .free,
+            in: context
+        )
+        #expect(
+            try context.fetch(FetchDescriptor<InventoryPlace>()).map(\.id).contains(flat.id)
+                == false
+        )
+        #expect(try context.fetch(FetchDescriptor<InventoryPlace>()).count == 3)
+    }
+
+    @Test func activeFamilyFactPermitsChildCreationAndCrossLocationRestructure() throws {
+        let context = try modelContext()
+        let office = StorageLocation(name: "Office")
+        let garage = StorageLocation(name: "Garage")
+        let root = InventoryPlace(locationID: office.id, name: "Cabinet")
+        let target = InventoryPlace(locationID: garage.id, name: "Workbench")
+        context.insert(office)
+        context.insert(garage)
+        context.insert(root)
+        context.insert(target)
+        try context.save()
+
+        let family = InventoryEntitlements(
+            ownsLifetimePro: false,
+            hasActiveFamilySubscription: true
+        )
+        let child = try InventoryPlaceMutationPersistence.createChild(
+            named: "Drawer",
+            under: .init(place: root),
+            entitlements: family,
+            in: context
+        )
+        _ = try InventoryPlaceMutationPersistence.moveSubtree(
+            .init(place: root),
+            toLocationID: garage.id,
+            parentPlaceID: target.id,
+            entitlements: family,
+            in: context
+        )
+
+        #expect(root.locationID == garage.id)
+        #expect(root.parentPlaceID == target.id)
+        #expect(child.locationID == garage.id)
+        #expect(child.parentPlaceID == root.id)
+    }
+
     @Test func locationChangingSubtreeMoveIsAtomicAndRecordsOneGroupedMovement() throws {
         let context = try modelContext()
         let office = StorageLocation(name: "Office")

@@ -275,4 +275,152 @@ struct InventoryPlaceDirectoryPresentationTests {
         #expect(sections[0].location.id == used.id)
         #expect(sections[0].places[0].iconID == PlaceIconCatalog.defaultIconID)
     }
+
+    @Test func hierarchyDirectoryKeepsEveryTreeParticipantVisibleAndDeterministic() {
+        let office = StorageLocation(name: "Office")
+        let root = InventoryPlace(locationID: office.id, name: "Cabinet")
+        let child = InventoryPlace(
+            locationID: office.id,
+            parentPlaceID: root.id,
+            name: "Drawer"
+        )
+        let leaf = InventoryPlace(
+            locationID: office.id,
+            parentPlaceID: child.id,
+            name: "Cable box"
+        )
+        let flat = InventoryPlace(locationID: office.id, name: "Shelf")
+        let item = InventoryItem(
+            name: "Adapter",
+            locationName: office.name,
+            containerName: leaf.name,
+            placeID: leaf.id
+        )
+
+        let sections = InventoryPlaceHierarchyManagement.sections(
+            locations: [office],
+            places: [leaf, flat, child, root],
+            items: [item]
+        )
+        let rows = sections[0].rows
+
+        #expect(rows.map(\.name) == ["Cabinet", "Drawer", "Cable box", "Shelf"])
+        #expect(rows.map(\.depth) == [0, 1, 2, 0])
+        #expect(rows.map(\.pathText) == [
+            "Cabinet",
+            "Cabinet › Drawer",
+            "Cabinet › Drawer › Cable box",
+            "Shelf"
+        ])
+        #expect(rows.prefix(3).map(\.participatesInHierarchy) == [true, true, true])
+        #expect(rows.last?.participatesInHierarchy == false)
+        #expect(rows[0].descendantPlaceCount == 2)
+        #expect(rows[0].containedItemCount == 1)
+        #expect(rows[2].directItemCount == 1)
+    }
+
+    @Test func freeCanEditOnlyTrulyFlatPlacesWhileBothProFactsUnlockTreeParticipants() {
+        let flat = InventoryPlaceHierarchyManagement.Row(
+            placeID: UUID(),
+            locationID: UUID(),
+            parentPlaceID: nil,
+            name: "Shelf",
+            iconID: nil,
+            depth: 0,
+            pathComponents: ["Shelf"],
+            directItemCount: 0,
+            descendantPlaceCount: 0,
+            containedItemCount: 0,
+            participatesInHierarchy: false,
+            hasCompletePath: true
+        )
+        let treeParticipant = InventoryPlaceHierarchyManagement.Row(
+            placeID: UUID(),
+            locationID: UUID(),
+            parentPlaceID: UUID(),
+            name: "Drawer",
+            iconID: nil,
+            depth: 1,
+            pathComponents: ["Cabinet", "Drawer"],
+            directItemCount: 0,
+            descendantPlaceCount: 0,
+            containedItemCount: 0,
+            participatesInHierarchy: true,
+            hasCompletePath: true
+        )
+
+        #expect(InventoryPlaceHierarchyManagement.canDirectlyEdit(flat, entitlements: .free))
+        #expect(!InventoryPlaceHierarchyManagement.canDirectlyEdit(treeParticipant, entitlements: .free))
+        #expect(
+            InventoryPlaceHierarchyManagement.canDirectlyEdit(
+                treeParticipant,
+                entitlements: .init(
+                    ownsLifetimePro: true,
+                    hasActiveFamilySubscription: false
+                )
+            )
+        )
+        #expect(
+            InventoryPlaceHierarchyManagement.canDirectlyEdit(
+                treeParticipant,
+                entitlements: .init(
+                    ownsLifetimePro: false,
+                    hasActiveFamilySubscription: true
+                )
+            )
+        )
+    }
+
+    @Test func hierarchyMovePreflightShowsFullPathsCountsAndExcludesCycles() {
+        let office = StorageLocation(name: "Office")
+        let garage = StorageLocation(name: "Garage")
+        let root = InventoryPlace(locationID: office.id, name: "Cabinet")
+        let child = InventoryPlace(
+            locationID: office.id,
+            parentPlaceID: root.id,
+            name: "Drawer"
+        )
+        let leaf = InventoryPlace(
+            locationID: office.id,
+            parentPlaceID: child.id,
+            name: "Cable box"
+        )
+        let target = InventoryPlace(locationID: garage.id, name: "Workbench")
+        let item = InventoryItem(
+            name: "Adapter",
+            locationName: office.name,
+            containerName: leaf.name,
+            placeID: leaf.id
+        )
+        let places = [root, child, leaf, target]
+        let locations = [office, garage]
+
+        let destinations = InventoryPlaceHierarchyManagement.destinations(
+            for: root.id,
+            locations: locations,
+            places: places
+        )
+        #expect(!destinations.contains { $0.id == .place(root.id) })
+        #expect(!destinations.contains { $0.id == .place(child.id) })
+        #expect(!destinations.contains { $0.id == .place(leaf.id) })
+        #expect(destinations.contains { $0.id == .place(target.id) })
+
+        let outcome = InventoryPlaceHierarchyManagement.prepareMove(
+            sourcePlaceID: root.id,
+            destinationID: .place(target.id),
+            locations: locations,
+            places: places,
+            items: [item]
+        )
+        guard case let .ready(preflight) = outcome else {
+            Issue.record("Expected a complete hierarchy preflight")
+            return
+        }
+        #expect(preflight.sourcePath == "Office › Cabinet")
+        #expect(preflight.destinationPath == "Garage › Workbench")
+        #expect(preflight.movedPlaceCount == 3)
+        #expect(preflight.descendantPlaceCount == 2)
+        #expect(preflight.containedItemCount == 1)
+        #expect(preflight.sourceExpectation.id == root.id)
+    }
 }

@@ -2702,6 +2702,234 @@
         "uk" : { "stringUnit" : { "state" : "translated", "value" : "Потрібен Home Stuff Pro" } }
       }
     },
+    "inventory.places.hierarchy.addChild.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add Nested Storage Place" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Додати вкладене місце зберігання" } }
+      }
+    },
+    "inventory.places.hierarchy.actions.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Actions for %@" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Дії для %@" } }
+      }
+    },
+    "inventory.places.hierarchy.addChild.action" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add Nested Storage Place" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Додати вкладене місце" } }
+      }
+    },
+    "inventory.places.hierarchy.context.section" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Storage Context" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Контекст зберігання" } }
+      }
+    },
+    "inventory.places.hierarchy.context.path" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Path" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Шлях" } }
+      }
+    },
+    "inventory.places.hierarchy.error.accessRequired" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Home Stuff Pro access is required before changing this storage hierarchy." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Щоб змінити цю ієрархію зберігання, потрібен доступ Home Stuff Pro." } }
+      }
+    },
+    "inventory.places.hierarchy.error.changed" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This Storage Place changed. Review the current hierarchy and try again." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Це місце зберігання змінилося. Перегляньте поточну ієрархію та спробуйте ще раз." } }
+      }
+    },
+    "inventory.places.hierarchy.error.containsChildren" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Move or delete its nested Storage Places first. Nothing was deleted." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Спочатку перемістіть або видаліть вкладені місця зберігання. Нічого не видалено." } }
+      }
+    },
+    "inventory.places.hierarchy.error.containsItems" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Move its Items first. Nothing was deleted." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Спочатку перемістіть речі. Нічого не видалено." } }
+      }
+    },
+    "inventory.places.hierarchy.error.duplicateName" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Another Storage Place at this level already uses that name." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Інше місце зберігання на цьому рівні вже має таку назву." } }
+      }
+    },
+    "inventory.places.hierarchy.error.emptyName" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Enter a Storage Place name." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Введіть назву місця зберігання." } }
+      }
+    },
+    "inventory.places.hierarchy.error.invalidDestination" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "That destination is no longer valid. Choose another destination." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Це місце призначення більше не дійсне. Виберіть інше." } }
+      }
+    },
+    "inventory.places.hierarchy.error.persistence" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The storage hierarchy could not be saved. Nothing was changed." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Не вдалося зберегти ієрархію. Нічого не змінено." } }
+      }
+    },
+    "inventory.places.hierarchy.error.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Storage Hierarchy Not Changed" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Ієрархію зберігання не змінено" } }
+      }
+    },
+    "inventory.places.hierarchy.move.atomicity" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The Storage Place, every nested Storage Place, and their Items move together. If validation fails, nothing moves." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Місце зберігання, усі вкладені місця та їхні речі переміщуються разом. Якщо перевірка не пройде, нічого не переміститься." } }
+      }
+    },
+    "inventory.places.hierarchy.move.changeDestination" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Change" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Змінити" } }
+      }
+    },
+    "inventory.places.hierarchy.move.confirm" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Move Storage Hierarchy" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Перемістити ієрархію" } }
+      }
+    },
+    "inventory.places.hierarchy.move.confirm.help" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Moves the reviewed subtree and its Items atomically." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Атомарно переміщує перевірене піддерево та його речі." } }
+      }
+    },
+    "inventory.places.hierarchy.move.descendantCount" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Nested Storage Places" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вкладені місця зберігання" } }
+      }
+    },
+    "inventory.places.hierarchy.move.destination" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Destination" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Місце призначення" } }
+      }
+    },
+    "inventory.places.hierarchy.move.destination.help" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose a Location for a top-level Storage Place, or choose another Storage Place as its parent." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Виберіть локацію для верхнього рівня або інше місце зберігання як батьківське." } }
+      }
+    },
+    "inventory.places.hierarchy.move.destination.section" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "New Parent" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Нове батьківське місце" } }
+      }
+    },
+    "inventory.places.hierarchy.move.itemCount" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Contained Items" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вкладені речі" } }
+      }
+    },
+    "inventory.places.hierarchy.move.placeCount" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Storage Places Moving" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Місця зберігання для переміщення" } }
+      }
+    },
+    "inventory.places.hierarchy.move.review" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Review Move" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Перевірити переміщення" } }
+      }
+    },
+    "inventory.places.hierarchy.move.review.contents" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Contents" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вміст" } }
+      }
+    },
+    "inventory.places.hierarchy.move.review.paths" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Review Paths" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Перевірка шляхів" } }
+      }
+    },
+    "inventory.places.hierarchy.move.source" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "From" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Звідки" } }
+      }
+    },
+    "inventory.places.hierarchy.move.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Restructure Storage Places" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Змінити структуру місць" } }
+      }
+    },
+    "inventory.places.hierarchy.history.applied" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Applied" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Застосовано" } }
+      }
+    },
+    "inventory.places.hierarchy.history.help" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Structural history remains readable even when editing is unavailable." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Історія структури залишається доступною для читання, навіть коли редагування недоступне." } }
+      }
+    },
+    "inventory.places.hierarchy.history.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Storage Hierarchy History" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Історія ієрархії зберігання" } }
+      }
+    },
+    "inventory.places.hierarchy.history.undone" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Undone" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Скасовано" } }
+      }
+    },
+    "inventory.places.hierarchy.history.unknownPlace" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Storage Place" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Місце зберігання" } }
+      }
+    },
+    "inventory.places.hierarchy.readOnly" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Structure read-only" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Структура лише для читання" } }
+      }
+    },
+    "inventory.places.hierarchy.restructure.action" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Restructure" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Змінити структуру" } }
+      }
+    },
+    "inventory.places.hierarchy.undoLatest" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Undo Latest Structural Move" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Скасувати останнє структурне переміщення" } }
+      }
+    },
+    "inventory.places.hierarchy.undoLatest.help" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Restores the latest compatible hierarchy move and its Item locations atomically." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Атомарно відновлює останнє сумісне переміщення ієрархії та розташування речей." } }
+      }
+    },
     "settings.title" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Settings" } },

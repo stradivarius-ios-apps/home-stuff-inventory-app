@@ -476,6 +476,337 @@ struct InventoryItemFormView: View {
     }
 }
 
+struct InventoryRoomSweepView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+    @Environment(PremiumAccessState.self) private var premiumAccess
+
+    @Query(sort: \InventoryItem.name) private var items: [InventoryItem]
+    @Query(sort: \InventoryCustomCategory.name) private var customCategories: [InventoryCustomCategory]
+    @Query(sort: \StorageLocation.name) private var locations: [StorageLocation]
+    @Query(sort: \InventoryPlace.name) private var places: [InventoryPlace]
+
+    @State private var workflow: InventoryRoomSweepWorkflow
+    @State private var isShowingSaveError = false
+    @State private var isShowingAccessRequired = false
+    @FocusState private var isNameFocused: Bool
+
+    init(createContext: InventoryItemCreateContext = .global) {
+        _workflow = State(initialValue: InventoryRoomSweepWorkflow(createContext: createContext))
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                destinationSection
+                itemSection
+                itemDetailsSection
+                extraContextSection
+            }
+            .inventoryFormPresentation()
+            .scrollDismissesKeyboard(.interactively)
+            .navigationTitle("inventory.roomSweep.title")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("inventory.action.done") {
+                        dismiss()
+                    }
+                    .accessibilityIdentifier("inventory.roomSweep.doneButton")
+                }
+
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("inventory.roomSweep.saveAndContinue") {
+                        save()
+                    }
+                    .inventoryPrimaryActionTint()
+                    .disabled(!workflow.isSaveEnabled)
+                    .accessibilityIdentifier("inventory.roomSweep.saveButton")
+                }
+            }
+            .onAppear {
+                isNameFocused = true
+            }
+            .onChange(of: workflow.draft.locationName) { previous, current in
+                guard InventoryNormalizedName.location(previous) != InventoryNormalizedName.location(current) else {
+                    return
+                }
+                workflow.draft.placeID = nil
+                workflow.draft.containerName = ""
+                workflow.draft.allowsLegacyPlaceResolution = false
+            }
+            .alert("inventory.roomSweep.saveError.title", isPresented: $isShowingSaveError) {
+                Button("inventory.action.ok", role: .cancel) { }
+            } message: {
+                Text("inventory.alert.saveError.message")
+            }
+            .alert("inventory.roomSweep.upgrade.title", isPresented: $isShowingAccessRequired) {
+                Button("inventory.action.ok", role: .cancel) { }
+            } message: {
+                Text("inventory.roomSweep.upgrade.message")
+            }
+        }
+    }
+
+    private var destinationSection: some View {
+        Section {
+            NavigationLink {
+                InventoryStandardizedValueSelectionView(
+                    title: "inventory.field.location",
+                    selection: $workflow.draft.locationName,
+                    options: locationOptions,
+                    emptySelectionTitle: "inventory.fallback.noLocation",
+                    createPrompt: "inventory.selection.location.newPrompt",
+                    createButtonTitle: "inventory.selection.location.addNew",
+                    createSheetTitle: "inventory.selection.location.create",
+                    resolveCreatedValue: resolveLocationName
+                )
+            } label: {
+                LabeledContent("inventory.field.location", value: selectedLocationDisplayName)
+            }
+            .accessibilityIdentifier("inventory.roomSweep.locationPicker")
+
+            NavigationLink {
+                InventoryItemPlaceSelectionView(
+                    location: selectedStorageLocation,
+                    places: places,
+                    selection: $workflow.draft.placeID,
+                    placeName: $workflow.draft.containerName,
+                    createPlace: createPlace
+                )
+            } label: {
+                LabeledContent("inventory.field.container", value: selectedPlaceDisplayName)
+            }
+            .disabled(selectedStorageLocation == nil)
+            .accessibilityIdentifier("inventory.roomSweep.placePicker")
+        } header: {
+            Text("inventory.roomSweep.destination.section")
+        } footer: {
+            Text("inventory.roomSweep.destination.footer")
+                .inventoryHelperText()
+        }
+        .inventoryFormRowSurface()
+    }
+
+    private var itemSection: some View {
+        Section {
+            TextField("inventory.field.name", text: $workflow.draft.name)
+                .textInputAutocapitalization(.words)
+                .focused($isNameFocused)
+                .submitLabel(.done)
+                .onSubmit {
+                    if workflow.isSaveEnabled {
+                        save()
+                    }
+                }
+                .accessibilityIdentifier("inventory.roomSweep.nameField")
+        } header: {
+            Text("inventory.section.item")
+        } footer: {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(savedCountText)
+                    .inventoryHelperText()
+                    .accessibilityIdentifier("inventory.roomSweep.savedCount")
+                if !workflow.draft.name.isEmpty && !workflow.draft.isNameValid {
+                    Text("inventory.form.nameRequiredFooter")
+                        .inventoryValidationMessage()
+                }
+            }
+        }
+        .inventoryFormRowSurface()
+    }
+
+    private var itemDetailsSection: some View {
+        Section("inventory.section.itemKind") {
+            NavigationLink {
+                InventoryStandardizedValueSelectionView(
+                    title: "inventory.field.category",
+                    selection: $workflow.draft.category,
+                    options: categoryOptions,
+                    emptySelectionTitle: nil,
+                    createPrompt: "inventory.selection.category.newPrompt",
+                    createButtonTitle: "inventory.selection.category.addNew",
+                    createSheetTitle: "inventory.selection.category.create",
+                    resolveCreatedValue: resolveCategoryValue
+                )
+            } label: {
+                LabeledContent("inventory.field.category", value: selectedCategoryDisplayName)
+            }
+
+            Stepper(value: $workflow.draft.quantity, in: 1...999) {
+                LabeledContent("inventory.field.quantity", value: workflow.draft.quantity.formatted())
+            }
+
+            Picker("inventory.field.condition", selection: $workflow.draft.condition) {
+                ForEach(InventoryCondition.allCases) { condition in
+                    Text(condition.displayName).tag(condition.rawValue)
+                }
+            }
+        }
+        .inventoryFormRowSurface()
+    }
+
+    private var extraContextSection: some View {
+        Section {
+            TextField("inventory.field.tags.placeholder", text: $workflow.draft.tagsText)
+                .textInputAutocapitalization(.never)
+                .accessibilityIdentifier("inventory.roomSweep.tagsField")
+
+            if !workflow.draft.isTagsValid {
+                Text(tagValidationText)
+                    .inventoryValidationMessage()
+                    .accessibilityIdentifier("inventory.roomSweep.tagsValidation")
+            }
+
+            TextField("inventory.field.notes", text: $workflow.draft.notes, axis: .vertical)
+                .lineLimit(2...5)
+                .accessibilityIdentifier("inventory.roomSweep.notesField")
+        } header: {
+            Text("inventory.section.extraContext")
+        }
+        .inventoryFormRowSurface()
+    }
+
+    private func save() {
+        switch InventoryRoomSweepPersistence.save(
+            draft: workflow.draft,
+            access: premiumAccess,
+            locations: locations,
+            places: places,
+            in: modelContext
+        ) {
+        case .saved:
+            workflow.didSaveItem()
+            isNameFocused = true
+        case .accessRequired:
+            isShowingAccessRequired = true
+        case .invalidDraft:
+            return
+        case .saveFailed:
+            isShowingSaveError = true
+        }
+    }
+
+    private var savedCountText: String {
+        InventoryLocalization.formatted(
+            "inventory.roomSweep.savedCount",
+            defaultValue: "%d items saved in this sweep.",
+            workflow.savedCount
+        )
+    }
+
+    private var tagValidationText: String {
+        InventoryLocalization.formatted(
+            "inventory.form.tagsMaxLengthFooter",
+            defaultValue: "Keep each tag to %d characters or fewer. “%@” is too long.",
+            InventoryItemDraft.maximumTagLength,
+            workflow.draft.invalidTags.first ?? ""
+        )
+    }
+
+    private var categoryOptions: [InventorySelectionOption] {
+        InventorySelectionOptions.categories(from: items, customCategories: customCategories)
+    }
+
+    private var locationOptions: [InventorySelectionOption] {
+        InventorySelectionOptions.locations(from: items, storageLocations: locations)
+    }
+
+    private var selectedCategoryDisplayName: String {
+        categoryOptions.first { $0.storageValue == workflow.draft.category }?.displayName
+            ?? InventoryCategory.displayName(forStoredValue: workflow.draft.category)
+    }
+
+    private var selectedLocationDisplayName: String {
+        let trimmed = workflow.draft.locationName.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? InventoryLocalization.noLocation : trimmed
+    }
+
+    private var selectedStorageLocation: StorageLocation? {
+        locations.first {
+            InventoryNormalizedName.location($0.name)
+                == InventoryNormalizedName.location(workflow.draft.locationName)
+        }
+    }
+
+    private var selectedPlaceDisplayName: String {
+        if let placeID = workflow.draft.placeID,
+           let place = places.first(where: { $0.id == placeID }) {
+            return place.name
+        }
+        let trimmed = workflow.draft.containerName.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? InventoryLocalization.noContainer : trimmed
+    }
+
+    private func resolveCategoryValue(_ value: String) -> InventoryValueCreationOutcome {
+        do {
+            guard let persistedValue = try InventorySelectionValueStore.persistedCategoryValue(
+                value,
+                items: items,
+                customCategories: customCategories,
+                modelContext: modelContext
+            ) else {
+                return .failure(valueCreationSaveErrorMessage)
+            }
+            return .success(persistedValue)
+        } catch {
+            return .failure(valueCreationSaveErrorMessage)
+        }
+    }
+
+    private func resolveLocationName(_ value: String) -> InventoryValueCreationOutcome {
+        do {
+            guard let persistedValue = try InventorySelectionValueStore.persistedLocationName(
+                value,
+                items: items,
+                storageLocations: locations,
+                modelContext: modelContext
+            ) else {
+                return .failure(valueCreationSaveErrorMessage)
+            }
+            return .success(persistedValue)
+        } catch {
+            return .failure(valueCreationSaveErrorMessage)
+        }
+    }
+
+    private func createPlace(_ name: String, _ iconID: String?) -> InventoryValueCreationOutcome {
+        guard let location = selectedStorageLocation else {
+            return .failure(valueCreationSaveErrorMessage)
+        }
+        do {
+            try InventoryListManagementPersistence.save(
+                .addPlace(name: name, iconID: iconID, location: location),
+                locations: locations,
+                places: places,
+                customCategories: customCategories,
+                items: items,
+                in: modelContext
+            )
+            let persistedPlaces = try modelContext.fetch(FetchDescriptor<InventoryPlace>())
+            guard let place = persistedPlaces.first(where: {
+                $0.locationID == location.id
+                    && InventoryNormalizedName.place($0.name) == InventoryNormalizedName.place(name)
+            }) else {
+                return .failure(valueCreationSaveErrorMessage)
+            }
+            workflow.draft.placeID = place.id
+            workflow.draft.containerName = place.name
+            workflow.draft.allowsLegacyPlaceResolution = true
+            return .success(place.name)
+        } catch {
+            return .failure(valueCreationSaveErrorMessage)
+        }
+    }
+
+    private var valueCreationSaveErrorMessage: String {
+        InventoryLocalization.string(
+            "inventory.selection.creation.error.message",
+            defaultValue: "Couldn't save this value. Please try again."
+        )
+    }
+}
+
 #if DEBUG
 #Preview("Item Capture Form - New") {
     InventoryItemFormView()

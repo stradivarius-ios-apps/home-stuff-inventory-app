@@ -52,6 +52,38 @@ struct PremiumUpgradeCoordinatorTests {
         #expect(coordinator.outcome == .none)
     }
 
+    @Test func movementHistoryOwnsItsContextualUpgradePresentation() {
+        let coordinator = makeCoordinator()
+
+        coordinator.request(
+            .extendedMovementUndo,
+            presentationHost: .movementHistory
+        )
+
+        #expect(coordinator.presentedContext(for: .root) == nil)
+        #expect(
+            coordinator.presentedContext(for: .movementHistory)
+                == .extendedMovementUndo
+        )
+    }
+
+    @Test func purchaseAndRestoreActionsDisableTogetherDuringEitherActiveOperation() {
+        for operationState in [
+            StoreKitEntitlementOperationState.purchasing,
+            .restoring
+        ] {
+            let availability = PremiumUpgradeActionAvailability(
+                operationState: operationState
+            )
+            #expect(!availability.purchaseEnabled)
+            #expect(!availability.restoreEnabled)
+        }
+
+        let idleAvailability = PremiumUpgradeActionAvailability(operationState: .idle)
+        #expect(idleAvailability.purchaseEnabled)
+        #expect(idleAvailability.restoreEnabled)
+    }
+
     @Test(arguments: [
         InventoryEntitlements(ownsLifetimePro: true, hasActiveFamilySubscription: false),
         InventoryEntitlements(ownsLifetimePro: false, hasActiveFamilySubscription: true),

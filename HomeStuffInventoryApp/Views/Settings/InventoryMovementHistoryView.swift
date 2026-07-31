@@ -114,7 +114,23 @@ struct InventoryMovementHistoryView: View {
                     )
                 )
             }
+            .sheet(item: movementHistoryUpgradeContext) { context in
+                PremiumUpgradeView(context: context)
+                    .environment(upgradeCoordinator)
+            }
         }
+    }
+
+    private var movementHistoryUpgradeContext: Binding<PremiumUpgradeContext?> {
+        Binding(
+            get: { upgradeCoordinator.presentedContext(for: .movementHistory) },
+            set: {
+                if $0 == nil,
+                   upgradeCoordinator.presentedContext(for: .movementHistory) != nil {
+                    upgradeCoordinator.dismiss()
+                }
+            }
+        )
     }
 
     private var visibleRecords: [InventoryMovementRecord] {
@@ -159,7 +175,10 @@ struct InventoryMovementHistoryView: View {
         case .confirm:
             isShowingUndoConfirmation = true
         case .upgrade:
-            upgradeCoordinator.request(.extendedMovementUndo) {
+            upgradeCoordinator.request(
+                .extendedMovementUndo,
+                presentationHost: .movementHistory
+            ) {
                 requestUndo()
             }
         case .unavailable:
@@ -188,7 +207,10 @@ struct InventoryMovementHistoryView: View {
         case .unsafeRestoration:
             outcomeKey = "premium.history.outcome.unsafe"
         case .accessRequired:
-            upgradeCoordinator.request(.extendedMovementUndo) {
+            upgradeCoordinator.request(
+                .extendedMovementUndo,
+                presentationHost: .movementHistory
+            ) {
                 undoLatest()
             }
         case .unavailable:

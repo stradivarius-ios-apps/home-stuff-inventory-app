@@ -72,6 +72,7 @@ SHARDS = {
     InventorySettingsUITests/testBlockedLocationDeleteUsesUkrainianGuidance
     InventorySettingsUITests/testSettingsShowsAlwaysAvailableManualBackupAction
     InventorySettingsUITests/testSettingsRestoreRowIsAlwaysAvailableAndInvokesTheImporterAction
+    InventorySettingsUITests/testFreeGlobalHistoryPresentsExtendedUndoUpgradeFromCurrentSheet
     InventorySettingsUITests/testListManagementEditorTextFieldSavesFromSettings
   ],
   "11" => %w[

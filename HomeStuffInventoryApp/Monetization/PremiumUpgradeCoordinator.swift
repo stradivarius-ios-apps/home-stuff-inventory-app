@@ -78,10 +78,16 @@ enum PremiumUpgradeOutcome: Equatable, Sendable {
     case restored
 }
 
+enum PremiumUpgradePresentationHost: Equatable, Sendable {
+    case root
+    case movementHistory
+}
+
 @Observable
 @MainActor
 final class PremiumUpgradeCoordinator {
     private(set) var presentedContext: PremiumUpgradeContext?
+    private(set) var presentationHost: PremiumUpgradePresentationHost = .root
     private(set) var outcome: PremiumUpgradeOutcome = .none
 
     @ObservationIgnored private let service: StoreKitEntitlementService
@@ -99,6 +105,7 @@ final class PremiumUpgradeCoordinator {
 
     func request(
         _ context: PremiumUpgradeContext,
+        presentationHost: PremiumUpgradePresentationHost = .root,
         resume: (() -> Void)? = nil
     ) {
         if let feature = context.requiredFeature,
@@ -110,11 +117,19 @@ final class PremiumUpgradeCoordinator {
         pendingAction = context.requiredFeature.map { PremiumIntendedAction(feature: $0) }
         resumeAction = resume
         outcome = .none
+        self.presentationHost = presentationHost
         presentedContext = context
+    }
+
+    func presentedContext(
+        for host: PremiumUpgradePresentationHost
+    ) -> PremiumUpgradeContext? {
+        presentationHost == host ? presentedContext : nil
     }
 
     func dismiss() {
         presentedContext = nil
+        presentationHost = .root
         outcome = .none
         pendingAction = nil
         resumeAction = nil

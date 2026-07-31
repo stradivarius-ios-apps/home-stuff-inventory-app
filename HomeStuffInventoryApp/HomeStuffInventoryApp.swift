@@ -74,8 +74,13 @@ struct HomeStuffInventoryApp: App {
 
     private var upgradeContext: Binding<PremiumUpgradeContext?> {
         Binding(
-            get: { upgradeCoordinator.presentedContext },
-            set: { if $0 == nil { upgradeCoordinator.dismiss() } }
+            get: { upgradeCoordinator.presentedContext(for: .root) },
+            set: {
+                if $0 == nil,
+                   upgradeCoordinator.presentedContext(for: .root) != nil {
+                    upgradeCoordinator.dismiss()
+                }
+            }
         )
     }
 }

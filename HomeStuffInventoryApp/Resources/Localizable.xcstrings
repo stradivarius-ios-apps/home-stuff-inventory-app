@@ -2900,6 +2900,12 @@
         "uk" : { "stringUnit" : { "state" : "translated", "value" : "Придбати Home Stuff Pro" } }
       }
     },
+    "premium.purchase.inProgress" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Purchasing Home Stuff Pro" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Триває придбання Home Stuff Pro" } }
+      }
+    },
     "premium.retry" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Try Again" } },
@@ -2910,6 +2916,12 @@
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Restore Purchases" } },
         "uk" : { "stringUnit" : { "state" : "translated", "value" : "Відновити покупки" } }
+      }
+    },
+    "premium.restore.inProgress" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Restoring Purchases" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Триває відновлення покупок" } }
       }
     },
     "premium.settings.available" : {

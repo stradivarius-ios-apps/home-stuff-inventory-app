@@ -25,6 +25,26 @@ individual `NonConsumable`; Family Sharing is off. The app must render the
 product display name and price supplied by StoreKit. Repository copy must not
 claim or hardcode a price.
 
+## Re-enable procedure after a Free-only release
+
+The temporary commercial hold is a release policy, not a rollback. The single
+production switch is `CommercialFeaturesAvailability.production` in
+`HomeStuffInventoryApp/Monetization/PremiumAccess.swift`; it is currently
+created with `isLifetimeProLaunchEnabled: false`.
+
+Only a dedicated, approved Pro-launch PR may change that value to `true`.
+That change reactivates the existing live StoreKit entitlement service and the
+Settings purchase and restore controls. Do not delete, recreate, rename, or
+migrate the StoreKit client, entitlement cache, product identifier, upgrade
+presentation, localized strings, feature gates, hierarchy schema, movement
+history, or their tests as part of re-enabling.
+
+The DEBUG-only `--qa-enable-lifetime-pro-launch` launch argument is test
+coverage for the dormant implementation; it must never be treated as a
+production launch mechanism. Before changing the production switch, complete
+every automated and manual gate below for the candidate SHA, then separately
+authorize App Store Connect product availability, pricing, and submission.
+
 ## Automated candidate gate
 
 Record the exact candidate SHA and retain the hosted check URLs outside this

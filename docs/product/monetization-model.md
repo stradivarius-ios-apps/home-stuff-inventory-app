@@ -135,7 +135,8 @@ Lifetime Pro launch. Production releases set it to disabled. In that state the
 app does not initialize live StoreKit product loading, transaction observation,
 or entitlement reconciliation; Settings omits Home Stuff Pro and Restore
 Purchases; and no purchase sheet can be presented. The implemented local launch
-bundle remains usable without a purchase while commercial activation is off.
+bundle remains in source, with its existing feature gates and data guarantees
+preserved while commercial activation is off.
 
 A future intentional Lifetime Pro launch changes this centralized policy to
 enabled. The existing StoreKit client, entitlement service, product fixture,

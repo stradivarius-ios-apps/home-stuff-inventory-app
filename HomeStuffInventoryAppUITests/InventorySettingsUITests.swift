@@ -243,7 +243,7 @@ final class InventorySettingsUITests: InventoryUITestCase {
 
         let undo = app.buttons["premium.history.undo"]
         XCTAssertTrue(undo.waitForExistence(timeout: 3))
-        XCTAssertTrue(undo.isEnabled)
+        XCTAssertFalse(undo.isEnabled)
         XCTAssertFalse(element(identifier: "premium.upgrade").exists)
     }
 

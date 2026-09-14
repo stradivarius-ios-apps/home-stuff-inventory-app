@@ -94,9 +94,6 @@ struct PremiumAccessPolicy: Sendable {
              .movePlaceContents,
              .extendedMovementUndo,
              .storageHierarchyEditing:
-            guard commercialFeaturesAvailability.isLifetimeProLaunchEnabled else {
-                return .available
-            }
             return entitlements.hasLocalProFeatures ? .available : .unavailable
         case .personalSync, .householdSharing:
             return entitlements.hasSyncAndSharing ? .available : .unavailable

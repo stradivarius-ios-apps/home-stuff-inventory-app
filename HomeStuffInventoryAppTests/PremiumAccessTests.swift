@@ -131,11 +131,11 @@ struct PremiumAccessTests {
         #expect(state.availability(of: .roomSweep) == .unavailable)
     }
 
-    @Test func disabledCommercialLaunchKeepsImplementedLocalWorkflowsAvailable() {
+    @Test func disabledCommercialLaunchKeepsImplementedLocalWorkflowsGated() {
         let policy = PremiumAccessPolicy()
 
         for feature in localFeatures {
-            #expect(policy.availability(of: feature, entitlements: .free) == .available)
+            #expect(policy.availability(of: feature, entitlements: .free) == .unavailable)
         }
         for feature in subscriptionFeatures {
             #expect(policy.availability(of: feature, entitlements: .free) == .unavailable)

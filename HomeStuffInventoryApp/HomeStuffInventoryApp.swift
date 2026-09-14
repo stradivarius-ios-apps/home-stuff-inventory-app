@@ -7,6 +7,7 @@ struct HomeStuffInventoryApp: App {
     @State private var bootstrap = InventoryAppBootstrapState()
     @State private var entitlementService: StoreKitEntitlementService
     @State private var upgradeCoordinator: PremiumUpgradeCoordinator
+    private let commercialFeaturesAvailability: CommercialFeaturesAvailability
 #if DEBUG
     private let qaAppearance = InventoryQAAppearanceConfiguration(
         arguments: ProcessInfo.processInfo.arguments
@@ -15,22 +16,41 @@ struct HomeStuffInventoryApp: App {
 #endif
 
     init() {
+        commercialFeaturesAvailability = .current
         let service = Self.makeEntitlementService(
-            arguments: ProcessInfo.processInfo.arguments
+            arguments: ProcessInfo.processInfo.arguments,
+            commercialFeaturesAvailability: commercialFeaturesAvailability
         )
         _entitlementService = State(initialValue: service)
-        _upgradeCoordinator = State(initialValue: PremiumUpgradeCoordinator(service: service))
+        _upgradeCoordinator = State(initialValue: PremiumUpgradeCoordinator(
+            service: service,
+            commercialFeaturesAvailability: commercialFeaturesAvailability
+        ))
     }
 
     private static func makeEntitlementService(
-        arguments: [String]
+        arguments: [String],
+        commercialFeaturesAvailability: CommercialFeaturesAvailability
     ) -> StoreKitEntitlementService {
+        let premiumAccess = PremiumAccessState(
+            entitlements: .free,
+            policy: PremiumAccessPolicy(
+                commercialFeaturesAvailability: commercialFeaturesAvailability
+            )
+        )
+        guard commercialFeaturesAvailability.isLifetimeProLaunchEnabled else {
+            return .dormant(premiumAccess: premiumAccess)
+        }
 #if DEBUG
         if let product = InventoryQAStoreProductFixture.product(arguments: arguments) {
-            return .qaProductFixture(product: product)
+            return .qaProductFixture(product: product, premiumAccess: premiumAccess)
         }
 #endif
-        return .live()
+        return StoreKitEntitlementService(
+            premiumAccess: premiumAccess,
+            client: .live,
+            cache: .live
+        )
     }
 
     var body: some Scene {
@@ -131,7 +151,8 @@ struct InventoryQAStoreProductFixture {
 
 private extension StoreKitEntitlementService {
     static func qaProductFixture(
-        product: StoreProductInfo
+        product: StoreProductInfo,
+        premiumAccess: PremiumAccessState
     ) -> StoreKitEntitlementService {
         let client = StoreKitEntitlementClient(
             loadLifetimeProduct: { product },
@@ -145,7 +166,11 @@ private extension StoreKitEntitlementService {
             store: { _ in },
             remove: {}
         )
-        return StoreKitEntitlementService(client: client, cache: cache)
+        return StoreKitEntitlementService(
+            premiumAccess: premiumAccess,
+            client: client,
+            cache: cache
+        )
     }
 }
 #endif

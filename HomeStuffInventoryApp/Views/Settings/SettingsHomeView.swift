@@ -49,36 +49,43 @@ struct SettingsHomeView: View {
                 }
             }
 
-            Section {
-                Button {
-                    upgradeCoordinator.request(.settings)
-                } label: {
-                    HStack(spacing: 12) {
-                        InventorySettingsNavigationRow(
-                            "premium.title",
-                            systemImage: "sparkles"
-                        )
-                        Spacer()
-                        Text(
-                            upgradeCoordinator.premiumAccess.entitlements.hasLocalProFeatures
-                                ? "premium.settings.owned"
-                                : "premium.settings.available"
-                        )
-                        .foregroundStyle(.secondary)
+            if upgradeCoordinator.isLifetimeProLaunchEnabled {
+                Section {
+                    Button {
+                        upgradeCoordinator.request(.settings)
+                    } label: {
+                        HStack(spacing: 12) {
+                            InventorySettingsNavigationRow(
+                                "premium.title",
+                                systemImage: "sparkles"
+                            )
+                            Spacer()
+                            Text(
+                                upgradeCoordinator.premiumAccess.entitlements.hasLocalProFeatures
+                                    ? "premium.settings.owned"
+                                    : "premium.settings.available"
+                            )
+                            .foregroundStyle(.secondary)
+                        }
+                        .contentShape(Rectangle())
                     }
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityHint("premium.settings.hint")
-                .accessibilityIdentifier("settings.pro")
+                    .buttonStyle(.plain)
+                    .accessibilityHint("premium.settings.hint")
+                    .accessibilityIdentifier("settings.pro")
 
-                Button("premium.restore") {
-                    upgradeCoordinator.request(.settings)
-                    Task { await upgradeCoordinator.restore() }
+                    Button("premium.restore") {
+                        upgradeCoordinator.request(.settings)
+                        Task { await upgradeCoordinator.restore() }
+                    }
+                    .frame(minHeight: 44)
+                    .accessibilityIdentifier("settings.pro.restore")
+                } header: {
+                    Text("premium.settings.section")
                 }
-                .frame(minHeight: 44)
-                .accessibilityIdentifier("settings.pro.restore")
+                .inventoryFormRowSurface()
+            }
 
+            Section {
                 Button {
                     isShowingMovementHistory = true
                 } label: {
@@ -89,9 +96,7 @@ struct SettingsHomeView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .accessibilityIdentifier("settings.pro.history")
-            } header: {
-                Text("premium.settings.section")
+                .accessibilityIdentifier("settings.history")
             }
             .inventoryFormRowSurface()
 

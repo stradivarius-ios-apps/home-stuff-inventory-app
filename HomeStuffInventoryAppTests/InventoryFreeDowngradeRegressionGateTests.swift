@@ -19,7 +19,9 @@ struct InventoryFreeDowngradeRegressionGateTests {
         #expect(Set(states.map(\.state)) == Set(InventoryEntitlementState.allCases))
 
         let freePolicy = InventoryFreeAccessPolicy()
-        let premiumPolicy = PremiumAccessPolicy()
+        let premiumPolicy = PremiumAccessPolicy(
+            commercialFeaturesAvailability: .lifetimeProLaunchEnabled
+        )
         let localFeatures = PremiumFeature.lifetimeLaunchBundle
         #expect(localFeatures.count == 5)
 
@@ -218,7 +220,9 @@ struct InventoryFreeDowngradeRegressionGateTests {
 
             let entitlements = InventoryEntitlements(state: fixture.state)
             #expect(
-                PremiumAccessPolicy().availability(
+                PremiumAccessPolicy(
+                    commercialFeaturesAvailability: .lifetimeProLaunchEnabled
+                ).availability(
                     of: .storageHierarchyEditing,
                     entitlements: entitlements
                 ) == (fixture.localPro ? .available : .unavailable)

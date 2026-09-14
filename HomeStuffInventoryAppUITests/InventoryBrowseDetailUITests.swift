@@ -98,6 +98,7 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
     func testPlaceContentsMovementActionDistinguishesAccessGateFromEmptyState() {
         launchStartupApp(arguments: [
             "--use-sample-inventory-data",
+            "--qa-enable-lifetime-pro-launch",
             "--qa-storekit-product-fixture",
             "--qa-storekit-product-name",
             "UI Test Pro Product",

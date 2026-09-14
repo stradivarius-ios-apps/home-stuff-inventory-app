@@ -2,11 +2,26 @@ import XCTest
 
 @MainActor
 final class InventorySettingsUITests: InventoryUITestCase {
+    func testProductionSettingsOmitsCommercialControlsAndKeepsMovementHistoryAvailable() {
+        launchStartupApp(arguments: ["--use-sample-inventory-data", "--qa-movement-history-fixture"])
+
+        app.tabBars.buttons["Settings"].tap()
+
+        XCTAssertFalse(app.buttons["settings.pro"].exists)
+        XCTAssertFalse(app.buttons["settings.pro.restore"].exists)
+        let history = app.buttons["settings.history"]
+        XCTAssertTrue(history.waitForExistence(timeout: 3))
+        history.tap()
+        XCTAssertTrue(app.buttons["premium.history.undo"].waitForExistence(timeout: 3))
+        XCTAssertFalse(element(identifier: "premium.upgrade").exists)
+    }
+
     func testFreeHierarchyDirectoryStaysReadableAndRoutesOnlyIntentionalStructuralActionsToUpgrade() {
         launchStartupApp(
             arguments: [
                 "--use-sample-inventory-data",
-                "--qa-hierarchy-management-fixture"
+                "--qa-hierarchy-management-fixture",
+                "--qa-enable-lifetime-pro-launch"
             ],
             contentSizeCategory: "UICTContentSizeCategoryAccessibilityXXXL",
             locale: "en"
@@ -55,6 +70,7 @@ final class InventorySettingsUITests: InventoryUITestCase {
             arguments: [
                 "--use-sample-inventory-data",
                 "--qa-hierarchy-management-fixture",
+                "--qa-enable-lifetime-pro-launch",
                 "--qa-force-dark-appearance",
                 "--qa-increase-contrast",
                 "--qa-reduce-transparency"
@@ -212,7 +228,7 @@ final class InventorySettingsUITests: InventoryUITestCase {
         restoreAction.tap(); XCTAssertTrue(element(identifier: "settings.restore.invocationCompleted").waitForExistence(timeout: 3))
     }
 
-    func testFreeGlobalHistoryPresentsExtendedUndoUpgradeFromCurrentSheet() {
+    func testFreeGlobalHistoryRemainsReadableWithoutAnUpgradeSurface() {
         launchStartupApp(
             arguments: [
                 "--use-sample-inventory-data",
@@ -221,18 +237,14 @@ final class InventorySettingsUITests: InventoryUITestCase {
         )
         app.tabBars.buttons["Settings"].tap()
 
-        let history = app.buttons["settings.pro.history"]
+        let history = app.buttons["settings.history"]
         XCTAssertTrue(history.waitForExistence(timeout: 3))
         history.tap()
 
         let undo = app.buttons["premium.history.undo"]
         XCTAssertTrue(undo.waitForExistence(timeout: 3))
         XCTAssertTrue(undo.isEnabled)
-        undo.tap()
-
-        XCTAssertTrue(element(identifier: "premium.upgrade").waitForExistence(timeout: 3))
-        XCTAssertTrue(app.staticTexts["Use Extended Undo"].exists)
-        XCTAssertTrue(app.buttons["premium.restore"].exists)
+        XCTAssertFalse(element(identifier: "premium.upgrade").exists)
     }
 
     func testListManagementEditorTextFieldSavesFromSettings() {

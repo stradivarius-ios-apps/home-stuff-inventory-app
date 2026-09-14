@@ -271,7 +271,8 @@ enum InventoryMovementHistoryPresentation {
         items: [InventoryItem],
         locations: [StorageLocation],
         places: [InventoryPlace],
-        entitlements: InventoryEntitlements
+        entitlements: InventoryEntitlements,
+        policy: PremiumAccessPolicy = PremiumAccessPolicy()
     ) -> UndoAction {
         guard itemID == nil else { return .hidden }
         return switch InventoryMovementHistory.undoAvailability(
@@ -279,7 +280,8 @@ enum InventoryMovementHistoryPresentation {
             items: items,
             locations: locations,
             places: places,
-            entitlements: entitlements
+            entitlements: entitlements,
+            policy: policy
         ) {
         case .available: .confirm
         case .accessRequired: .upgrade

@@ -33,6 +33,7 @@ SHARDS = {
   "04" => %w[
     InventoryBrowseDetailUITests/testEmptyNotesCardOpensNotesEditor
     InventoryBrowseDetailUITests/testScopedRoomSweepUsesSharedUpgradeWithoutBlockingOrdinaryAddItem
+    InventoryBrowseDetailUITests/testProductionPlaceDetailOmitsCommercialActionsAndKeepsAddItemAvailable
     InventoryItemFormUITests/testNewItemFormInitiallyFocusesNameWhileEditFormDoesNotForceFocus
     InventoryItemFormUITests/testPreScopedNewItemFormInitiallyFocusesName
     InventoryItemFormUITests/testReturningFromItemFormPickersDoesNotRestoreNameFocus

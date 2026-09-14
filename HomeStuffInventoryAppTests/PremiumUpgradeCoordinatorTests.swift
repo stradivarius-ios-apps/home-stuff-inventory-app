@@ -365,6 +365,22 @@ struct PremiumUpgradeCoordinatorTests {
         let upgrade = undoAction(records: [record], items: [item], locations: locations)
         #expect(upgrade == .upgrade)
         #expect(InventoryMovementHistoryPresentation.isUndoEnabled(for: upgrade))
+        let productionHold = InventoryMovementHistoryPresentation.actionForCommercialAvailability(
+            upgrade,
+            isLifetimeProLaunchEnabled: false
+        )
+        #expect(productionHold == .unavailable)
+        #expect(!InventoryMovementHistoryPresentation.isUndoEnabled(for: productionHold))
+        #expect(
+            InventoryMovementHistoryPresentation.disabledReasonKey(for: productionHold)
+                == "premium.history.outcome.unavailable"
+        )
+        #expect(
+            InventoryMovementHistoryPresentation.actionForCommercialAvailability(
+                upgrade,
+                isLifetimeProLaunchEnabled: true
+            ) == .upgrade
+        )
         #expect(
             undoAction(
                 records: [record],

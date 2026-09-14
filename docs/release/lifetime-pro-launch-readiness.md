@@ -39,6 +39,14 @@ migrate the StoreKit client, entitlement cache, product identifier, upgrade
 presentation, localized strings, feature gates, hierarchy schema, movement
 history, or their tests as part of re-enabling.
 
+While the switch is false, every purchase-dependent entry point is hidden:
+Settings purchase and restore, Room Sweep, selected-Item movement, whole-place
+movement, nested-place creation and restructure, and Free-tier extended Undo.
+Movement history and ordinary Free place operations remain readable and
+available; extended Undo is displayed as unavailable rather than opening a
+purchase surface. The coordinator remains a defensive second boundary, so a
+stale callback cannot present an upgrade screen.
+
 The DEBUG-only `--qa-enable-lifetime-pro-launch` launch argument is test
 coverage for the dormant implementation; it must never be treated as a
 production launch mechanism. Before changing the production switch, complete
@@ -133,6 +141,7 @@ these focused launch UI tests:
 - `InventoryBrowseDetailUITests/testFirstLaunchDoesNotPresentProUpgrade`;
 - `InventoryBrowseDetailUITests/testPlaceContentsMovementActionDistinguishesAccessGateFromEmptyState`;
 - `InventoryBrowseDetailUITests/testScopedRoomSweepUsesSharedUpgradeWithoutBlockingOrdinaryAddItem`;
+- `InventoryBrowseDetailUITests/testProductionPlaceDetailOmitsCommercialActionsAndKeepsAddItemAvailable`;
 - `InventoryBrowseDetailUITests/testItemDetailMovementHistoryIsReadableWithoutUpgrade`;
 - `InventorySettingsUITests/testFreeGlobalHistoryRemainsReadableWithoutAnUpgradeSurface`;
 - `InventorySettingsUITests/testProductionSettingsOmitsCommercialControlsAndKeepsMovementHistoryAvailable`;

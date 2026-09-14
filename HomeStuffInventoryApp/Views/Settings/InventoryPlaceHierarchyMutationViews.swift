@@ -4,6 +4,7 @@ import SwiftUI
 struct InventoryPlaceHierarchyDirectoryView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(PremiumAccessState.self) private var premiumAccess
+    @Environment(PremiumUpgradeCoordinator.self) private var upgradeCoordinator
     @Query(sort: \StorageLocation.name) private var locations: [StorageLocation]
     @Query(sort: \InventoryPlace.name) private var places: [InventoryPlace]
     @Query(sort: \InventoryItem.name) private var items: [InventoryItem]
@@ -176,27 +177,29 @@ struct InventoryPlaceHierarchyDirectoryView: View {
                 .accessibilityIdentifier("inventory.lists.viewItems")
             }
 
-            Group {
+            if hasActions(isEditable: isEditable) {
                 Menu {
-                    Button {
-                        onCreateChild(row.placeID)
-                    } label: {
-                        Label(
-                            "inventory.places.hierarchy.addChild.action",
-                            systemImage: "rectangle.stack.badge.plus"
-                        )
-                    }
-                    .disabled(!row.hasCompletePath)
+                    if upgradeCoordinator.isLifetimeProLaunchEnabled {
+                        Button {
+                            onCreateChild(row.placeID)
+                        } label: {
+                            Label(
+                                "inventory.places.hierarchy.addChild.action",
+                                systemImage: "rectangle.stack.badge.plus"
+                            )
+                        }
+                        .disabled(!row.hasCompletePath)
 
-                    Button {
-                        onRestructure(row.placeID)
-                    } label: {
-                        Label(
-                            "inventory.places.hierarchy.restructure.action",
-                            systemImage: "arrow.triangle.branch"
-                        )
+                        Button {
+                            onRestructure(row.placeID)
+                        } label: {
+                            Label(
+                                "inventory.places.hierarchy.restructure.action",
+                                systemImage: "arrow.triangle.branch"
+                            )
+                        }
+                        .disabled(!row.hasCompletePath)
                     }
-                    .disabled(!row.hasCompletePath)
 
                     if isEditable {
                         Button {
@@ -225,10 +228,10 @@ struct InventoryPlaceHierarchyDirectoryView: View {
                     )
                 )
                 .accessibilityIdentifier("inventory.lists.valueActions")
+                .accessibilityIdentifier(
+                    "settings.places.hierarchy.actions.\(row.placeID.uuidString)"
+                )
             }
-            .accessibilityIdentifier(
-                "settings.places.hierarchy.actions.\(row.placeID.uuidString)"
-            )
         }
         .padding(.vertical, 3)
         .accessibilityElement(children: .contain)
@@ -272,7 +275,12 @@ struct InventoryPlaceHierarchyDirectoryView: View {
     }
 
     private var canOfferUndo: Bool {
-        switch InventoryPlaceMutationPersistence.undoLatestAvailability(
+        guard upgradeCoordinator.isLifetimeProLaunchEnabled
+            || premiumAccess.availability(of: .extendedMovementUndo) == .available
+        else {
+            return false
+        }
+        return switch InventoryPlaceMutationPersistence.undoLatestAvailability(
             entitlements: premiumAccess.entitlements,
             in: modelContext
         ) {
@@ -281,6 +289,10 @@ struct InventoryPlaceHierarchyDirectoryView: View {
         case .unavailable, .currentStateChanged, .unsafeRestoration:
             false
         }
+    }
+
+    private func hasActions(isEditable: Bool) -> Bool {
+        isEditable || upgradeCoordinator.isLifetimeProLaunchEnabled
     }
 
     private func historySummary(

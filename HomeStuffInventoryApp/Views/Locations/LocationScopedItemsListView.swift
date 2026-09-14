@@ -133,7 +133,8 @@ struct PlaceItemsListView: View {
             )
         }
         .toolbar {
-            if let placeID = place.placeID {
+            if let placeID = place.placeID,
+               upgradeCoordinator.isLifetimeProLaunchEnabled {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Button {

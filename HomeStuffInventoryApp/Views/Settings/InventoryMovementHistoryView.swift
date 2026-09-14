@@ -142,13 +142,17 @@ struct InventoryMovementHistoryView: View {
     }
 
     private var undoAction: InventoryMovementHistoryPresentation.UndoAction {
-        InventoryMovementHistoryPresentation.undoAction(
+        let entitlementAction = InventoryMovementHistoryPresentation.undoAction(
             itemID: itemID,
             records: records,
             items: items,
             locations: locations,
             places: places,
             entitlements: premiumAccess.entitlements
+        )
+        return InventoryMovementHistoryPresentation.actionForCommercialAvailability(
+            entitlementAction,
+            isLifetimeProLaunchEnabled: upgradeCoordinator.isLifetimeProLaunchEnabled
         )
     }
 
@@ -246,6 +250,16 @@ enum InventoryMovementHistoryPresentation {
 
     static func isUndoEnabled(for action: UndoAction) -> Bool {
         action == .confirm || action == .upgrade
+    }
+
+    static func actionForCommercialAvailability(
+        _ action: UndoAction,
+        isLifetimeProLaunchEnabled: Bool
+    ) -> UndoAction {
+        guard !isLifetimeProLaunchEnabled, action == .upgrade else {
+            return action
+        }
+        return .unavailable
     }
 
     static func records(

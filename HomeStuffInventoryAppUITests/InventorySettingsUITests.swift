@@ -3,7 +3,11 @@ import XCTest
 @MainActor
 final class InventorySettingsUITests: InventoryUITestCase {
     func testProductionSettingsOmitsCommercialControlsAndKeepsMovementHistoryAvailable() {
-        launchStartupApp(arguments: ["--use-sample-inventory-data", "--qa-movement-history-fixture"])
+        launchStartupApp(arguments: [
+            "--use-sample-inventory-data",
+            "--qa-movement-history-fixture",
+            "--qa-hierarchy-management-fixture"
+        ])
 
         app.tabBars.buttons["Settings"].tap()
 
@@ -12,8 +16,21 @@ final class InventorySettingsUITests: InventoryUITestCase {
         let history = app.buttons["settings.history"]
         XCTAssertTrue(history.waitForExistence(timeout: 3))
         history.tap()
-        XCTAssertTrue(app.buttons["premium.history.undo"].waitForExistence(timeout: 3))
+        let undo = app.buttons["premium.history.undo"]
+        XCTAssertTrue(undo.waitForExistence(timeout: 3))
+        XCTAssertFalse(undo.isEnabled)
         XCTAssertFalse(element(identifier: "premium.upgrade").exists)
+
+        app.buttons["Close"].tap()
+        let placesLink = app.buttons["settings.lists.placesLink"]
+        scrollToElement(placesLink)
+        placesLink.tap()
+        let rootID = "B1F0A001-EE01-4E10-9000-000000000503"
+        let rootRow = element(identifier: "settings.places.hierarchy.row.\(rootID)")
+        scrollToElement(rootRow)
+        XCTAssertTrue(rootRow.exists)
+        XCTAssertFalse(element(identifier: "settings.places.hierarchy.actions.\(rootID)").exists)
+        XCTAssertTrue(app.buttons["settings.places.addButton"].exists)
     }
 
     func testFreeHierarchyDirectoryStaysReadableAndRoutesOnlyIntentionalStructuralActionsToUpgrade() {

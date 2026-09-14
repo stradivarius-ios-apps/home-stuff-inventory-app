@@ -170,6 +170,10 @@ struct PlaceManagementView: View {
         case .available:
             dialog = .undo
         case .accessRequired:
+            guard upgradeCoordinator.isLifetimeProLaunchEnabled else {
+                dialog = .message("inventory.places.hierarchy.error.accessRequired")
+                return
+            }
             upgradeCoordinator.request(.extendedMovementUndo) {
                 requestUndo()
             }

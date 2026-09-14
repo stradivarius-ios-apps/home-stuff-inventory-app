@@ -149,7 +149,7 @@ class HostedPublicCITest < Minitest::Test
     end
     validation = File.read(".github/workflows/validation.yml")
     assert_equal 1, validation.scan("bash .github/scripts/configure_hosted_xcode.sh").length
-    assert_includes validation, "ruby/setup-ruby@a30dfa457ad68707b8b910ac3a244714b61c0626"
+    assert_includes validation, "ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b"
     assert_includes validation, 'ruby-version: "4.0.5"'
     assert_includes validation, 'bundler: "2.7.2"'
     refute_includes validation, "$RUNNER_TOOL_CACHE/Ruby/"

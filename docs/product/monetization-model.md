@@ -128,6 +128,21 @@ Potential later Home Stuff Pro scope includes:
 
 The five-item launch list is frozen by the canonical launch-bundle contract. The later list defines possible direction only; each capability requires a separate product decision before work begins.
 
+## Current release activation
+
+`CommercialFeaturesAvailability` is the single release-level policy for the
+Lifetime Pro launch. Production releases set it to disabled. In that state the
+app does not initialize live StoreKit product loading, transaction observation,
+or entitlement reconciliation; Settings omits Home Stuff Pro and Restore
+Purchases; and no purchase sheet can be presented. The implemented local launch
+bundle remains in source, with its existing feature gates and data guarantees
+preserved while commercial activation is off.
+
+A future intentional Lifetime Pro launch changes this centralized policy to
+enabled. The existing StoreKit client, entitlement service, product fixture,
+upgrade presentation, localized copy, and tests remain in source so that change
+does not require a new integration or data migration.
+
 Lifetime Pro must not be launched as a payment for one minor convenience. The initial Pro release should contain a coherent bundle with clear user value.
 
 The exact initial bundle, protected Free adjacency, release gate, and rollback contract are now frozen in the canonical [Home Stuff Pro launch-bundle contract](pro-launch-bundle-contract.md). Capabilities listed here but omitted from that five-capability launch contract remain deferred and are not authorized for implementation or marketing.

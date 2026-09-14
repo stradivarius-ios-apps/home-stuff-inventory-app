@@ -39,7 +39,9 @@ struct PremiumAccessTests {
     }
 
     @Test func everyFeatureUsesItsSingleCentralRequirement() {
-        let policy = PremiumAccessPolicy()
+        let policy = PremiumAccessPolicy(
+            commercialFeaturesAvailability: .lifetimeProLaunchEnabled
+        )
         let fixtures: [(InventoryEntitlements, Bool, Bool)] = [
             (.free, false, false),
             (.init(ownsLifetimePro: true, hasActiveFamilySubscription: false), true, false),
@@ -64,7 +66,9 @@ struct PremiumAccessTests {
     }
 
     @Test func allSixApprovedStatesResolveTheExpectedMatrix() {
-        let policy = PremiumAccessPolicy()
+        let policy = PremiumAccessPolicy(
+            commercialFeaturesAvailability: .lifetimeProLaunchEnabled
+        )
         let fixtures: [(InventoryEntitlementState, Bool, Bool)] = [
             (.free, false, false),
             (.lifetimePro, true, false),
@@ -95,7 +99,12 @@ struct PremiumAccessTests {
     }
 
     @Test @MainActor func observableStateReflectsInjectedEntitlementChanges() {
-        let state = PremiumAccessState(entitlements: .free)
+        let state = PremiumAccessState(
+            entitlements: .free,
+            policy: PremiumAccessPolicy(
+                commercialFeaturesAvailability: .lifetimeProLaunchEnabled
+            )
+        )
 
         #expect(state.availability(of: .roomSweep) == .unavailable)
         #expect(state.availability(of: .personalSync) == .unavailable)
@@ -122,12 +131,28 @@ struct PremiumAccessTests {
         #expect(state.availability(of: .roomSweep) == .unavailable)
     }
 
+    @Test func disabledCommercialLaunchKeepsImplementedLocalWorkflowsGated() {
+        let policy = PremiumAccessPolicy()
+
+        for feature in localFeatures {
+            #expect(policy.availability(of: feature, entitlements: .free) == .unavailable)
+        }
+        for feature in subscriptionFeatures {
+            #expect(policy.availability(of: feature, entitlements: .free) == .unavailable)
+        }
+    }
+
     @Test @MainActor func transientOutcomesPreserveLastVerifiedOfflineAccess() {
         let verifiedLifetime = InventoryEntitlements(
             ownsLifetimePro: true,
             hasActiveFamilySubscription: false
         )
-        let state = PremiumAccessState(entitlements: verifiedLifetime)
+        let state = PremiumAccessState(
+            entitlements: verifiedLifetime,
+            policy: PremiumAccessPolicy(
+                commercialFeaturesAvailability: .lifetimeProLaunchEnabled
+            )
+        )
 
         for resolution in [
             InventoryEntitlementResolution.pending,
@@ -147,7 +172,9 @@ struct PremiumAccessTests {
     }
 
     @Test func everyProtectedFreeCapabilityStaysAvailableInEveryState() {
-        let policy = PremiumAccessPolicy()
+        let policy = PremiumAccessPolicy(
+            commercialFeaturesAvailability: .lifetimeProLaunchEnabled
+        )
         let states: [InventoryEntitlementState?] = [nil] + InventoryEntitlementState.allCases.map(Optional.some)
 
         #expect(InventoryFreeCapability.allCases.count == 24)

@@ -52,6 +52,21 @@ struct PremiumUpgradeCoordinatorTests {
         #expect(coordinator.outcome == .none)
     }
 
+    @Test func disabledCommercialLaunchNeverActivatesOrPresentsAPurchaseSurface() {
+        let service = StoreKitEntitlementService.dormant(
+            premiumAccess: PremiumAccessState(entitlements: .free)
+        )
+        let coordinator = PremiumUpgradeCoordinator(service: service)
+
+        service.start()
+        coordinator.request(.settings)
+        coordinator.request(.roomSweep)
+
+        #expect(coordinator.presentedContext == nil)
+        #expect(coordinator.productState == .idle)
+        #expect(service.lifecycleState == .unavailable)
+    }
+
     @Test func movementHistoryOwnsItsContextualUpgradePresentation() {
         let coordinator = makeCoordinator()
 
@@ -350,6 +365,22 @@ struct PremiumUpgradeCoordinatorTests {
         let upgrade = undoAction(records: [record], items: [item], locations: locations)
         #expect(upgrade == .upgrade)
         #expect(InventoryMovementHistoryPresentation.isUndoEnabled(for: upgrade))
+        let productionHold = InventoryMovementHistoryPresentation.actionForCommercialAvailability(
+            upgrade,
+            isLifetimeProLaunchEnabled: false
+        )
+        #expect(productionHold == .unavailable)
+        #expect(!InventoryMovementHistoryPresentation.isUndoEnabled(for: productionHold))
+        #expect(
+            InventoryMovementHistoryPresentation.disabledReasonKey(for: productionHold)
+                == "premium.history.outcome.unavailable"
+        )
+        #expect(
+            InventoryMovementHistoryPresentation.actionForCommercialAvailability(
+                upgrade,
+                isLifetimeProLaunchEnabled: true
+            ) == .upgrade
+        )
         #expect(
             undoAction(
                 records: [record],
@@ -432,7 +463,10 @@ struct PremiumUpgradeCoordinatorTests {
             items: items,
             locations: locations,
             places: [],
-            entitlements: entitlements
+            entitlements: entitlements,
+            policy: PremiumAccessPolicy(
+                commercialFeaturesAvailability: .lifetimeProLaunchEnabled
+            )
         )
     }
 
@@ -489,12 +523,20 @@ struct PremiumUpgradeCoordinatorTests {
             remove: {}
         )
         let service = StoreKitEntitlementService(
-            premiumAccess: PremiumAccessState(entitlements: entitlements),
+            premiumAccess: PremiumAccessState(
+                entitlements: entitlements,
+                policy: PremiumAccessPolicy(
+                    commercialFeaturesAvailability: .lifetimeProLaunchEnabled
+                )
+            ),
             client: client,
             cache: cache,
             now: { Date(timeIntervalSince1970: 1_750_000_100) }
         )
-        return PremiumUpgradeCoordinator(service: service)
+        return PremiumUpgradeCoordinator(
+            service: service,
+            commercialFeaturesAvailability: .lifetimeProLaunchEnabled
+        )
     }
 
     private struct TestFailure: Error {}

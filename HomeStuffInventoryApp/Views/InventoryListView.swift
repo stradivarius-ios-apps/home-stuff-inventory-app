@@ -236,16 +236,18 @@ struct InventoryListView: View {
                     .accessibilityIdentifier("inventory.filter.menu")
                 }
 
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        beginBulkSelection()
-                    } label: {
-                        Image(systemName: "checklist")
+                if upgradeCoordinator.isLifetimeProLaunchEnabled {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            beginBulkSelection()
+                        } label: {
+                            Image(systemName: "checklist")
+                        }
+                        .disabled(filteredItems.isEmpty)
+                        .accessibilityLabel("inventory.bulkMove.select.action")
+                        .accessibilityHint("inventory.bulkMove.select.hint")
+                        .accessibilityIdentifier("inventory.bulkSelection.startButton")
                     }
-                    .disabled(filteredItems.isEmpty)
-                    .accessibilityLabel("inventory.bulkMove.select.action")
-                    .accessibilityHint("inventory.bulkMove.select.hint")
-                    .accessibilityIdentifier("inventory.bulkSelection.startButton")
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
@@ -256,10 +258,12 @@ struct InventoryListView: View {
                             Label("inventory.action.addItem", systemImage: "plus")
                         }
 
-                        Button {
-                            requestRoomSweep()
-                        } label: {
-                            Label("inventory.roomSweep.action", systemImage: "square.stack.3d.up")
+                        if upgradeCoordinator.isLifetimeProLaunchEnabled {
+                            Button {
+                                requestRoomSweep()
+                            } label: {
+                                Label("inventory.roomSweep.action", systemImage: "square.stack.3d.up")
+                            }
                         }
                     } label: {
                         Image(systemName: "plus")

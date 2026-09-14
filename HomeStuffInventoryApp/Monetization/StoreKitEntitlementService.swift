@@ -132,6 +132,7 @@ final class StoreKitEntitlementService {
     @ObservationIgnored private let client: StoreKitEntitlementClient
     @ObservationIgnored private let cache: LifetimeAccessCache
     @ObservationIgnored private let now: @Sendable () -> Date
+    @ObservationIgnored private let activatesStoreKit: Bool
     @ObservationIgnored private var observationTask: Task<Void, Never>?
     @ObservationIgnored private var pendingIntendedAction: PremiumIntendedAction?
     @ObservationIgnored private var processedUpdates: Set<TransactionUpdateIdentity> = []
@@ -145,17 +146,38 @@ final class StoreKitEntitlementService {
         )
     }
 
+    static func dormant(
+        premiumAccess: PremiumAccessState
+    ) -> StoreKitEntitlementService {
+        StoreKitEntitlementService(
+            premiumAccess: premiumAccess,
+            client: StoreKitEntitlementClient(
+                loadLifetimeProduct: { throw StoreKitClientError.productUnavailable(.lifetimePro) },
+                purchaseLifetime: { throw StoreKitClientError.productUnavailable(.lifetimePro) },
+                currentEntitlements: { [] },
+                transactionUpdates: { AsyncStream { $0.finish() } },
+                synchronize: {}
+            ),
+            cache: LifetimeAccessCache(load: { nil }, store: { _ in }, remove: {}),
+            activatesStoreKit: false
+        )
+    }
+
     init(
         premiumAccess: PremiumAccessState = PremiumAccessState(entitlements: .free),
         client: StoreKitEntitlementClient,
         cache: LifetimeAccessCache,
+        activatesStoreKit: Bool = true,
         now: @escaping @Sendable () -> Date = Date.init
     ) {
         self.premiumAccess = premiumAccess
         self.client = client
         self.cache = cache
+        self.activatesStoreKit = activatesStoreKit
         self.now = now
-        lifecycleState = .loading(cachedLifetimeAccess: premiumAccess.entitlements.ownsLifetimePro)
+        lifecycleState = activatesStoreKit
+            ? .loading(cachedLifetimeAccess: premiumAccess.entitlements.ownsLifetimePro)
+            : .unavailable
     }
 
     deinit {
@@ -163,7 +185,7 @@ final class StoreKitEntitlementService {
     }
 
     func start() {
-        guard observationTask == nil else { return }
+        guard activatesStoreKit, observationTask == nil else { return }
 
         observationTask = Task { [weak self, client] in
             await self?.loadCachedAccessIfNeeded()

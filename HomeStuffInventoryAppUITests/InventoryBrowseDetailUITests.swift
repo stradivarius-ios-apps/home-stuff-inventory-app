@@ -98,6 +98,7 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
     func testPlaceContentsMovementActionDistinguishesAccessGateFromEmptyState() {
         launchStartupApp(arguments: [
             "--use-sample-inventory-data",
+            "--qa-enable-lifetime-pro-launch",
             "--qa-storekit-product-fixture",
             "--qa-storekit-product-name",
             "UI Test Pro Product",
@@ -149,7 +150,7 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
     }
 
     func testScopedRoomSweepUsesSharedUpgradeWithoutBlockingOrdinaryAddItem() {
-        launchApp()
+        launchStartupApp(arguments: ["--use-sample-inventory-data", "--qa-enable-lifetime-pro-launch"])
         openPlaceDetail(location: "Office", place: "Desk drawer")
 
         app.buttons["locations.placeDetail.proActions"].tap()
@@ -164,6 +165,17 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
         XCTAssertTrue(app.buttons["inventory.itemForm.cancelButton"].waitForExistence(timeout: 3))
         XCTAssertTrue(app.buttons["inventory.itemForm.locationPicker"].label.contains("Office"))
         assertSelectedPlace(named: "Desk drawer")
+    }
+
+    func testProductionPlaceDetailOmitsCommercialActionsAndKeepsAddItemAvailable() {
+        launchApp()
+        openPlaceDetail(location: "Office", place: "Desk drawer")
+
+        XCTAssertFalse(app.buttons["locations.placeDetail.proActions"].exists)
+        XCTAssertFalse(app.buttons["locations.placeDetail.roomSweep"].exists)
+        XCTAssertFalse(app.buttons["locations.placeDetail.moveContentsButton"].exists)
+        XCTAssertTrue(app.buttons["locations.placeDetail.addItemButton"].exists)
+        XCTAssertFalse(element(identifier: "premium.upgrade").exists)
     }
 
     func testItemDetailMovementHistoryIsReadableWithoutUpgrade() {

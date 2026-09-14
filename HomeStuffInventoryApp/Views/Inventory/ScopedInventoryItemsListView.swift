@@ -116,7 +116,7 @@ struct ScopedInventoryItemsListView<Header: View>: View {
                     }
                     .accessibilityIdentifier("inventory.scopedBulkSelection.selectAllButton")
                 }
-            } else if !items.isEmpty {
+            } else if !items.isEmpty, upgradeCoordinator.isLifetimeProLaunchEnabled {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         beginBulkSelection()

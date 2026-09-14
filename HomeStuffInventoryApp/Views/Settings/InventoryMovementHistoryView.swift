@@ -142,13 +142,17 @@ struct InventoryMovementHistoryView: View {
     }
 
     private var undoAction: InventoryMovementHistoryPresentation.UndoAction {
-        InventoryMovementHistoryPresentation.undoAction(
+        let entitlementAction = InventoryMovementHistoryPresentation.undoAction(
             itemID: itemID,
             records: records,
             items: items,
             locations: locations,
             places: places,
             entitlements: premiumAccess.entitlements
+        )
+        return InventoryMovementHistoryPresentation.actionForCommercialAvailability(
+            entitlementAction,
+            isLifetimeProLaunchEnabled: upgradeCoordinator.isLifetimeProLaunchEnabled
         )
     }
 
@@ -248,6 +252,16 @@ enum InventoryMovementHistoryPresentation {
         action == .confirm || action == .upgrade
     }
 
+    static func actionForCommercialAvailability(
+        _ action: UndoAction,
+        isLifetimeProLaunchEnabled: Bool
+    ) -> UndoAction {
+        guard !isLifetimeProLaunchEnabled, action == .upgrade else {
+            return action
+        }
+        return .unavailable
+    }
+
     static func records(
         _ records: [InventoryMovementRecord],
         for itemID: UUID?
@@ -271,7 +285,8 @@ enum InventoryMovementHistoryPresentation {
         items: [InventoryItem],
         locations: [StorageLocation],
         places: [InventoryPlace],
-        entitlements: InventoryEntitlements
+        entitlements: InventoryEntitlements,
+        policy: PremiumAccessPolicy = PremiumAccessPolicy()
     ) -> UndoAction {
         guard itemID == nil else { return .hidden }
         return switch InventoryMovementHistory.undoAvailability(
@@ -279,7 +294,8 @@ enum InventoryMovementHistoryPresentation {
             items: items,
             locations: locations,
             places: places,
-            entitlements: entitlements
+            entitlements: entitlements,
+            policy: policy
         ) {
         case .available: .confirm
         case .accessRequired: .upgrade

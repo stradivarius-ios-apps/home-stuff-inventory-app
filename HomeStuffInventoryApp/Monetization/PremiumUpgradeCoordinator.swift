@@ -91,23 +91,34 @@ final class PremiumUpgradeCoordinator {
     private(set) var outcome: PremiumUpgradeOutcome = .none
 
     @ObservationIgnored private let service: StoreKitEntitlementService
+    @ObservationIgnored private let commercialFeaturesAvailability: CommercialFeaturesAvailability
     @ObservationIgnored private var pendingAction: PremiumIntendedAction?
     @ObservationIgnored private var resumeAction: (() -> Void)?
     @ObservationIgnored private var consumedActionIDs: Set<UUID> = []
 
-    init(service: StoreKitEntitlementService) {
+    init(
+        service: StoreKitEntitlementService,
+        commercialFeaturesAvailability: CommercialFeaturesAvailability = .production
+    ) {
         self.service = service
+        self.commercialFeaturesAvailability = commercialFeaturesAvailability
     }
 
     var premiumAccess: PremiumAccessState { service.premiumAccess }
     var productState: LifetimeProductLoadState { service.productState }
     var operationState: StoreKitEntitlementOperationState { service.operationState }
+    var isLifetimeProLaunchEnabled: Bool {
+        commercialFeaturesAvailability.isLifetimeProLaunchEnabled
+    }
 
     func request(
         _ context: PremiumUpgradeContext,
         presentationHost: PremiumUpgradePresentationHost = .root,
         resume: (() -> Void)? = nil
     ) {
+        guard commercialFeaturesAvailability.isLifetimeProLaunchEnabled else {
+            return
+        }
         if let feature = context.requiredFeature,
            premiumAccess.availability(of: feature) == .available {
             resume?()

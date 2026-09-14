@@ -1,4 +1,23 @@
+import Foundation
 import Observation
+
+/// Keeps release activation separate from the durable entitlement and feature model.
+/// Changing this value for a future launch does not require rebuilding StoreKit or data flows.
+struct CommercialFeaturesAvailability: Sendable {
+    let isLifetimeProLaunchEnabled: Bool
+
+    static let production = Self(isLifetimeProLaunchEnabled: false)
+    static let lifetimeProLaunchEnabled = Self(isLifetimeProLaunchEnabled: true)
+
+    static var current: Self {
+#if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("--qa-enable-lifetime-pro-launch") {
+            return .lifetimeProLaunchEnabled
+        }
+#endif
+        return .production
+    }
+}
 
 struct InventoryEntitlements: Equatable, Sendable {
     let ownsLifetimePro: Bool
@@ -57,6 +76,14 @@ enum PremiumFeature: CaseIterable, Hashable, Sendable {
 }
 
 struct PremiumAccessPolicy: Sendable {
+    private let commercialFeaturesAvailability: CommercialFeaturesAvailability
+
+    init(
+        commercialFeaturesAvailability: CommercialFeaturesAvailability = .current
+    ) {
+        self.commercialFeaturesAvailability = commercialFeaturesAvailability
+    }
+
     func availability(
         of feature: PremiumFeature,
         entitlements: InventoryEntitlements
@@ -67,9 +94,9 @@ struct PremiumAccessPolicy: Sendable {
              .movePlaceContents,
              .extendedMovementUndo,
              .storageHierarchyEditing:
-            entitlements.hasLocalProFeatures ? .available : .unavailable
+            return entitlements.hasLocalProFeatures ? .available : .unavailable
         case .personalSync, .householdSharing:
-            entitlements.hasSyncAndSharing ? .available : .unavailable
+            return entitlements.hasSyncAndSharing ? .available : .unavailable
         }
     }
 

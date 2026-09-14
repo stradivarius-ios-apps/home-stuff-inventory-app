@@ -43,9 +43,9 @@ While the switch is false, every purchase-dependent entry point is hidden:
 Settings purchase and restore, Room Sweep, selected-Item movement, whole-place
 movement, nested-place creation and restructure, and Free-tier extended Undo.
 Movement history and ordinary Free place operations remain readable and
-available; extended Undo is displayed as unavailable rather than opening a
-purchase surface. The coordinator remains a defensive second boundary, so a
-stale callback cannot present an upgrade screen.
+available; Movement History's extended Undo is displayed as unavailable rather
+than opening a purchase surface. The coordinator remains a defensive second
+boundary, so a stale callback cannot present an upgrade screen.
 
 The DEBUG-only `--qa-enable-lifetime-pro-launch` launch argument is test
 coverage for the dormant implementation; it must never be treated as a

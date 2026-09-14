@@ -4,7 +4,7 @@
 PINS = {
   "actions/checkout" => ["9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0", "v7.0.0"],
   "actions/upload-artifact" => ["043fb46d1a93c77aae656e7c1c64a875d1fc6a0a", "v7.0.1"],
-  "github/codeql-action" => ["cdf488f595d80d6e07e03d4674febd5ab45fa938", "v4.37.9"]
+  "github/codeql-action" => ["b96794f015dfd88f77b49b1c93e0fa7110f94c63", "v4.38.0"]
 }.freeze
 
 Dir[".github/workflows/*.yml"].sort.each do |path|

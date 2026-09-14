@@ -8,7 +8,7 @@ class CodeQLAdvancedSetupTest < Minitest::Test
   WORKFLOW_PATH = ".github/workflows/codeql.yml"
   CONFIG_PATH = ".github/codeql/codeql-config.yml"
   CODEQL_ACTION = "github/codeql-action"
-  CODEQL_SHA = "cdf488f595d80d6e07e03d4674febd5ab45fa938"
+  CODEQL_SHA = "b96794f015dfd88f77b49b1c93e0fa7110f94c63"
 
   def setup
     @workflow = YAML.load_file(WORKFLOW_PATH)

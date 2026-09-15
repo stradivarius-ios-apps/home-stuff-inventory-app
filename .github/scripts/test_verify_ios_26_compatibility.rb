@@ -27,15 +27,21 @@ class IOS26CompatibilityTest < Minitest::Test
     end
   end
 
-  def test_rejects_a_later_26_x_availability_check
+  def test_allows_a_later_26_x_availability_check_with_a_fallback
     with_repository do |root|
       source = File.join(root, "HomeStuffInventoryApp/Views/Extra.swift")
       FileUtils.mkdir_p(File.dirname(source))
-      File.write(source, "if #available(iOS 26.5, *) {}\n")
+      File.write(source, <<~SWIFT)
+        if #available(iOS 26.5, *) {
+          newerNativeAPI()
+        } else {
+          ios26_0Fallback()
+        }
+      SWIFT
       output, status = Open3.capture2e("ruby", SCRIPT, chdir: root)
 
-      refute status.success?
-      assert_includes output, "requires iOS 26.5"
+      assert status.success?, output
+      assert_includes output, "iOS 26.0 static compatibility gate passed"
     end
   end
 

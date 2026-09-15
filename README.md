@@ -98,8 +98,9 @@ surfaces are intentional: do not emulate Liquid Glass on iOS 18.
 For iOS 26 support, the app's minimum supported point release is **iOS 26.0**.
 Run the static gate and the focused 26.0 runtime smoke procedure in
 [`docs/ci/ios-26-compatibility.md`](docs/ci/ios-26-compatibility.md) for each
-affected release. A later installed 26.x simulator validates that runtime only;
-it is not evidence for iOS 26.0.
+affected release. APIs introduced in later 26.x releases require a runtime
+availability check and a valid iOS 26.0 fallback. A later installed 26.x
+simulator validates that runtime only; it is not evidence for iOS 26.0.
 
 ## Localization
 

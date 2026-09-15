@@ -7,6 +7,8 @@ Home Stuff Inventory supports iOS 26 starting at **26.0**. A newer SDK or a
 its broader iOS deployment target, so Swift's availability checking rejects
 unguarded APIs newer than that target; iOS 26-only native behavior must also
 remain guarded at `iOS 26.0` with a fallback where it is not available.
+APIs introduced after iOS 26.0 may be used only behind runtime availability
+handling that preserves a valid iOS 26.0 fallback.
 
 ## Required evidence
 
@@ -14,9 +16,11 @@ Record evidence against the exact release-candidate SHA outside this repository'
 tracked source. Keep these three kinds of evidence distinct:
 
 1. **Compile-time SDK compatibility.** Run the static gate and the ordinary app
-   build. The static gate rejects deployment targets or `#available`/`@available`
-   checks that name iOS 26.1 or later, and asserts the known native Search and
-   Liquid Glass call sites retain 26.0 guards.
+   build. The static gate rejects deployment targets later than iOS 26.0 and
+   asserts the known native Search and Liquid Glass call sites retain 26.0
+   guards. It deliberately does not infer Swift control flow or prove runtime
+   fallback behavior; Xcode availability checking and runtime smoke evidence
+   remain authoritative for that purpose.
 2. **Runtime availability.** Run the focused smoke suite on the earliest
    installed iOS 26 runtime. If iOS 26.0 is installed, it is mandatory; do not
    substitute a later 26.x runtime while claiming 26.0 smoke evidence.

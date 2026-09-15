@@ -37,6 +37,7 @@ module PublicAutomationContract
     test_public_security_gates.rb
     test_release_app_store_screenshots.rb
     test_validate_public_surface.rb
+    test_verify_ios_26_compatibility.rb
     test_verify_gitleaks_security_boundary.rb
     validate_action_pins.rb
     validate_ci_lanes.rb
@@ -48,6 +49,7 @@ module PublicAutomationContract
   PUBLIC_RUNTIME_RUBY_FILES = %w[
     full_test_validation.rb
     ordinary_validation.rb
+    verify_ios_26_compatibility.rb
     test_full_test_validation.rb
   ].freeze
 

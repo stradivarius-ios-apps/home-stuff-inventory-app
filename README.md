@@ -70,7 +70,7 @@ xcodebuild test \
   -configuration Debug
 ```
 
-## iOS 18 Compatibility Smoke Test
+## iOS Compatibility Smoke Tests
 
 Keep the deployment target at its configured minimum; the compiler therefore
 rejects unguarded APIs that are newer than that minimum. Before a release that
@@ -94,6 +94,12 @@ The suite covers the Free launch path, Locations and Storage Place browsing,
 search, Item create/edit/movement, Settings export/backup/restore entry points,
 maximum Dynamic Type, and Ukrainian localization. The pre-iOS-26 fallback
 surfaces are intentional: do not emulate Liquid Glass on iOS 18.
+
+For iOS 26 support, the app's minimum supported point release is **iOS 26.0**.
+Run the static gate and the focused 26.0 runtime smoke procedure in
+[`docs/ci/ios-26-compatibility.md`](docs/ci/ios-26-compatibility.md) for each
+affected release. A later installed 26.x simulator validates that runtime only;
+it is not evidence for iOS 26.0.
 
 ## Localization
 

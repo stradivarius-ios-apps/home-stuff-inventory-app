@@ -86,7 +86,12 @@ class InventoryUITestCase: XCTestCase {
     }
 
     func openPlaceDetail(location: String, place: String) {
-        app.tabBars.buttons["Locations"].tap()
+        // iOS 18 exposes SwiftUI's tab item as an application button rather
+        // than a button scoped to the tab bar, while newer runtimes support
+        // both queries.
+        let locationsTab = app.buttons["Locations"]
+        XCTAssertTrue(locationsTab.waitForExistence(timeout: 3))
+        locationsTab.tap()
         let locationRow = app.buttons["locations.locationRow.\(location)"]
         scrollToElement(locationRow, in: element(identifier: "locations.list"))
         locationRow.tap()

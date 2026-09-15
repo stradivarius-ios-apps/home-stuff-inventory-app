@@ -70,6 +70,31 @@ xcodebuild test \
   -configuration Debug
 ```
 
+## iOS 18 Compatibility Smoke Test
+
+Keep the deployment target at its configured minimum; the compiler therefore
+rejects unguarded APIs that are newer than that minimum. Before a release that
+supports iOS 18, also run this focused smoke suite on an installed iOS 18
+simulator. Replace `<iOS-18-simulator-UDID>` with an available simulator from
+`xcrun simctl list devices available`.
+
+```sh
+xcodebuild test \
+  -project "HomeStuffInventoryApp.xcodeproj" \
+  -scheme "HomeStuffInventoryApp" \
+  -destination "platform=iOS Simulator,id=<iOS-18-simulator-UDID>" \
+  -configuration Debug \
+  -only-testing:HomeStuffInventoryAppUITests/InventorySmokeUITests/testFreeReleaseGateLaunchCreateSearchAndReadWithoutEntitlement \
+  -only-testing:HomeStuffInventoryAppUITests/InventorySmokeUITests/testFreeReleaseGateBrowseAndPortabilityWithoutEntitlement \
+  -only-testing:HomeStuffInventoryAppUITests/InventorySmokeUITests/testMaximumDynamicTypeNavigatesLocationItemDetailAndPicker \
+  -only-testing:HomeStuffInventoryAppUITests/InventorySettingsUITests/testPlaceDirectoryIsLocalizedInUkrainianAndLeavesLocationCategorySemanticsUntouched
+```
+
+The suite covers the Free launch path, Locations and Storage Place browsing,
+search, Item create/edit/movement, Settings export/backup/restore entry points,
+maximum Dynamic Type, and Ukrainian localization. The pre-iOS-26 fallback
+surfaces are intentional: do not emulate Liquid Glass on iOS 18.
+
 ## Localization
 
 User-facing strings are localized in English and Ukrainian. The localization catalog is:

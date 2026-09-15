@@ -15,8 +15,9 @@ The runtime, device model, result bundles, locale, appearance, Dynamic Type,
 and accessibility outcomes are evidence; an installed runtime alone is not a
 passing result.
 
-1. **Toolchain and SDK.** Use Xcode 27 or later with an iOS Simulator 27 SDK.
-   The static command below rejects an older Xcode or SDK.
+1. **Toolchain, SDK, and runtime.** Use Xcode 27 or later with an iOS
+   Simulator 27 SDK and the exact iOS 27.0 runtime. The static command below
+   rejects an older Xcode or SDK and an unavailable 27.0 runtime.
 2. **Build and smoke.** Run the focused smoke suite on an iOS 27.0 simulator.
    Do not substitute a later runtime while claiming iOS 27.0 evidence.
 3. **Existing-data launch.** Start from a current production-compatible store,

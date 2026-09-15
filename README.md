@@ -102,6 +102,12 @@ affected release. APIs introduced in later 26.x releases require a runtime
 availability check and a valid iOS 26.0 fallback. A later installed 26.x
 simulator validates that runtime only; it is not evidence for iOS 26.0.
 
+For release candidates validated on iOS 27, run the reproducible
+[`docs/ci/ios-27-compatibility.md`](docs/ci/ios-27-compatibility.md) gate.
+It verifies the Xcode/iOS 27 SDK, focused smoke coverage, existing-data launch,
+and the platform-specific visual and accessibility review without raising the
+minimum deployment target.
+
 ## Localization
 
 User-facing strings are localized in English and Ukrainian. The localization catalog is:

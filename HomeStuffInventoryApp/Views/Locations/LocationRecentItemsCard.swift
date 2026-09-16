@@ -38,6 +38,7 @@ struct LocationRecentItemsCard: View {
 
             LocationRecentItemTilesSection(
                 presentation: presentation,
+                shelfAccessibilityIdentifier: LocationRecentItemsAccessibilityIdentifier.locationShelf,
                 transitionNamespace: transitionNamespace,
                 reduceMotion: reduceMotion,
                 isRecentItemResolvable: isRecentItemResolvable,
@@ -65,6 +66,7 @@ struct PlaceRecentItemsCard: View {
 
             LocationRecentItemTilesSection(
                 presentation: presentation,
+                shelfAccessibilityIdentifier: LocationRecentItemsAccessibilityIdentifier.placeShelf,
                 transitionNamespace: transitionNamespace,
                 reduceMotion: reduceMotion,
                 isRecentItemResolvable: isRecentItemResolvable,
@@ -77,10 +79,14 @@ struct PlaceRecentItemsCard: View {
     }
 }
 
+private enum LocationRecentItemsAccessibilityIdentifier {
+    static let locationShelf = ["locations", "recentItems", "shelf"].joined(separator: ".")
+    static let placeShelf = ["locations", "placeRecentItems", "shelf"].joined(separator: ".")
+}
+
 private extension View {
     func recentItemsSectionLayout() -> some View {
         frame(maxWidth: .infinity, alignment: .leading)
-            .padding(InventoryDesign.compactCardPadding)
     }
 }
 
@@ -88,6 +94,7 @@ private struct LocationRecentItemTilesSection: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     let presentation: InventoryPreviewGroupPresentation
+    let shelfAccessibilityIdentifier: String
     let transitionNamespace: Namespace.ID
     let reduceMotion: Bool
     let isRecentItemResolvable: (InventoryPreviewGroupPresentation.Chip) -> Bool
@@ -122,6 +129,8 @@ private struct LocationRecentItemTilesSection: View {
             }
         }
         .inventorySemanticSurface(.context, cornerRadius: InventoryDesign.compactCornerRadius)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier(shelfAccessibilityIdentifier)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 

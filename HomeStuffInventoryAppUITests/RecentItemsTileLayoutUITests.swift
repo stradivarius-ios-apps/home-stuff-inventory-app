@@ -34,6 +34,11 @@ final class RecentItemsTileLayoutUITests: XCTestCase {
         assertItemDetail(for: expectedItem.name)
     }
 
+    func testLocationRecentItemsShelfAlignsWithStoragePlaceCardInLightAndDarkAppearance() {
+        assertLocationRecentItemsShelfAlignment(appearanceArgument: nil)
+        assertLocationRecentItemsShelfAlignment(appearanceArgument: "--qa-force-dark-appearance")
+    }
+
     func testPlaceRecentItemsUseFullWidthShelfRowsAndNavigate() {
         launchApp(itemCount: 5)
         openFixturePlace()
@@ -199,11 +204,13 @@ final class RecentItemsTileLayoutUITests: XCTestCase {
         location.tap()
 
         let hero = app.otherElements["locations.detailHero"]
+        let recentItemsShelf = locationRecentItemsShelf
         let placesHeader = element(identifier: "locations.placesSectionHeader")
         let place = app.buttons["locations.placeRow.\(Fixture.placeName)"]
 
         XCTAssertTrue(hero.waitForExistence(timeout: 3))
         XCTAssertTrue(locationRecentItems.exists)
+        XCTAssertTrue(recentItemsShelf.exists)
         XCTAssertFalse(element(identifier: "locations.itemsAccess").exists)
         XCTAssertTrue(placesHeader.exists)
         XCTAssertTrue(place.exists)
@@ -213,6 +220,8 @@ final class RecentItemsTileLayoutUITests: XCTestCase {
         XCTAssertGreaterThanOrEqual(place.frame.height, 44)
         XCTAssertGreaterThanOrEqual(place.frame.minX, app.frame.minX)
         XCTAssertLessThanOrEqual(place.frame.maxX, app.frame.maxX)
+        XCTAssertEqual(recentItemsShelf.frame.minX, place.frame.minX, accuracy: 2)
+        XCTAssertEqual(recentItemsShelf.frame.maxX, place.frame.maxX, accuracy: 2)
     }
 
     func testLocationDetailWithReduceMotionKeepsCompositionVisible() {
@@ -406,6 +415,19 @@ final class RecentItemsTileLayoutUITests: XCTestCase {
         }
     }
 
+    private func assertLocationRecentItemsShelfAlignment(appearanceArgument: String?) {
+        launchApp(appearanceArgument: appearanceArgument)
+        openFixtureLocation()
+
+        let place = app.buttons["locations.placeRow.\(Fixture.placeName)"]
+        let recentItemsShelf = locationRecentItemsShelf
+
+        scrollToHittable(place, in: locationDetail)
+        XCTAssertTrue(recentItemsShelf.exists)
+        XCTAssertEqual(recentItemsShelf.frame.minX, place.frame.minX, accuracy: 2)
+        XCTAssertEqual(recentItemsShelf.frame.maxX, place.frame.maxX, accuracy: 2)
+    }
+
     private func assertOverflowSummary(in section: XCUIElement) {
         let overflowSummary = section.descendants(matching: .any)
             .matching(NSPredicate(format: "label CONTAINS %@", "1 more"))
@@ -471,6 +493,7 @@ final class RecentItemsTileLayoutUITests: XCTestCase {
     private var locationsList: XCUIElement { element(identifier: "locations.list") }
     private var locationDetail: XCUIElement { element(identifier: "locations.locationDetail") }
     private var locationRecentItems: XCUIElement { app.otherElements["locations.recentItems"] }
+    private var locationRecentItemsShelf: XCUIElement { app.otherElements["locations.recentItems.shelf"] }
     private var placeDetail: XCUIElement { element(identifier: "locations.placeDetail.itemList") }
     private var placeRecentItems: XCUIElement { app.otherElements["locations.placeRecentItems"] }
     private var itemDetail: XCUIElement { element(identifier: "inventory.itemDetail") }

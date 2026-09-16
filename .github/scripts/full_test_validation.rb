@@ -119,6 +119,7 @@ SHARDS = {
     RecentItemsTileLayoutUITests/testLocationDetailPlacesFollowRecentItemsCard
     RecentItemsTileLayoutUITests/testLocationDetailUsesAllItemsAccessWhenRecentItemsAreAbsent
     RecentItemsTileLayoutUITests/testLocationDetailPlacesEmptyStateFollowsHeader
+    RecentItemsTileLayoutUITests/testLocationRecentItemsShelfAlignsWithStoragePlaceCardInLightAndDarkAppearance
     RecentItemsTileLayoutUITests/testLocationDetailCompositionFitsUkrainianAccessibilityInDarkAppearance
   ],
   "18" => %w[

@@ -89,6 +89,17 @@ class ReleasePrivateHandoffTest < Minitest::Test
     assert_equal false, flow.dig("concurrency", "cancel-in-progress")
     assert_equal "./.github/workflows/validation.yml", flow.dig("jobs", "validation", "uses")
     assert_equal true, flow.dig("jobs", "validation", "with", "run_app_validation")
+    evidence_job = flow.dig("jobs", "evidence")
+    assert_equal({ "contents" => "read", "checks" => "read" }, evidence_job.fetch("permissions"))
+    checkout_index = evidence_job.fetch("steps").index { |step| step["name"] == "Check out captured release source" }
+    helper_index = evidence_job.fetch("steps").index { |step| step["run"].to_s.include?("release_check_evidence") }
+    refute_nil checkout_index
+    refute_nil helper_index
+    assert_operator checkout_index, :<, helper_index
+    checkout = evidence_job.fetch("steps").fetch(checkout_index)
+    assert_equal "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0", checkout.fetch("uses")
+    assert_equal "${{ needs.identity.outputs.sha }}", checkout.dig("with", "ref")
+    assert_equal false, checkout.dig("with", "persist-credentials")
     assert_includes flow.dig("jobs", "public-release", "if"), "needs.evidence.result == 'success'"
     assert_equal "${{ needs.identity.outputs.sha }}", flow.dig("jobs", "public-release", "with", "trusted_release_sha")
     private_job = flow.dig("jobs", "private-release")

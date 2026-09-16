@@ -21,6 +21,11 @@ class CreateGitHubReleasePreflightTest < Minitest::Test
     assert_raises(RuntimeError) { GitHubReleasePreflight.validate_source_ref!(sha, false) }
     assert_equal sha.downcase, GitHubReleasePreflight.validate_source_ref!(sha, true)
     assert_raises(RuntimeError) { GitHubReleasePreflight.validate_source_ref!("feature/release-prep", true) }
+    captured = "a" * 40
+    assert_equal captured, GitHubReleasePreflight.validate_source_ref!(captured, false, trusted_release_sha: captured)
+    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_source_ref!("b" * 40, false, trusted_release_sha: captured) }
+    assert_raises(RuntimeError) { ensure_source_matches!(captured, "b" * 40, trusted_release_sha: captured) }
+    ensure_source_matches!(captured, captured, trusted_release_sha: captured)
   end
 
   def test_changelog_extracts_finalized_entry

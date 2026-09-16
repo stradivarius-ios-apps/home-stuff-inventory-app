@@ -9,6 +9,12 @@ on:
         type: boolean
         default: true
         required: true
+  workflow_call:
+    inputs:
+      run_app_validation:
+        type: boolean
+        default: true
+        required: true
 
 permissions:
   contents: read
@@ -112,7 +118,7 @@ jobs:
 
           changed_files=()
 
-          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+          if [[ "$EVENT_NAME" == "workflow_dispatch" || "$EVENT_NAME" == "workflow_call" ]]; then
             if [[ "$RUN_APP_VALIDATION" == "true" ]]; then
               app_validation_required=true
             else

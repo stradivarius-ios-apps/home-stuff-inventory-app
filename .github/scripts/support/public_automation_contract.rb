@@ -9,6 +9,7 @@ module PublicAutomationContract
     .github/workflows/validation.yml
     .github/workflows/full-tests.yml
     .github/workflows/pr-ui-screenshots.yml
+    .github/workflows/release.yml
     .github/workflows/prepare-release-version.yml
     .github/workflows/release-app-store-screenshots.yml
   ].freeze
@@ -36,6 +37,7 @@ module PublicAutomationContract
     test_public_release_contracts.rb
     test_public_security_gates.rb
     test_release_app_store_screenshots.rb
+    test_release_private_handoff.rb
     test_validate_public_surface.rb
     test_verify_ios_26_compatibility.rb
     test_verify_ios_27_compatibility.rb

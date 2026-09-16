@@ -1,0 +1,168 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      validation_only:
+        description: Validate the release path without creating a tag, dispatching private release, or uploading.
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: normal-release
+  cancel-in-progress: false
+
+jobs:
+  identity:
+    name: Capture committed release identity
+    runs-on: ubuntu-latest
+    if: github.repository == 'stradivarius-ios-apps/home-stuff-inventory-app' && github.ref == 'refs/heads/main'
+    outputs:
+      sha: ${{ steps.identity.outputs.sha }}
+      version: ${{ steps.identity.outputs.version }}
+      tag: ${{ steps.identity.outputs.tag }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Capture source version and tag
+        id: identity
+        env:
+          CAPTURED_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$CAPTURED_SHA"
+          ruby -r./.github/scripts/support/release_contract -e '
+            sha = ENV.fetch("CAPTURED_SHA")
+            ReleaseContract.strict_sha!(sha, label: "captured release SHA")
+            version = ReleaseContract.project_marketing_version!(File.read(ReleaseContract::PROJECT_PATH))
+            ReleaseContract.finalized_changelog_entry!(File.read(ReleaseContract::CHANGELOG_PATH), version)
+            File.open(ENV.fetch("GITHUB_OUTPUT"), "a") { |out| out.puts "sha=#{sha}\nversion=#{version}\ntag=#{ReleaseContract.tag_for(version)}" }
+          '
+
+  validation:
+    name: Validate exact release source
+    needs: identity
+    if: needs.identity.result == 'success'
+    uses: ./.github/workflows/validation.yml
+    with:
+      run_app_validation: true
+    permissions:
+      contents: read
+
+  evidence:
+    name: Verify exact-SHA release checks
+    needs: [identity, validation]
+    if: needs.validation.result == 'success' && needs.identity.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: read
+    steps:
+      - name: Require approved successful checks on captured SHA
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_SHA: ${{ needs.identity.outputs.sha }}
+          RELEASE_RUN_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          test "$RELEASE_SHA" = "$GITHUB_SHA"
+          gh api "repos/$GITHUB_REPOSITORY/commits/$RELEASE_SHA/check-runs?filter=latest&per_page=100" \
+            | jq -r --arg sha "$RELEASE_SHA" --arg run "$RELEASE_RUN_ID" '[.check_runs[] | select(.name == "Classify changed files" or .name == "CI workflow validation" or .name == "Build and test" or .name == "Code coverage") | select(.head_sha == $sha and .conclusion == "success" and .app.slug == "github-actions" and .app.id == 15368 and (.details_url | contains("/actions/runs/" + $run + "/"))) | .name] | unique | length' \
+            | grep -qx 4
+
+  public-release:
+    name: Create verified public release
+    needs: [identity, evidence]
+    if: needs.evidence.result == 'success' && !inputs.validation_only
+    uses: ./.github/workflows/create-github-release.yml
+    permissions:
+      contents: write
+    with:
+      source_ref: ${{ needs.identity.outputs.sha }}
+      trusted_release_sha: ${{ needs.identity.outputs.sha }}
+      target_version: ${{ needs.identity.outputs.version }}
+
+  private-release:
+    name: Dispatch and await private TestFlight upload
+    needs: [identity, validation, evidence, public-release]
+    if: needs.public-release.result == 'success' && needs.evidence.result == 'success' && !inputs.validation_only
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    environment: release-orchestration
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ needs.identity.outputs.sha }}
+          persist-credentials: false
+      - name: Verify handoff identity
+        env:
+          CAPTURED_SHA: ${{ needs.identity.outputs.sha }}
+          TAG: ${{ needs.identity.outputs.tag }}
+          RELEASE_SHA: ${{ needs.public-release.outputs.source_sha }}
+          RELEASE_TAG: ${{ needs.public-release.outputs.tag_name }}
+        run: |
+          set -euo pipefail
+          test "$CAPTURED_SHA" = "$GITHUB_SHA"
+          test "$(git rev-parse HEAD)" = "$CAPTURED_SHA"
+          test "$RELEASE_SHA" = "$CAPTURED_SHA"
+          test "$RELEASE_TAG" = "$TAG"
+      - name: Dispatch and watch the exact private run
+        id: private
+        env:
+          PUBLIC_SOURCE_SHA: ${{ needs.identity.outputs.sha }}
+          PUBLIC_RELEASE_TAG: ${{ needs.identity.outputs.tag }}
+          PUBLIC_RUN_ID: ${{ github.run_id }}
+          RELEASE_APP_ID: ${{ vars.RELEASE_APP_ID }}
+          RELEASE_APP_INSTALLATION_ID: ${{ vars.RELEASE_APP_INSTALLATION_ID }}
+          RELEASE_APP_ACTOR: ${{ vars.RELEASE_APP_ACTOR }}
+          RELEASE_APP_PRIVATE_KEY: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+        run: ruby .github/scripts/release_private_handoff.rb
+
+  summary:
+    name: Summarize release result
+    needs: [identity, validation, evidence, public-release, private-release]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report bounded release state
+        env:
+          SOURCE_SHA: ${{ needs.identity.outputs.sha }}
+          VERSION: ${{ needs.identity.outputs.version }}
+          TAG: ${{ needs.identity.outputs.tag }}
+          VALIDATION: ${{ needs.validation.result }}
+          EVIDENCE: ${{ needs.evidence.result }}
+          PUBLIC_RELEASE: ${{ needs.public-release.result }}
+          PRIVATE_RELEASE: ${{ needs.private-release.result }}
+          DRY_RUN: ${{ inputs.validation_only }}
+        run: |
+          {
+            echo '## Release result'
+            echo '- Repository: `stradivarius-ios-apps/home-stuff-inventory-app`'
+            echo "- Captured SHA: \`$SOURCE_SHA\`"
+            echo "- Committed version: \`$VERSION\`"
+            echo "- Intended tag: \`$TAG\`"
+            echo "- Validation: $VALIDATION; exact-SHA evidence: $EVIDENCE"
+            echo "- GitHub Release: $PUBLIC_RELEASE"
+            echo "- Private provenance, archive/export, and upload: $PRIVATE_RELEASE"
+            if [[ "$DRY_RUN" == 'true' && "$EVIDENCE" == 'success' ]]; then
+              echo '- Final state: validation only; no tag or upload.'
+            elif [[ "$PRIVATE_RELEASE" == 'success' ]]; then
+              echo '- Final state: TestFlight upload accepted for processing.'
+            else
+              echo '- Final state: failed or incomplete. If dispatch occurred, verify App Store Connect before any recovery attempt.'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [[ "$DRY_RUN" == 'true' ]]; then
+            test "$EVIDENCE" = 'success'
+          else
+            test "$PRIVATE_RELEASE" = 'success'
+          fi

@@ -27,8 +27,12 @@ module GitHubReleasePreflight
     ReleaseContract.project_value!(content, setting)
   end
 
-  def validate_source_ref!(source_ref, allow_recovery)
+  def validate_source_ref!(source_ref, allow_recovery, trusted_release_sha: "")
     return "main" if source_ref == "main"
+    if !trusted_release_sha.empty?
+      raise "Trusted release SHA must match the exact source ref." unless source_ref.match?(SHA) && source_ref == trusted_release_sha
+      return source_ref
+    end
     raise "Non-main recovery requires explicit maintainer approval." unless allow_recovery
     raise "Recovery source_ref must be an exact 40-character commit SHA." unless source_ref.match?(SHA)
 
@@ -58,7 +62,11 @@ def valid_tag_versions
   ReleaseContract.valid_tag_versions(stdout.lines)
 end
 
-def ensure_source_matches!(source_ref, source_sha)
+def ensure_source_matches!(source_ref, source_sha, trusted_release_sha: "")
+  unless trusted_release_sha.empty?
+    raise "Captured release identity does not match checkout." unless source_sha == trusted_release_sha && source_ref == source_sha
+    return
+  end
   if source_ref == "main"
     main_sha, = run!("git", "rev-parse", "origin/main")
     raise "Checked-out source #{source_sha} is not current origin/main #{main_sha.strip}." unless main_sha.strip == source_sha
@@ -125,20 +133,21 @@ def write_summary(marketing_version:, tag:, source_ref:, source_sha:)
 end
 
 def main(argv)
-  options = { target: "", source_ref: "main", allow_recovery: false, notes: "release-notes.md", skip_remote_checks: false }
+  options = { target: "", source_ref: "main", trusted_release_sha: "", allow_recovery: false, notes: "release-notes.md", skip_remote_checks: false }
   OptionParser.new do |parser|
     parser.on("--target-version VERSION") { |value| options[:target] = value }
     parser.on("--source-ref REF") { |value| options[:source_ref] = value }
+    parser.on("--trusted-release-sha SHA") { |value| options[:trusted_release_sha] = value }
     parser.on("--allow-non-main-source-ref") { options[:allow_recovery] = true }
     parser.on("--release-notes PATH") { |value| options[:notes] = value }
     parser.on("--release-body-path PATH") { |value| options[:notes] = value }
     parser.on("--skip-remote-checks") { options[:skip_remote_checks] = true }
   end.parse!(argv)
 
-  source_ref = GitHubReleasePreflight.validate_source_ref!(options[:source_ref].to_s.strip, options[:allow_recovery])
+  source_ref = GitHubReleasePreflight.validate_source_ref!(options[:source_ref].to_s.strip, options[:allow_recovery], trusted_release_sha: options[:trusted_release_sha])
   source_sha, = run!("git", "rev-parse", "HEAD")
   source_sha = source_sha.strip
-  ensure_source_matches!(source_ref, source_sha)
+  ensure_source_matches!(source_ref, source_sha, trusted_release_sha: options[:trusted_release_sha])
 
   project = File.read(GitHubReleasePreflight::PROJECT_PATH)
   marketing_version = ReleaseContract.project_marketing_version!(project)

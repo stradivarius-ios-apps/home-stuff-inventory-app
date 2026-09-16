@@ -38,6 +38,7 @@ struct LocationRecentItemsCard: View {
 
             LocationRecentItemTilesSection(
                 presentation: presentation,
+                shelfAccessibilityIdentifier: "locations.recentItems.shelf",
                 transitionNamespace: transitionNamespace,
                 reduceMotion: reduceMotion,
                 isRecentItemResolvable: isRecentItemResolvable,
@@ -65,6 +66,7 @@ struct PlaceRecentItemsCard: View {
 
             LocationRecentItemTilesSection(
                 presentation: presentation,
+                shelfAccessibilityIdentifier: "locations.placeRecentItems.shelf",
                 transitionNamespace: transitionNamespace,
                 reduceMotion: reduceMotion,
                 isRecentItemResolvable: isRecentItemResolvable,
@@ -87,6 +89,7 @@ private struct LocationRecentItemTilesSection: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     let presentation: InventoryPreviewGroupPresentation
+    let shelfAccessibilityIdentifier: String
     let transitionNamespace: Namespace.ID
     let reduceMotion: Bool
     let isRecentItemResolvable: (InventoryPreviewGroupPresentation.Chip) -> Bool
@@ -121,6 +124,8 @@ private struct LocationRecentItemTilesSection: View {
             }
         }
         .inventorySemanticSurface(.context, cornerRadius: InventoryDesign.compactCornerRadius)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier(shelfAccessibilityIdentifier)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 

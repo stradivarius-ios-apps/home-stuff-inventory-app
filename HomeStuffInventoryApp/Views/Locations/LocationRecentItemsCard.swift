@@ -80,7 +80,6 @@ struct PlaceRecentItemsCard: View {
 private extension View {
     func recentItemsSectionLayout() -> some View {
         frame(maxWidth: .infinity, alignment: .leading)
-            .padding(InventoryDesign.compactCardPadding)
     }
 }
 

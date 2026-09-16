@@ -34,6 +34,11 @@ final class RecentItemsTileLayoutUITests: XCTestCase {
         assertItemDetail(for: expectedItem.name)
     }
 
+    func testLocationRecentItemsShelfAlignsWithStoragePlaceCardInLightAndDarkAppearance() {
+        assertLocationRecentItemsShelfAlignment(appearanceArgument: nil)
+        assertLocationRecentItemsShelfAlignment(appearanceArgument: "--qa-force-dark-appearance")
+    }
+
     func testPlaceRecentItemsUseFullWidthShelfRowsAndNavigate() {
         launchApp(itemCount: 5)
         openFixturePlace()
@@ -213,6 +218,8 @@ final class RecentItemsTileLayoutUITests: XCTestCase {
         XCTAssertGreaterThanOrEqual(place.frame.height, 44)
         XCTAssertGreaterThanOrEqual(place.frame.minX, app.frame.minX)
         XCTAssertLessThanOrEqual(place.frame.maxX, app.frame.maxX)
+        XCTAssertEqual(locationRecentItems.frame.minX, place.frame.minX, accuracy: 2)
+        XCTAssertEqual(locationRecentItems.frame.maxX, place.frame.maxX, accuracy: 2)
     }
 
     func testLocationDetailWithReduceMotionKeepsCompositionVisible() {
@@ -404,6 +411,17 @@ final class RecentItemsTileLayoutUITests: XCTestCase {
                 "Shelf rows should remain full-width within the Recent Items section."
             )
         }
+    }
+
+    private func assertLocationRecentItemsShelfAlignment(appearanceArgument: String?) {
+        launchApp(appearanceArgument: appearanceArgument)
+        openFixtureLocation()
+
+        let place = app.buttons["locations.placeRow.\(Fixture.placeName)"]
+
+        scrollToHittable(place, in: locationDetail)
+        XCTAssertEqual(locationRecentItems.frame.minX, place.frame.minX, accuracy: 2)
+        XCTAssertEqual(locationRecentItems.frame.maxX, place.frame.maxX, accuracy: 2)
     }
 
     private func assertOverflowSummary(in section: XCUIElement) {

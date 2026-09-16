@@ -38,7 +38,7 @@ struct LocationRecentItemsCard: View {
 
             LocationRecentItemTilesSection(
                 presentation: presentation,
-                shelfAccessibilityIdentifier: "locations.recentItems.shelf",
+                shelfAccessibilityIdentifier: LocationRecentItemsAccessibilityIdentifier.locationShelf,
                 transitionNamespace: transitionNamespace,
                 reduceMotion: reduceMotion,
                 isRecentItemResolvable: isRecentItemResolvable,
@@ -66,7 +66,7 @@ struct PlaceRecentItemsCard: View {
 
             LocationRecentItemTilesSection(
                 presentation: presentation,
-                shelfAccessibilityIdentifier: "locations.placeRecentItems.shelf",
+                shelfAccessibilityIdentifier: LocationRecentItemsAccessibilityIdentifier.placeShelf,
                 transitionNamespace: transitionNamespace,
                 reduceMotion: reduceMotion,
                 isRecentItemResolvable: isRecentItemResolvable,
@@ -77,6 +77,11 @@ struct PlaceRecentItemsCard: View {
         .recentItemsSectionLayout()
         .accessibilityIdentifier("locations.placeRecentItems")
     }
+}
+
+private enum LocationRecentItemsAccessibilityIdentifier {
+    static let locationShelf = ["locations", "recentItems", "shelf"].joined(separator: ".")
+    static let placeShelf = ["locations", "placeRecentItems", "shelf"].joined(separator: ".")
 }
 
 private extension View {

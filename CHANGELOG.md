@@ -2,6 +2,42 @@
 
 All notable user-facing and release-track changes for Home Stuff Inventory are recorded here.
 
+## 1.3.0
+
+### Changed
+
+- Keep shelf identifiers out of localization scan (#53).
+- Require iOS 27.0 simulator runtime (#52).
+- Allow guarded iOS 26 point releases (#51).
+- Update CodeQL action pins (#49).
+- Clarify dormant undo behavior (#47).
+- Update automation action pins (#48).
+- Align Lifetime Pro documentation with implemented state (#43).
+- Clarify implemented entitlement boundaries (#42).
+- Cover legacy place hierarchy compatibility (#41).
+- Present contextual Undo upgrade from history (#40).
+- Integrate hierarchy mutations and legacy-place safeguards (#39).
+- Merge remote-tracking branch 'origin/main' into feature/add-storage-hierarchy-mutations (#38).
+- Restore hierarchy browse localizations (#37).
+- Merge remote-tracking branch 'origin/main' into feature/add-room-sweep-capture (#35).
+- Merge remote-tracking branch 'origin/main' into feature/add-hierarchical-storage-browsing (#34).
+- Merge remote-tracking branch 'origin/main' into feature/preserve-nested-storage-portability (#36).
+- Merge remote-tracking branch 'origin/main' into feature/add-purchase-restore-reconciliation (#33).
+- Merge current main into movement history (#32).
+- Preserve authoritative nested place links (#31).
+- Limit retained StoreKit transactions (#30).
+- Run PR screenshots only on demand (#28).
+- Document CodeQL setup transition behavior (#27).
+- Reduce pull request validation latency (#26).
+- Honor hosted action allowlist (#25).
+- Run full validation only for releases (#24).
+- Protect public change provenance (#23).
+
+### Internal
+
+- Harden iOS 18 compatibility smoke coverage (#50).
+- Rename advanced CodeQL workflow (#29).
+
 ## 1.2.8
 
 ### Fixed

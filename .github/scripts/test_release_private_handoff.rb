@@ -14,6 +14,8 @@ class ReleasePrivateHandoffTest < Minitest::Test
     assert_equal 123, ReleasePrivateHandoff.validate_dispatch!("workflow_run_id" => 123,
       "run_url" => "https://api.github.com/repos/stradivarius-ios-apps/home-stuff-inventory/actions/runs/123")
     assert_raises(KeyError) { ReleasePrivateHandoff.validate_dispatch!({}) }
+    assert_raises(KeyError) { ReleasePrivateHandoff.validate_dispatch!("workflow_run_id" => 123) }
+    assert_raises(RuntimeError) { ReleasePrivateHandoff.validate_dispatch!("workflow_run_id" => "123", "run_url" => "https://api.github.com/repos/stradivarius-ios-apps/home-stuff-inventory/actions/runs/123") }
     assert_raises(RuntimeError) { ReleasePrivateHandoff.validate_dispatch!("workflow_run_id" => 123, "run_url" => "https://elsewhere.test/123") }
   end
 
@@ -38,7 +40,10 @@ class ReleasePrivateHandoffTest < Minitest::Test
       "status" => "completed", "conclusion" => "success" }
     assert_equal :success, ReleasePrivateHandoff.validate_run!(run, id: 123, private_sha: SHA, app_actor: "release-handoff[bot]")
     assert_raises(RuntimeError) { ReleasePrivateHandoff.validate_run!(run.merge("id" => 124), id: 123, private_sha: SHA, app_actor: "release-handoff[bot]") }
+    assert_raises(RuntimeError) { ReleasePrivateHandoff.validate_run!(run.merge("workflow_id" => 1), id: 123, private_sha: SHA, app_actor: "release-handoff[bot]") }
+    assert_raises(RuntimeError) { ReleasePrivateHandoff.validate_run!(run.merge("actor" => { "login" => "other[bot]" }), id: 123, private_sha: SHA, app_actor: "release-handoff[bot]") }
     assert_raises(RuntimeError) { ReleasePrivateHandoff.validate_run!(run.merge("conclusion" => "failure"), id: 123, private_sha: SHA, app_actor: "release-handoff[bot]") }
+    assert_raises(RuntimeError) { ReleasePrivateHandoff.validate_run!(run.merge("conclusion" => "cancelled"), id: 123, private_sha: SHA, app_actor: "release-handoff[bot]") }
   end
 
   def test_dispatches_only_dedicated_workflow_and_waits_for_returned_run
@@ -72,7 +77,7 @@ class ReleasePrivateHandoffTest < Minitest::Test
     assert_equal [:post, :get], calls.map(&:first)
     assert_equal "/repos/stradivarius-ios-apps/home-stuff-inventory/actions/workflows/private-public-release.yml/dispatches", calls.first[1]
     assert_equal "/repos/stradivarius-ios-apps/home-stuff-inventory/actions/runs/123", calls.last[1]
-    assert_equal({ ref: "main", return_run_details: true,
+    assert_equal({ ref: "main",
       inputs: { public_source_sha: SHA, public_release_tag: "v1.3.0", upload: "true", public_run_id: "456" } }, calls.first[2])
   end
 
@@ -90,8 +95,11 @@ class ReleasePrivateHandoffTest < Minitest::Test
     assert_equal "release-orchestration", private_job.fetch("environment")
     assert_equal({ "contents" => "read" }, private_job.fetch("permissions"))
     assert_includes private_job.fetch("if"), "needs.public-release.result == 'success'"
+    assert_includes flow.dig("jobs", "public-release", "if"), "!inputs.validation_only"
+    assert_includes private_job.fetch("if"), "!inputs.validation_only"
+    assert_equal "${{ needs.identity.outputs.sha }}", flow.dig("jobs", "private-release", "steps").last.dig("env", "PUBLIC_SOURCE_SHA")
     text = File.read(File.join(ROOT, ".github/workflows/release.yml"))
     refute_match(/pull_request_target|write-all|APP_STORE_CONNECT_API_PRIVATE_KEY/, text)
-    assert_includes File.read(File.join(ROOT, ".github/scripts/release_private_handoff.rb")), "return_run_details: true"
+    refute_match(/latest.run|actions\/runs\?/, File.read(File.join(ROOT, ".github/scripts/release_private_handoff.rb")))
   end
 end

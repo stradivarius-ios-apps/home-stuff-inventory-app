@@ -80,7 +80,7 @@ module ReleasePrivateHandoff
 
     token = installation_token!(app_id: app_id, installation_id: installation_id, private_key: private_key)
     response = request!(:post, "/repos/#{REPOSITORY}/actions/workflows/#{WORKFLOW}/dispatches", token: token,
-      body: { ref: "main", return_run_details: true,
+      body: { ref: "main",
         inputs: { public_source_sha: sha, public_release_tag: tag, upload: "true", public_run_id: public_run_id } })
     id = validate_dispatch!(response)
     File.open(ENV.fetch("GITHUB_OUTPUT"), "a") { |out| out.puts "private_run_id=#{id}" }

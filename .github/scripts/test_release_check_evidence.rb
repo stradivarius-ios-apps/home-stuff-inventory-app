@@ -21,6 +21,20 @@ class ReleaseCheckEvidenceTest < Minitest::Test
     assert_raises(RuntimeError) { C.validate!(check_runs: duplicate, sha: SHA, run_id: RUN_ID, repository: REPOSITORY) }
   end
 
+  def test_ignores_checks_from_an_earlier_release_run_on_the_same_sha
+    data = check_runs
+    earlier = check_runs.fetch("check_runs").map do |check|
+      check.merge("details_url" => check.fetch("details_url").sub("/runs/#{RUN_ID}/", "/runs/35100000000/"),
+        "conclusion" => "failure")
+    end
+    data.fetch("check_runs").concat(earlier)
+
+    assert C.validate!(check_runs: data, sha: SHA, run_id: RUN_ID, repository: REPOSITORY)
+
+    data.fetch("check_runs").shift
+    assert_raises(RuntimeError) { C.validate!(check_runs: data, sha: SHA, run_id: RUN_ID, repository: REPOSITORY) }
+  end
+
   def test_rejects_wrong_evidence_attributes
     {
       "head_sha" => "b" * 40,

@@ -16,7 +16,9 @@ module ReleaseCheckEvidence
     raise "Release SHA is invalid." unless sha.match?(/\A[0-9a-f]{40}\z/)
     raise "Release run ID is invalid." unless run_id.match?(/\A[1-9]\d*\z/)
     expected_prefix = "https://github.com/#{repository}/actions/runs/#{run_id}/"
-    matching = check_runs.fetch("check_runs").select { |check| REQUIRED_CHECKS.include?(check["name"]) }
+    matching = check_runs.fetch("check_runs").select do |check|
+      REQUIRED_CHECKS.include?(check["name"]) && check["details_url"].to_s.start_with?(expected_prefix)
+    end
 
     raise "Required release checks must be exactly the four configured names." unless
       matching.length == REQUIRED_CHECKS.length && matching.map { |check| check["name"] }.sort == REQUIRED_CHECKS.sort

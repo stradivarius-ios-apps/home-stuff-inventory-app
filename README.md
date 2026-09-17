@@ -129,8 +129,9 @@ Repository documentation authority, ownership, update triggers, replacements, an
 The protected Free boundary is documented in [`docs/product/free-capability-contract.md`](docs/product/free-capability-contract.md), and the shipped file format and recovery guarantees are documented in [`docs/data/portability-recovery-contract.md`](docs/data/portability-recovery-contract.md).
 
 Release history and the next patch-line notes live in `CHANGELOG.md`.
-The normal technical release is one manual **Actions → Release** run from `main`
-after release-prep merge; see [`docs/ci/release.md`](docs/ci/release.md).
+The technical release uses **Actions → Release** from `main` after release-prep
+merge and an administrator-created protected tag; see
+[`docs/ci/release.md`](docs/ci/release.md).
 
 This repository is the only source of product changes and release candidates. Signing
 and App Store upload are performed by a separate private release control plane using a

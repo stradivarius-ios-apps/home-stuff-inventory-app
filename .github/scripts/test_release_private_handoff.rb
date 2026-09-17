@@ -86,6 +86,7 @@ class ReleasePrivateHandoffTest < Minitest::Test
     events = flow[true] || flow.fetch("on")
     assert_equal ["workflow_dispatch"], events.keys
     assert_equal false, events.dig("workflow_dispatch", "inputs", "validation_only", "default")
+    assert_equal false, events.dig("workflow_dispatch", "inputs", "existing_protected_tag", "default")
     assert_equal false, flow.dig("concurrency", "cancel-in-progress")
     assert_equal "./.github/workflows/validation.yml", flow.dig("jobs", "validation", "uses")
     assert_equal true, flow.dig("jobs", "validation", "with", "run_app_validation")
@@ -102,6 +103,7 @@ class ReleasePrivateHandoffTest < Minitest::Test
     assert_equal false, checkout.dig("with", "persist-credentials")
     assert_includes flow.dig("jobs", "public-release", "if"), "needs.evidence.result == 'success'"
     assert_equal "${{ needs.identity.outputs.sha }}", flow.dig("jobs", "public-release", "with", "trusted_release_sha")
+    assert_equal "${{ inputs.existing_protected_tag }}", flow.dig("jobs", "public-release", "with", "existing_protected_tag")
     private_job = flow.dig("jobs", "private-release")
     assert_equal "release-orchestration", private_job.fetch("environment")
     assert_equal({ "contents" => "read" }, private_job.fetch("permissions"))
@@ -109,6 +111,14 @@ class ReleasePrivateHandoffTest < Minitest::Test
     assert_includes flow.dig("jobs", "public-release", "if"), "!inputs.validation_only"
     assert_includes private_job.fetch("if"), "!inputs.validation_only"
     assert_equal "${{ needs.identity.outputs.sha }}", flow.dig("jobs", "private-release", "steps").last.dig("env", "PUBLIC_SOURCE_SHA")
+    create_flow = YAML.load_file(File.join(ROOT, ".github/workflows/create-github-release.yml"))
+    create_events = create_flow[true] || create_flow.fetch("on")
+    assert_equal false, create_events.dig("workflow_call", "inputs", "existing_protected_tag", "default")
+    release_steps = create_flow.dig("jobs", "create-github-release", "steps")
+    assert_includes release_steps.find { |step| step["id"] == "preflight" }.fetch("run"), "--existing-protected-tag"
+    create_tag = release_steps.find { |step| step["id"] == "release" }.fetch("run")
+    assert_includes create_tag, 'if [[ "$EXISTING_PROTECTED_TAG" != "true" ]]'
+    assert_includes create_tag, 'git ls-remote origin "refs/tags/$TAG_NAME^{}"'
     text = File.read(File.join(ROOT, ".github/workflows/release.yml"))
     refute_match(/pull_request_target|write-all|APP_STORE_CONNECT_API_PRIVATE_KEY/, text)
     refute_match(/latest.run|actions\/runs\?/, File.read(File.join(ROOT, ".github/scripts/release_private_handoff.rb")))

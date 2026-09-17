@@ -49,19 +49,25 @@ module GitHubReleasePreflight
     raise "Target version #{target} must be newer than latest tag v#{latest}." unless (tuple(target) <=> tuple(latest)).positive?
   end
 
-  def validate_existing_tag!(tag, source_sha, type:, object:, target:, remote:)
-    raise "Protected release tag must be annotated." unless type.strip == "tag"
-    raise "Protected release tag must point to the captured SHA." unless target.strip == source_sha
+  def validate_existing_tag!(tag, source_sha, ref_type:, tag_object:, target_type:, target_sha:, target_object_type:, remote:)
+    raise "Protected release tag must be annotated." unless ref_type.strip == "tag"
+    raise "Protected release tag must directly reference a commit." unless target_type.strip == "commit"
+    raise "Protected release tag target must be a commit object." unless target_object_type.strip == "commit"
+    raise "Protected release tag must directly point to the captured SHA." unless target_sha.strip == source_sha
 
     tag_ref = "refs/tags/#{tag}"
     refs = remote.lines.map { |line| line.strip.split("\t", 2).reverse }.to_h
     raise "Protected release tag differs from the remote annotated tag." unless
-      refs[tag_ref] == object.strip && refs["#{tag_ref}^{}"] == source_sha
+      refs[tag_ref] == tag_object.strip && refs["#{tag_ref}^{}"] == source_sha
   end
 
   def validate_existing_tag_mode!(trusted_release_sha:, skip_remote_checks:)
     raise "Existing protected tag requires a trusted release SHA." if trusted_release_sha.empty?
     raise "Existing protected tag requires remote checks." if skip_remote_checks
+  end
+
+  def github_release_missing?(stdout, stderr, status)
+    !status.success? && "#{stdout}#{stderr}".match?(/not found|HTTP 404/i)
   end
 end
 
@@ -120,7 +126,7 @@ def ensure_tag_and_release_missing!(tag, source_sha, skip_remote_checks)
     "gh", "release", "view", tag, "--repo", ENV.fetch("GITHUB_REPOSITORY"), "--json", "url",
     allow_failure: true, env: { "GH_TOKEN" => ENV.fetch("GH_TOKEN") }
   )
-  return if !release_status.success? && "#{stdout}#{stderr}".match?(/not found|HTTP 404/i)
+  return if GitHubReleasePreflight.github_release_missing?(stdout, stderr, release_status)
   raise "GitHub Release #{tag} already exists." if release_status.success?
 
   raise "Unable to verify GitHub Release absence: #{stdout}#{stderr}"
@@ -128,15 +134,29 @@ end
 
 def require_existing_protected_tag!(tag, source_sha)
   tag_ref = "refs/tags/#{tag}"
-  type, = run!("git", "cat-file", "-t", tag_ref)
+  ref_type, = run!("git", "cat-file", "-t", tag_ref)
   tag_object, = run!("git", "rev-parse", tag_ref)
-  target, = run!("git", "rev-list", "-n", "1", tag_ref)
+  tag_contents, = run!("git", "cat-file", "-p", tag_ref)
+  target_sha = tag_contents[/^object ([0-9a-f]{40})$/i, 1]
+  target_type = tag_contents[/^type (\S+)$/, 1]
+  raise "Protected release tag object is malformed." if target_sha.nil? || target_type.nil?
+
+  target_object_type, = run!("git", "cat-file", "-t", target_sha)
   remote, = run!("git", "ls-remote", "--tags", "origin", tag_ref, "#{tag_ref}^{}")
-  GitHubReleasePreflight.validate_existing_tag!(tag, source_sha, type: type, object: tag_object, target: target, remote: remote)
+  GitHubReleasePreflight.validate_existing_tag!(
+    tag,
+    source_sha,
+    ref_type: ref_type,
+    tag_object: tag_object,
+    target_type: target_type,
+    target_sha: target_sha,
+    target_object_type: target_object_type,
+    remote: remote
+  )
 
   stdout, stderr, status = run!("gh", "release", "view", tag, "--repo", ENV.fetch("GITHUB_REPOSITORY"), "--json", "url",
     allow_failure: true, env: { "GH_TOKEN" => ENV.fetch("GH_TOKEN") })
-  return if !status.success? && "#{stdout}#{stderr}".match?(/not found|HTTP 404/i)
+  return if GitHubReleasePreflight.github_release_missing?(stdout, stderr, status)
   raise "GitHub Release #{tag} already exists." if status.success?
 
   raise "Unable to verify GitHub Release absence: #{stdout}#{stderr}"

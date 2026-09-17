@@ -63,19 +63,39 @@ class CreateGitHubReleasePreflightTest < Minitest::Test
     assert_raises(RuntimeError) { GitHubReleasePreflight.ensure_newer!("1.2.2", ["1.2.3"]) }
   end
 
-  def test_existing_protected_tag_must_be_annotated_and_exact_on_remote
+  def test_existing_protected_tag_must_directly_reference_exact_commit_and_match_remote
     sha = "a" * 40
     object = "b" * 40
     tag = "v1.2.3"
     remote = "#{object}\trefs/tags/#{tag}\n#{sha}\trefs/tags/#{tag}^{}\n"
-    valid = { type: "tag\n", object: "#{object}\n", target: "#{sha}\n", remote: remote }
+    valid = {
+      ref_type: "tag\n",
+      tag_object: "#{object}\n",
+      target_type: "commit\n",
+      target_sha: "#{sha}\n",
+      target_object_type: "commit\n",
+      remote: remote
+    }
 
     GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid)
-    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(type: "commit\n")) }
-    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(target: "#{'c' * 40}\n")) }
-    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(object: "#{'c' * 40}\n")) }
+    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(ref_type: "commit\n")) }
+    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(target_type: "tag\n")) }
+    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(target_object_type: "tag\n")) }
+    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(target_sha: "#{'c' * 40}\n")) }
+    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(tag_object: "#{'c' * 40}\n")) }
+    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(remote: "")) }
     assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(remote: "#{object}\trefs/tags/#{tag}\n")) }
     assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(remote: remote.sub(sha, "c" * 40))) }
+  end
+
+  def test_existing_protected_tag_requires_no_existing_github_release
+    absent = Struct.new(:success?).new(false)
+    present = Struct.new(:success?).new(true)
+
+    assert GitHubReleasePreflight.github_release_missing?("", "release not found", absent)
+    assert GitHubReleasePreflight.github_release_missing?("", "HTTP 404", absent)
+    refute GitHubReleasePreflight.github_release_missing?("", "unexpected failure", absent)
+    refute GitHubReleasePreflight.github_release_missing?("{\"url\":\"https://example.test\"}", "", present)
   end
 
   def test_existing_protected_tag_requires_trusted_sha_and_remote_checks

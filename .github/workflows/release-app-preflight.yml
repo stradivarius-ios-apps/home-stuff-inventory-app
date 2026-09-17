@@ -1,0 +1,27 @@
+name: Release App Bridge Preflight
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    name: Verify release App installation without dispatch
+    if: github.repository == 'stradivarius-ios-apps/home-stuff-inventory-app' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: release-orchestration
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Verify exact App installation and token scope
+        env:
+          RELEASE_APP_ID: ${{ vars.RELEASE_APP_ID }}
+          RELEASE_APP_INSTALLATION_ID: ${{ vars.RELEASE_APP_INSTALLATION_ID }}
+          RELEASE_APP_ACTOR: ${{ vars.RELEASE_APP_ACTOR }}
+          RELEASE_APP_PRIVATE_KEY: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+        run: ruby .github/scripts/release_app_preflight.rb

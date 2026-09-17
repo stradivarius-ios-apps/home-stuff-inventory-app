@@ -98,6 +98,33 @@ class CreateGitHubReleasePreflightTest < Minitest::Test
     refute GitHubReleasePreflight.github_release_missing?("{\"url\":\"https://example.test\"}", "", present)
   end
 
+  def test_protected_tag_validation_fails_when_tag_is_missing
+    runner = protected_tag_runner(missing_tag: true)
+
+    assert_raises(RuntimeError) { require_existing_protected_tag!("v1.2.3", "a" * 40, command_runner: runner) }
+  end
+
+  def test_protected_tag_validation_fails_when_github_release_exists
+    runner = protected_tag_runner(release_status: successful_status, release_stdout: '{"url":"https://example.test"}')
+
+    with_release_environment do
+      assert_raises(RuntimeError) { require_existing_protected_tag!("v1.2.3", "a" * 40, command_runner: runner) }
+    end
+  end
+
+  def test_annotated_tag_object_parser_rejects_ambiguous_or_malformed_headers
+    sha = "a" * 40
+    assert_equal({ sha: sha, type: "commit" }, GitHubReleasePreflight.parse_annotated_tag_object!("object #{sha}\ntype commit\ntag v1.2.3\n\nmessage\n"))
+    [
+      "object #{sha}\nobject #{'b' * 40}\ntype commit\n\n",
+      "object #{sha}\ntype commit\ntype tag\n\n",
+      "object not-a-sha\ntype commit\n\n",
+      "object #{sha}\ntype\n\n"
+    ].each do |contents|
+      assert_raises(RuntimeError) { GitHubReleasePreflight.parse_annotated_tag_object!(contents) }
+    end
+  end
+
   def test_existing_protected_tag_requires_trusted_sha_and_remote_checks
     GitHubReleasePreflight.validate_existing_tag_mode!(trusted_release_sha: "a" * 40, skip_remote_checks: false)
     assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag_mode!(trusted_release_sha: "", skip_remote_checks: false) }
@@ -123,5 +150,54 @@ class CreateGitHubReleasePreflightTest < Minitest::Test
     ensure
       ENV["GITHUB_STEP_SUMMARY"] = previous
     end
+  end
+
+  private
+
+  def protected_tag_runner(missing_tag: false, release_status: missing_release_status, release_stdout: "", release_stderr: "release not found")
+    tag = "v1.2.3"
+    sha = "a" * 40
+    object = "b" * 40
+    tag_ref = "refs/tags/#{tag}"
+    remote = "#{object}\t#{tag_ref}\n#{sha}\t#{tag_ref}^{}\n"
+    lambda do |*command, allow_failure: false, env: {}|
+      case command
+      when ["git", "cat-file", "-t", tag_ref]
+        raise "missing tag" if missing_tag
+
+        ["tag\n", "", successful_status]
+      when ["git", "rev-parse", tag_ref]
+        ["#{object}\n", "", successful_status]
+      when ["git", "cat-file", "-p", tag_ref]
+        ["object #{sha}\ntype commit\ntag #{tag}\n\nmessage\n", "", successful_status]
+      when ["git", "cat-file", "-t", sha]
+        ["commit\n", "", successful_status]
+      when ["git", "ls-remote", "--tags", "origin", tag_ref, "#{tag_ref}^{}"]
+        [remote, "", successful_status]
+      when ["gh", "release", "view", tag, "--repo", "stradivarius-ios-apps/home-stuff-inventory-app", "--json", "url"]
+        [release_stdout, release_stderr, release_status]
+      else
+        raise "Unexpected command: #{command.join(' ')}"
+      end
+    end
+  end
+
+  def successful_status
+    Struct.new(:success?).new(true)
+  end
+
+  def missing_release_status
+    Struct.new(:success?).new(false)
+  end
+
+  def with_release_environment
+    original_repository = ENV["GITHUB_REPOSITORY"]
+    original_token = ENV["GH_TOKEN"]
+    ENV["GITHUB_REPOSITORY"] = "stradivarius-ios-apps/home-stuff-inventory-app"
+    ENV["GH_TOKEN"] = "test-token"
+    yield
+  ensure
+    ENV["GITHUB_REPOSITORY"] = original_repository
+    ENV["GH_TOKEN"] = original_token
   end
 end

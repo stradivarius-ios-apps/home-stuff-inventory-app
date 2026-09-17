@@ -66,6 +66,19 @@ module GitHubReleasePreflight
     raise "Existing protected tag requires remote checks." if skip_remote_checks
   end
 
+  def parse_annotated_tag_object!(contents)
+    header = contents.split("\n\n", 2).first
+    object_lines = header.lines.grep(/^object /)
+    type_lines = header.lines.grep(/^type /)
+    raise "Protected release tag object is malformed." unless object_lines.length == 1 && type_lines.length == 1
+
+    target_sha = object_lines.first[/\Aobject ([0-9a-f]{40})\n?\z/i, 1]
+    target_type = type_lines.first[/\Atype (\S+)\n?\z/, 1]
+    raise "Protected release tag object is malformed." if target_sha.nil? || target_type.nil?
+
+    { sha: target_sha, type: target_type }
+  end
+
   def github_release_missing?(stdout, stderr, status)
     !status.success? && "#{stdout}#{stderr}".match?(/not found|HTTP 404/i)
   end
@@ -132,29 +145,27 @@ def ensure_tag_and_release_missing!(tag, source_sha, skip_remote_checks)
   raise "Unable to verify GitHub Release absence: #{stdout}#{stderr}"
 end
 
-def require_existing_protected_tag!(tag, source_sha)
+def require_existing_protected_tag!(tag, source_sha, command_runner: method(:run!))
   tag_ref = "refs/tags/#{tag}"
-  ref_type, = run!("git", "cat-file", "-t", tag_ref)
-  tag_object, = run!("git", "rev-parse", tag_ref)
-  tag_contents, = run!("git", "cat-file", "-p", tag_ref)
-  target_sha = tag_contents[/^object ([0-9a-f]{40})$/i, 1]
-  target_type = tag_contents[/^type (\S+)$/, 1]
-  raise "Protected release tag object is malformed." if target_sha.nil? || target_type.nil?
+  ref_type, = command_runner.call("git", "cat-file", "-t", tag_ref)
+  tag_object, = command_runner.call("git", "rev-parse", tag_ref)
+  tag_contents, = command_runner.call("git", "cat-file", "-p", tag_ref)
+  direct_target = GitHubReleasePreflight.parse_annotated_tag_object!(tag_contents)
 
-  target_object_type, = run!("git", "cat-file", "-t", target_sha)
-  remote, = run!("git", "ls-remote", "--tags", "origin", tag_ref, "#{tag_ref}^{}")
+  target_object_type, = command_runner.call("git", "cat-file", "-t", direct_target.fetch(:sha))
+  remote, = command_runner.call("git", "ls-remote", "--tags", "origin", tag_ref, "#{tag_ref}^{}")
   GitHubReleasePreflight.validate_existing_tag!(
     tag,
     source_sha,
     ref_type: ref_type,
     tag_object: tag_object,
-    target_type: target_type,
-    target_sha: target_sha,
+    target_type: direct_target.fetch(:type),
+    target_sha: direct_target.fetch(:sha),
     target_object_type: target_object_type,
     remote: remote
   )
 
-  stdout, stderr, status = run!("gh", "release", "view", tag, "--repo", ENV.fetch("GITHUB_REPOSITORY"), "--json", "url",
+  stdout, stderr, status = command_runner.call("gh", "release", "view", tag, "--repo", ENV.fetch("GITHUB_REPOSITORY"), "--json", "url",
     allow_failure: true, env: { "GH_TOKEN" => ENV.fetch("GH_TOKEN") })
   return if GitHubReleasePreflight.github_release_missing?(stdout, stderr, status)
   raise "GitHub Release #{tag} already exists." if status.success?

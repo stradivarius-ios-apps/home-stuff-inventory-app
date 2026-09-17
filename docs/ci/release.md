@@ -4,10 +4,13 @@ After the release-prep pull request has been reviewed and merged into `main`,
 first run `validation_only` from **Actions → Release**. The active release-tag
 creation rule permits only organization administrators to create `v*` tags, so
 the default workflow cannot create a tag with `GITHUB_TOKEN` under that rule.
-For an operator-gated release, an organization administrator must create the
-annotated `vMAJOR.MINOR.PATCH` tag at the exact validated `main` SHA and verify
-its peeled commit. Never move or replace an existing release tag. Confirm the
-GitHub Release does not already exist. Then:
+For an operator-gated release, freeze `main` after the final validation-only
+run. An organization administrator must create the annotated
+`vMAJOR.MINOR.PATCH` tag at that exact validated SHA, then immediately verify
+both its direct tag-object target (a commit at the validated SHA) and its peeled
+commit. Nested and lightweight tags are not valid. Never move or replace an
+existing release tag. Confirm the GitHub Release does not already exist and that
+`main` has not advanced. Then:
 
 1. Open **Actions → Release** and select `main`.
 2. Select `existing_protected_tag`; leave `validation_only` off.
@@ -30,8 +33,10 @@ Selecting `validation_only` runs the committed identity and validation/check
 evidence stages without creating a tag or dispatching the private workflow. Run
 this once from `main` before creating the protected tag. After tagging, confirm
 `main` has not advanced before starting the live workflow; otherwise stop and
-revalidate a new exact SHA. A real App Store Connect upload is a separate
-maintainer-authorized production step.
+revalidate a new exact SHA. If the immutable tag was created at the wrong target
+or its verification fails, do not move, replace, force-update, or delete it;
+select a new version and repeat validation with a newly created tag. A real App
+Store Connect upload is a separate maintainer-authorized production step.
 
 ## Handoff configuration
 

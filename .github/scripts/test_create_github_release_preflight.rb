@@ -63,19 +63,66 @@ class CreateGitHubReleasePreflightTest < Minitest::Test
     assert_raises(RuntimeError) { GitHubReleasePreflight.ensure_newer!("1.2.2", ["1.2.3"]) }
   end
 
-  def test_existing_protected_tag_must_be_annotated_and_exact_on_remote
+  def test_existing_protected_tag_must_directly_reference_exact_commit_and_match_remote
     sha = "a" * 40
     object = "b" * 40
     tag = "v1.2.3"
     remote = "#{object}\trefs/tags/#{tag}\n#{sha}\trefs/tags/#{tag}^{}\n"
-    valid = { type: "tag\n", object: "#{object}\n", target: "#{sha}\n", remote: remote }
+    valid = {
+      ref_type: "tag\n",
+      tag_object: "#{object}\n",
+      target_type: "commit\n",
+      target_sha: "#{sha}\n",
+      target_object_type: "commit\n",
+      remote: remote
+    }
 
     GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid)
-    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(type: "commit\n")) }
-    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(target: "#{'c' * 40}\n")) }
-    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(object: "#{'c' * 40}\n")) }
+    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(ref_type: "commit\n")) }
+    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(target_type: "tag\n")) }
+    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(target_object_type: "tag\n")) }
+    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(target_sha: "#{'c' * 40}\n")) }
+    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(tag_object: "#{'c' * 40}\n")) }
+    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(remote: "")) }
     assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(remote: "#{object}\trefs/tags/#{tag}\n")) }
     assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(remote: remote.sub(sha, "c" * 40))) }
+  end
+
+  def test_existing_protected_tag_requires_no_existing_github_release
+    absent = Struct.new(:success?).new(false)
+    present = Struct.new(:success?).new(true)
+
+    assert GitHubReleasePreflight.github_release_missing?("", "release not found", absent)
+    assert GitHubReleasePreflight.github_release_missing?("", "HTTP 404", absent)
+    refute GitHubReleasePreflight.github_release_missing?("", "unexpected failure", absent)
+    refute GitHubReleasePreflight.github_release_missing?("{\"url\":\"https://example.test\"}", "", present)
+  end
+
+  def test_protected_tag_validation_fails_when_tag_is_missing
+    runner = protected_tag_runner(missing_tag: true)
+
+    assert_raises(RuntimeError) { require_existing_protected_tag!("v1.2.3", "a" * 40, command_runner: runner) }
+  end
+
+  def test_protected_tag_validation_fails_when_github_release_exists
+    runner = protected_tag_runner(release_status: successful_status, release_stdout: '{"url":"https://example.test"}')
+
+    with_release_environment do
+      assert_raises(RuntimeError) { require_existing_protected_tag!("v1.2.3", "a" * 40, command_runner: runner) }
+    end
+  end
+
+  def test_annotated_tag_object_parser_rejects_ambiguous_or_malformed_headers
+    sha = "a" * 40
+    assert_equal({ sha: sha, type: "commit" }, GitHubReleasePreflight.parse_annotated_tag_object!("object #{sha}\ntype commit\ntag v1.2.3\n\nmessage\n"))
+    [
+      "object #{sha}\nobject #{'b' * 40}\ntype commit\n\n",
+      "object #{sha}\ntype commit\ntype tag\n\n",
+      "object not-a-sha\ntype commit\n\n",
+      "object #{sha}\ntype\n\n"
+    ].each do |contents|
+      assert_raises(RuntimeError) { GitHubReleasePreflight.parse_annotated_tag_object!(contents) }
+    end
   end
 
   def test_existing_protected_tag_requires_trusted_sha_and_remote_checks
@@ -103,5 +150,54 @@ class CreateGitHubReleasePreflightTest < Minitest::Test
     ensure
       ENV["GITHUB_STEP_SUMMARY"] = previous
     end
+  end
+
+  private
+
+  def protected_tag_runner(missing_tag: false, release_status: missing_release_status, release_stdout: "", release_stderr: "release not found")
+    tag = "v1.2.3"
+    sha = "a" * 40
+    object = "b" * 40
+    tag_ref = "refs/tags/#{tag}"
+    remote = "#{object}\t#{tag_ref}\n#{sha}\t#{tag_ref}^{}\n"
+    lambda do |*command, allow_failure: false, env: {}|
+      case command
+      when ["git", "cat-file", "-t", tag_ref]
+        raise "missing tag" if missing_tag
+
+        ["tag\n", "", successful_status]
+      when ["git", "rev-parse", tag_ref]
+        ["#{object}\n", "", successful_status]
+      when ["git", "cat-file", "-p", tag_ref]
+        ["object #{sha}\ntype commit\ntag #{tag}\n\nmessage\n", "", successful_status]
+      when ["git", "cat-file", "-t", sha]
+        ["commit\n", "", successful_status]
+      when ["git", "ls-remote", "--tags", "origin", tag_ref, "#{tag_ref}^{}"]
+        [remote, "", successful_status]
+      when ["gh", "release", "view", tag, "--repo", "stradivarius-ios-apps/home-stuff-inventory-app", "--json", "url"]
+        [release_stdout, release_stderr, release_status]
+      else
+        raise "Unexpected command: #{command.join(' ')}"
+      end
+    end
+  end
+
+  def successful_status
+    Struct.new(:success?).new(true)
+  end
+
+  def missing_release_status
+    Struct.new(:success?).new(false)
+  end
+
+  def with_release_environment
+    original_repository = ENV["GITHUB_REPOSITORY"]
+    original_token = ENV["GH_TOKEN"]
+    ENV["GITHUB_REPOSITORY"] = "stradivarius-ios-apps/home-stuff-inventory-app"
+    ENV["GH_TOKEN"] = "test-token"
+    yield
+  ensure
+    ENV["GITHUB_REPOSITORY"] = original_repository
+    ENV["GH_TOKEN"] = original_token
   end
 end

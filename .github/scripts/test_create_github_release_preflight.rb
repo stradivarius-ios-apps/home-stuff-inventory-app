@@ -63,6 +63,27 @@ class CreateGitHubReleasePreflightTest < Minitest::Test
     assert_raises(RuntimeError) { GitHubReleasePreflight.ensure_newer!("1.2.2", ["1.2.3"]) }
   end
 
+  def test_existing_protected_tag_must_be_annotated_and_exact_on_remote
+    sha = "a" * 40
+    object = "b" * 40
+    tag = "v1.2.3"
+    remote = "#{object}\trefs/tags/#{tag}\n#{sha}\trefs/tags/#{tag}^{}\n"
+    valid = { type: "tag\n", object: "#{object}\n", target: "#{sha}\n", remote: remote }
+
+    GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid)
+    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(type: "commit\n")) }
+    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(target: "#{'c' * 40}\n")) }
+    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(object: "#{'c' * 40}\n")) }
+    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(remote: "#{object}\trefs/tags/#{tag}\n")) }
+    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag!(tag, sha, **valid.merge(remote: remote.sub(sha, "c" * 40))) }
+  end
+
+  def test_existing_protected_tag_requires_trusted_sha_and_remote_checks
+    GitHubReleasePreflight.validate_existing_tag_mode!(trusted_release_sha: "a" * 40, skip_remote_checks: false)
+    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag_mode!(trusted_release_sha: "", skip_remote_checks: false) }
+    assert_raises(RuntimeError) { GitHubReleasePreflight.validate_existing_tag_mode!(trusted_release_sha: "a" * 40, skip_remote_checks: true) }
+  end
+
   def test_project_setting_must_be_unique
     project = "MARKETING_VERSION = 1.2.3;\nMARKETING_VERSION = 1.2.3;\n"
     assert_equal "1.2.3", GitHubReleasePreflight.unique_project_value!(project, "MARKETING_VERSION")

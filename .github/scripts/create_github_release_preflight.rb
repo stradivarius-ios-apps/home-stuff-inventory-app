@@ -48,6 +48,21 @@ module GitHubReleasePreflight
     return unless latest
     raise "Target version #{target} must be newer than latest tag v#{latest}." unless (tuple(target) <=> tuple(latest)).positive?
   end
+
+  def validate_existing_tag!(tag, source_sha, type:, object:, target:, remote:)
+    raise "Protected release tag must be annotated." unless type.strip == "tag"
+    raise "Protected release tag must point to the captured SHA." unless target.strip == source_sha
+
+    tag_ref = "refs/tags/#{tag}"
+    refs = remote.lines.map { |line| line.strip.split("\t", 2).reverse }.to_h
+    raise "Protected release tag differs from the remote annotated tag." unless
+      refs[tag_ref] == object.strip && refs["#{tag_ref}^{}"] == source_sha
+  end
+
+  def validate_existing_tag_mode!(trusted_release_sha:, skip_remote_checks:)
+    raise "Existing protected tag requires a trusted release SHA." if trusted_release_sha.empty?
+    raise "Existing protected tag requires remote checks." if skip_remote_checks
+  end
 end
 
 def run!(*command, allow_failure: false, env: {})
@@ -111,6 +126,22 @@ def ensure_tag_and_release_missing!(tag, source_sha, skip_remote_checks)
   raise "Unable to verify GitHub Release absence: #{stdout}#{stderr}"
 end
 
+def require_existing_protected_tag!(tag, source_sha)
+  tag_ref = "refs/tags/#{tag}"
+  type, = run!("git", "cat-file", "-t", tag_ref)
+  tag_object, = run!("git", "rev-parse", tag_ref)
+  target, = run!("git", "rev-list", "-n", "1", tag_ref)
+  remote, = run!("git", "ls-remote", "--tags", "origin", tag_ref, "#{tag_ref}^{}")
+  GitHubReleasePreflight.validate_existing_tag!(tag, source_sha, type: type, object: tag_object, target: target, remote: remote)
+
+  stdout, stderr, status = run!("gh", "release", "view", tag, "--repo", ENV.fetch("GITHUB_REPOSITORY"), "--json", "url",
+    allow_failure: true, env: { "GH_TOKEN" => ENV.fetch("GH_TOKEN") })
+  return if !status.success? && "#{stdout}#{stderr}".match?(/not found|HTTP 404/i)
+  raise "GitHub Release #{tag} already exists." if status.success?
+
+  raise "Unable to verify GitHub Release absence: #{stdout}#{stderr}"
+end
+
 def write_output(name, value)
   path = ENV["GITHUB_OUTPUT"]
   return if path.to_s.empty?
@@ -133,7 +164,7 @@ def write_summary(marketing_version:, tag:, source_ref:, source_sha:)
 end
 
 def main(argv)
-  options = { target: "", source_ref: "main", trusted_release_sha: "", allow_recovery: false, notes: "release-notes.md", skip_remote_checks: false }
+  options = { target: "", source_ref: "main", trusted_release_sha: "", allow_recovery: false, notes: "release-notes.md", skip_remote_checks: false, existing_protected_tag: false }
   OptionParser.new do |parser|
     parser.on("--target-version VERSION") { |value| options[:target] = value }
     parser.on("--source-ref REF") { |value| options[:source_ref] = value }
@@ -142,6 +173,7 @@ def main(argv)
     parser.on("--release-notes PATH") { |value| options[:notes] = value }
     parser.on("--release-body-path PATH") { |value| options[:notes] = value }
     parser.on("--skip-remote-checks") { options[:skip_remote_checks] = true }
+    parser.on("--existing-protected-tag") { options[:existing_protected_tag] = true }
   end.parse!(argv)
 
   source_ref = GitHubReleasePreflight.validate_source_ref!(options[:source_ref].to_s.strip, options[:allow_recovery], trusted_release_sha: options[:trusted_release_sha])
@@ -155,9 +187,15 @@ def main(argv)
   raise "Target override #{override} does not exactly match committed MARKETING_VERSION #{marketing_version}." if override && override != marketing_version
 
   tag = ReleaseContract.tag_for(marketing_version)
-  GitHubReleasePreflight.ensure_newer!(marketing_version, valid_tag_versions)
+  if options[:existing_protected_tag]
+    GitHubReleasePreflight.validate_existing_tag_mode!(trusted_release_sha: options[:trusted_release_sha], skip_remote_checks: options[:skip_remote_checks])
+    GitHubReleasePreflight.ensure_newer!(marketing_version, valid_tag_versions.reject { |version| version == marketing_version })
+    require_existing_protected_tag!(tag, source_sha)
+  else
+    GitHubReleasePreflight.ensure_newer!(marketing_version, valid_tag_versions)
+    ensure_tag_and_release_missing!(tag, source_sha, options[:skip_remote_checks])
+  end
   notes = GitHubReleasePreflight.changelog_entry!(File.read(GitHubReleasePreflight::CHANGELOG_PATH), marketing_version)
-  ensure_tag_and_release_missing!(tag, source_sha, options[:skip_remote_checks])
   File.write(options[:notes], "#{notes}\n")
 
   write_output("marketing_version", marketing_version)

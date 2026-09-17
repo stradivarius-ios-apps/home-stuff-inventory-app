@@ -8,6 +8,11 @@ on:
         type: boolean
         required: true
         default: false
+      existing_protected_tag:
+        description: Use an administrator-created annotated tag at the captured main SHA after a tag-creation ruleset blocks automation.
+        type: boolean
+        required: true
+        default: false
 
 permissions:
   contents: read
@@ -96,6 +101,7 @@ jobs:
       source_ref: ${{ needs.identity.outputs.sha }}
       trusted_release_sha: ${{ needs.identity.outputs.sha }}
       target_version: ${{ needs.identity.outputs.version }}
+      existing_protected_tag: ${{ inputs.existing_protected_tag }}
 
   private-release:
     name: Dispatch and await private TestFlight upload

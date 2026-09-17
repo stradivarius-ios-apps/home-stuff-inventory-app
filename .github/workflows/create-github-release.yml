@@ -37,9 +37,14 @@ on:
         type: boolean
         default: false
         required: false
+      existing_protected_tag:
+        description: Require an existing administrator-created annotated tag at the trusted exact SHA.
+        type: boolean
+        default: false
+        required: false
     outputs:
       tag_name:
-        description: Created annotated release tag.
+        description: Verified annotated release tag.
         value: ${{ jobs.create-github-release.outputs.tag_name }}
       source_sha:
         description: Commit SHA used for the release tag.
@@ -79,6 +84,7 @@ jobs:
         with:
           ref: ${{ inputs.trusted_release_sha || inputs.source_ref || 'main' }}
           fetch-depth: 0
+          fetch-tags: true
 
       - name: Run release preflight checks
         id: preflight
@@ -88,11 +94,13 @@ jobs:
           SOURCE_REF: ${{ inputs.source_ref || 'main' }}
           ALLOW_RECOVERY: ${{ inputs.allow_non_main_source_ref }}
           TRUSTED_RELEASE_SHA: ${{ inputs.trusted_release_sha }}
+          EXISTING_PROTECTED_TAG: ${{ inputs.existing_protected_tag }}
         run: |
           set -euo pipefail
           args=(--target-version "$TARGET_VERSION" --source-ref "$SOURCE_REF" --release-body-path release-notes.md)
           if [[ "$ALLOW_RECOVERY" == "true" ]]; then args+=(--allow-non-main-source-ref); fi
           if [[ -n "$TRUSTED_RELEASE_SHA" ]]; then args+=(--trusted-release-sha "$TRUSTED_RELEASE_SHA"); fi
+          if [[ "$EXISTING_PROTECTED_TAG" == "true" ]]; then args+=(--existing-protected-tag); fi
           ruby .github/scripts/create_github_release_preflight.rb "${args[@]}"
 
       - name: Create annotated tag and GitHub Release
@@ -101,12 +109,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TAG_NAME: ${{ steps.preflight.outputs.tag_name }}
           SOURCE_SHA: ${{ steps.preflight.outputs.source_sha }}
+          EXISTING_PROTECTED_TAG: ${{ inputs.existing_protected_tag }}
         run: |
           set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag --annotate "$TAG_NAME" "$SOURCE_SHA" --message "Home Stuff Inventory $TAG_NAME"
-          git push origin "refs/tags/$TAG_NAME"
+          if [[ "$EXISTING_PROTECTED_TAG" != "true" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag --annotate "$TAG_NAME" "$SOURCE_SHA" --message "Home Stuff Inventory $TAG_NAME"
+            git push origin "refs/tags/$TAG_NAME"
+          fi
           test "$(git ls-remote origin "refs/tags/$TAG_NAME^{}" | cut -f1)" = "$SOURCE_SHA"
           gh release create "$TAG_NAME" \
             --repo "$GITHUB_REPOSITORY" \

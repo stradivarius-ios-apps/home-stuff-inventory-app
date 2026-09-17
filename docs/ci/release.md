@@ -1,17 +1,25 @@
 # Release
 
-After the release-prep pull request has been reviewed and merged into `main`:
+After the release-prep pull request has been reviewed and merged into `main`,
+first run `validation_only` from **Actions → Release**. The active release-tag
+creation rule permits only organization administrators to create `v*` tags, so
+the default workflow cannot create a tag with `GITHUB_TOKEN` under that rule.
+For an operator-gated release, an organization administrator must create the
+annotated `vMAJOR.MINOR.PATCH` tag at the exact validated `main` SHA and verify
+its peeled commit. Never move or replace an existing release tag. Confirm the
+GitHub Release does not already exist. Then:
 
 1. Open **Actions → Release** and select `main`.
-2. Run the workflow with the default settings.
+2. Select `existing_protected_tag`; leave `validation_only` off.
 3. Wait for this single run to finish. A green result means the GitHub Release
    exists and the exact build was accepted for TestFlight processing. It does not
    submit the app for review or publish it on the App Store.
 
 The run captures one immutable source SHA and its committed version, reuses the
 ordinary validation jobs on that SHA, checks their exact-SHA GitHub Actions evidence,
-creates the annotated tag/Release, then dispatches the dedicated private control
-plane and waits for its exact run ID. A failed or ambiguous upload must be verified
+verifies the existing annotated tag and creates the GitHub Release, then
+dispatches the dedicated private control plane and waits for its exact run ID.
+A failed or ambiguous upload must be verified
 in App Store Connect before any manual recovery. Never rerun a normal release to
 retry an uncertain upload. Lower-level Validation, Create GitHub Release, and
 private workflows are recovery/diagnostic tools, not normal release steps.
@@ -20,10 +28,10 @@ private workflows are recovery/diagnostic tools, not normal release steps.
 
 Selecting `validation_only` runs the committed identity and validation/check
 evidence stages without creating a tag or dispatching the private workflow. Run
-this once from `main` after workflow review to confirm the reusable job check-run
-names and approved GitHub Actions app identity before enabling the first live
-release. A real App Store Connect upload is a separate maintainer-authorized
-production validation step.
+this once from `main` before creating the protected tag. After tagging, confirm
+`main` has not advanced before starting the live workflow; otherwise stop and
+revalidate a new exact SHA. A real App Store Connect upload is a separate
+maintainer-authorized production step.
 
 ## Handoff configuration
 

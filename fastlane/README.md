@@ -4,13 +4,15 @@ Status: Active public metadata source and validation guide
 
 `fastlane/metadata` is the reviewed source for durable version-localized App Store copy
 in `en-GB` and `uk`. The app name is managed separately in App Store Connect: do not add
-`name.txt`. Per-release What’s New text is also separate: do not commit
-`release_notes.txt`.
+`name.txt`. Per-release What’s New text is version-bound under
+`fastlane/release_notes/<MAJOR.MINOR.PATCH>/` rather than in the durable metadata
+baseline. Each release directory has exactly `en-GB.txt` and `uk.txt`.
 
 Validate locally with:
 
 ```sh
 ruby .github/scripts/validate_app_store_metadata.rb fastlane/metadata
+ruby .github/scripts/validate_app_store_release_notes.rb fastlane/release_notes 1.3.1
 ```
 
 ## Public Ownership Boundary
@@ -19,8 +21,8 @@ This directory owns only the repository-managed localized metadata files and the
 local validation contract. Keep `en-GB` and `uk` values paired, review changes in the
 pull request, and run the validator above before merging.
 
-The app name is App Store-managed and per-release What’s New text belongs to the
-release process, so neither is part of this metadata directory.
+The app name is App Store-managed. What’s New belongs to the release process and
+must be reviewed with the version change; the exact tagged source is its authority.
 
 Credentialed comparison with App Store Connect, publication, verification, and
 recovery are maintainer-only operations in a separate private release control plane.

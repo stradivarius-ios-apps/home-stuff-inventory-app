@@ -51,6 +51,11 @@ jobs:
             File.open(ENV.fetch("GITHUB_OUTPUT"), "a") { |out| out.puts "sha=#{sha}\nversion=#{version}\ntag=#{ReleaseContract.tag_for(version)}" }
           '
 
+      - name: Validate localized What’s New for the exact version
+        env:
+          RELEASE_VERSION: ${{ steps.identity.outputs.version }}
+        run: ruby .github/scripts/validate_app_store_release_notes.rb fastlane/release_notes "$RELEASE_VERSION"
+
   validation:
     name: Validate exact release source
     needs: identity

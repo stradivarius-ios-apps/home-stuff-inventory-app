@@ -46,12 +46,21 @@ class ReleasePrivateHandoffTest < Minitest::Test
     assert_raises(RuntimeError) { ReleasePrivateHandoff.validate_run!(run.merge("conclusion" => "cancelled"), id: 123, private_sha: SHA, app_actor: "release-handoff[bot]") }
   end
 
+  def test_private_readiness_requires_one_safe_typed_summary
+    assert_equal "ready_for_app_review", ReleasePrivateHandoff.readiness_from_jobs!("jobs" => [{ "name" => "Summarize release-preparation state / ready_for_app_review" }])
+    assert_equal "pending_processing", ReleasePrivateHandoff.readiness_from_jobs!("jobs" => [{ "name" => "Summarize release-preparation state / pending_processing" }])
+    assert_raises(RuntimeError) { ReleasePrivateHandoff.readiness_from_jobs!("jobs" => [{ "name" => "Summarize release-preparation state / success" }]) }
+    assert_raises(RuntimeError) { ReleasePrivateHandoff.readiness_from_jobs!("jobs" => []) }
+  end
+
   def test_dispatches_only_dedicated_workflow_and_waits_for_returned_run
     calls = []
     api = lambda do |method, path, token:, body: nil|
       calls << [method, path, body]
       if method == :post
         { "workflow_run_id" => 123, "run_url" => "https://api.github.com/repos/stradivarius-ios-apps/home-stuff-inventory/actions/runs/123" }
+      elsif path.end_with?("/jobs?per_page=100")
+        { "jobs" => [{ "name" => "Summarize release-preparation state / ready_for_app_review" }] }
       else
         { "id" => 123, "workflow_id" => 318196942, "event" => "workflow_dispatch",
           "head_branch" => "main", "head_sha" => SHA, "actor" => { "login" => "release-handoff[bot]" },
@@ -68,15 +77,15 @@ class ReleasePrivateHandoffTest < Minitest::Test
       ReleasePrivateHandoff.define_singleton_method(:request!, api)
       assert_equal 123, ReleasePrivateHandoff.execute!(sha: SHA, tag: "v1.3.0", public_run_id: "456",
         app_id: "9", installation_id: "10", private_key: "not-used", app_actor: "release-handoff[bot]")
-      assert_equal "private_run_id=123\n", File.read(output)
+      assert_equal "private_run_id=123\nprivate_readiness=ready_for_app_review\n", File.read(output)
     ensure
       ENV["GITHUB_OUTPUT"] = original
       ReleasePrivateHandoff.define_singleton_method(:installation_token!, original_token)
       ReleasePrivateHandoff.define_singleton_method(:request!, original_request)
     end
-    assert_equal [:post, :get], calls.map(&:first)
+    assert_equal [:post, :get, :get], calls.map(&:first)
     assert_equal "/repos/stradivarius-ios-apps/home-stuff-inventory/actions/workflows/private-public-release.yml/dispatches", calls.first[1]
-    assert_equal "/repos/stradivarius-ios-apps/home-stuff-inventory/actions/runs/123", calls.last[1]
+    assert_equal "/repos/stradivarius-ios-apps/home-stuff-inventory/actions/runs/123/jobs?per_page=100", calls.last[1]
     assert_equal({ ref: "main",
       inputs: { public_source_sha: SHA, public_release_tag: "v1.3.0", upload: "true", publish_metadata: "true", publish_screenshots: "true", public_run_id: "456" } }, calls.first[2])
   end
@@ -111,6 +120,11 @@ class ReleasePrivateHandoffTest < Minitest::Test
     assert_includes flow.dig("jobs", "public-release", "if"), "!inputs.validation_only"
     assert_includes private_job.fetch("if"), "!inputs.validation_only"
     assert_equal "${{ needs.identity.outputs.sha }}", flow.dig("jobs", "private-release", "steps").last.dig("env", "PUBLIC_SOURCE_SHA")
+    assert_equal "${{ steps.private.outputs.private_readiness }}", private_job.dig("outputs", "readiness")
+    summary = flow.dig("jobs", "summary", "steps").first.fetch("run")
+    assert_includes summary, "ready_for_app_review"
+    assert_includes summary, "pending_processing"
+    refute_includes summary, "TestFlight upload accepted for processing."
     create_flow = YAML.load_file(File.join(ROOT, ".github/workflows/create-github-release.yml"))
     create_events = create_flow[true] || create_flow.fetch("on")
     assert_equal false, create_events.dig("workflow_call", "inputs", "existing_protected_tag", "default")

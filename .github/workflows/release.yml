@@ -117,6 +117,8 @@ jobs:
     environment: release-orchestration
     permissions:
       contents: read
+    outputs:
+      readiness: ${{ steps.private.outputs.private_readiness }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
@@ -161,6 +163,7 @@ jobs:
           EVIDENCE: ${{ needs.evidence.result }}
           PUBLIC_RELEASE: ${{ needs.public-release.result }}
           PRIVATE_RELEASE: ${{ needs.private-release.result }}
+          PRIVATE_READINESS: ${{ needs.private-release.outputs.readiness }}
           DRY_RUN: ${{ inputs.validation_only }}
         run: |
           {
@@ -171,11 +174,13 @@ jobs:
             echo "- Intended tag: \`$TAG\`"
             echo "- Validation: $VALIDATION; exact-SHA evidence: $EVIDENCE"
             echo "- GitHub Release: $PUBLIC_RELEASE"
-            echo "- Private provenance, archive/export, and upload: $PRIVATE_RELEASE"
+            echo "- Private release preparation: $PRIVATE_RELEASE (${PRIVATE_READINESS:-incomplete})"
             if [[ "$DRY_RUN" == 'true' && "$EVIDENCE" == 'success' ]]; then
               echo '- Final state: validation only; no tag or upload.'
-            elif [[ "$PRIVATE_RELEASE" == 'success' ]]; then
-              echo '- Final state: TestFlight upload accepted for processing.'
+            elif [[ "$PRIVATE_RELEASE" == 'success' && "$PRIVATE_READINESS" == 'ready_for_app_review' ]]; then
+              echo '- Final state: READY FOR APP REVIEW.'
+            elif [[ "$PRIVATE_RELEASE" == 'success' && "$PRIVATE_READINESS" == 'pending_processing' ]]; then
+              echo '- Final state: pending provider processing; not ready for App Review.'
             else
               echo '- Final state: failed or incomplete. If dispatch occurred, verify App Store Connect before any recovery attempt.'
             fi

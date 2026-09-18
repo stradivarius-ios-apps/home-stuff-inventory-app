@@ -15,8 +15,10 @@ existing release tag. Confirm the GitHub Release does not already exist and that
 1. Open **Actions → Release** and select `main`.
 2. Select `existing_protected_tag`; leave `validation_only` off.
 3. Wait for this single run to finish. A green result means the GitHub Release
-   exists and the exact build was accepted for TestFlight processing. It does not
-   submit the app for review or publish it on the App Store.
+   exists and the private control plane completed its exact build, repository-owned
+   metadata, and screenshot preparation stages. Its redacted provider summary records
+   whether the build reached readiness or remains processing. It does not submit the
+   app for review or publish it on the App Store.
 
 The run captures one immutable source SHA and its committed version, reuses the
 ordinary validation jobs on that SHA, checks their exact-SHA GitHub Actions evidence,

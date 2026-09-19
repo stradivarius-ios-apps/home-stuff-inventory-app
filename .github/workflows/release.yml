@@ -27,7 +27,6 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository == 'stradivarius-ios-apps/home-stuff-inventory-app' && github.ref == 'refs/heads/main'
     outputs:
-      provenance: ${{ steps.private.outputs.private_provenance }}
       sha: ${{ steps.identity.outputs.sha }}
       version: ${{ steps.identity.outputs.version }}
       tag: ${{ steps.identity.outputs.tag }}
@@ -119,6 +118,7 @@ jobs:
     permissions:
       contents: read
     outputs:
+      provenance: ${{ steps.private.outputs.private_provenance }}
       archive: ${{ steps.private.outputs.private_archive }}
       upload: ${{ steps.private.outputs.private_upload }}
       screenshots: ${{ steps.private.outputs.private_screenshots }}

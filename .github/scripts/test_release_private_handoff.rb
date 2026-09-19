@@ -51,6 +51,17 @@ class ReleasePrivateHandoffTest < Minitest::Test
     assert_equal "ready_for_app_review", ReleasePrivateHandoff.stage_status_from_jobs!("jobs" => [{ "name" => name }]).fetch("readiness")
     assert_raises(RuntimeError) { ReleasePrivateHandoff.stage_status_from_jobs!("jobs" => [{ "name" => name }, { "name" => name }]) }
     assert_raises(RuntimeError) { ReleasePrivateHandoff.stage_status_from_jobs!("jobs" => [{ "name" => "Release stage status / archive=unknown" }]) }
+    %w[
+      provenance=success;provenance=success
+      archive=success;archive=success
+      unknown=success
+      provenance=
+      =success
+      provenance
+    ].each do |invalid|
+      record = "Release stage status / #{invalid};archive=success;upload=success;screenshots=success;metadata=published;readiness=ready_for_app_review"
+      assert_raises(RuntimeError) { ReleasePrivateHandoff.stage_status_from_jobs!("jobs" => [{ "name" => record }]) }
+    end
   end
 
   def test_dispatches_only_dedicated_workflow_and_waits_for_returned_run
@@ -121,6 +132,9 @@ class ReleasePrivateHandoffTest < Minitest::Test
     assert_includes private_job.fetch("if"), "!inputs.validation_only"
     assert_equal "${{ needs.identity.outputs.sha }}", flow.dig("jobs", "private-release", "steps").last.dig("env", "PUBLIC_SOURCE_SHA")
     assert_equal "${{ steps.private.outputs.private_readiness }}", private_job.dig("outputs", "readiness")
+    assert_equal "${{ steps.private.outputs.private_provenance }}", private_job.dig("outputs", "provenance")
+    refute flow.dig("jobs", "identity", "outputs").key?("provenance")
+    assert_equal "${{ needs.private-release.outputs.provenance }}", flow.dig("jobs", "summary", "steps").first.dig("env", "PRIVATE_PROVENANCE")
     summary = flow.dig("jobs", "summary", "steps").first.fetch("run")
     assert_includes summary, "ready_for_app_review"
     assert_includes summary, "pending_processing"

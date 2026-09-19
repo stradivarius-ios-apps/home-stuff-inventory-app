@@ -38,16 +38,16 @@ class ReleasePrivateHandoffTest < Minitest::Test
     run = { "id" => 123, "workflow_id" => 318196942, "event" => "workflow_dispatch",
       "head_branch" => "main", "head_sha" => SHA, "actor" => { "login" => "release-handoff[bot]" },
       "status" => "completed", "conclusion" => "success" }
-    assert_equal :success, ReleasePrivateHandoff.validate_run!(run, id: 123, private_sha: SHA, app_actor: "release-handoff[bot]")
+    assert_equal "success", ReleasePrivateHandoff.validate_run!(run, id: 123, private_sha: SHA, app_actor: "release-handoff[bot]")
     assert_raises(RuntimeError) { ReleasePrivateHandoff.validate_run!(run.merge("id" => 124), id: 123, private_sha: SHA, app_actor: "release-handoff[bot]") }
     assert_raises(RuntimeError) { ReleasePrivateHandoff.validate_run!(run.merge("workflow_id" => 1), id: 123, private_sha: SHA, app_actor: "release-handoff[bot]") }
     assert_raises(RuntimeError) { ReleasePrivateHandoff.validate_run!(run.merge("actor" => { "login" => "other[bot]" }), id: 123, private_sha: SHA, app_actor: "release-handoff[bot]") }
-    assert_raises(RuntimeError) { ReleasePrivateHandoff.validate_run!(run.merge("conclusion" => "failure"), id: 123, private_sha: SHA, app_actor: "release-handoff[bot]") }
-    assert_raises(RuntimeError) { ReleasePrivateHandoff.validate_run!(run.merge("conclusion" => "cancelled"), id: 123, private_sha: SHA, app_actor: "release-handoff[bot]") }
+    assert_equal "failure", ReleasePrivateHandoff.validate_run!(run.merge("conclusion" => "failure"), id: 123, private_sha: SHA, app_actor: "release-handoff[bot]")
+    assert_equal "cancelled", ReleasePrivateHandoff.validate_run!(run.merge("conclusion" => "cancelled"), id: 123, private_sha: SHA, app_actor: "release-handoff[bot]")
   end
 
   def test_private_stage_status_requires_one_complete_allowlisted_summary
-    name = "Release stage status / archive=success;upload=success;screenshots=success;metadata=recovered_partial;readiness=ready_for_app_review"
+    name = "Release stage status / provenance=success;archive=success;upload=success;screenshots=success;metadata=recovered_partial;readiness=ready_for_app_review"
     assert_equal "ready_for_app_review", ReleasePrivateHandoff.stage_status_from_jobs!("jobs" => [{ "name" => name }]).fetch("readiness")
     assert_raises(RuntimeError) { ReleasePrivateHandoff.stage_status_from_jobs!("jobs" => [{ "name" => name }, { "name" => name }]) }
     assert_raises(RuntimeError) { ReleasePrivateHandoff.stage_status_from_jobs!("jobs" => [{ "name" => "Release stage status / archive=unknown" }]) }
@@ -60,7 +60,7 @@ class ReleasePrivateHandoffTest < Minitest::Test
       if method == :post
         { "workflow_run_id" => 123, "run_url" => "https://api.github.com/repos/stradivarius-ios-apps/home-stuff-inventory/actions/runs/123" }
       elsif path.end_with?("/jobs?per_page=100")
-        { "jobs" => [{ "name" => "Release stage status / archive=success;upload=success;screenshots=success;metadata=published;readiness=ready_for_app_review" }] }
+        { "jobs" => [{ "name" => "Release stage status / provenance=success;archive=success;upload=success;screenshots=success;metadata=published;readiness=ready_for_app_review" }] }
       else
         { "id" => 123, "workflow_id" => 318196942, "event" => "workflow_dispatch",
           "head_branch" => "main", "head_sha" => SHA, "actor" => { "login" => "release-handoff[bot]" },
@@ -77,7 +77,7 @@ class ReleasePrivateHandoffTest < Minitest::Test
       ReleasePrivateHandoff.define_singleton_method(:request!, api)
       assert_equal 123, ReleasePrivateHandoff.execute!(sha: SHA, tag: "v1.3.0", public_run_id: "456",
         app_id: "9", installation_id: "10", private_key: "not-used", app_actor: "release-handoff[bot]")
-      assert_equal "private_run_id=123\nprivate_archive=success\nprivate_upload=success\nprivate_screenshots=success\nprivate_metadata=published\nprivate_readiness=ready_for_app_review\n", File.read(output)
+      assert_equal "private_run_id=123\nprivate_provenance=success\nprivate_archive=success\nprivate_upload=success\nprivate_screenshots=success\nprivate_metadata=published\nprivate_readiness=ready_for_app_review\n", File.read(output)
     ensure
       ENV["GITHUB_OUTPUT"] = original
       ReleasePrivateHandoff.define_singleton_method(:installation_token!, original_token)

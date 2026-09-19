@@ -69,15 +69,19 @@ module ReleasePrivateHandoff
     raise "Private run actor mismatch." unless run.fetch("actor").fetch("login") == app_actor
     status = run.fetch("status")
     return :waiting unless status == "completed"
-    raise "Private release failed or was cancelled: #{run.fetch('conclusion')}. Upload state requires maintainer verification before retry." unless run.fetch("conclusion") == "success"
-    :success
+    run.fetch("conclusion")
   end
 
   def stage_status_from_jobs!(jobs)
     names = jobs.fetch("jobs").filter_map { |job| job["name"] if job["name"].to_s.start_with?("Release stage status / ") }
     raise "Private stage summary is missing or ambiguous." unless names.one?
-    fields = names.first.delete_prefix("Release stage status / ").split(";").to_h { |field| field.split("=", 2) }
-    allowed = { "archive" => %w[success failed not-run], "upload" => %w[success failed not-requested], "screenshots" => %w[success failed not-requested], "metadata" => %w[published already_correct recovered_partial failed not-requested], "readiness" => %w[ready_for_app_review pending_processing failed not-requested] }
+    allowed = { "provenance" => %w[success failed skipped not-run], "archive" => %w[success failed not-run], "upload" => %w[success failed not-requested], "screenshots" => %w[success failed not-requested], "metadata" => %w[published already_correct recovered_partial failed not-requested], "readiness" => %w[ready_for_app_review pending_processing failed not-requested] }
+    fields = {}
+    names.first.delete_prefix("Release stage status / ").split(";").each do |field|
+      key, value = field.split("=", 2)
+      raise "Private stage summary is invalid." if key.to_s.empty? || value.to_s.empty? || fields.key?(key)
+      fields[key] = value
+    end
     raise "Private stage summary is invalid." unless fields.keys.sort == allowed.keys.sort && fields.all? { |key, value| allowed.fetch(key).include?(value) }
     fields
   end
@@ -110,10 +114,12 @@ module ReleasePrivateHandoff
       run = request!(:get, "/repos/#{REPOSITORY}/actions/runs/#{id}", token: token)
       private_sha ||= run.fetch("head_sha")
       raise "Private workflow SHA is invalid." unless SHA.match?(private_sha)
-      if validate_run!(run, id: id, private_sha: private_sha, app_actor: app_actor) == :success
+      conclusion = validate_run!(run, id: id, private_sha: private_sha, app_actor: app_actor)
+      unless conclusion == :waiting
         jobs = request!(:get, "/repos/#{REPOSITORY}/actions/runs/#{id}/jobs?per_page=100", token: token)
         stages = stage_status_from_jobs!(jobs)
         File.open(ENV.fetch("GITHUB_OUTPUT"), "a") { |out| stages.each { |key, value| out.puts "private_#{key}=#{value}" } }
+        raise "Private release failed or was cancelled: #{conclusion}. Upload state requires maintainer verification before retry." unless conclusion == "success"
         return id
       end
       sleep POLL_SECONDS

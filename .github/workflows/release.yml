@@ -27,6 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository == 'stradivarius-ios-apps/home-stuff-inventory-app' && github.ref == 'refs/heads/main'
     outputs:
+      provenance: ${{ steps.private.outputs.private_provenance }}
       sha: ${{ steps.identity.outputs.sha }}
       version: ${{ steps.identity.outputs.version }}
       tag: ${{ steps.identity.outputs.tag }}
@@ -168,6 +169,7 @@ jobs:
           PUBLIC_RELEASE: ${{ needs.public-release.result }}
           PRIVATE_RELEASE: ${{ needs.private-release.result }}
           PRIVATE_READINESS: ${{ needs.private-release.outputs.readiness }}
+          PRIVATE_PROVENANCE: ${{ needs.private-release.outputs.provenance }}
           PRIVATE_ARCHIVE: ${{ needs.private-release.outputs.archive }}
           PRIVATE_UPLOAD: ${{ needs.private-release.outputs.upload }}
           PRIVATE_SCREENSHOTS: ${{ needs.private-release.outputs.screenshots }}
@@ -184,7 +186,7 @@ jobs:
             echo "- GitHub Release: $PUBLIC_RELEASE"
             echo "| Private stage | Safe status |"
             echo "| --- | --- |"
-            echo "| Private provenance | $PRIVATE_RELEASE |"
+            echo "| Private provenance | ${PRIVATE_PROVENANCE:-failed} |"
             echo "| Archive/export | ${PRIVATE_ARCHIVE:-failed} |"
             echo "| TestFlight/App Store Connect upload | ${PRIVATE_UPLOAD:-failed} |"
             echo "| Screenshot publication | ${PRIVATE_SCREENSHOTS:-failed} |"

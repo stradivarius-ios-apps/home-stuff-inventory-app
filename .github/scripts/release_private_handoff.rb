@@ -73,6 +73,14 @@ module ReleasePrivateHandoff
     :success
   end
 
+  def readiness_from_jobs!(jobs)
+    names = jobs.fetch("jobs").filter_map { |job| job["name"] if job["name"].to_s.start_with?("Summarize release-preparation state / ") }
+    raise "Private readiness summary is missing or ambiguous." unless names.one?
+    readiness = names.first.delete_prefix("Summarize release-preparation state / ")
+    raise "Private readiness result is invalid." unless %w[ready_for_app_review pending_processing].include?(readiness)
+    readiness
+  end
+
   def execute!(sha:, tag:, public_run_id:, app_id:, installation_id:, private_key:, app_actor:)
     require_identity!(sha: sha, tag: tag, run_id: public_run_id)
     raise "App actor must be a named bot." unless app_actor.match?(/\A[a-z0-9-]+\[bot\]\z/)
@@ -83,7 +91,7 @@ module ReleasePrivateHandoff
       body: { ref: "main",
         inputs: {
           public_source_sha: sha, public_release_tag: tag, upload: "true",
-          publish_metadata: "true", publish_screenshots: "true", public_run_id: public_run_id
+          publish_metadata: "true", publish_screenshots: "true", verify_readiness: "true", public_run_id: public_run_id
         } })
     id = validate_dispatch!(response)
     File.open(ENV.fetch("GITHUB_OUTPUT"), "a") { |out| out.puts "private_run_id=#{id}" }
@@ -101,7 +109,12 @@ module ReleasePrivateHandoff
       run = request!(:get, "/repos/#{REPOSITORY}/actions/runs/#{id}", token: token)
       private_sha ||= run.fetch("head_sha")
       raise "Private workflow SHA is invalid." unless SHA.match?(private_sha)
-      return id if validate_run!(run, id: id, private_sha: private_sha, app_actor: app_actor) == :success
+      if validate_run!(run, id: id, private_sha: private_sha, app_actor: app_actor) == :success
+        jobs = request!(:get, "/repos/#{REPOSITORY}/actions/runs/#{id}/jobs?per_page=100", token: token)
+        readiness = readiness_from_jobs!(jobs)
+        File.open(ENV.fetch("GITHUB_OUTPUT"), "a") { |out| out.puts "private_readiness=#{readiness}" }
+        return id
+      end
       sleep POLL_SECONDS
     end
   end

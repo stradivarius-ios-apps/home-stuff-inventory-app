@@ -73,12 +73,13 @@ module ReleasePrivateHandoff
     :success
   end
 
-  def readiness_from_jobs!(jobs)
-    names = jobs.fetch("jobs").filter_map { |job| job["name"] if job["name"].to_s.start_with?("Summarize release-preparation state / ") }
-    raise "Private readiness summary is missing or ambiguous." unless names.one?
-    readiness = names.first.delete_prefix("Summarize release-preparation state / ")
-    raise "Private readiness result is invalid." unless %w[ready_for_app_review pending_processing].include?(readiness)
-    readiness
+  def stage_status_from_jobs!(jobs)
+    names = jobs.fetch("jobs").filter_map { |job| job["name"] if job["name"].to_s.start_with?("Release stage status / ") }
+    raise "Private stage summary is missing or ambiguous." unless names.one?
+    fields = names.first.delete_prefix("Release stage status / ").split(";").to_h { |field| field.split("=", 2) }
+    allowed = { "archive" => %w[success failed not-run], "upload" => %w[success failed not-requested], "screenshots" => %w[success failed not-requested], "metadata" => %w[published already_correct recovered_partial failed not-requested], "readiness" => %w[ready_for_app_review pending_processing failed not-requested] }
+    raise "Private stage summary is invalid." unless fields.keys.sort == allowed.keys.sort && fields.all? { |key, value| allowed.fetch(key).include?(value) }
+    fields
   end
 
   def execute!(sha:, tag:, public_run_id:, app_id:, installation_id:, private_key:, app_actor:)
@@ -111,8 +112,8 @@ module ReleasePrivateHandoff
       raise "Private workflow SHA is invalid." unless SHA.match?(private_sha)
       if validate_run!(run, id: id, private_sha: private_sha, app_actor: app_actor) == :success
         jobs = request!(:get, "/repos/#{REPOSITORY}/actions/runs/#{id}/jobs?per_page=100", token: token)
-        readiness = readiness_from_jobs!(jobs)
-        File.open(ENV.fetch("GITHUB_OUTPUT"), "a") { |out| out.puts "private_readiness=#{readiness}" }
+        stages = stage_status_from_jobs!(jobs)
+        File.open(ENV.fetch("GITHUB_OUTPUT"), "a") { |out| stages.each { |key, value| out.puts "private_#{key}=#{value}" } }
         return id
       end
       sleep POLL_SECONDS

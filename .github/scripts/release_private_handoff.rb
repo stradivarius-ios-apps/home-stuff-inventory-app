@@ -91,7 +91,7 @@ module ReleasePrivateHandoff
       body: { ref: "main",
         inputs: {
           public_source_sha: sha, public_release_tag: tag, upload: "true",
-          publish_metadata: "true", publish_screenshots: "true", public_run_id: public_run_id
+          publish_metadata: "true", publish_screenshots: "true", verify_readiness: "true", public_run_id: public_run_id
         } })
     id = validate_dispatch!(response)
     File.open(ENV.fetch("GITHUB_OUTPUT"), "a") { |out| out.puts "private_run_id=#{id}" }

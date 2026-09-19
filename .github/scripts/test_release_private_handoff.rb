@@ -87,7 +87,7 @@ class ReleasePrivateHandoffTest < Minitest::Test
     assert_equal "/repos/stradivarius-ios-apps/home-stuff-inventory/actions/workflows/private-public-release.yml/dispatches", calls.first[1]
     assert_equal "/repos/stradivarius-ios-apps/home-stuff-inventory/actions/runs/123/jobs?per_page=100", calls.last[1]
     assert_equal({ ref: "main",
-      inputs: { public_source_sha: SHA, public_release_tag: "v1.3.0", upload: "true", publish_metadata: "true", publish_screenshots: "true", public_run_id: "456" } }, calls.first[2])
+      inputs: { public_source_sha: SHA, public_release_tag: "v1.3.0", upload: "true", publish_metadata: "true", publish_screenshots: "true", verify_readiness: "true", public_run_id: "456" } }, calls.first[2])
   end
 
   def test_workflow_pins_identity_and_restricts_secret_job

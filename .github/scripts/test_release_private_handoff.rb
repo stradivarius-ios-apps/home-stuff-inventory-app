@@ -101,6 +101,31 @@ class ReleasePrivateHandoffTest < Minitest::Test
       inputs: { public_source_sha: SHA, public_release_tag: "v1.3.0", upload: "true", publish_metadata: "true", publish_screenshots: "true", verify_readiness: "true", public_run_id: "456" } }, calls.first[2])
   end
 
+  def test_failed_or_cancelled_private_runs_write_safe_outputs_before_failing
+    %w[failure cancelled].each do |conclusion|
+      output = File.join(Dir.mktmpdir, "output")
+      original_output, original_token, original_request = ENV["GITHUB_OUTPUT"], ReleasePrivateHandoff.method(:installation_token!), ReleasePrivateHandoff.method(:request!)
+      ENV["GITHUB_OUTPUT"] = output
+      ReleasePrivateHandoff.define_singleton_method(:installation_token!) { |**_| "token" }
+      ReleasePrivateHandoff.define_singleton_method(:request!) do |method, path, token:, body: nil|
+        if method == :post
+          { "workflow_run_id" => 123, "run_url" => "https://api.github.com/repos/stradivarius-ios-apps/home-stuff-inventory/actions/runs/123" }
+        elsif path.end_with?("/jobs?per_page=100")
+          { "jobs" => [{ "name" => "Release stage status / provenance=success;archive=success;upload=success;screenshots=success;metadata=failed;readiness=not-requested" }] }
+        else
+          { "id" => 123, "workflow_id" => 318196942, "event" => "workflow_dispatch", "head_branch" => "main", "head_sha" => SHA, "actor" => { "login" => "release-handoff[bot]" }, "status" => "completed", "conclusion" => conclusion }
+        end
+      end
+      assert_raises(RuntimeError) { ReleasePrivateHandoff.execute!(sha: SHA, tag: "v1.3.0", public_run_id: "456", app_id: "9", installation_id: "10", private_key: "unused", app_actor: "release-handoff[bot]") }
+      assert_includes File.read(output), "private_metadata=failed\n"
+      assert_includes File.read(output), "private_provenance=success\n"
+    ensure
+      ENV["GITHUB_OUTPUT"] = original_output
+      ReleasePrivateHandoff.define_singleton_method(:installation_token!, original_token)
+      ReleasePrivateHandoff.define_singleton_method(:request!, original_request)
+    end
+  end
+
   def test_workflow_pins_identity_and_restricts_secret_job
     flow = YAML.load_file(File.join(ROOT, ".github/workflows/release.yml"))
     events = flow[true] || flow.fetch("on")

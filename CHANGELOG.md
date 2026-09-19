@@ -2,6 +2,18 @@
 
 All notable user-facing and release-track changes for Home Stuff Inventory are recorded here.
 
+## 1.3.1
+
+### Changed
+
+- Cover invalid safe stage records (#65).
+
+### Internal
+
+- Authorize release readiness verification (#64).
+- Authorize complete App Store release preparation (#63).
+- Add version-bound App Store release notes (#62).
+
 ## 1.3.0
 
 ### Changed

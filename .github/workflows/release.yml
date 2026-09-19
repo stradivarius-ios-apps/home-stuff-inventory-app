@@ -118,6 +118,11 @@ jobs:
     permissions:
       contents: read
     outputs:
+      provenance: ${{ steps.private.outputs.private_provenance }}
+      archive: ${{ steps.private.outputs.private_archive }}
+      upload: ${{ steps.private.outputs.private_upload }}
+      screenshots: ${{ steps.private.outputs.private_screenshots }}
+      metadata: ${{ steps.private.outputs.private_metadata }}
       readiness: ${{ steps.private.outputs.private_readiness }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -164,6 +169,11 @@ jobs:
           PUBLIC_RELEASE: ${{ needs.public-release.result }}
           PRIVATE_RELEASE: ${{ needs.private-release.result }}
           PRIVATE_READINESS: ${{ needs.private-release.outputs.readiness }}
+          PRIVATE_PROVENANCE: ${{ needs.private-release.outputs.provenance }}
+          PRIVATE_ARCHIVE: ${{ needs.private-release.outputs.archive }}
+          PRIVATE_UPLOAD: ${{ needs.private-release.outputs.upload }}
+          PRIVATE_SCREENSHOTS: ${{ needs.private-release.outputs.screenshots }}
+          PRIVATE_METADATA: ${{ needs.private-release.outputs.metadata }}
           DRY_RUN: ${{ inputs.validation_only }}
         run: |
           {
@@ -174,7 +184,15 @@ jobs:
             echo "- Intended tag: \`$TAG\`"
             echo "- Validation: $VALIDATION; exact-SHA evidence: $EVIDENCE"
             echo "- GitHub Release: $PUBLIC_RELEASE"
-            echo "- Private release preparation: $PRIVATE_RELEASE (${PRIVATE_READINESS:-incomplete})"
+            echo "| Private stage | Safe status |"
+            echo "| --- | --- |"
+            echo "| Private provenance | ${PRIVATE_PROVENANCE:-failed} |"
+            echo "| Archive/export | ${PRIVATE_ARCHIVE:-failed} |"
+            echo "| TestFlight/App Store Connect upload | ${PRIVATE_UPLOAD:-failed} |"
+            echo "| Screenshot publication | ${PRIVATE_SCREENSHOTS:-failed} |"
+            echo "| Metadata publication | ${PRIVATE_METADATA:-failed} |"
+            echo "| Localized What’s New | ${PRIVATE_METADATA:-failed} |"
+            echo "| Build association/provider verification | ${PRIVATE_READINESS:-failed} |"
             if [[ "$DRY_RUN" == 'true' && "$EVIDENCE" == 'success' ]]; then
               echo '- Final state: validation only; no tag or upload.'
             elif [[ "$PRIVATE_RELEASE" == 'success' && "$PRIVATE_READINESS" == 'ready_for_app_review' ]]; then

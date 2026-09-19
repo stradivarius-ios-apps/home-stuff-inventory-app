@@ -62,6 +62,11 @@ class ReleasePrivateHandoffTest < Minitest::Test
       record = "Release stage status / #{invalid};archive=success;upload=success;screenshots=success;metadata=published;readiness=ready_for_app_review"
       assert_raises(RuntimeError) { ReleasePrivateHandoff.stage_status_from_jobs!("jobs" => [{ "name" => record }]) }
     end
+    missing = "Release stage status / provenance=success;archive=success;upload=success;screenshots=success;metadata=published"
+    invalid_readiness = "Release stage status / provenance=success;archive=success;upload=success;screenshots=success;metadata=published;readiness=success"
+    [missing, invalid_readiness].each do |record|
+      assert_raises(RuntimeError) { ReleasePrivateHandoff.stage_status_from_jobs!("jobs" => [{ "name" => record }]) }
+    end
   end
 
   def test_dispatches_only_dedicated_workflow_and_waits_for_returned_run

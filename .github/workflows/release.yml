@@ -56,6 +56,10 @@ jobs:
               --trusted-release-sha "$CAPTURED_SHA" \
               --release-body-path release-notes.md
           fi
+      - name: Validate exact-version App Store What's New
+        env:
+          RELEASE_VERSION: ${{ steps.identity.outputs.version }}
+        run: ruby .github/scripts/validate_app_store_release_notes.rb fastlane/release_notes "$RELEASE_VERSION"
 
   validation:
     name: Validate exact release source
@@ -108,6 +112,8 @@ jobs:
       trusted_release_sha: ${{ needs.identity.outputs.sha }}
       target_version: ${{ needs.identity.outputs.version }}
       existing_protected_tag: ${{ inputs.existing_protected_tag }}
+    secrets:
+      RELEASE_TAG_APP_PRIVATE_KEY: ${{ secrets.RELEASE_TAG_APP_PRIVATE_KEY }}
 
   private-release:
     name: Dispatch and await private TestFlight upload

@@ -3,20 +3,22 @@
 After the release-prep pull request has been reviewed and merged into `main`, a
 maintainer authorized to run release CI opens **Actions → Release**, selects
 `main`, and leaves `validation_only` off. The trusted GitHub Actions release
-identity is the only ruleset bypass allowed to create `v*` tags. Developers and
-branches cannot create them; tag update, deletion, force-update, and retargeting
-remain prohibited. The workflow first fails fast unless the committed version is
+dedicated, repository-scoped **Home Stuff Release Tag** GitHub App is the only
+ruleset bypass allowed to create `v*` tags. Its write token is minted only in the
+narrow reusable Create GitHub Release job, after the top-level Release workflow's
+exact-SHA evidence succeeds. Developers and branches cannot create tags; tag update,
+deletion, force-update, and retargeting remain prohibited. The workflow first fails fast unless the committed version is
 strict SemVer, newer than the latest valid release tag, has finalized changelog
 and localized What’s New entries, and has neither a tag nor GitHub Release.
 
-The workflow captures one immutable source SHA, validates it, creates an
-annotated `vMAJOR.MINOR.PATCH` tag directly at that SHA, verifies its direct
-commit target and remote peeled commit, creates the GitHub Release, and then
-dispatches the private control plane. A green result means the GitHub Release
-   exists and the private control plane completed its exact build, repository-owned
-   metadata, and screenshot preparation stages. Its redacted provider summary records
-   whether the build reached readiness or remains processing. It does not submit the
-   app for review or publish it on the App Store.
+The workflow captures one immutable source SHA, validates it, verifies exact-SHA
+release evidence, then creates an annotated `vMAJOR.MINOR.PATCH` tag directly at that
+SHA immediately before creating the GitHub Release and dispatching the private
+control plane. A green result means the GitHub Release exists and the private control
+plane completed exact-source archive/sign/export/upload, screenshot and metadata
+publication/readback, exact build association, and provider readiness verification.
+Its redacted provider summary records whether the build reached readiness or remains
+processing. It does not submit the app for review or publish it on the App Store.
 
 The run checks exact-SHA GitHub Actions evidence before any release mutation,
 then dispatches the dedicated private control plane and waits for its exact run ID.
@@ -30,12 +32,14 @@ private workflows are recovery/diagnostic tools, not normal release steps.
 Selecting `validation_only` runs the same fail-fast preflight and validation/check
 evidence stages without creating a tag, GitHub Release, or dispatching the private
 workflow. If a run is interrupted after tag creation but before GitHub Release
-creation, rerun **Release** from `main`: it verifies that the existing tag is
-annotated, directly targets the captured SHA, and peels remotely to that SHA, then
-creates only the missing GitHub Release. Any conflicting, lightweight, nested, or
+creation, rerun **Release** from `main` with `existing_protected_tag` enabled: it
+verifies that the existing tag is annotated, directly targets the captured SHA, and
+peels remotely to that SHA, then creates only the missing GitHub Release. This mode
+never creates, moves, deletes, or pushes a tag. Any conflicting, lightweight, nested, or
 ambiguous tag stops for maintainer review; never move, replace, force-update, or
-delete it. A real App Store Connect upload is a separate maintainer-authorized
-production step.
+delete it. Upload/listing preparation is performed by the private control plane in
+the same authorized production run; App Review submission and public App Store
+release remain out of scope.
 
 ## Handoff configuration
 

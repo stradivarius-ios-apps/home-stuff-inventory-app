@@ -68,7 +68,7 @@ end
 
 [
   "set -euo pipefail", "simctl create", "simctl bootstatus", "simctl status_bar", "appearance light",
-  "InventoryReleaseScreenshotUITests/testReleaseAppStoreScreenshots", "DEBUG RELEASE_APP_STORE_SCREENSHOTS",
+  "InventoryReleaseScreenshotUITests/testReleaseAppStoreScreenshots", "DEBUG RELEASE_APP_STORE_SCREENSHOTS", "ENABLE_TESTABILITY=YES",
   "TestResults/ReleaseAppStoreScreenshots.xcresult", "release-app-store-screenshots", "export_release_app_store_screenshots.rb"
 ].each { |value| fail_lane("shared helper is missing #{value}") unless helper.include?(value) }
 

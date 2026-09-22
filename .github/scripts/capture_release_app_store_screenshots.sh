@@ -52,6 +52,7 @@ xcodebuild test \
   -only-testing:"HomeStuffInventoryAppUITests/InventoryReleaseScreenshotUITests/testReleaseAppStoreScreenshots" \
   -resultBundlePath "$result_bundle" \
   SWIFT_ACTIVE_COMPILATION_CONDITIONS="DEBUG RELEASE_APP_STORE_SCREENSHOTS" \
+  ENABLE_TESTABILITY=YES \
   CODE_SIGNING_ALLOWED=NO
 
 ruby .github/scripts/export_release_app_store_screenshots.rb "$result_bundle" "$output_directory"

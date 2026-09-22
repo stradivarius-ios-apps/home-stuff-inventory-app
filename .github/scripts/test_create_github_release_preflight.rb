@@ -63,6 +63,14 @@ class CreateGitHubReleasePreflightTest < Minitest::Test
     assert_raises(RuntimeError) { GitHubReleasePreflight.ensure_newer!("1.2.2", ["1.2.3"]) }
   end
 
+  def test_existing_exact_tag_is_a_recovery_path_not_a_retarget
+    runner = protected_tag_runner
+
+    with_release_environment do
+      assert_nil require_existing_protected_tag!("v1.2.3", "a" * 40, command_runner: runner)
+    end
+  end
+
   def test_existing_protected_tag_must_directly_reference_exact_commit_and_match_remote
     sha = "a" * 40
     object = "b" * 40

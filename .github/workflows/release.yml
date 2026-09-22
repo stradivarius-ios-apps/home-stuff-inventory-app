@@ -9,7 +9,7 @@ on:
         required: true
         default: false
       existing_protected_tag:
-        description: Use an administrator-created annotated tag at the captured main SHA after a tag-creation ruleset blocks automation.
+        description: "Recovery only: verify an exact existing annotated tag and create its missing GitHub Release. Never use for a normal release."
         type: boolean
         required: true
         default: false
@@ -36,22 +36,27 @@ jobs:
           ref: ${{ github.sha }}
           persist-credentials: false
           fetch-depth: 0
-      - name: Capture source version and tag
+      - name: Fail fast unless a new release is prepared
         id: identity
         env:
           CAPTURED_SHA: ${{ github.sha }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$CAPTURED_SHA"
-          ruby -r./.github/scripts/support/release_contract -e '
-            sha = ENV.fetch("CAPTURED_SHA")
-            ReleaseContract.strict_sha!(sha, label: "captured release SHA")
-            version = ReleaseContract.project_marketing_version!(File.read(ReleaseContract::PROJECT_PATH))
-            ReleaseContract.finalized_changelog_entry!(File.read(ReleaseContract::CHANGELOG_PATH), version)
-            File.open(ENV.fetch("GITHUB_OUTPUT"), "a") { |out| out.puts "sha=#{sha}\nversion=#{version}\ntag=#{ReleaseContract.tag_for(version)}" }
-          '
-
-      - name: Validate localized What’s New for the exact version
+          if [[ "${{ inputs.existing_protected_tag }}" == "true" ]]; then
+            ruby .github/scripts/create_github_release_preflight.rb \
+              --source-ref "$CAPTURED_SHA" \
+              --trusted-release-sha "$CAPTURED_SHA" \
+              --existing-protected-tag \
+              --release-body-path release-notes.md
+          else
+            ruby .github/scripts/create_github_release_preflight.rb \
+              --source-ref "$CAPTURED_SHA" \
+              --trusted-release-sha "$CAPTURED_SHA" \
+              --release-body-path release-notes.md
+          fi
+      - name: Validate exact-version App Store What's New
         env:
           RELEASE_VERSION: ${{ steps.identity.outputs.version }}
         run: ruby .github/scripts/validate_app_store_release_notes.rb fastlane/release_notes "$RELEASE_VERSION"
@@ -107,6 +112,8 @@ jobs:
       trusted_release_sha: ${{ needs.identity.outputs.sha }}
       target_version: ${{ needs.identity.outputs.version }}
       existing_protected_tag: ${{ inputs.existing_protected_tag }}
+    secrets:
+      RELEASE_TAG_APP_PRIVATE_KEY: ${{ secrets.RELEASE_TAG_APP_PRIVATE_KEY }}
 
   private-release:
     name: Dispatch and await private TestFlight upload

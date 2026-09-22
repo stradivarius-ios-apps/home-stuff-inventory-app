@@ -218,10 +218,12 @@ def main(argv)
   raise "Target override #{override} does not exactly match committed MARKETING_VERSION #{marketing_version}." if override && override != marketing_version
 
   tag = ReleaseContract.tag_for(marketing_version)
+  existing_exact_tag = false
   if options[:existing_protected_tag]
     GitHubReleasePreflight.validate_existing_tag_mode!(trusted_release_sha: options[:trusted_release_sha], skip_remote_checks: options[:skip_remote_checks])
     GitHubReleasePreflight.ensure_newer!(marketing_version, valid_tag_versions.reject { |version| version == marketing_version })
     require_existing_protected_tag!(tag, source_sha)
+    existing_exact_tag = true
   else
     GitHubReleasePreflight.ensure_newer!(marketing_version, valid_tag_versions)
     ensure_tag_and_release_missing!(tag, source_sha, options[:skip_remote_checks])
@@ -230,9 +232,12 @@ def main(argv)
   File.write(options[:notes], "#{notes}\n")
 
   write_output("marketing_version", marketing_version)
+  write_output("version", marketing_version)
   write_output("tag_name", tag)
+  write_output("tag", tag)
   write_output("source_ref", source_ref)
   write_output("source_sha", source_sha)
+  write_output("existing_exact_tag", existing_exact_tag)
   write_summary(marketing_version: marketing_version, tag: tag, source_ref: source_ref, source_sha: source_sha)
   puts "GitHub Release preflight passed for #{tag} at #{source_sha}."
 end

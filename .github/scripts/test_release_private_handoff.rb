@@ -173,10 +173,34 @@ class ReleasePrivateHandoffTest < Minitest::Test
     create_events = create_flow[true] || create_flow.fetch("on")
     assert_equal false, create_events.dig("workflow_call", "inputs", "existing_protected_tag", "default")
     release_steps = create_flow.dig("jobs", "create-github-release", "steps")
+    identity = flow.dig("jobs", "identity")
+    preflight_step = identity.fetch("steps").find { |step| step["id"] == "identity" }
+    assert_includes preflight_step.fetch("run"), "create_github_release_preflight.rb"
+    assert_includes preflight_step.fetch("run"), "--trusted-release-sha"
+    note_step = identity.fetch("steps").find { |step| step["name"] == "Validate exact-version App Store What's New" }
+    refute_nil note_step
+    assert_includes note_step.fetch("run"), "validate_app_store_release_notes.rb fastlane/release_notes"
+    assert_equal "${{ steps.identity.outputs.version }}", note_step.dig("env", "RELEASE_VERSION")
+    assert_operator identity.fetch("steps").index(note_step), :>, identity.fetch("steps").index(preflight_step)
+    assert_includes flow.dig("jobs", "validation").fetch("needs"), "identity"
     assert_includes release_steps.find { |step| step["id"] == "preflight" }.fetch("run"), "--existing-protected-tag"
+    create_events = create_flow[true] || create_flow.fetch("on")
+    assert create_events.key?("workflow_call")
+    refute create_events.key?("workflow_dispatch")
+    assert_equal({ "RELEASE_TAG_APP_PRIVATE_KEY" => { "required" => true } }, create_events.dig("workflow_call", "secrets"))
+    assert_equal({ "RELEASE_TAG_APP_PRIVATE_KEY" => "${{ secrets.RELEASE_TAG_APP_PRIVATE_KEY }}" }, flow.dig("jobs", "public-release", "secrets"))
+    refute_match(/secrets:\s*inherit/, File.read(File.join(ROOT, ".github/workflows/release.yml")))
     create_tag = release_steps.find { |step| step["id"] == "release" }.fetch("run")
-    assert_includes create_tag, 'if [[ "$EXISTING_PROTECTED_TAG" != "true" ]]'
+    assert_includes create_tag, 'if [[ "$EXISTING_EXACT_TAG" != "true" ]]'
+    assert_includes create_tag, 'git cat-file -t "refs/tags/$TAG_NAME"'
     assert_includes create_tag, 'git ls-remote origin "refs/tags/$TAG_NAME^{}"'
+    release_checkout = release_steps.find { |step| step["name"] == "Check out release source" }
+    assert_equal "${{ steps.release-tag-token.outputs.token }}", release_checkout.dig("with", "token")
+    assert_equal true, release_checkout.dig("with", "persist-credentials")
+    assert_equal "${{ steps.release-tag-token.outputs.token }}", release_steps.find { |step| step["id"] == "release" }.dig("env", "GH_TOKEN")
+    assert_equal "${{ steps.release-tag-token.outputs.token }}", release_steps.find { |step| step["id"] == "preflight" }.dig("env", "GH_TOKEN")
+    assert_includes flow.dig("jobs", "public-release", "if"), "needs.evidence.result == 'success'"
+    assert_includes flow.dig("jobs", "public-release", "if"), "!inputs.validation_only"
     text = File.read(File.join(ROOT, ".github/workflows/release.yml"))
     refute_match(/pull_request_target|write-all|APP_STORE_CONNECT_API_PRIVATE_KEY/, text)
     refute_match(/latest.run|actions\/runs\?/, File.read(File.join(ROOT, ".github/scripts/release_private_handoff.rb")))

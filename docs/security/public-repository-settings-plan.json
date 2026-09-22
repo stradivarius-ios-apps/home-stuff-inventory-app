@@ -101,12 +101,17 @@
       "bypass": "minimum-maintainer-emergency-set-to-be-recorded"
     },
     "release_tag_ruleset": {
-      "state": "blocked-until-clean-root-and-tag-contract-are-integrated",
-      "pattern": "v*",
-      "creation": "maintainer-only-after-required-checks",
+      "state": "active-and-observed-2026-09-22",
+      "ruleset_ids": {
+        "creation": 19562530,
+        "immutability": 19562533
+      },
+      "pattern": "refs/tags/v*",
+      "creation": "active; only the Home Stuff Release Tag GitHub App Integration (app id 5036168) bypasses creation restriction; invoked by public Release after exact-SHA evidence",
       "update": "prohibited",
       "deletion": "prohibited",
-      "force_update": "prohibited"
+      "force_update": "prohibited",
+      "immutability_bypass_actors": []
     },
     "security_features": {
       "secret_scanning": "enable-when-supported",

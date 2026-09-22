@@ -2,6 +2,12 @@
 
 All notable user-facing and release-track changes for Home Stuff Inventory are recorded here.
 
+## 1.3.3
+
+### Internal
+
+- Harden release tag orchestration (#70).
+
 ## 1.3.1
 
 ### Changed

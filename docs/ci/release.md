@@ -1,29 +1,25 @@
 # Release
 
-After the release-prep pull request has been reviewed and merged into `main`,
-first run `validation_only` from **Actions → Release**. The active release-tag
-creation rule permits only organization administrators to create `v*` tags, so
-the default workflow cannot create a tag with `GITHUB_TOKEN` under that rule.
-For an operator-gated release, freeze `main` after the final validation-only
-run. An organization administrator must create the annotated
-`vMAJOR.MINOR.PATCH` tag at that exact validated SHA, then immediately verify
-both its direct tag-object target (a commit at the validated SHA) and its peeled
-commit. Nested and lightweight tags are not valid. Never move or replace an
-existing release tag. Confirm the GitHub Release does not already exist and that
-`main` has not advanced. Then:
+After the release-prep pull request has been reviewed and merged into `main`, a
+maintainer authorized to run release CI opens **Actions → Release**, selects
+`main`, and leaves `validation_only` off. The trusted GitHub Actions release
+identity is the only ruleset bypass allowed to create `v*` tags. Developers and
+branches cannot create them; tag update, deletion, force-update, and retargeting
+remain prohibited. The workflow first fails fast unless the committed version is
+strict SemVer, newer than the latest valid release tag, has finalized changelog
+and localized What’s New entries, and has neither a tag nor GitHub Release.
 
-1. Open **Actions → Release** and select `main`.
-2. Select `existing_protected_tag`; leave `validation_only` off.
-3. Wait for this single run to finish. A green result means the GitHub Release
+The workflow captures one immutable source SHA, validates it, creates an
+annotated `vMAJOR.MINOR.PATCH` tag directly at that SHA, verifies its direct
+commit target and remote peeled commit, creates the GitHub Release, and then
+dispatches the private control plane. A green result means the GitHub Release
    exists and the private control plane completed its exact build, repository-owned
    metadata, and screenshot preparation stages. Its redacted provider summary records
    whether the build reached readiness or remains processing. It does not submit the
    app for review or publish it on the App Store.
 
-The run captures one immutable source SHA and its committed version, reuses the
-ordinary validation jobs on that SHA, checks their exact-SHA GitHub Actions evidence,
-verifies the existing annotated tag and creates the GitHub Release, then
-dispatches the dedicated private control plane and waits for its exact run ID.
+The run checks exact-SHA GitHub Actions evidence before any release mutation,
+then dispatches the dedicated private control plane and waits for its exact run ID.
 A failed or ambiguous upload must be verified
 in App Store Connect before any manual recovery. Never rerun a normal release to
 retry an uncertain upload. Lower-level Validation, Create GitHub Release, and
@@ -31,14 +27,15 @@ private workflows are recovery/diagnostic tools, not normal release steps.
 
 ## Safe pre-production check
 
-Selecting `validation_only` runs the committed identity and validation/check
-evidence stages without creating a tag or dispatching the private workflow. Run
-this once from `main` before creating the protected tag. After tagging, confirm
-`main` has not advanced before starting the live workflow; otherwise stop and
-revalidate a new exact SHA. If the immutable tag was created at the wrong target
-or its verification fails, do not move, replace, force-update, or delete it;
-select a new version and repeat validation with a newly created tag. A real App
-Store Connect upload is a separate maintainer-authorized production step.
+Selecting `validation_only` runs the same fail-fast preflight and validation/check
+evidence stages without creating a tag, GitHub Release, or dispatching the private
+workflow. If a run is interrupted after tag creation but before GitHub Release
+creation, rerun **Release** from `main`: it verifies that the existing tag is
+annotated, directly targets the captured SHA, and peels remotely to that SHA, then
+creates only the missing GitHub Release. Any conflicting, lightweight, nested, or
+ambiguous tag stops for maintainer review; never move, replace, force-update, or
+delete it. A real App Store Connect upload is a separate maintainer-authorized
+production step.
 
 ## Handoff configuration
 

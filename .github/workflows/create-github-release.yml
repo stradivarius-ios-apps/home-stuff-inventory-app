@@ -23,6 +23,11 @@ on:
         description: Captured SHA supplied only by the reviewed release orchestrator.
         type: string
         required: false
+      existing_protected_tag:
+        description: "Recovery only: require an existing annotated tag at the trusted exact SHA."
+        type: boolean
+        default: false
+        required: false
       target_version:
         description: Optional release version as MAJOR.MINOR.PATCH or vMAJOR.MINOR.PATCH. It must exactly match committed MARKETING_VERSION.
         type: string
@@ -34,11 +39,6 @@ on:
         required: false
       allow_non_main_source_ref:
         description: Explicit maintainer approval for exact-SHA recovery outside current main. Never use a release-prep branch.
-        type: boolean
-        default: false
-        required: false
-      existing_protected_tag:
-        description: Require an existing administrator-created annotated tag at the trusted exact SHA.
         type: boolean
         default: false
         required: false
@@ -79,6 +79,15 @@ jobs:
             exit 1
           fi
 
+      - name: Mint scoped release-tag App token
+        id: release-tag-token
+        uses: actions/create-github-app-token@064492a9a1762067169d50c792a7dc02bc3d1254 # v2.0.0
+        with:
+          app-id: ${{ vars.RELEASE_TAG_APP_ID }}
+          private-key: ${{ secrets.RELEASE_TAG_APP_PRIVATE_KEY }}
+          owner: stradivarius-ios-apps
+          repositories: home-stuff-inventory-app
+
       - name: Check out release source
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
@@ -89,7 +98,7 @@ jobs:
       - name: Run release preflight checks
         id: preflight
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.release-tag-token.outputs.token }}
           TARGET_VERSION: ${{ inputs.target_version }}
           SOURCE_REF: ${{ inputs.source_ref || 'main' }}
           ALLOW_RECOVERY: ${{ inputs.allow_non_main_source_ref }}
@@ -106,18 +115,21 @@ jobs:
       - name: Create annotated tag and GitHub Release
         id: release
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.release-tag-token.outputs.token }}
           TAG_NAME: ${{ steps.preflight.outputs.tag_name }}
           SOURCE_SHA: ${{ steps.preflight.outputs.source_sha }}
-          EXISTING_PROTECTED_TAG: ${{ inputs.existing_protected_tag }}
+          EXISTING_EXACT_TAG: ${{ steps.preflight.outputs.existing_exact_tag }}
         run: |
           set -euo pipefail
-          if [[ "$EXISTING_PROTECTED_TAG" != "true" ]]; then
+          if [[ "$EXISTING_EXACT_TAG" != "true" ]]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git tag --annotate "$TAG_NAME" "$SOURCE_SHA" --message "Home Stuff Inventory $TAG_NAME"
             git push origin "refs/tags/$TAG_NAME"
           fi
+          test "$(git cat-file -t "refs/tags/$TAG_NAME")" = tag
+          test "$(git cat-file -p "refs/tags/$TAG_NAME" | sed -n 's/^object //p' | head -n 1)" = "$SOURCE_SHA"
+          test "$(git cat-file -p "refs/tags/$TAG_NAME" | sed -n 's/^type //p' | head -n 1)" = commit
           test "$(git ls-remote origin "refs/tags/$TAG_NAME^{}" | cut -f1)" = "$SOURCE_SHA"
           gh release create "$TAG_NAME" \
             --repo "$GITHUB_REPOSITORY" \

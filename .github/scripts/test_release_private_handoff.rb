@@ -173,9 +173,13 @@ class ReleasePrivateHandoffTest < Minitest::Test
     create_events = create_flow[true] || create_flow.fetch("on")
     assert_equal false, create_events.dig("workflow_call", "inputs", "existing_protected_tag", "default")
     release_steps = create_flow.dig("jobs", "create-github-release", "steps")
+    identity = flow.dig("jobs", "identity")
+    assert_includes identity.fetch("steps").last.fetch("run"), "create_github_release_preflight.rb"
+    assert_includes identity.fetch("steps").last.fetch("run"), "--trusted-release-sha"
     assert_includes release_steps.find { |step| step["id"] == "preflight" }.fetch("run"), "--existing-protected-tag"
     create_tag = release_steps.find { |step| step["id"] == "release" }.fetch("run")
-    assert_includes create_tag, 'if [[ "$EXISTING_PROTECTED_TAG" != "true" ]]'
+    assert_includes create_tag, 'if [[ "$EXISTING_EXACT_TAG" != "true" ]]'
+    assert_includes create_tag, 'git cat-file -t "refs/tags/$TAG_NAME"'
     assert_includes create_tag, 'git ls-remote origin "refs/tags/$TAG_NAME^{}"'
     text = File.read(File.join(ROOT, ".github/workflows/release.yml"))
     refute_match(/pull_request_target|write-all|APP_STORE_CONNECT_API_PRIVATE_KEY/, text)

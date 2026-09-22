@@ -130,7 +130,7 @@ The protected Free boundary is documented in [`docs/product/free-capability-cont
 
 Release history and the next patch-line notes live in `CHANGELOG.md`.
 The technical release uses **Actions → Release** from `main` after release-prep
-merge and an administrator-created protected tag; see
+merge; trusted CI creates the protected annotated tag. See
 [`docs/ci/release.md`](docs/ci/release.md).
 
 This repository is the only source of product changes and release candidates. Signing

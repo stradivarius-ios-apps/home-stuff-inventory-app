@@ -82,6 +82,7 @@
       "default_workflow_permissions": "read",
       "can_approve_pull_request_reviews": false,
       "allowed_actions": "selected-reviewed-actions-only",
+      "release_tag_token_action": "actions/create-github-app-token@064492a9a1762067169d50c792a7dc02bc3d1254",
       "require_full_commit_sha_pins": true,
       "fork_pull_requests": "approval-policy-plus-read-only-hosted-execution-without-secrets",
       "pull_request_target_with_untrusted_checkout": "prohibited",

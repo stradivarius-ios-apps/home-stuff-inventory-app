@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require "minitest/autorun"
+require "json"
 require "tmpdir"
 require "yaml"
 require_relative "release_private_handoff"
@@ -187,9 +188,22 @@ class ReleasePrivateHandoffTest < Minitest::Test
     create_events = create_flow[true] || create_flow.fetch("on")
     assert create_events.key?("workflow_call")
     refute create_events.key?("workflow_dispatch")
-    assert_equal({ "RELEASE_TAG_APP_PRIVATE_KEY" => { "required" => true } }, create_events.dig("workflow_call", "secrets"))
+    assert_equal({ "RELEASE_TAG_APP_PRIVATE_KEY" => { "required" => false } }, create_events.dig("workflow_call", "secrets"))
     assert_equal({ "RELEASE_TAG_APP_PRIVATE_KEY" => "${{ secrets.RELEASE_TAG_APP_PRIVATE_KEY }}" }, flow.dig("jobs", "public-release", "secrets"))
     refute_match(/secrets:\s*inherit/, File.read(File.join(ROOT, ".github/workflows/release.yml")))
+    credential_gate = release_steps.find { |step| step["name"] == "Require production tag App credentials" }
+    refute_nil credential_gate
+    assert_equal "${{ vars.RELEASE_TAG_APP_ID }}", credential_gate.dig("env", "RELEASE_TAG_APP_ID")
+    assert_equal "${{ secrets.RELEASE_TAG_APP_PRIVATE_KEY }}", credential_gate.dig("env", "RELEASE_TAG_APP_PRIVATE_KEY")
+    assert_includes credential_gate.fetch("run"), '[[ -z "$RELEASE_TAG_APP_ID" || -z "$RELEASE_TAG_APP_PRIVATE_KEY" ]]'
+    assert_operator release_steps.index(credential_gate), :<, release_steps.index { |step| step["id"] == "release-tag-token" }
+    assert_equal ["identity", "evidence"], flow.dig("jobs", "public-release", "needs")
+    assert_equal "${{ needs.identity.outputs.sha }}", flow.dig("jobs", "public-release", "with", "trusted_release_sha")
+    assert_includes flow.dig("jobs", "public-release", "if"), "!inputs.validation_only"
+    assert_equal "./.github/workflows/create-github-release.yml", flow.dig("jobs", "public-release", "uses")
+    selected_action = JSON.parse(File.read(File.join(ROOT, "docs/security/public-repository-settings-plan.json"))).dig("desired_controls", "actions", "release_tag_token_action")
+    assert_equal "actions/create-github-app-token@064492a9a1762067169d50c792a7dc02bc3d1254", selected_action
+    assert_equal selected_action, release_steps.find { |step| step["id"] == "release-tag-token" }.fetch("uses")
     create_tag = release_steps.find { |step| step["id"] == "release" }.fetch("run")
     assert_includes create_tag, 'if [[ "$EXISTING_EXACT_TAG" != "true" ]]'
     assert_includes create_tag, 'git cat-file -t "refs/tags/$TAG_NAME"'

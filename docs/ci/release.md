@@ -31,8 +31,15 @@ private workflows are recovery/diagnostic tools, not normal release steps.
 
 Selecting `validation_only` runs the same fail-fast preflight and validation/check
 evidence stages without creating a tag, GitHub Release, or dispatching the private
-workflow. If a run is interrupted after tag creation but before GitHub Release
-creation, rerun **Release** from `main` with `existing_protected_tag` enabled: it
+workflow. The reusable tag workflow accepts an absent App key while this job is
+skipped; a production invocation checks the App ID and private key before minting a
+token or touching a tag. Keep `RELEASE_TAG_APP_PRIVATE_KEY` in this repository's
+Actions secrets and `RELEASE_TAG_APP_ID` in its Actions variables. Keep the pinned
+`actions/create-github-app-token` revision in the repository's selected-actions
+allowlist so the reusable workflow can use it when production release is authorized.
+
+If a run is interrupted after tag creation but before GitHub Release creation,
+rerun **Release** from `main` with `existing_protected_tag` enabled: it
 verifies that the existing tag is annotated, directly targets the captured SHA, and
 peels remotely to that SHA, then creates only the missing GitHub Release. This mode
 never creates, moves, deletes, or pushes a tag. Any conflicting, lightweight, nested, or

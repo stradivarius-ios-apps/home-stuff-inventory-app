@@ -4,7 +4,7 @@ on:
   workflow_call:
     secrets:
       RELEASE_TAG_APP_PRIVATE_KEY:
-        required: true
+        required: false
     inputs:
       trusted_release_sha:
         description: Captured SHA supplied only by the reviewed release orchestrator.
@@ -58,6 +58,17 @@ jobs:
       release_url: ${{ steps.release.outputs.release_url }}
 
     steps:
+      - name: Require production tag App credentials
+        env:
+          RELEASE_TAG_APP_ID: ${{ vars.RELEASE_TAG_APP_ID }}
+          RELEASE_TAG_APP_PRIVATE_KEY: ${{ secrets.RELEASE_TAG_APP_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$RELEASE_TAG_APP_ID" || -z "$RELEASE_TAG_APP_PRIVATE_KEY" ]]; then
+            echo "Release Tag App credentials are required for production tag creation." >&2
+            exit 1
+          fi
+
       - name: Check selected ref
         run: |
           if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then

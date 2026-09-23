@@ -178,6 +178,11 @@ class ReleasePrivateHandoffTest < Minitest::Test
     preflight_step = identity.fetch("steps").find { |step| step["id"] == "identity" }
     assert_includes preflight_step.fetch("run"), "create_github_release_preflight.rb"
     assert_includes preflight_step.fetch("run"), "--trusted-release-sha"
+    preflight_outputs = File.read(File.join(ROOT, ".github/scripts/create_github_release_preflight.rb")).scan(/write_output\("([^\"]+)"/).flatten
+    assert_equal "${{ steps.identity.outputs.source_sha }}", identity.dig("outputs", "sha")
+    assert_equal "${{ steps.identity.outputs.version }}", identity.dig("outputs", "version")
+    assert_equal "${{ steps.identity.outputs.tag_name }}", identity.dig("outputs", "tag")
+    %w[source_sha version tag_name].each { |name| assert_includes preflight_outputs, name }
     note_step = identity.fetch("steps").find { |step| step["name"] == "Validate exact-version App Store What's New" }
     refute_nil note_step
     assert_includes note_step.fetch("run"), "validate_app_store_release_notes.rb fastlane/release_notes"

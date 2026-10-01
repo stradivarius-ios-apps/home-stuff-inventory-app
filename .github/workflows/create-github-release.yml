@@ -79,7 +79,7 @@ jobs:
 
       - name: Mint scoped release-tag App token
         id: release-tag-token
-        uses: actions/create-github-app-token@064492a9a1762067169d50c792a7dc02bc3d1254 # v2.0.0
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
           app-id: ${{ vars.RELEASE_TAG_APP_ID }}
           private-key: ${{ secrets.RELEASE_TAG_APP_PRIVATE_KEY }}

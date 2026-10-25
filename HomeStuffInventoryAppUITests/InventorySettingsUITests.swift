@@ -235,14 +235,15 @@ final class InventorySettingsUITests: InventoryUITestCase {
         launchApp(); app.tabBars.buttons["Settings"].tap()
         let backupAction = app.buttons["settings.backup.action"]
         for _ in 0..<3 where !backupAction.exists { app.swipeUp() }
-        XCTAssertTrue(backupAction.waitForExistence(timeout: 3)); XCTAssertTrue(backupAction.isEnabled); XCTAssertTrue(backupAction.isHittable); XCTAssertEqual(backupAction.label, "Back Up Inventory")
+        XCTAssertTrue(backupAction.waitForExistence(timeout: 3)); XCTAssertTrue(backupAction.isEnabled); XCTAssertTrue(backupAction.isHittable); XCTAssertEqual(backupAction.label, "Back Up Inventory"); XCTAssertEqual(backupAction.value as? String, "A complete copy for restoring your inventory.")
     }
 
     func testSettingsRestoreRowIsAlwaysAvailableAndInvokesTheImporterAction() {
         launchStartupApp(arguments: ["--qa-suppress-restore-importer"]); app.tabBars.buttons["Settings"].tap()
         let restoreAction = app.buttons["settings.restore.action"]
         scrollToElement(restoreAction); XCTAssertTrue(restoreAction.isEnabled); XCTAssertTrue(restoreAction.isHittable); XCTAssertEqual(restoreAction.label, "Restore Inventory from Backup")
-        restoreAction.tap(); XCTAssertTrue(element(identifier: "settings.restore.invocationCompleted").waitForExistence(timeout: 3))
+        XCTAssertEqual(restoreAction.value as? String, "Replaces this device’s inventory with a backup.")
+        restoreAction.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5)).tap(); XCTAssertTrue(element(identifier: "settings.restore.invocationCompleted").waitForExistence(timeout: 3))
     }
 
     func testFreeGlobalHistoryRemainsReadableWithoutAnUpgradeSurface() {
@@ -272,10 +273,31 @@ final class InventorySettingsUITests: InventoryUITestCase {
 
     func testSettingsDisclosesPlaintextExportAndBackupBeforeInvokingEitherAction() {
         launchStartupApp(arguments: ["--use-sample-inventory-data", "--qa-suppress-export-share-sheet", "--qa-suppress-backup-file-exporter"]); app.tabBars.buttons["Settings"].tap()
-        let export = app.buttons["settings.export.action"]; scrollToElement(export); XCTAssertGreaterThanOrEqual(export.frame.height, 44); export.tap()
-        XCTAssertTrue(app.staticTexts["This file is not password-protected"].waitForExistence(timeout: 3)); XCTAssertTrue(staticText(labeled: "The export may include item names, locations, storage places, categories, quantities, conditions, tags, notes, and dates. Home Stuff does not encrypt or password-protect the exported JSON file. After you save or share it, its protection depends on the destination you choose.").exists); XCTAssertTrue(app.buttons["Continue to Export"].exists); add(attachment(named: "plaintext-export-disclosure-en-light")); XCTAssertFalse(element(identifier: "settings.export.invocationCompleted").exists); app.buttons["Cancel"].tap(); XCTAssertFalse(element(identifier: "settings.export.invocationCompleted").exists)
+        add(attachment(named: "ordinary-settings-en"))
+        let exportRow = app.buttons["settings.export.action"]
+        scrollToElement(exportRow)
+        XCTAssertEqual(app.buttons.matching(identifier: "settings.export.action").count, 1)
+        XCTAssertEqual(exportRow.value as? String, "For reading or sharing. Cannot restore your inventory.")
+        XCTAssertEqual(exportRow.label, "Export Inventory")
+        add(attachment(named: "data-export-en"))
+        let backupRow = app.buttons["settings.backup.action"]
+        scrollToElement(backupRow)
+        XCTAssertEqual(app.buttons.matching(identifier: "settings.backup.action").count, 1)
+        XCTAssertEqual(backupRow.value as? String, "A complete copy for restoring your inventory.")
+        XCTAssertEqual(backupRow.label, "Back Up Inventory")
+        add(attachment(named: "data-backup-en"))
+        let restoreRow = app.buttons["settings.restore.action"]
+        scrollToElement(restoreRow)
+        XCTAssertEqual(app.buttons.matching(identifier: "settings.restore.action").count, 1)
+        XCTAssertEqual(restoreRow.value as? String, "Replaces this device’s inventory with a backup.")
+        XCTAssertEqual(restoreRow.label, "Restore Inventory from Backup")
+        add(attachment(named: "data-restore-en"))
+        app.swipeDown()
+        app.swipeDown()
+        let export = app.buttons["settings.export.action"]; scrollToElement(export); XCTAssertGreaterThanOrEqual(export.frame.height, 44); export.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5)).tap()
+        XCTAssertTrue(app.staticTexts["This file is not password-protected"].waitForExistence(timeout: 3)); XCTAssertTrue(staticText(labeled: "This export cannot be used to restore your inventory. The export may include item names, locations, storage places, categories, quantities, conditions, tags, notes, and dates. Home Stuff does not encrypt or password-protect the exported JSON file. After you save or share it, its protection depends on the destination you choose.").exists); XCTAssertTrue(app.buttons["Continue to Export"].exists); add(attachment(named: "plaintext-export-disclosure-en-light")); XCTAssertFalse(element(identifier: "settings.export.invocationCompleted").exists); app.buttons["Cancel"].tap(); XCTAssertFalse(element(identifier: "settings.export.invocationCompleted").exists)
         export.tap(); app.buttons["Continue to Export"].tap(); XCTAssertTrue(element(identifier: "settings.export.invocationCompleted").waitForExistence(timeout: 5))
-        let backup = app.buttons["settings.backup.action"]; scrollToElement(backup); backup.tap(); XCTAssertTrue(staticText(labeled: "The backup contains your complete local inventory, including item details, locations, storage places, notes, tags, dates, and recent item-view history. Home Stuff does not encrypt or password-protect the backup file. After you save it, its protection depends on the destination you choose.").waitForExistence(timeout: 3)); XCTAssertTrue(app.buttons["Continue to Backup"].exists); add(attachment(named: "plaintext-backup-disclosure-en-light")); XCTAssertFalse(element(identifier: "settings.backup.invocationCompleted").exists); app.buttons["Cancel"].tap(); XCTAssertFalse(element(identifier: "settings.backup.invocationCompleted").exists)
+        let backup = app.buttons["settings.backup.action"]; scrollToElement(backup); backup.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5)).tap(); XCTAssertTrue(staticText(labeled: "The backup contains your complete local inventory, including item details, locations, storage places, notes, tags, dates, and recent item-view history. Home Stuff does not encrypt or password-protect the backup file. After you save it, its protection depends on the destination you choose.").waitForExistence(timeout: 3)); XCTAssertTrue(app.buttons["Continue to Backup"].exists); add(attachment(named: "plaintext-backup-disclosure-en-light")); XCTAssertFalse(element(identifier: "settings.backup.invocationCompleted").exists); app.buttons["Cancel"].tap(); XCTAssertFalse(element(identifier: "settings.backup.invocationCompleted").exists)
         backup.tap(); app.buttons["Continue to Backup"].tap(); XCTAssertTrue(element(identifier: "settings.backup.invocationCompleted").waitForExistence(timeout: 5))
     }
 
@@ -292,11 +314,32 @@ final class InventorySettingsUITests: InventoryUITestCase {
         )
         app.tabBars.buttons["Налаштування"].tap()
 
+        add(attachment(named: "ordinary-settings-uk"))
+        let exportRow = app.buttons["settings.export.action"]
+        scrollToElement(exportRow)
+        XCTAssertEqual(app.buttons.matching(identifier: "settings.export.action").count, 1)
+        XCTAssertEqual(exportRow.value as? String, "Для перегляду або поширення. Не підходить для відновлення інвентарю.")
+        XCTAssertEqual(exportRow.label, "Експортувати інвентар")
+        add(attachment(named: "data-export-uk"))
+        let backupRow = app.buttons["settings.backup.action"]
+        scrollToElement(backupRow)
+        XCTAssertEqual(app.buttons.matching(identifier: "settings.backup.action").count, 1)
+        XCTAssertEqual(backupRow.value as? String, "Повна копія для відновлення інвентарю.")
+        XCTAssertEqual(backupRow.label, "Створити резервну копію інвентарю")
+        add(attachment(named: "data-backup-uk"))
+        let restoreRow = app.buttons["settings.restore.action"]
+        scrollToElement(restoreRow)
+        XCTAssertEqual(app.buttons.matching(identifier: "settings.restore.action").count, 1)
+        XCTAssertEqual(restoreRow.value as? String, "Замінює інвентар на цьому пристрої даними резервної копії.")
+        XCTAssertEqual(restoreRow.label, "Відновити інвентар із резервної копії")
+        add(attachment(named: "data-restore-uk"))
+        app.swipeDown()
+        app.swipeDown()
         let export = app.buttons["settings.export.action"]
         scrollToElement(export)
         export.tap()
         XCTAssertTrue(app.staticTexts["Цей файл не захищено паролем"].waitForExistence(timeout: 3))
-        XCTAssertTrue(staticText(labeled: "Експорт може містити назви речей, локації, місця зберігання, категорії, кількість, стан, теги, нотатки та дати. Home Stuff не шифрує й не захищає паролем експортований JSON-файл. Після збереження або надсилання його захист залежить від вибраного місця призначення.").waitForExistence(timeout: 3))
+        XCTAssertTrue(staticText(labeled: "Цей експорт не можна використати для відновлення інвентарю. Експорт може містити назви речей, локації, місця зберігання, категорії, кількість, стан, теги, нотатки та дати. Home Stuff не шифрує й не захищає паролем експортований JSON-файл. Після збереження або надсилання його захист залежить від вибраного місця призначення.").waitForExistence(timeout: 3))
         XCTAssertTrue(app.buttons["Продовжити експорт"].waitForExistence(timeout: 3))
         add(attachment(named: "plaintext-export-disclosure-uk-dark-accessibility"))
         app.buttons["Скасувати"].tap()

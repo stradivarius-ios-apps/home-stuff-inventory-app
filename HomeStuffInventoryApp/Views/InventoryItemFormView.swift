@@ -12,6 +12,8 @@ struct InventoryItemFormView: View {
     @State private var isShowingSaveError = false
     @State private var isShowingDiscardConfirmation = false
     @State private var placeReviewPrompt: InventoryStorageConsistencyReview.Prompt?
+    @State private var pendingPlaceReviewPrompt: InventoryStorageConsistencyReview.Prompt?
+    @State private var isFormContentVisible = false
     @State private var hasBlurredNameField = false
     @State private var hasRequestedInitialFocus = false
     @FocusState private var focusedField: InventoryItemFormFocusedField?
@@ -167,9 +169,13 @@ struct InventoryItemFormView: View {
             .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
+                isFormContentVisible = true
+                placeReviewPrompt = pendingPlaceReviewPrompt
+                pendingPlaceReviewPrompt = nil
                 requestInitialNameFocusIfAppropriate()
             }
             .onDisappear {
+                isFormContentVisible = false
                 focusedField = nil
             }
             .onChange(of: focusedField) { previousField, currentField in
@@ -197,10 +203,15 @@ struct InventoryItemFormView: View {
             .onChange(of: draft.locationName) { _, nextLocationName in
                 draft.placeID = nil
                 draft.allowsLegacyPlaceResolution = false
-                placeReviewPrompt = workflow.reviewPlaceAfterLocationChange(
+                let prompt = workflow.reviewPlaceAfterLocationChange(
                     locationName: nextLocationName,
                     placeName: draft.containerName
                 )
+                if isFormContentVisible {
+                    placeReviewPrompt = prompt
+                } else {
+                    pendingPlaceReviewPrompt = prompt
+                }
             }
             .alert(saveErrorTitle, isPresented: $isShowingSaveError) {
                 Button("inventory.action.ok", role: .cancel) { }

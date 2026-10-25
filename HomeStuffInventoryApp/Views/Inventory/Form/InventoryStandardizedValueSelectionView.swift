@@ -12,6 +12,7 @@ struct InventoryStandardizedValueSelectionView: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var isShowingCreateSheet = false
+    @State private var hasPendingCreationSuccess = false
     @State private var searchText = ""
 
     private var displayedOptions: [InventorySelectionOption] {
@@ -76,6 +77,7 @@ struct InventoryStandardizedValueSelectionView: View {
 
             Section {
                 Button {
+                    hasPendingCreationSuccess = false
                     isShowingCreateSheet = true
                 } label: {
                     InventoryAddNewRow(createButtonTitle)
@@ -90,7 +92,11 @@ struct InventoryStandardizedValueSelectionView: View {
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $searchText)
-        .sheet(isPresented: $isShowingCreateSheet) {
+        .sheet(isPresented: $isShowingCreateSheet, onDismiss: {
+            let didCreateValue = hasPendingCreationSuccess
+            hasPendingCreationSuccess = false
+            if didCreateValue { dismiss() }
+        }) {
             InventoryStandardizedValueCreationView(
                 title: createSheetTitle,
                 prompt: createPrompt
@@ -120,7 +126,7 @@ struct InventoryStandardizedValueSelectionView: View {
 
         if case let .success(resolvedValue) = outcome {
             selection = resolvedValue
-            isShowingCreateSheet = false
+            hasPendingCreationSuccess = true
         }
 
         return outcome

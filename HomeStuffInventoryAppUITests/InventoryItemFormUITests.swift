@@ -198,9 +198,7 @@ final class InventoryItemFormUITests: InventoryUITestCase {
             XCTAssertFalse(waitForKeyboardFocus(nameField, timeout: 1))
             revealDraftField(quantity)
             XCTAssertEqual(quantity.value as? String, "2")
-            revealDraftField(tags)
             XCTAssertEqual(tags.value as? String, "usb, cable")
-            revealDraftField(notes)
             XCTAssertEqual(notes.value as? String, "Original draft note")
 
             // A later canceled creation must not reuse the previous success.

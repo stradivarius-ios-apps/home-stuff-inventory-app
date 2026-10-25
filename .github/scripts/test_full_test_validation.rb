@@ -13,6 +13,12 @@ SHARD_TESTS = %w[
   testCompactInventoryRowPreservesRetrievalOrderAndTapTarget
   testPrimaryEditAndNotesSaveKeepDestructiveAndContextControlsAsNegativeControls
   testPlaceFilterNarrowsInventoryAndCanBeCleared
+  testFilterSubmenusKeepFirstLevelCompactAndSelectionsIndependent
+  testInventoryFiltersRemainIndependentOfNativeSearchQuery
+  testFilterLocationReconcilesPlaceAndDistinguishesMissingFromAny
+  testFilterScaleSubmenusReachFortiethOption
+  testFilterSubmenusUseUkrainianLabelsAtMaximumAccessibilitySize
+  testEmptyInventoryKeepsAllFilterSubmenusAndAnyChoices
   testSearchingByItemNameLocationAndPlace
 ].freeze
 
@@ -50,7 +56,7 @@ Dir.mktmpdir("full-test-validation-success") do |directory|
   assert(status.success?, "complete shard must succeed: #{output}")
   summary = JSON.parse(File.read(File.join(results, "ui-shard-summary.json")))
   assert(summary.dig(SHARD, "status") == "success", "successful shard status was not recorded")
-  assert(summary.dig(SHARD, "test_identifiers").length == 4, "successful shard did not retain all identifiers")
+  assert(summary.dig(SHARD, "test_identifiers").length == SHARD_TESTS.length, "successful shard did not retain all identifiers")
   published_output = File.read(output_path)
   assert(published_output.include?("status=success"), "successful matrix status was not published")
   assert(published_output.include?("shard_01_status=success"), "named shard status was not published")
@@ -147,7 +153,7 @@ Dir.mktmpdir("full-test-validation-missing-identifiers") do |directory|
   output, status = Open3.capture2e({ "PATH" => "#{fake_bin}:#{ENV.fetch("PATH")}" }, *shard_command(results))
   assert(!status.success?, "missing shard identifiers must fail: #{output}")
   summary = JSON.parse(File.read(File.join(results, "ui-shard-summary.json")))
-  assert(summary.dig(SHARD, "missing_test_identifiers").length == 3, "missing identifiers were not recorded")
+  assert(summary.dig(SHARD, "missing_test_identifiers").length == SHARD_TESTS.length - 1, "missing identifiers were not recorded")
 end
 
 Dir.mktmpdir("full-test-validation-empty-result") do |directory|
@@ -177,7 +183,7 @@ Dir.mktmpdir("full-test-validation-observability") do |directory|
       "duration_seconds" => 5,
       "started_at" => "2026-07-28T12:00:00Z",
       "finished_at" => "2026-07-28T12:00:05Z",
-      "test_count" => 4,
+      "test_count" => SHARD_TESTS.length,
       "test_identifiers" => SHARD_TESTS.map { |method| "HomeStuffInventoryAppUITests.InventoryBrowseDetailUITests #{method}" },
       "test_durations" => SHARD_TESTS.map { |method| { "identifier" => "HomeStuffInventoryAppUITests.InventoryBrowseDetailUITests #{method}", "duration_seconds" => 1.25 } }
     }
@@ -192,7 +198,7 @@ Dir.mktmpdir("full-test-validation-observability") do |directory|
   output, status = Open3.capture2e(environment, "ruby", SCRIPT, "summarize", results)
   assert(status.success?, "shard summary must succeed: #{output}")
   summary = File.read(summary_path)
-  assert(summary.include?("Combined UI tests: 4 tests"), "shard summary did not report its test total")
+  assert(summary.include?("Combined UI tests: #{SHARD_TESTS.length} tests"), "shard summary did not report its test total")
   assert(summary.include?("Missing expected UI identifiers: none"), "shard summary did not scope completeness to its manifest")
 end
 

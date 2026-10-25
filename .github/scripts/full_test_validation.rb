@@ -14,6 +14,12 @@ SHARDS = {
     InventoryBrowseDetailUITests/testCompactInventoryRowPreservesRetrievalOrderAndTapTarget
     InventoryBrowseDetailUITests/testPrimaryEditAndNotesSaveKeepDestructiveAndContextControlsAsNegativeControls
     InventoryBrowseDetailUITests/testPlaceFilterNarrowsInventoryAndCanBeCleared
+    InventoryBrowseDetailUITests/testFilterSubmenusKeepFirstLevelCompactAndSelectionsIndependent
+    InventoryBrowseDetailUITests/testInventoryFiltersRemainIndependentOfNativeSearchQuery
+    InventoryBrowseDetailUITests/testFilterLocationReconcilesPlaceAndDistinguishesMissingFromAny
+    InventoryBrowseDetailUITests/testFilterScaleSubmenusReachFortiethOption
+    InventoryBrowseDetailUITests/testFilterSubmenusUseUkrainianLabelsAtMaximumAccessibilitySize
+    InventoryBrowseDetailUITests/testEmptyInventoryKeepsAllFilterSubmenusAndAnyChoices
     InventoryBrowseDetailUITests/testSearchingByItemNameLocationAndPlace
   ],
   "02" => %w[

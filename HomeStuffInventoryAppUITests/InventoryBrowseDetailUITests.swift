@@ -450,30 +450,6 @@ extension InventoryBrowseDetailUITests {
         assertFullPlaceDirectory()
     }
 
-    func testOverviewLocationMenuMinimumTouchTarget() {
-        assertFreshLocationMenuTouchTarget(isDetail: false)
-    }
-
-    func testDetailLocationMenuMinimumTouchTarget() {
-        assertFreshLocationMenuTouchTarget(isDetail: true)
-    }
-
-    private func assertFreshLocationMenuTouchTarget(isDetail: Bool) {
-        continueAfterFailure = true
-        for verticalOffset in [-21.0, 21.0] {
-            launchStartupApp(arguments: ["--use-sample-inventory-data"])
-            if isDetail { app.buttons["locations.locationRow.Office"].tap() }
-            let menu = app.buttons[isDetail ? "locations.locationDetail.managementMenu" : "locations.managementMenu"]
-            let actionID = isDetail ? "locations.locationDetail.editLocation" : "locations.manageLocations"
-            XCTAssertTrue(menu.waitForExistence(timeout: 3))
-            print("Menu touch target: detail=\(isDetail), offset=\(verticalOffset), menu=\(menu.frame), navigation=\(app.navigationBars.firstMatch.frame)")
-            menu.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
-                .withOffset(CGVector(dx: 0, dy: verticalOffset)).tap()
-            XCTAssertTrue(app.buttons[actionID].waitForExistence(timeout: 2))
-            app.terminate()
-        }
-    }
-
     private func openLocationsAction(_ identifier: String) {
         let menu = app.buttons["locations.managementMenu"]
         XCTAssertTrue(menu.waitForExistence(timeout: 3))

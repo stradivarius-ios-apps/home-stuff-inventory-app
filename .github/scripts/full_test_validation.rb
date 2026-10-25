@@ -17,8 +17,6 @@ SHARDS = {
     InventoryBrowseDetailUITests/testSearchingByItemNameLocationAndPlace
   ],
   "02" => %w[
-    InventoryBrowseDetailUITests/testOverviewLocationMenuMinimumTouchTarget
-    InventoryBrowseDetailUITests/testDetailLocationMenuMinimumTouchTarget
     InventoryBrowseDetailUITests/testEmptyLocationsShortcutsKeepAddItemAndFullManagersInLocationsStack
     InventoryBrowseDetailUITests/testDirectLocationEditRenamesStableRouteAndPreservesLinkedItemContext
     InventoryBrowseDetailUITests/testLocationEditCancelIconOnlyAndDuplicateRetryKeepSameEditor

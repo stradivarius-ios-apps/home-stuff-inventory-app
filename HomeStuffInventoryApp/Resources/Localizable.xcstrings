@@ -1,6 +1,18 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "inventory.field.tags" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Tags" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Теги" } }
+      }
+    },
+    "inventory.form.tagsFormatHelper" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Separate tags with commas. Maximum %d characters per tag." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Розділяйте теги комами. Максимум %d символів у кожному тегу." } }
+      }
+    },
     "locations.management.menu.accessibilityLabel" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Location actions" } },

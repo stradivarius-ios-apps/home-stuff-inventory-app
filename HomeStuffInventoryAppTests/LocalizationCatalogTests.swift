@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+@testable import HomeStuffInventoryApp
 
 struct LocalizationCatalogTests {
     @Test func catalogContainsEveryCodeReferencedLocalizationKey() throws {
@@ -61,6 +62,20 @@ struct LocalizationCatalogTests {
         #expect(listSource.contains("editActionLabel: localized(\"inventory.action.rename\""))
         #expect(placeSource.contains("onEdit: presentHierarchyEditor"))
         #expect(hierarchySource.contains("Label(\"inventory.action.edit\""))
+    }
+
+    @Test func tagsLabelAndFormatHelperResolveInBothLanguages() {
+        for (language, label, format, expected) in [
+            ("en", "Tags", "Separate tags with commas. Maximum %d characters per tag.",
+             "Separate tags with commas. Maximum 16 characters per tag."),
+            ("uk", "Теги", "Розділяйте теги комами. Максимум %d символів у кожному тегу.",
+             "Розділяйте теги комами. Максимум 16 символів у кожному тегу.")
+        ] {
+            #expect(localizationTestValue("inventory.field.tags", language: language) == label)
+            let helper = localizationTestValue("inventory.form.tagsFormatHelper", language: language)
+            #expect(helper == format)
+            #expect(String(format: helper, InventoryItemDraft.maximumTagLength) == expected)
+        }
     }
 
     @Test func ukrainianCoreStringsResolveFromCatalog() {

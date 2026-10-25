@@ -2378,6 +2378,12 @@
         "uk" : { "stringUnit" : { "state" : "translated", "value" : "Інвентар відновлено" } }
       }
     },
+    "settings.restore.subtitle" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Replaces this device’s inventory with a backup." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Замінює інвентар на цьому пристрої даними резервної копії." } }
+      }
+    },
     "settings.restore.title" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Restore from Backup" } },
@@ -2436,6 +2442,12 @@
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Not Enough Storage" } },
         "uk" : { "stringUnit" : { "state" : "translated", "value" : "Недостатньо місця" } }
+      }
+    },
+    "settings.backup.subtitle" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "A complete copy for restoring your inventory." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Повна копія для відновлення інвентарю." } }
       }
     },
     "settings.backup.title" : {
@@ -2510,6 +2522,12 @@
         "uk" : { "stringUnit" : { "state" : "translated", "value" : "Файл експорту не збережено" } }
       }
     },
+    "settings.export.subtitle" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "For reading or sharing. Cannot restore your inventory." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Для перегляду або поширення. Не підходить для відновлення інвентарю." } }
+      }
+    },
     "settings.export.title" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Export Inventory" } },
@@ -2542,8 +2560,8 @@
     },
     "settings.fileDisclosure.export.message" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "The export may include item names, locations, storage places, categories, quantities, conditions, tags, notes, and dates. Home Stuff does not encrypt or password-protect the exported JSON file. After you save or share it, its protection depends on the destination you choose." } },
-        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Експорт може містити назви речей, локації, місця зберігання, категорії, кількість, стан, теги, нотатки та дати. Home Stuff не шифрує й не захищає паролем експортований JSON-файл. Після збереження або надсилання його захист залежить від вибраного місця призначення." } }
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This export cannot be used to restore your inventory. The export may include item names, locations, storage places, categories, quantities, conditions, tags, notes, and dates. Home Stuff does not encrypt or password-protect the exported JSON file. After you save or share it, its protection depends on the destination you choose." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Цей експорт не можна використати для відновлення інвентарю. Експорт може містити назви речей, локації, місця зберігання, категорії, кількість, стан, теги, нотатки та дати. Home Stuff не шифрує й не захищає паролем експортований JSON-файл. Після збереження або надсилання його захист залежить від вибраного місця призначення." } }
       }
     },
     "settings.fileDisclosure.title" : {

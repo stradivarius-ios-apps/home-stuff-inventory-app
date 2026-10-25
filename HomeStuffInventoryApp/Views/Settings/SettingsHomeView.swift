@@ -138,13 +138,15 @@ struct SettingsHomeView: View {
                     InventorySettingsNavigationRow(
                         "settings.export.title",
                         systemImage: "square.and.arrow.up",
-                        iconRole: .storage
+                        iconRole: .storage,
+                        subtitle: "settings.export.subtitle"
                     )
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .disabled(!workflow.canRequestDataTransfer)
                 .accessibilityLabel("settings.export.accessibilityLabel")
+                .accessibilityValue("settings.export.subtitle")
                 .accessibilityHint("settings.export.accessibilityHint")
                 .accessibilityIdentifier("settings.export.action")
 
@@ -154,7 +156,8 @@ struct SettingsHomeView: View {
                     HStack(spacing: 12) {
                         InventorySettingsNavigationRow(
                             "settings.backup.title",
-                            systemImage: "externaldrive.badge.plus"
+                            systemImage: "externaldrive.badge.plus",
+                            subtitle: "settings.backup.subtitle"
                         )
 
                         if workflow.isPreparingBackup {
@@ -167,6 +170,7 @@ struct SettingsHomeView: View {
                 .buttonStyle(.plain)
                 .disabled(!workflow.canRequestDataTransfer)
                 .accessibilityLabel("settings.backup.accessibilityLabel")
+                .accessibilityValue("settings.backup.subtitle")
                 .accessibilityHint("settings.backup.accessibilityHint")
                 .accessibilityIdentifier("settings.backup.action")
 
@@ -182,7 +186,8 @@ struct SettingsHomeView: View {
                     HStack(spacing: 12) {
                         InventorySettingsNavigationRow(
                             "settings.restore.title",
-                            systemImage: "arrow.down.doc"
+                            systemImage: "arrow.down.doc",
+                            subtitle: "settings.restore.subtitle"
                         )
 
                         if workflow.isPlanningRestore {
@@ -195,6 +200,7 @@ struct SettingsHomeView: View {
                 .buttonStyle(.plain)
                 .disabled(!workflow.canRequestDataTransfer)
                 .accessibilityLabel("settings.restore.accessibilityLabel")
+                .accessibilityValue("settings.restore.subtitle")
                 .accessibilityHint("settings.restore.accessibilityHint")
                 .accessibilityIdentifier("settings.restore.action")
             } header: {

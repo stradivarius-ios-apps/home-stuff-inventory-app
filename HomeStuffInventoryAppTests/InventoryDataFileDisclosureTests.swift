@@ -23,6 +23,8 @@ struct InventoryDataFileDisclosureTests {
         let ukrainianExport = try #require(catalog["settings.fileDisclosure.export.message"]?.localizedValue(for: "uk"))
         let ukrainianBackup = try #require(catalog["settings.fileDisclosure.backup.message"]?.localizedValue(for: "uk"))
 
+        #expect(englishExport.hasPrefix("This export cannot be used to restore your inventory. "))
+        #expect(ukrainianExport.hasPrefix("Цей експорт не можна використати для відновлення інвентарю. "))
         #expect(englishExport.contains("does not encrypt or password-protect"))
         #expect(englishExport.contains("destination you choose"))
         #expect(englishBackup.contains("recent item-view history"))

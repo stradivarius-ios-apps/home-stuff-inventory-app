@@ -17,6 +17,13 @@ SHARDS = {
     InventoryBrowseDetailUITests/testSearchingByItemNameLocationAndPlace
   ],
   "02" => %w[
+    InventoryBrowseDetailUITests/testOverviewLocationMenuMinimumTouchTarget
+    InventoryBrowseDetailUITests/testDetailLocationMenuMinimumTouchTarget
+    InventoryBrowseDetailUITests/testEmptyLocationsShortcutsKeepAddItemAndFullManagersInLocationsStack
+    InventoryBrowseDetailUITests/testDirectLocationEditRenamesStableRouteAndPreservesLinkedItemContext
+    InventoryBrowseDetailUITests/testLocationEditCancelIconOnlyAndDuplicateRetryKeepSameEditor
+    InventoryBrowseDetailUITests/testMissingLocationHasNoManagementMenuAndKeepsAddItemAvailable
+    InventoryBrowseDetailUITests/testLocationManagementShortcutsReuseGlobalDirectoryAndReturnToTheirSource
     InventoryBrowseDetailUITests/testInventorySearchAndEmptyStateSurfaces
     InventoryBrowseDetailUITests/testLocationAndPlaceDetailContextualAddAndHeroQA
     InventoryBrowseDetailUITests/testNestedPlaceRetainsExtendedContextWithoutLaunchFlags

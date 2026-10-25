@@ -317,3 +317,202 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
     }
     func testEmptyNotesCardOpensNotesEditor() { launchApp(); let itemName = "Empty Notes \(uniqueTestSuffix())"; app.buttons["inventory.addItemButton"].tap(); let nameField = app.textFields["inventory.itemForm.nameField"]; XCTAssertTrue(nameField.waitForExistence(timeout: 3)); nameField.tap(); nameField.typeText(itemName); app.buttons["inventory.itemForm.saveButton"].tap(); resetToInventoryList(); openSearch(); let searchField = app.searchFields.firstMatch; XCTAssertTrue(searchField.waitForExistence(timeout: 3)); searchField.tap(); searchField.typeText(itemName); openItem(named: itemName); let detail = element(identifier: "inventory.itemDetail"); XCTAssertTrue(detail.waitForExistence(timeout: 3)); let notesCard = app.buttons["inventory.detail.notesCard"]; scrollToElement(notesCard); XCTAssertEqual(notesCard.label, "Notes: No notes"); XCTAssertTrue(notesCard.isHittable); notesCard.tap(); let notesEditor = app.textViews["inventory.notesEditor.editor"]; XCTAssertTrue(notesEditor.waitForExistence(timeout: 3)); XCTAssertTrue(waitForKeyboardFocus(notesEditor, timeout: 3)); XCTAssertFalse(element(identifier: "inventory.itemForm").exists); let savedNotes = "Saved empty Notes \(uniqueTestSuffix())"; notesEditor.tap(); notesEditor.typeText(savedNotes); app.buttons["inventory.notesEditor.saveButton"].tap(); XCTAssertFalse(notesEditor.waitForExistence(timeout: 3)); XCTAssertTrue(detail.exists); XCTAssertTrue(notesCard.waitForExistence(timeout: 3)); XCTAssertTrue(notesCard.isHittable); XCTAssertTrue(notesCard.label.contains(savedNotes)) }
 }
+
+extension InventoryBrowseDetailUITests {
+    func testEmptyLocationsShortcutsKeepAddItemAndFullManagersInLocationsStack() {
+        launchStartupApp(arguments: ["--qa-empty-inventory-store"])
+        XCTAssertTrue(app.buttons["locations.empty.addItemButton"].waitForExistence(timeout: 3))
+        app.buttons["locations.empty.addItemButton"].tap()
+        XCTAssertTrue(app.textFields["inventory.itemForm.nameField"].waitForExistence(timeout: 3))
+        app.buttons["inventory.itemForm.cancelButton"].tap()
+        app.buttons["locations.addItemButton"].tap()
+        XCTAssertTrue(app.textFields["inventory.itemForm.nameField"].waitForExistence(timeout: 3))
+        app.buttons["inventory.itemForm.cancelButton"].tap()
+
+        openLocationsAction("locations.managePlaces")
+        XCTAssertTrue(app.buttons["settings.places.addLocationButton"].waitForExistence(timeout: 3))
+        tapBackButton()
+        openLocationsAction("locations.manageLocations")
+        addManagedLocation("Office")
+        tapBackButton()
+        XCTAssertTrue(app.buttons["locations.locationRow.Office"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.tabBars.buttons["Locations"].isSelected)
+        XCTAssertEqual(app.buttons.matching(identifier: "locations.locationRow.Office").count, 1)
+    }
+
+    func testDirectLocationEditRenamesStableRouteAndPreservesLinkedItemContext() {
+        launchStartupApp(arguments: ["--use-sample-inventory-data"])
+        let renamed = "Study \(uniqueTestSuffix())"
+        app.buttons["locations.locationRow.Office"].tap()
+        openDirectLocationEditor()
+        XCTAssertEqual(app.textFields["inventory.lists.valueField"].value as? String, "Office")
+        replaceManagedLocationName(renamed)
+        app.buttons["inventory.lists.locationIconPicker"].tap()
+        app.buttons["locationIcons.option.kitchen"].tap()
+        app.buttons["inventory.lists.saveButton"].tap()
+        XCTAssertTrue(element(identifier: "locations.locationDetail").waitForExistence(timeout: 3))
+        XCTAssertTrue(element(identifier: "locations.detailHero").label.contains(renamed))
+        XCTAssertFalse(app.textFields["inventory.lists.valueField"].exists)
+        openDirectLocationEditor()
+        XCTAssertTrue(app.buttons["inventory.lists.locationIconPicker"].label.contains("Kitchen"))
+        app.buttons["inventory.lists.cancelButton"].tap()
+
+        app.buttons["locations.placeRow.Desk drawer"].tap()
+        XCTAssertEqual(app.staticTexts["locations.placeDetail.path"].label, "Storage path: \(renamed), Desk drawer")
+        app.buttons["locations.placeDetail.itemRow.USB-C to HDMI adapter"].tap()
+        XCTAssertTrue(element(identifier: "inventory.itemDetail.hero").waitForExistence(timeout: 3))
+        tapBackButton()
+        tapBackButton()
+        XCTAssertTrue(element(identifier: "locations.detailHero").label.contains(renamed))
+        app.buttons["locations.locationDetail.addItemButton"].tap()
+        XCTAssertTrue(app.buttons["inventory.itemForm.locationPicker"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.buttons["inventory.itemForm.locationPicker"].label.contains(renamed))
+        app.buttons["inventory.itemForm.cancelButton"].tap()
+        tapBackButton()
+        XCTAssertEqual(app.buttons.matching(identifier: "locations.locationRow.\(renamed)").count, 1)
+        XCTAssertFalse(app.buttons["locations.locationRow.Office"].exists)
+    }
+
+    func testLocationEditCancelIconOnlyAndDuplicateRetryKeepSameEditor() {
+        launchStartupApp(arguments: ["--qa-empty-inventory-store"])
+        openLocationsAction("locations.manageLocations")
+        addManagedLocation("Kitchen")
+        addManagedLocation("Office")
+        tapBackButton()
+        app.buttons["locations.locationRow.Office"].tap()
+        openDirectLocationEditor()
+        replaceManagedLocationName("Discarded")
+        app.buttons["inventory.lists.locationIconPicker"].tap()
+        app.buttons["locationIcons.option.kitchen"].tap()
+        app.buttons["inventory.lists.cancelButton"].tap()
+        XCTAssertTrue(element(identifier: "locations.detailHero").label.contains("Office"))
+        openDirectLocationEditor()
+        XCTAssertEqual(app.textFields["inventory.lists.valueField"].value as? String, "Office")
+        XCTAssertTrue(app.buttons["inventory.lists.locationIconPicker"].label.contains("Default"))
+        app.buttons["inventory.lists.locationIconPicker"].tap()
+        app.buttons["locationIcons.option.kitchen"].tap()
+        app.buttons["inventory.lists.saveButton"].tap()
+        openDirectLocationEditor()
+        XCTAssertEqual(app.textFields["inventory.lists.valueField"].value as? String, "Office")
+        XCTAssertTrue(app.buttons["inventory.lists.locationIconPicker"].label.contains("Kitchen"))
+        replaceManagedLocationName("   ")
+        XCTAssertFalse(app.buttons["inventory.lists.saveButton"].isEnabled)
+        replaceManagedLocationName("Kitchen")
+        app.buttons["inventory.lists.saveButton"].tap()
+        XCTAssertTrue(app.alerts["Name Already Exists"].waitForExistence(timeout: 3))
+        app.alerts.buttons["OK"].tap()
+        XCTAssertEqual(app.textFields["inventory.lists.valueField"].value as? String, "Kitchen")
+        XCTAssertTrue(app.buttons["inventory.lists.locationIconPicker"].label.contains("Kitchen"))
+        replaceManagedLocationName("Study")
+        app.buttons["inventory.lists.saveButton"].tap()
+        XCTAssertTrue(element(identifier: "locations.detailHero").label.contains("Study"))
+        tapBackButton()
+        XCTAssertTrue(app.buttons["locations.locationRow.Kitchen"].exists)
+        XCTAssertEqual(app.buttons.matching(identifier: "locations.locationRow.Study").count, 1)
+        XCTAssertFalse(app.buttons["locations.locationRow.Office"].exists)
+    }
+
+    func testMissingLocationHasNoManagementMenuAndKeepsAddItemAvailable() {
+        launchStartupApp(arguments: ["--qa-empty-inventory-store"])
+        app.buttons["locations.addItemButton"].tap()
+        let name = app.textFields["inventory.itemForm.nameField"]
+        XCTAssertTrue(name.waitForExistence(timeout: 3))
+        name.tap()
+        name.typeText("Unsorted cable")
+        app.buttons["inventory.itemForm.saveButton"].tap()
+        let missing = app.buttons["locations.locationRow.No location"]
+        XCTAssertTrue(missing.waitForExistence(timeout: 3))
+        missing.tap()
+        XCTAssertTrue(element(identifier: "locations.locationDetail").waitForExistence(timeout: 3))
+        XCTAssertFalse(app.buttons["locations.locationDetail.managementMenu"].exists)
+        app.buttons["locations.locationDetail.addItemButton"].tap()
+        XCTAssertTrue(app.textFields["inventory.itemForm.nameField"].waitForExistence(timeout: 3))
+        app.buttons["inventory.itemForm.cancelButton"].tap()
+        tapBackButton()
+        openLocationsAction("locations.manageLocations")
+        XCTAssertTrue(app.staticTexts["No reusable locations yet."].waitForExistence(timeout: 3))
+    }
+
+    func testLocationManagementShortcutsReuseGlobalDirectoryAndReturnToTheirSource() {
+        launchStartupApp(arguments: ["--use-sample-inventory-data", "--qa-place-management-fixture"])
+        openLocationsAction("locations.managePlaces")
+        assertFullPlaceDirectory()
+        tapBackButton()
+        app.buttons["locations.locationRow.Office"].tap()
+        app.buttons["locations.locationDetail.managementMenu"].tap()
+        app.buttons["locations.locationDetail.managePlaces"].tap()
+        assertFullPlaceDirectory()
+        tapBackButton()
+        XCTAssertTrue(element(identifier: "locations.detailHero").label.contains("Office"))
+        XCTAssertTrue(app.tabBars.buttons["Locations"].isSelected)
+        app.tabBars.buttons["Settings"].tap()
+        tapVisibleButton(identifier: "settings.lists.placesLink")
+        assertFullPlaceDirectory()
+    }
+
+    func testOverviewLocationMenuMinimumTouchTarget() {
+        assertFreshLocationMenuTouchTarget(isDetail: false)
+    }
+
+    func testDetailLocationMenuMinimumTouchTarget() {
+        assertFreshLocationMenuTouchTarget(isDetail: true)
+    }
+
+    private func assertFreshLocationMenuTouchTarget(isDetail: Bool) {
+        continueAfterFailure = true
+        for verticalOffset in [-21.0, 21.0] {
+            launchStartupApp(arguments: ["--use-sample-inventory-data"])
+            if isDetail { app.buttons["locations.locationRow.Office"].tap() }
+            let menu = app.buttons[isDetail ? "locations.locationDetail.managementMenu" : "locations.managementMenu"]
+            let actionID = isDetail ? "locations.locationDetail.editLocation" : "locations.manageLocations"
+            XCTAssertTrue(menu.waitForExistence(timeout: 3))
+            print("Menu touch target: detail=\(isDetail), offset=\(verticalOffset), menu=\(menu.frame), navigation=\(app.navigationBars.firstMatch.frame)")
+            menu.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+                .withOffset(CGVector(dx: 0, dy: verticalOffset)).tap()
+            XCTAssertTrue(app.buttons[actionID].waitForExistence(timeout: 2))
+            app.terminate()
+        }
+    }
+
+    private func openLocationsAction(_ identifier: String) {
+        let menu = app.buttons["locations.managementMenu"]
+        XCTAssertTrue(menu.waitForExistence(timeout: 3))
+        XCTAssertEqual(menu.label, "Location actions")
+        menu.tap()
+        app.buttons[identifier].tap()
+    }
+
+    private func openDirectLocationEditor() {
+        let menu = app.buttons["locations.locationDetail.managementMenu"]
+        XCTAssertTrue(menu.waitForExistence(timeout: 3))
+        menu.tap()
+        app.buttons["locations.locationDetail.editLocation"].tap()
+        XCTAssertTrue(app.textFields["inventory.lists.valueField"].waitForExistence(timeout: 3))
+        XCTAssertFalse(app.buttons["inventory.lists.addLocationButton"].isHittable)
+    }
+
+    private func addManagedLocation(_ name: String) {
+        tapVisibleButton(identifier: "inventory.lists.addLocationButton")
+        let field = app.textFields["inventory.lists.valueField"]
+        XCTAssertTrue(field.waitForExistence(timeout: 3))
+        field.tap()
+        field.typeText(name)
+        app.buttons["inventory.lists.saveButton"].tap()
+        XCTAssertTrue(app.staticTexts[name].waitForExistence(timeout: 3))
+    }
+
+    private func replaceManagedLocationName(_ name: String) {
+        let field = app.textFields["inventory.lists.valueField"]
+        field.tap()
+        let value = field.value as? String ?? ""
+        field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: value.count) + name)
+    }
+
+    private func assertFullPlaceDirectory() {
+        XCTAssertTrue(app.buttons["settings.places.addButton"].waitForExistence(timeout: 3))
+        XCTAssertGreaterThanOrEqual(app.descendants(matching: .any).matching(
+            NSPredicate(format: "identifier BEGINSWITH %@", "settings.places.locationHeader.")
+        ).count, 2)
+        XCTAssertTrue(app.staticTexts["Shared box"].firstMatch.exists)
+    }
+}

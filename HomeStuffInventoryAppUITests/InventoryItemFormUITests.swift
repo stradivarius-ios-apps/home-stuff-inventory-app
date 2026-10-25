@@ -352,9 +352,10 @@ final class InventoryItemFormUITests: InventoryUITestCase {
     }
 
     private func openStandardizedCreation(kind: String) {
-        scrollVisibleForm(up: false)
-        scrollVisibleForm(up: false)
-        revealDraftField(app.buttons["inventory.itemForm.\(kind)Picker"])
+        let picker = app.buttons["inventory.itemForm.\(kind)Picker"]
+        if !picker.isHittable { scrollVisibleForm(up: false) }
+        if !picker.isHittable { scrollVisibleForm(up: false) }
+        revealDraftField(picker)
         tapVisibleButton(identifier: "inventory.itemForm.\(kind)Picker")
         let create = app.buttons["inventory.selection.createButton"]
         scrollToElement(create, in: element(identifier: "inventory.selection"))

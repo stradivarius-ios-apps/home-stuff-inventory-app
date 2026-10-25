@@ -50,6 +50,74 @@ struct InventorySampleDataTests {
         #expect(items.contains { $0.name == "CR2032 batteries" && $0.quantity == 4 })
     }
 
+    @Test func filterMenuScaleFixtureRequiresSampleModeAndItsExplicitArgument() {
+        let sample = SampleDataConfiguration.launchArgument
+        let scale = InventoryFilterMenuScaleFixture.launchArgument
+        #expect(!InventoryFilterMenuScaleFixture.isEnabled(arguments: []))
+        #expect(!InventoryFilterMenuScaleFixture.isEnabled(arguments: [sample]))
+        #expect(!InventoryFilterMenuScaleFixture.isEnabled(arguments: [scale]))
+        #expect(InventoryFilterMenuScaleFixture.isEnabled(arguments: [sample, scale]))
+    }
+
+    @Test func filterMenuScaleFixtureSeedsDeterministicLinkedGraphAndMissingControls() throws {
+        let container = try InventoryModelContainer.make(inMemory: true)
+        let context = ModelContext(container)
+        try InventoryFilterMenuScaleFixture.seed(in: context)
+        let locations = try context.fetch(FetchDescriptor<StorageLocation>())
+        let places = try context.fetch(FetchDescriptor<InventoryPlace>())
+        let categories = try context.fetch(FetchDescriptor<InventoryCustomCategory>())
+        let items = try context.fetch(FetchDescriptor<InventoryItem>())
+        let regularItems = items.filter { $0.name.hasPrefix("Filter Item ") }
+        let suffixes = (1...40).map { String(format: "%02d", $0) }
+
+        #expect(locations.count == 40 && places.count == 40 && categories.count == 40)
+        #expect(items.count == 42 && regularItems.count == 40)
+        #expect(Set(locations.map(\.name)) == Set(suffixes.map { "Filter Location \($0)" }))
+        #expect(Set(places.map(\.name)) == Set(suffixes.map { "Filter Place \($0)" }))
+        #expect(Set(categories.map(\.name)) == Set(suffixes.map { "Filter Category \($0)" }))
+        #expect(Set(regularItems.map(\.name)) == Set(suffixes.map { "Filter Item \($0)" }))
+        #expect(places.allSatisfy { $0.parentPlaceID == nil })
+        #expect(regularItems.allSatisfy { item in
+            let suffix = String(item.name.suffix(2))
+            guard let location = locations.first(where: { $0.name == "Filter Location \(suffix)" }),
+                  let place = places.first(where: { $0.id == item.placeID }) else { return false }
+            return item.locationName == location.name && place.locationID == location.id
+                && place.name == "Filter Place \(suffix)" && item.containerName == place.name
+                && item.category == "Filter Category \(suffix)" && item.quantity == 1
+        })
+
+        let missingPlace = try #require(items.first { $0.name == "Filter Missing Place Item" })
+        let missingLocation = try #require(items.first { $0.name == "Filter Missing Location Item" })
+        #expect(missingPlace.locationName == "Filter Location 01")
+        #expect(missingLocation.locationName.isEmpty)
+        #expect([missingPlace, missingLocation].allSatisfy {
+            $0.containerName == nil && $0.placeID == nil && $0.category == "Filter Category 01"
+        })
+        #expect(InventorySearch.matchingItems(
+            in: items, query: "", filters: .init(locationName: "Filter Location 01", place: .missing)
+        ).map(\.id) == [missingPlace.id])
+        #expect(Set(InventorySearch.matchingItems(
+            in: items, query: "", filters: .init(locationName: "Filter Location 01")
+        ).map(\.id)) == Set([missingPlace.id] + regularItems.filter { $0.locationName == "Filter Location 01" }.map(\.id)))
+        #expect(InventorySearch.matchingItems(
+            in: items, query: "", filters: .init(locationName: InventoryBrowseVocabulary.default.missingLocationName)
+        ).map(\.id) == [missingLocation.id])
+
+        func identities(in context: ModelContext) throws -> [String: UUID] {
+            let locations = try context.fetch(FetchDescriptor<StorageLocation>()).map { ("location:" + $0.name, $0.id) }
+            let places = try context.fetch(FetchDescriptor<InventoryPlace>()).map { ("place:" + $0.name, $0.id) }
+            let categories = try context.fetch(FetchDescriptor<InventoryCustomCategory>()).map { ("category:" + $0.name, $0.id) }
+            let items = try context.fetch(FetchDescriptor<InventoryItem>()).map { ("item:" + $0.name, $0.id) }
+            return Dictionary(uniqueKeysWithValues: locations + places + categories + items)
+        }
+        let firstIDs = try identities(in: context)
+        #expect(firstIDs.count == 162 && Set(firstIDs.values).count == 162)
+        let secondContainer = try InventoryModelContainer.make(inMemory: true)
+        let secondContext = ModelContext(secondContainer)
+        try InventoryFilterMenuScaleFixture.seed(in: secondContext)
+        #expect(try identities(in: secondContext) == firstIDs)
+    }
+
     @Test func recentItemsLayoutFixtureRequiresItsExplicitLaunchArgument() {
         #expect(!InventoryRecentItemsLayoutFixture.isEnabled(arguments: []))
         #expect(InventoryRecentItemsLayoutFixture.isEnabled(arguments: [

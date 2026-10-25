@@ -43,7 +43,9 @@ SHARDS = {
     InventoryBrowseDetailUITests/testExistingNotesEditorLifecycleSupportsDismissDiscardAndSave
   ],
   "04" => %w[
-    InventoryBrowseDetailUITests/testEmptyNotesCardOpensNotesEditor
+    InventoryBrowseDetailUITests/testEmptyNotesContentOpensNotesEditor
+    InventoryBrowseDetailUITests/testEmptyNotesEditingStartsOnlyFromContentText
+    InventoryBrowseDetailUITests/testShortNotesEditingStartsOnlyFromContentText
     InventoryBrowseDetailUITests/testScopedRoomSweepUsesSharedUpgradeWithoutBlockingOrdinaryAddItem
     InventoryBrowseDetailUITests/testProductionPlaceDetailOmitsCommercialActionsAndKeepsAddItemAvailable
     InventoryItemFormUITests/testNewItemFormInitiallyFocusesNameWhileEditFormDoesNotForceFocus

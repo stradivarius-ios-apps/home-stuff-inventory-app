@@ -78,6 +78,16 @@ struct LocalizationCatalogTests {
         }
     }
 
+    @Test func notesEmptyPromptKeepsDisplayCopySeparateFromNoNotesFallback() {
+        for (language, prompt, fallback) in [
+            ("en", "Tap to add a note", "No notes"),
+            ("uk", "Торкніться, щоб додати нотатку", "Без нотаток")
+        ] {
+            #expect(localizationTestValue("inventory.notes.emptyPrompt", language: language) == prompt)
+            #expect(localizationTestValue("inventory.fallback.noNotes", language: language) == fallback)
+        }
+    }
+
     @Test func ukrainianCoreStringsResolveFromCatalog() {
         #expect(localized("inventory.title") == "Інвентар")
         #expect(localized("inventory.action.addItem") == "Додати річ")
@@ -89,6 +99,7 @@ struct LocalizationCatalogTests {
         #expect(localized("inventory.fallback.noLocation") == "Без локації")
         #expect(localized("inventory.fallback.noContainer") == "Без місця зберігання")
         #expect(localized("inventory.fallback.noNotes") == "Без нотаток")
+        #expect(localized("inventory.notes.emptyPrompt") == "Торкніться, щоб додати нотатку")
         #expect(localized("inventory.field.location") == "Локація")
         #expect(localized("inventory.field.container") == "Місце зберігання")
         #expect(localized("inventory.field.itemIcon") == "Іконка речі")

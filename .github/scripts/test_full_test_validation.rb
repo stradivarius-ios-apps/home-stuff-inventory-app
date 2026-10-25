@@ -62,6 +62,35 @@ Dir.mktmpdir("full-test-validation-success") do |directory|
   assert(published_output.include?("shard_01_status=success"), "named shard status was not published")
 end
 
+# Keep Notes selectors aligned with their explicit UI shard.
+Dir.mktmpdir("full-test-validation-notes") do |directory|
+  methods = %w[
+    testEmptyNotesContentOpensNotesEditor
+    testEmptyNotesEditingStartsOnlyFromContentText
+    testShortNotesEditingStartsOnlyFromContentText
+    testScopedRoomSweepUsesSharedUpgradeWithoutBlockingOrdinaryAddItem
+    testProductionPlaceDetailOmitsCommercialActionsAndKeepsAddItemAvailable
+    testNewItemFormInitiallyFocusesNameWhileEditFormDoesNotForceFocus
+    testPreScopedNewItemFormInitiallyFocusesName
+    testReturningFromItemFormPickersDoesNotRestoreNameFocus
+  ]
+  fake_bin = File.join(directory, "bin")
+  FileUtils.mkdir_p(fake_bin)
+  lines = methods.map do |method|
+    suite = method.start_with?("testNewItemForm", "testPreScoped", "testReturningFrom") ? "InventoryItemFormUITests" : "InventoryBrowseDetailUITests"
+    "Test Case '-[HomeStuffInventoryAppUITests.#{suite} #{method}]' passed (1.0 seconds)."
+  end
+  File.write(File.join(fake_bin, "xcodebuild"), "#!/bin/sh\n" + lines.map { |line| "echo #{line.dump}" }.join("\n") + "\n")
+  File.write(File.join(fake_bin, "xcrun"), "#!/bin/sh\nexit 1\n")
+  FileUtils.chmod("u+x", Dir[File.join(fake_bin, "*")])
+  results = File.join(directory, "results")
+  output, status = Open3.capture2e({ "PATH" => "#{fake_bin}:#{ENV.fetch("PATH")}" },
+    "ruby", SCRIPT, "run-ui-shard", "04", "shared.xctestrun", "platform=iOS Simulator,id=shard-04", results)
+  assert(status.success?, "complete Notes shard must succeed: #{output}")
+  summary = JSON.parse(File.read(File.join(results, "ui-shard-summary.json")))
+  assert(summary.dig("04", "test_identifiers").length == methods.length, "Notes shard did not retain every selector")
+end
+
 # Keep the item-form shard fixture aligned with its explicit UI selectors.
 Dir.mktmpdir("full-test-validation-item-form") do |directory|
   methods = %w[

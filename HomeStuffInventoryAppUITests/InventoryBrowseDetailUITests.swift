@@ -542,7 +542,7 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
                 nameField.typeText(itemName)
                 app.buttons["inventory.itemForm.saveButton"].tap()
                 resetToInventoryList()
-                openSearch()
+                app.tabBars.buttons[locale == "uk" ? "Шукати в інвентарі" : "Search inventory"].tap()
                 let search = app.searchFields.firstMatch
                 XCTAssertTrue(search.waitForExistence(timeout: 3))
                 search.tap()

@@ -127,15 +127,26 @@ struct InventoryItemFormView: View {
                 .inventoryFormRowSurface()
 
                 Section {
-                    TextField("inventory.field.tags.placeholder", text: $draft.tagsText)
-                        .textInputAutocapitalization(.never)
-                        .inventoryFocusableFormRow(focusedField: $focusedField, equals: .tags)
-                        .accessibilityIdentifier("inventory.itemForm.tagsField")
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("inventory.field.tags")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
 
-                    if !draft.isTagsValid {
-                        Text(tagValidationText)
-                            .inventoryValidationMessage()
-                            .accessibilityIdentifier("inventory.itemForm.tagsValidation")
+                        Text(tagsFormatHelper)
+                            .inventoryHelperText()
+
+                        TextField("inventory.field.tags.placeholder", text: $draft.tagsText)
+                            .textInputAutocapitalization(.never)
+                            .inventoryFocusableFormRow(focusedField: $focusedField, equals: .tags)
+                            .accessibilityLabel("inventory.field.tags")
+                            .accessibilityHint(tagsFormatHelper)
+                            .accessibilityIdentifier("inventory.itemForm.tagsField")
+
+                        if !draft.isTagsValid {
+                            Text(tagValidationText)
+                                .inventoryValidationMessage()
+                                .accessibilityIdentifier("inventory.itemForm.tagsValidation")
+                        }
                     }
 
                     VStack(alignment: .leading, spacing: 8) {
@@ -302,6 +313,14 @@ struct InventoryItemFormView: View {
 
     private var isDirty: Bool {
         workflow.isDirty(draft)
+    }
+
+    private var tagsFormatHelper: String {
+        InventoryLocalization.formatted(
+            "inventory.form.tagsFormatHelper",
+            defaultValue: "Separate tags with commas. Maximum %d characters per tag.",
+            InventoryItemDraft.maximumTagLength
+        )
     }
 
     private var tagValidationText: String {

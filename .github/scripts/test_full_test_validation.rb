@@ -65,6 +65,8 @@ end
 # Keep the item-form shard fixture aligned with its explicit UI selectors.
 Dir.mktmpdir("full-test-validation-item-form") do |directory|
   methods = %w[
+    testTagsGuidanceRemainsVisibleAcrossLengthValidationAndCorrection
+    testEditingTagsKeepsStoredValueAfterCancel
     testItemFormDiscardProtectionForNewContextualAndEditFlows
     testEditingLocationReviewsExistingPlaceBeforeSaving
     testPlacePickerCanClearASelectedPlace

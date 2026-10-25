@@ -2,6 +2,73 @@ import XCTest
 
 @MainActor
 final class InventoryItemFormUITests: InventoryUITestCase {
+    func testTagsGuidanceRemainsVisibleAcrossLengthValidationAndCorrection() {
+        launchApp()
+        app.buttons["inventory.addItemButton"].tap()
+        let name = app.textFields["inventory.itemForm.nameField"]
+        XCTAssertTrue(name.waitForExistence(timeout: 3))
+        name.typeText("USB-C cable")
+        let tags = app.textFields["inventory.itemForm.tagsField"]
+        let validation = app.staticTexts["inventory.itemForm.tagsValidation"]
+        let save = app.buttons["inventory.itemForm.saveButton"]
+        revealDraftField(tags)
+        assertTagsGuidance()
+        XCTAssertEqual(tags.placeholderValue, "Adapters, tools, spare")
+        XCTAssertFalse(validation.exists)
+        XCTAssertTrue(save.isEnabled)
+
+        tags.tap()
+        XCTAssertTrue(waitForKeyboardFocus(tags, timeout: 3))
+        tags.typeText("1234567890123456")
+        assertTagsGuidance()
+        XCTAssertFalse(validation.exists)
+        XCTAssertTrue(save.isEnabled)
+        tags.typeText("7")
+        XCTAssertTrue(validation.waitForExistence(timeout: 3))
+        revealDraftField(validation)
+        XCTAssertTrue(validation.label.contains("12345678901234567"))
+        XCTAssertFalse(save.isEnabled)
+        assertTagsGuidance()
+
+        tags.typeText(XCUIKeyboardKey.delete.rawValue)
+        XCTAssertTrue(validation.waitForNonExistence(timeout: 3))
+        XCTAssertTrue(save.isEnabled)
+        XCTAssertTrue(waitForKeyboardFocus(tags, timeout: 3))
+        XCTAssertEqual(tags.value as? String, "1234567890123456")
+        assertTagsGuidance()
+    }
+
+    func testEditingTagsKeepsStoredValueAfterCancel() {
+        launchApp()
+        openItem(named: "Precision screwdriver set")
+        app.buttons["inventory.editItemButton"].tap()
+        let tags = app.textFields["inventory.itemForm.tagsField"]
+        revealDraftField(tags)
+        assertTagsGuidance()
+        let storedTags = tags.value as? String
+        XCTAssertFalse(storedTags?.isEmpty ?? true)
+        tags.tap()
+        tags.typeText(", temporary")
+        app.buttons["inventory.itemForm.cancelButton"].tap()
+        tapAlertButton(identifier: "inventory.itemForm.discardButton")
+        XCTAssertTrue(element(identifier: "inventory.itemDetail").waitForExistence(timeout: 3))
+        app.buttons["inventory.editItemButton"].tap()
+        revealDraftField(tags)
+        XCTAssertEqual(tags.value as? String, storedTags)
+        assertTagsGuidance()
+        app.buttons["inventory.itemForm.cancelButton"].tap()
+        XCTAssertTrue(element(identifier: "inventory.itemDetail").waitForExistence(timeout: 3))
+        XCTAssertFalse(app.buttons["inventory.itemForm.discardButton"].exists)
+    }
+
+    private func assertTagsGuidance(file: StaticString = #filePath, line: UInt = #line) {
+        let tags = app.textFields["inventory.itemForm.tagsField"]
+        XCTAssertEqual(app.textFields.matching(identifier: "inventory.itemForm.tagsField").count, 1, file: file, line: line)
+        XCTAssertEqual(tags.label, "Tags", file: file, line: line)
+        XCTAssertTrue(staticText(labeled: "Tags").exists, file: file, line: line)
+        XCTAssertTrue(staticText(labeled: "Separate tags with commas. Maximum 16 characters per tag.").exists, file: file, line: line)
+    }
+
     func testNewItemFormInitiallyFocusesNameWhileEditFormDoesNotForceFocus() {
         launchApp()
         app.buttons["inventory.addItemButton"].tap()
@@ -384,8 +451,34 @@ final class InventoryItemFormUITests: InventoryUITestCase {
     }
 
     func testAddItemFormTextFieldsFocusFromExpandedRows() {
-        launchApp(); app.buttons["inventory.addItemButton"].tap(); assertFieldAcceptsTextAfterRowTaps(app.textFields["inventory.itemForm.nameField"], textParts: ["NameTop", "NameMid", "NameLow"]); tapVisibleButton(identifier: "inventory.itemForm.locationPicker"); app.buttons["inventory.selection.option.Office"].tap(); createPlace(named: "Focus place \(uniqueTestSuffix())"); XCTAssertTrue(app.buttons["inventory.itemForm.containerPicker"].waitForExistence(timeout: 3)); app.swipeUp(); assertFieldAcceptsTextAfterRowTaps(app.textFields["inventory.itemForm.tagsField"], textParts: ["TagTop", "TagMid", "TagLow"]); app.buttons["inventory.itemForm.cancelButton"].tap()
-        app.buttons["inventory.addItemButton"].tap(); app.swipeDown(); app.buttons["inventory.itemForm.locationPicker"].tap(); app.buttons["inventory.selection.createButton"].tap(); assertFieldAcceptsTextAfterRowTaps(app.textFields["inventory.selection.newValueField"], textParts: ["LocationTop", "LocationMid", "LocationLow"]); app.buttons["inventory.selection.cancelCreateButton"].tap(); tapBackButton(); app.buttons["inventory.itemForm.categoryPicker"].tap(); app.buttons["inventory.selection.createButton"].tap(); assertFieldAcceptsTextAfterRowTaps(app.textFields["inventory.selection.newValueField"], textParts: ["CategoryTop", "CategoryMid", "CategoryLow"]); app.buttons["inventory.selection.cancelCreateButton"].tap(); tapBackButton(); app.buttons["inventory.itemForm.cancelButton"].tap()
+        launchApp()
+        app.buttons["inventory.addItemButton"].tap()
+        assertFieldAcceptsTextAfterRowTaps(app.textFields["inventory.itemForm.nameField"], textParts: ["NameTop", "NameMid", "NameLow"])
+        tapVisibleButton(identifier: "inventory.itemForm.locationPicker")
+        app.buttons["inventory.selection.option.Office"].tap()
+        createPlace(named: "Focus place \(uniqueTestSuffix())")
+        XCTAssertTrue(app.buttons["inventory.itemForm.containerPicker"].waitForExistence(timeout: 3))
+        let tags = app.textFields["inventory.itemForm.tagsField"]
+        let returnKey = app.keyboards.buttons["Return"]
+        if returnKey.exists { returnKey.tap() }
+        XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 3))
+        revealDraftField(tags)
+        assertFieldAcceptsTextAfterRowTaps(tags, textParts: ["TagTop", "TagMid", "TagLow"])
+        app.buttons["inventory.itemForm.cancelButton"].tap()
+        tapAlertButton(identifier: "inventory.itemForm.discardButton")
+
+        app.buttons["inventory.addItemButton"].tap()
+        tapVisibleButton(identifier: "inventory.itemForm.locationPicker")
+        app.buttons["inventory.selection.createButton"].tap()
+        assertFieldAcceptsTextAfterRowTaps(app.textFields["inventory.selection.newValueField"], textParts: ["LocationTop", "LocationMid", "LocationLow"])
+        app.buttons["inventory.selection.cancelCreateButton"].tap()
+        tapBackButton()
+        app.buttons["inventory.itemForm.categoryPicker"].tap()
+        app.buttons["inventory.selection.createButton"].tap()
+        assertFieldAcceptsTextAfterRowTaps(app.textFields["inventory.selection.newValueField"], textParts: ["CategoryTop", "CategoryMid", "CategoryLow"])
+        app.buttons["inventory.selection.cancelCreateButton"].tap()
+        tapBackButton()
+        app.buttons["inventory.itemForm.cancelButton"].tap()
     }
 
     func testNameValidationAppearsOnlyAfterNameFieldLosesFocus() {

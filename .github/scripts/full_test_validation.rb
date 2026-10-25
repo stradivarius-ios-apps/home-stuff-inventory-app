@@ -58,6 +58,8 @@ SHARDS = {
     InventoryItemFormUITests/testAddCategoryCreationSurfaceRendersAtAccessibilitySize
   ],
   "06" => %w[
+    InventoryItemFormUITests/testTagsGuidanceRemainsVisibleAcrossLengthValidationAndCorrection
+    InventoryItemFormUITests/testEditingTagsKeepsStoredValueAfterCancel
     InventoryItemFormUITests/testItemFormDiscardProtectionForNewContextualAndEditFlows
     InventoryItemFormUITests/testEditingLocationReviewsExistingPlaceBeforeSaving
     InventoryItemFormUITests/testPlacePickerCanClearASelectedPlace

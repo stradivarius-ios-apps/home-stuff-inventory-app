@@ -33,6 +33,52 @@ enum InventorySampleDataSeeder {
     }
 }
 
+enum InventoryFilterMenuScaleFixture {
+    static let launchArgument = "--qa-filter-menu-scale-fixture"
+
+    static func isEnabled(arguments: [String]) -> Bool {
+        arguments.contains(SampleDataConfiguration.launchArgument) && arguments.contains(launchArgument)
+    }
+
+    static func seed(in context: ModelContext) throws {
+        let timestamp = Date(timeIntervalSince1970: 1_700_000_000)
+        func id(_ group: Int, _ index: Int) -> UUID {
+            UUID(uuidString: String(format: "F17E0000-0000-4000-8000-%04d%08d", group, index))!
+        }
+        for index in 1...40 {
+            let suffix = String(format: "%02d", index)
+            let location = StorageLocation(
+                id: id(1, index), name: "Filter Location \(suffix)",
+                createdAt: timestamp, updatedAt: timestamp
+            )
+            let place = InventoryPlace(
+                id: id(2, index), locationID: location.id, name: "Filter Place \(suffix)",
+                createdAt: timestamp
+            )
+            let category = "Filter Category \(suffix)"
+            context.insert(location)
+            context.insert(place)
+            context.insert(InventoryCustomCategory(
+                id: id(3, index), name: category, createdAt: timestamp, updatedAt: timestamp
+            ))
+            context.insert(InventoryItem(
+                id: id(4, index), name: "Filter Item \(suffix)", category: category,
+                locationName: location.name, containerName: place.name, placeID: place.id,
+                quantity: 1, createdAt: timestamp
+            ))
+        }
+        context.insert(InventoryItem(
+            id: id(4, 41), name: "Filter Missing Place Item", category: "Filter Category 01",
+            locationName: "Filter Location 01", createdAt: timestamp
+        ))
+        context.insert(InventoryItem(
+            id: id(4, 42), name: "Filter Missing Location Item", category: "Filter Category 01",
+            locationName: "", createdAt: timestamp
+        ))
+        try context.save()
+    }
+}
+
 enum InventoryRecentItemsLayoutFixture {
     static let launchArgument = "--qa-recent-items-layout-fixture"
     static let itemCountLaunchArgument = "--qa-recent-items-layout-fixture-count"

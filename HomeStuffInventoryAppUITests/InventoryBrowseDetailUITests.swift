@@ -49,6 +49,7 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
         let filterMenu = app.buttons["inventory.filter.menu"]
         XCTAssertTrue(filterMenu.waitForExistence(timeout: 3))
         filterMenu.tap()
+        app.buttons["inventory.filter.placeMenu"].tap()
         let deskDrawer = app.buttons["Desk drawer"]
         XCTAssertTrue(waitForHittableElement(deskDrawer, in: nil))
         deskDrawer.tap()
@@ -59,6 +60,213 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
         XCTAssertEqual(clearButton.label, "Clear Filters")
         clearButton.tap()
         XCTAssertTrue(waitForVisibleRow(named: "Cable ties"))
+    }
+
+    func testFilterSubmenusKeepFirstLevelCompactAndSelectionsIndependent() {
+        launchFilterScaleApp()
+        openFilterMenu()
+        let category = filterSubmenu("category", title: "Category")
+        let location = filterSubmenu("location", title: "Location")
+        let place = filterSubmenu("place", title: "Storage Place")
+        XCTAssertEqual(category.label, "Category")
+        XCTAssertEqual(location.label, "Location")
+        XCTAssertEqual(place.label, "Storage Place")
+        XCTAssertLessThan(category.frame.midY, location.frame.midY)
+        XCTAssertLessThan(location.frame.midY, place.frame.midY)
+        XCTAssertFalse(app.buttons["Filter Category 01"].exists)
+        XCTAssertFalse(app.buttons["Filter Location 01"].exists)
+        XCTAssertFalse(app.buttons["Filter Place 01"].exists)
+        XCTAssertFalse(app.buttons["inventory.filter.clearFiltersButton"].exists)
+        category.tap()
+        assertFilterChoiceSelected("Any Category")
+        chooseFilterOption("Filter Category 01")
+        selectFilter("location", title: "Location", option: "Filter Location 01")
+        selectFilter("place", title: "Storage Place", option: "Filter Place 01")
+        XCTAssertTrue(waitForVisibleRow(named: "Filter Item 01"))
+        XCTAssertFalse(row(named: "Filter Missing Place Item").exists)
+        XCTAssertTrue(app.staticTexts["1 item"].exists)
+        for badge in ["Category: Filter Category 01", "Location: Filter Location 01", "Storage Place: Filter Place 01"] {
+            XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label == %@", badge)).firstMatch.exists)
+        }
+        openFilterMenu()
+        for (dimension, title) in [("category", "Category"), ("location", "Location"), ("place", "Storage Place")] {
+            XCTAssertEqual(filterSubmenu(dimension, title: title).label, title)
+        }
+        filterSubmenu("place", title: "Storage Place").tap()
+        assertFilterChoiceSelected("Filter Place 01")
+        chooseFilterOption("Any Storage Place")
+        XCTAssertTrue(waitForVisibleRow(named: "Filter Missing Place Item"))
+        XCTAssertTrue(app.staticTexts["2 items"].exists)
+        openFilterSubmenu("place", title: "Storage Place")
+        assertFilterChoiceSelected("Any Storage Place")
+        chooseFilterOption("Any Storage Place")
+        openFilterSubmenu("location", title: "Location")
+        assertFilterChoiceSelected("Filter Location 01")
+        chooseFilterOption("Any Location")
+        XCTAssertTrue(waitForVisibleRow(named: "Filter Missing Location Item"))
+        openFilterSubmenu("location", title: "Location")
+        assertFilterChoiceSelected("Any Location")
+        chooseFilterOption("Any Location")
+        openFilterSubmenu("category", title: "Category")
+        assertFilterChoiceSelected("Filter Category 01")
+        chooseFilterOption("Any Category")
+        openFilterSubmenu("category", title: "Category")
+        assertFilterChoiceSelected("Any Category")
+        chooseFilterOption("Any Category")
+        XCTAssertFalse(app.buttons["inventory.filterContext.clearButton"].exists)
+    }
+
+    func testInventoryFiltersRemainIndependentOfNativeSearchQuery() {
+        launchFilterScaleApp()
+        selectFilter("location", title: "Location", option: "Filter Location 02")
+        openSearch()
+        let query = app.searchFields.firstMatch
+        query.tap(); query.typeText("Filter\n")
+        XCTAssertTrue(waitForVisibleRow(named: "Filter Item 01"))
+        XCTAssertTrue(waitForVisibleRow(named: "Filter Item 02"))
+        let clear = app.buttons["inventory.filterContext.clearButton"]
+        XCTAssertEqual(clear.label, "Clear Search")
+        clear.tap()
+        XCTAssertNotEqual(query.value as? String, "Filter")
+        XCTAssertFalse(clear.exists)
+        let closeSearch = app.buttons.matching(NSPredicate(format: "label IN %@", ["Close", "Закрити"])).firstMatch
+        if closeSearch.exists { closeSearch.tap() }
+        resetToInventoryList()
+        XCTAssertTrue(waitForVisibleRow(named: "Filter Item 02"))
+        XCTAssertFalse(row(named: "Filter Item 01").exists)
+        openFilterSubmenu("location", title: "Location")
+        assertFilterChoiceSelected("Filter Location 02")
+        chooseFilterOption("Any Location")
+    }
+
+    func testFilterLocationReconcilesPlaceAndDistinguishesMissingFromAny() {
+        launchFilterScaleApp()
+        selectFilter("category", title: "Category", option: "Filter Category 01")
+        selectFilter("place", title: "Storage Place", option: "Filter Place 01")
+        selectFilter("location", title: "Location", option: "Filter Location 01")
+        openFilterSubmenu("place", title: "Storage Place")
+        assertFilterChoiceSelected("Filter Place 01")
+        chooseFilterOption("Filter Place 01")
+        selectFilter("location", title: "Location", option: "Filter Location 02")
+        XCTAssertTrue(app.staticTexts["No Matching Items"].waitForExistence(timeout: 3))
+        openFilterSubmenu("place", title: "Storage Place")
+        assertFilterChoiceSelected("Any Storage Place")
+        chooseFilterOption("Any Storage Place")
+        openFilterSubmenu("category", title: "Category")
+        assertFilterChoiceSelected("Filter Category 01")
+        chooseFilterOption("Any Category")
+        XCTAssertTrue(waitForVisibleRow(named: "Filter Item 02"))
+        selectFilter("location", title: "Location", option: "Filter Location 01")
+        selectFilter("place", title: "Storage Place", option: "No Storage Place")
+        XCTAssertTrue(waitForVisibleRow(named: "Filter Missing Place Item"))
+        XCTAssertFalse(row(named: "Filter Item 01").exists)
+        selectFilter("place", title: "Storage Place", option: "Any Storage Place")
+        XCTAssertTrue(waitForVisibleRow(named: "Filter Item 01"))
+        XCTAssertTrue(waitForVisibleRow(named: "Filter Missing Place Item"))
+        selectFilter("location", title: "Location", option: "No location")
+        XCTAssertTrue(waitForVisibleRow(named: "Filter Missing Location Item"))
+        XCTAssertFalse(row(named: "Filter Missing Place Item").exists)
+        selectFilter("category", title: "Category", option: "Filter Category 02")
+        XCTAssertTrue(app.staticTexts["No Matching Items"].waitForExistence(timeout: 3))
+        let emptyReset = app.buttons.matching(NSPredicate(format: "label == %@ AND identifier != %@", "Clear Filters", "inventory.filterContext.clearButton")).firstMatch
+        XCTAssertTrue(emptyReset.waitForExistence(timeout: 3)); emptyReset.tap()
+        XCTAssertFalse(app.buttons["inventory.filterContext.clearButton"].exists)
+    }
+
+    func testFilterScaleSubmenusReachFortiethOption() {
+        launchFilterScaleApp()
+        for (dimension, title, option) in [
+            ("category", "Category", "Filter Category 40"),
+            ("location", "Location", "Filter Location 40"),
+            ("place", "Storage Place", "Filter Place 40")
+        ] {
+            openFilterSubmenu(dimension, title: title)
+            XCTAssertFalse(app.buttons[dimension == "category" ? "Filter Location 40" : "Filter Category 40"].exists)
+            chooseFilterOption(option)
+            XCTAssertTrue(waitForVisibleRow(named: "Filter Item 40"))
+            openFilterSubmenu(dimension, title: title)
+            assertFilterChoiceSelected(option)
+            chooseFilterOption(option)
+            openFilterMenu()
+            app.buttons["inventory.filter.clearFiltersButton"].tap()
+        }
+    }
+
+    func testFilterSubmenusUseUkrainianLabelsAtMaximumAccessibilitySize() {
+        launchStartupApp(arguments: ["--use-sample-inventory-data", "--qa-filter-menu-scale-fixture", "--qa-force-dark-appearance", "--qa-increase-contrast", "--qa-reduce-transparency"], contentSizeCategory: "UICTContentSizeCategoryAccessibilityXXXL", locale: "uk")
+        resetToInventoryList()
+        for (dimension, title, any) in [
+            ("category", "Категорія", "Будь-яка категорія"),
+            ("location", "Локація", "Будь-яка локація"),
+            ("place", "Місце зберігання", "Будь-яке місце зберігання")
+        ] {
+            openFilterSubmenu(dimension, title: title)
+            assertFilterChoiceSelected(any)
+            chooseFilterOption(any)
+        }
+    }
+
+    func testEmptyInventoryKeepsAllFilterSubmenusAndAnyChoices() {
+        launchStartupApp(arguments: ["--qa-empty-inventory-store", "--qa-filter-menu-scale-fixture"], locale: "uk")
+        resetToInventoryList()
+        for (dimension, title, any) in [
+            ("category", "Категорія", "Будь-яка категорія"),
+            ("location", "Локація", "Будь-яка локація"),
+            ("place", "Місце зберігання", "Будь-яке місце зберігання")
+        ] {
+            openFilterSubmenu(dimension, title: title)
+            assertFilterChoiceSelected(any)
+            chooseFilterOption(any)
+        }
+        XCTAssertTrue(app.buttons["inventory.empty.addItemButton"].exists)
+        XCTAssertFalse(app.buttons["inventory.filterContext.clearButton"].exists)
+    }
+
+    private func launchFilterScaleApp() {
+        launchStartupApp(arguments: ["--use-sample-inventory-data", "--qa-filter-menu-scale-fixture"])
+        resetToInventoryList()
+    }
+
+    private func openFilterMenu() {
+        let menu = app.buttons["inventory.filter.menu"]
+        XCTAssertTrue(menu.waitForExistence(timeout: 3)); menu.tap()
+    }
+
+    private func filterSubmenu(_ dimension: String, title: String) -> XCUIElement {
+        let identified = app.buttons["inventory.filter.\(dimension)Menu"]
+        if identified.waitForExistence(timeout: 1) { return identified }
+        // Native menu presentation can omit the SwiftUI identifier on older runtimes.
+        let labeled = app.buttons[title]
+        XCTAssertTrue(labeled.waitForExistence(timeout: 3))
+        return labeled
+    }
+
+    private func openFilterSubmenu(_ dimension: String, title: String) {
+        openFilterMenu()
+        filterSubmenu(dimension, title: title).tap()
+    }
+
+    private func selectFilter(_ dimension: String, title: String, option: String) {
+        openFilterSubmenu(dimension, title: title)
+        chooseFilterOption(option)
+    }
+
+    private func filterOption(_ title: String) -> XCUIElement {
+        let option = app.buttons[title]
+        for _ in 0..<18 {
+            if option.exists && option.isHittable { return option }
+            let menu = app.collectionViews.firstMatch
+            if menu.exists { menu.swipeUp() } else { app.swipeUp() }
+        }
+        XCTFail("Native filter option is unreachable: \(title)")
+        return option
+    }
+
+    private func chooseFilterOption(_ title: String) { filterOption(title).tap() }
+
+    private func assertFilterChoiceSelected(_ title: String) {
+        let option = filterOption(title)
+        XCTAssertTrue(option.isSelected || option.value as? String == "1", "Expected native selected state for \(title): \(option.debugDescription)")
     }
 
     func testSearchingByItemNameLocationAndPlace() { launchApp(); assertSearch(query: "router", shows: "Old router", hides: "Bike pump"); assertSearch(query: "Living room", shows: "Ethernet cable 5m", hides: "Precision screwdriver set"); assertSearch(query: "Desk drawer", shows: "USB-C to HDMI adapter", hides: "Bike pump") }

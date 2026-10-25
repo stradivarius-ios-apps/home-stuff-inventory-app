@@ -189,35 +189,49 @@ struct InventoryListView: View {
             } else {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
-                        Picker("inventory.field.category", selection: $selectedCategory) {
-                            Text("inventory.filter.anyCategory").tag(String?.none)
+                        Menu("inventory.field.category") {
+                            Picker("inventory.field.category", selection: $selectedCategory) {
+                                Text("inventory.filter.anyCategory").tag(String?.none)
 
-                            ForEach(availableCategories, id: \.self) { category in
-                                Text(category).tag(Optional(category))
-                            }
-                        }
-
-                        Picker("inventory.field.location", selection: $selectedLocationName) {
-                            Text("inventory.filter.anyLocation").tag(String?.none)
-
-                            ForEach(availableLocations, id: \.self) { locationName in
-                                Text(locationName).tag(Optional(locationName))
-                            }
-                        }
-
-                        Picker("inventory.field.container", selection: $selectedPlace) {
-                            Text("inventory.filter.anyPlace").tag(InventorySearch.PlaceFilter?.none)
-
-                            ForEach(availablePlaces, id: \.self) { place in
-                                switch place {
-                                case let .named(name):
-                                    Text(name).tag(Optional(place))
-                                case .missing:
-                                    Text(InventoryLocalization.noContainer).tag(Optional(place))
+                                ForEach(availableCategories, id: \.self) { category in
+                                    Text(category).tag(Optional(category))
                                 }
                             }
+                            .pickerStyle(.inline)
+                            .accessibilityIdentifier("inventory.filter.categoryPicker")
                         }
-                        .accessibilityIdentifier("inventory.filter.placePicker")
+                        .accessibilityIdentifier("inventory.filter.categoryMenu")
+
+                        Menu("inventory.field.location") {
+                            Picker("inventory.field.location", selection: $selectedLocationName) {
+                                Text("inventory.filter.anyLocation").tag(String?.none)
+
+                                ForEach(availableLocations, id: \.self) { locationName in
+                                    Text(locationName).tag(Optional(locationName))
+                                }
+                            }
+                            .pickerStyle(.inline)
+                            .accessibilityIdentifier("inventory.filter.locationPicker")
+                        }
+                        .accessibilityIdentifier("inventory.filter.locationMenu")
+
+                        Menu("inventory.field.container") {
+                            Picker("inventory.field.container", selection: $selectedPlace) {
+                                Text("inventory.filter.anyPlace").tag(InventorySearch.PlaceFilter?.none)
+
+                                ForEach(availablePlaces, id: \.self) { place in
+                                    switch place {
+                                    case let .named(name):
+                                        Text(name).tag(Optional(place))
+                                    case .missing:
+                                        Text(InventoryLocalization.noContainer).tag(Optional(place))
+                                    }
+                                }
+                            }
+                            .pickerStyle(.inline)
+                            .accessibilityIdentifier("inventory.filter.placePicker")
+                        }
+                        .accessibilityIdentifier("inventory.filter.placeMenu")
 
                         if hasActiveFilters {
                             Divider()
@@ -227,6 +241,7 @@ struct InventoryListView: View {
                             } label: {
                                 Label("inventory.action.clearFilters", systemImage: "xmark.circle")
                             }
+                            .accessibilityIdentifier("inventory.filter.clearFiltersButton")
                         }
                     } label: {
                         Label("inventory.filter.menu", systemImage: filterMenuSystemImage)

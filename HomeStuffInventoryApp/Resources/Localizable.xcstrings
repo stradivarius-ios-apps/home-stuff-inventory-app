@@ -1,6 +1,24 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "locations.management.menu.accessibilityLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Location actions" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Дії з локаціями" } }
+      }
+    },
+    "locations.management.unavailable.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This location is no longer available. Close the editor and return to Locations." } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Ця локація більше недоступна. Закрийте редактор і поверніться до локацій." } }
+      }
+    },
+    "locations.management.unavailable.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Location Unavailable" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Локація недоступна" } }
+      }
+    },
     "inventory.action.add" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Add" } },

@@ -420,12 +420,37 @@ final class InventoryItemFormUITests: InventoryUITestCase {
 
     private func openStandardizedCreation(kind: String) {
         let picker = app.buttons["inventory.itemForm.\(kind)Picker"]
-        if !picker.isHittable { scrollVisibleForm(up: false) }
-        if !picker.isHittable { scrollVisibleForm(up: false) }
-        revealDraftField(picker)
-        tapVisibleButton(identifier: "inventory.itemForm.\(kind)Picker")
+        let form = element(identifier: "inventory.itemForm")
+        let navigationBar = app.navigationBars.containing(.button, identifier: "inventory.itemForm.cancelButton").firstMatch
+        XCTAssertTrue(form.waitForExistence(timeout: 3))
+        XCTAssertTrue(navigationBar.waitForExistence(timeout: 3))
+        func visibleContentBounds() -> CGRect {
+            let frame = form.frame
+            let keyboard = app.keyboards.firstMatch
+            let top = max(frame.minY, navigationBar.frame.maxY)
+            let bottom = keyboard.exists ? min(frame.maxY, keyboard.frame.minY) : frame.maxY
+            return CGRect(x: frame.minX, y: top, width: frame.width, height: max(0, bottom - top))
+        }
+        for _ in 0..<8 {
+            if !picker.exists {
+                // These picker rows precede the lower draft fields in the lazy Form.
+                scrollVisibleForm(up: false)
+                continue
+            }
+            let bounds = visibleContentBounds()
+            if bounds.contains(picker.frame) { break }
+            scrollVisibleForm(up: picker.frame.maxY > bounds.maxY)
+        }
+        XCTAssertTrue(picker.exists)
+        let bounds = visibleContentBounds()
+        print("Picker pre-tap: id=\(picker.identifier), picker=\(picker.frame), visibleContent=\(bounds), navigationBar=\(navigationBar.frame)")
+        XCTAssertTrue(bounds.contains(picker.frame), "Picker must be fully within visible form content before tapping")
+        XCTAssertTrue(picker.isHittable)
+        picker.tap()
+        let selector = element(identifier: "inventory.selection")
+        XCTAssertTrue(selector.waitForExistence(timeout: 3))
         let create = app.buttons["inventory.selection.createButton"]
-        scrollToElement(create, in: element(identifier: "inventory.selection"))
+        scrollToElement(create, in: selector)
         create.tap()
         XCTAssertTrue(app.textFields["inventory.selection.newValueField"].waitForExistence(timeout: 3))
     }

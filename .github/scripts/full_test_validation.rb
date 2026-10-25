@@ -44,8 +44,8 @@ SHARDS = {
   ],
   "04" => %w[
     InventoryBrowseDetailUITests/testEmptyNotesContentOpensNotesEditor
-    InventoryBrowseDetailUITests/testEmptyNotesEditingStartsOnlyFromContentText
-    InventoryBrowseDetailUITests/testShortNotesEditingStartsOnlyFromContentText
+    InventoryBrowseDetailUITests/testEmptyNotesUsesNativeTextActionWithoutCardAction
+    InventoryBrowseDetailUITests/testShortNotesUsesNativeTextActionWithoutCardAction
     InventoryBrowseDetailUITests/testScopedRoomSweepUsesSharedUpgradeWithoutBlockingOrdinaryAddItem
     InventoryBrowseDetailUITests/testProductionPlaceDetailOmitsCommercialActionsAndKeepsAddItemAvailable
     InventoryItemFormUITests/testNewItemFormInitiallyFocusesNameWhileEditFormDoesNotForceFocus

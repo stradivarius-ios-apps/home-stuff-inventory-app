@@ -517,15 +517,15 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
         XCTAssertGreaterThanOrEqual(place.frame.minX, app.frame.minX)
         XCTAssertLessThanOrEqual(place.frame.maxX, app.frame.maxX)
     }
-    func testEmptyNotesEditingStartsOnlyFromContentText() {
-        checkNotesContentHitArea(filled: false)
+    func testEmptyNotesUsesNativeTextActionWithoutCardAction() {
+        checkNotesNativeTextAction(filled: false)
     }
 
-    func testShortNotesEditingStartsOnlyFromContentText() {
-        checkNotesContentHitArea(filled: true)
+    func testShortNotesUsesNativeTextActionWithoutCardAction() {
+        checkNotesNativeTextAction(filled: true)
     }
 
-    private func checkNotesContentHitArea(filled: Bool) {
+    private func checkNotesNativeTextAction(filled: Bool) {
         for locale in ["en", "uk"] {
             for size: String? in [nil, "UICTContentSizeCategoryAccessibilityXXXL"] {
                 launchStartupApp(
@@ -581,7 +581,7 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
                 capture.lifetime = .keepAlways
                 add(capture)
                 for zone in 0..<(filled ? 8 : 7) {
-                    assertInertNotesZone(zone, expectedLabel: label)
+                    checkNotesZone(zone, expectedLabel: label, expectedNotes: text, configuration: "\(locale)-\(size == nil ? "default" : "accessibility")-\(filled ? "short" : "empty")")
                 }
                 content.tap()
                 XCTAssertTrue(editor.waitForExistence(timeout: 3))
@@ -604,6 +604,7 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
                 XCTAssertEqual(editor.value as? String, (text + " Saved").trimmingCharacters(in: .whitespacesAndNewlines))
                 app.buttons["inventory.notesEditor.cancelButton"].tap()
                 XCTAssertFalse(editor.waitForExistence(timeout: 3))
+                print("NOTES_NATIVE_CONFIGURATION_COMPLETE \(locale)-\(size == nil ? "default" : "accessibility")-\(filled ? "short" : "empty")")
             }
         }
     }
@@ -632,7 +633,7 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
         XCTAssertTrue(notesVisibleViewport.insetBy(dx: 1, dy: 8).contains(card.frame), "Whole Notes card must be visible: \(card.frame), viewport: \(notesVisibleViewport)")
     }
 
-    private func assertInertNotesZone(_ zone: Int, expectedLabel: String) {
+    private func checkNotesZone(_ zone: Int, expectedLabel: String, expectedNotes: String, configuration: String) {
         let card = element(identifier: "inventory.detail.notesCard").frame
         let header = element(identifier: "inventory.detail.notesHeader").frame
         let content = app.buttons["inventory.detail.notesContent"]
@@ -645,6 +646,7 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
         XCTAssertTrue(card.contains(header))
         XCTAssertTrue(card.contains(text))
         XCTAssertGreaterThan(text.minY, header.maxY)
+        XCTAssertLessThan(text.width, card.width)
         let point: CGPoint
         switch zone {
         case 0: point = CGPoint(x: header.midX, y: header.midY)
@@ -663,7 +665,25 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
         XCTAssertTrue(notesVisibleViewport.contains(point), "Zone \(zone) must be visible")
         XCTAssertFalse(text.contains(point), "Zone \(zone) must be outside the text: \(point), text: \(text)")
         app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: point.x - app.frame.minX, dy: point.y - app.frame.minY)).tap()
-        XCTAssertFalse(app.textViews["inventory.notesEditor.editor"].waitForExistence(timeout: 1), "Zone \(zone) must stay inert; card: \(card), header: \(header), text: \(text), point: \(point), viewport: \(notesVisibleViewport)")
+        let editor = app.textViews["inventory.notesEditor.editor"]
+        let opened = editor.waitForExistence(timeout: 1)
+        let record = "\(configuration), zone: \(zone), opened: \(opened), card: \(card), header: \(header), text: \(text), point: \(point), viewport: \(notesVisibleViewport)"
+        let observation = XCTAttachment(string: record)
+        observation.name = "notes-native-outcome-\(configuration)-zone-\(zone)"
+        observation.lifetime = .keepAlways
+        add(observation)
+        print("NOTES_NATIVE_OUTCOME \(record)")
+        if [0, 5, 6].contains(zone) {
+            XCTAssertFalse(opened, "Zone must stay inert: \(record)")
+        } else if opened {
+            XCTAssertEqual(app.textViews.matching(identifier: "inventory.notesEditor.editor").count, 1)
+            XCTAssertEqual(editor.value as? String, expectedNotes)
+            XCTAssertFalse(element(identifier: "inventory.itemForm").exists)
+            let cancel = app.buttons["inventory.notesEditor.cancelButton"]
+            XCTAssertTrue(cancel.isHittable)
+            cancel.tap()
+            XCTAssertFalse(editor.waitForExistence(timeout: 3))
+        }
         XCTAssertFalse(element(identifier: "inventory.itemForm").exists)
         XCTAssertTrue(element(identifier: "inventory.itemDetail").exists)
         XCTAssertTrue(content.isHittable)

@@ -66,8 +66,8 @@ end
 Dir.mktmpdir("full-test-validation-notes") do |directory|
   methods = %w[
     testEmptyNotesContentOpensNotesEditor
-    testEmptyNotesEditingStartsOnlyFromContentText
-    testShortNotesEditingStartsOnlyFromContentText
+    testEmptyNotesUsesNativeTextActionWithoutCardAction
+    testShortNotesUsesNativeTextActionWithoutCardAction
     testScopedRoomSweepUsesSharedUpgradeWithoutBlockingOrdinaryAddItem
     testProductionPlaceDetailOmitsCommercialActionsAndKeepsAddItemAvailable
     testNewItemFormInitiallyFocusesNameWhileEditFormDoesNotForceFocus

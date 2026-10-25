@@ -62,6 +62,9 @@ SHARDS = {
     InventoryItemFormUITests/testEditingLocationReviewsExistingPlaceBeforeSaving
     InventoryItemFormUITests/testPlacePickerCanClearASelectedPlace
     InventoryItemFormUITests/testCreatingLocationAndCategoryFromItemFormSelectsPersistedValues
+    InventoryItemFormUITests/testCanceledAndSwipedCreationsPreserveSelectorQueryAndSelection
+    InventoryItemFormUITests/testExistingAndEmptySelectionsReturnToSameItemForm
+    InventoryItemFormUITests/testCreatedLocationDefersPlaceReviewUntilFormReturns
   ],
   "07" => %w[
     InventoryItemFormUITests/testAddItemFormTextFieldsFocusFromExpandedRows

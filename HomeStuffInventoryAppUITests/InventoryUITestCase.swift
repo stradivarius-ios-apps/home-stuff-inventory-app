@@ -41,8 +41,8 @@ class InventoryUITestCase: XCTestCase {
         locationField.tap()
         locationField.typeText(location)
         app.buttons["inventory.selection.confirmCreateButton"].tap()
-        XCTAssertTrue(app.buttons["inventory.selection.option.\(location)"].waitForExistence(timeout: 3))
-        tapBackButton()
+        XCTAssertTrue(app.buttons["inventory.itemForm.locationPicker"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.buttons["inventory.itemForm.locationPicker"].label.contains(location))
         selectPlace(named: container)
         let tagsField = app.textFields["inventory.itemForm.tagsField"]
         let keyboard = app.keyboards.firstMatch

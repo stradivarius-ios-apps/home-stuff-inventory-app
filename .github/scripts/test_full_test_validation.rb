@@ -62,6 +62,33 @@ Dir.mktmpdir("full-test-validation-success") do |directory|
   assert(published_output.include?("shard_01_status=success"), "named shard status was not published")
 end
 
+# Keep the item-form shard fixture aligned with its explicit UI selectors.
+Dir.mktmpdir("full-test-validation-item-form") do |directory|
+  methods = %w[
+    testItemFormDiscardProtectionForNewContextualAndEditFlows
+    testEditingLocationReviewsExistingPlaceBeforeSaving
+    testPlacePickerCanClearASelectedPlace
+    testCreatingLocationAndCategoryFromItemFormSelectsPersistedValues
+    testCanceledAndSwipedCreationsPreserveSelectorQueryAndSelection
+    testExistingAndEmptySelectionsReturnToSameItemForm
+    testCreatedLocationDefersPlaceReviewUntilFormReturns
+  ]
+  fake_bin = File.join(directory, "bin")
+  FileUtils.mkdir_p(fake_bin)
+  lines = methods.map do |method|
+    "Test Case '-[HomeStuffInventoryAppUITests.InventoryItemFormUITests #{method}]' passed (1.0 seconds)."
+  end
+  File.write(File.join(fake_bin, "xcodebuild"), "#!/bin/sh\n" + lines.map { |line| "echo #{line.dump}" }.join("\n") + "\n")
+  File.write(File.join(fake_bin, "xcrun"), "#!/bin/sh\nexit 1\n")
+  FileUtils.chmod("u+x", Dir[File.join(fake_bin, "*")])
+  results = File.join(directory, "results")
+  command = ["ruby", SCRIPT, "run-ui-shard", "06", "shared.xctestrun", "platform=iOS Simulator,id=shard-06", results]
+  output, status = Open3.capture2e({ "PATH" => "#{fake_bin}:#{ENV.fetch("PATH")}" }, *command)
+  assert(status.success?, "complete item-form shard must succeed: #{output}")
+  summary = JSON.parse(File.read(File.join(results, "ui-shard-summary.json")))
+  assert(summary.dig("06", "test_identifiers").length == methods.length, "item-form shard did not retain every selector")
+end
+
 Dir.mktmpdir("full-test-validation-failure") do |directory|
   fake_bin = File.join(directory, "bin")
   FileUtils.mkdir_p(fake_bin)

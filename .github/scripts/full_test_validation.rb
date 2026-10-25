@@ -19,6 +19,7 @@ SHARDS = {
   "02" => %w[
     InventoryBrowseDetailUITests/testInventorySearchAndEmptyStateSurfaces
     InventoryBrowseDetailUITests/testLocationAndPlaceDetailContextualAddAndHeroQA
+    InventoryBrowseDetailUITests/testNestedPlaceRetainsExtendedContextWithoutLaunchFlags
     InventoryBrowseDetailUITests/testDeletingLastPlaceItemKeepsEmptyPlaceContext
     InventoryBrowseDetailUITests/testPlaceContentsMovementActionDistinguishesAccessGateFromEmptyState
     InventoryBrowseDetailUITests/testOpeningItemDetailKeepsHeroAndRevealsNavigationTitleAfterScroll
@@ -111,6 +112,8 @@ SHARDS = {
   ],
   "16" => %w[
     RecentItemsTileLayoutUITests/testPlaceRecentItemsUseFullWidthShelfRowsAndNavigate
+    RecentItemsTileLayoutUITests/testRealLeafRetainsPathAndRecentItemsBeforeDirectList
+    RecentItemsTileLayoutUITests/testLongRealLeafWrapsInUkrainianAccessibilityDarkAppearance
     RecentItemsTileLayoutUITests/testFourItemPlaceDoesNotExposeRecentItems
     RecentItemsTileLayoutUITests/testAccessibilityDynamicTypeKeepsFiveItemPlaceRecentItemsNavigable
     RecentItemsTileLayoutUITests/testAccessibilityDynamicTypeReachesAndActivatesEveryLocationRecentTile
@@ -119,6 +122,7 @@ SHARDS = {
     RecentItemsTileLayoutUITests/testLocationDetailPlacesFollowRecentItemsCard
     RecentItemsTileLayoutUITests/testLocationDetailUsesAllItemsAccessWhenRecentItemsAreAbsent
     RecentItemsTileLayoutUITests/testLocationDetailPlacesEmptyStateFollowsHeader
+    RecentItemsTileLayoutUITests/testOneAndZeroRealLeafKeepContextAndAddPrefillInBothLanguages
     RecentItemsTileLayoutUITests/testLocationRecentItemsShelfAlignsWithStoragePlaceCardInLightAndDarkAppearance
     RecentItemsTileLayoutUITests/testLocationDetailCompositionFitsUkrainianAccessibilityInDarkAppearance
   ],
@@ -127,6 +131,7 @@ SHARDS = {
     RecentItemsTileLayoutUITests/testLocationDetailWithReduceTransparencyKeepsCompositionVisible
     RecentItemsTileLayoutUITests/testLocationDetailWithIncreaseContrastKeepsCompositionVisible
     RecentItemsTileLayoutUITests/testDifferentiateWithoutColorKeepsItemLocationAndPlaceContextDistinct
+    RecentItemsTileLayoutUITests/testRealLeafVisualConfigurations
   ]
 }.freeze
 DEFAULT_UI_SHARD_TIMEOUT_SECONDS = 20 * 60

@@ -89,6 +89,15 @@ enum InventoryRecentItemsLayoutFixture {
     }
 
     static func seed(in context: ModelContext, count: Int = items.count, now: Date = .now) throws {
+        let arguments = ProcessInfo.processInfo.arguments
+        let usesLongNames = arguments.contains("--qa-recent-items-layout-fixture-long-names")
+        let locationName = usesLongNames
+            ? "Домашній кабінет із довгою назвою для родинних речей і запасних аксесуарів" : Self.locationName
+        let placeName = usesLongNames
+            ? "Верхня шухляда великої шафи з кабелями, зарядними пристроями та перехідниками" : Self.placeName
+        let category = usesLongNames
+            ? "Кабелі, зарядні пристрої та різноманітні запасні аксесуари для подорожей"
+            : InventoryCategory.miscellaneous.rawValue
         let fixtureItems = Array(items.prefix(min(max(count, 1), items.count)))
         let fixtureItemIDs = Set(fixtureItems.map(\.id))
         let allFixtureItemIDs = Set(items.map(\.id))
@@ -103,8 +112,8 @@ enum InventoryRecentItemsLayoutFixture {
         for fixtureItem in fixtureItems {
             if let item = existingItemsByID[fixtureItem.id] {
                 item.applyUserEdit(
-                    name: fixtureItem.name,
-                    category: InventoryCategory.miscellaneous.rawValue,
+                    name: usesLongNames ? "Комплект запасних кабелів і перехідників для сімейних подорожей — " + fixtureItem.name : fixtureItem.name,
+                    category: category,
                     locationName: locationName,
                     containerName: placeName,
                     iconID: nil,
@@ -118,8 +127,8 @@ enum InventoryRecentItemsLayoutFixture {
                 context.insert(
                     InventoryItem(
                         id: fixtureItem.id,
-                        name: fixtureItem.name,
-                        category: InventoryCategory.miscellaneous.rawValue,
+                        name: usesLongNames ? "Комплект запасних кабелів і перехідників для сімейних подорожей — " + fixtureItem.name : fixtureItem.name,
+                        category: category,
                         locationName: locationName,
                         containerName: placeName,
                         quantity: 1,
@@ -139,7 +148,11 @@ enum InventoryRecentItemsLayoutFixture {
 
         // Keep five current Items with four recent events to exercise the inclusive
         // Place Detail threshold while retaining the existing three-plus-overflow layout.
-        let recentFixtureItems = fixtureItems.prefix(4)
+        let historyArgument = "--qa-recent-items-layout-fixture-history-count"
+        let historyCount = arguments.firstIndex(of: historyArgument).flatMap { index in
+            arguments.indices.contains(index + 1) ? Int(arguments[index + 1]) : nil
+        } ?? 4
+        let recentFixtureItems = fixtureItems.prefix(min(max(historyCount, 0), items.count))
         let fixtureEventIDs = Set(recentFixtureItems.map(\.eventID))
         let existingEvents = try context.fetch(FetchDescriptor<InventoryItemViewEvent>())
         for event in existingEvents where allFixtureItemIDs.contains(event.itemID) && !fixtureEventIDs.contains(event.id) {

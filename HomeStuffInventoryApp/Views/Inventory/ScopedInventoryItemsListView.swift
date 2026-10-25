@@ -37,6 +37,7 @@ struct ScopedInventoryItemsListView<Header: View>: View {
     let emptySystemImage: String
     let backgroundStyle: InventoryScreenBackgroundStyle
     let accessibilityContext: AccessibilityContext
+    let showsStorageSummary: Bool
     let header: Header
 
     @State private var selectedItemID: UUID?
@@ -55,6 +56,7 @@ struct ScopedInventoryItemsListView<Header: View>: View {
         emptySystemImage: String,
         backgroundStyle: InventoryScreenBackgroundStyle = .locationAtmosphere,
         accessibilityContext: AccessibilityContext = .scoped,
+        showsStorageSummary: Bool = true,
         @ViewBuilder header: () -> Header
     ) {
         self.title = title
@@ -66,6 +68,7 @@ struct ScopedInventoryItemsListView<Header: View>: View {
         self.emptySystemImage = emptySystemImage
         self.backgroundStyle = backgroundStyle
         self.accessibilityContext = accessibilityContext
+        self.showsStorageSummary = showsStorageSummary
         self.header = header()
     }
 
@@ -154,6 +157,7 @@ struct ScopedInventoryItemsListView<Header: View>: View {
                     InventoryItemNavigationCard(
                         item: item,
                         presentation: .compactInventory,
+                        showsStorageSummary: showsStorageSummary,
                         transitionNamespace: itemNavigationNamespace,
                         reduceMotion: accessibilityReduceMotion,
                         accessibilityIdentifier: accessibilityContext.rowIdentifier(for: item)

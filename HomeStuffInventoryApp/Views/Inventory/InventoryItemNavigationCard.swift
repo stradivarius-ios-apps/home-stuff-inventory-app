@@ -5,6 +5,7 @@ struct InventoryItemNavigationCard: View {
     let item: InventoryItem
     let matchContext: InventorySearch.MatchContext?
     let presentation: InventoryListPresentation
+    let showsStorageSummary: Bool
     let transitionNamespace: Namespace.ID
     let reduceMotion: Bool
     let accessibilityIdentifier: String
@@ -15,6 +16,7 @@ struct InventoryItemNavigationCard: View {
         item: InventoryItem,
         matchContext: InventorySearch.MatchContext? = nil,
         presentation: InventoryListPresentation = .searchResults,
+        showsStorageSummary: Bool = true,
         transitionNamespace: Namespace.ID,
         reduceMotion: Bool,
         accessibilityIdentifier: String? = nil,
@@ -23,6 +25,7 @@ struct InventoryItemNavigationCard: View {
         self.item = item
         self.matchContext = matchContext
         self.presentation = presentation
+        self.showsStorageSummary = showsStorageSummary
         self.transitionNamespace = transitionNamespace
         self.reduceMotion = reduceMotion
         self.accessibilityIdentifier = accessibilityIdentifier ?? "inventory." + "itemRow.\(item.name)"
@@ -33,7 +36,7 @@ struct InventoryItemNavigationCard: View {
         Button(action: action) {
             switch presentation {
             case .compactInventory:
-                InventoryCompactItemCard(item: item, placePath: placePath)
+                InventoryCompactItemCard(item: item, placePath: placePath, showsStorageSummary: showsStorageSummary)
             case .searchResults:
                 InventoryItemRowView(item: item, matchContext: matchContext, placePath: placePath)
             }

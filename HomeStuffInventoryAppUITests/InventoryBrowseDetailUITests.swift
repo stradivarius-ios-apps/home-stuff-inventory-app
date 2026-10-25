@@ -89,8 +89,44 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
         XCTAssertTrue(waitForVisibleRow(named: "USB-C to HDMI adapter"))
     }
     func testLocationAndPlaceDetailContextualAddAndHeroQA() {
-        launchApp(); openItem(named: "USB-C to HDMI adapter"); tapBackButton(); openPlaceDetail(location: "Office", place: "Desk drawer"); XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 3)); XCTAssertTrue(app.tabBars.buttons["Search inventory"].exists); let placeHero = element(identifier: "locations.placeDetailHero"); XCTAssertTrue(placeHero.waitForExistence(timeout: 3)); XCTAssertTrue(placeHero.label.contains("Desk drawer")); XCTAssertTrue(placeHero.label.contains("Location: Office")); XCTAssertTrue(placeHero.label.contains("1 item")); let parentLocation = element(identifier: "locations.placeDetailHero.parentLocation"); XCTAssertTrue(parentLocation.waitForExistence(timeout: 3)); XCTAssertTrue(parentLocation.label.contains("Office")); XCTAssertFalse(element(identifier: "locations.placeRecentItems").exists); XCTAssertFalse(app.staticTexts["All items"].exists); XCTAssertFalse(app.buttons["All items"].exists); app.buttons["locations.placeDetail.addItemButton"].tap(); XCTAssertTrue(app.buttons["inventory.itemForm.locationPicker"].waitForExistence(timeout: 3)); XCTAssertTrue(app.buttons["inventory.itemForm.locationPicker"].label.contains("Office")); assertSelectedPlace(named: "Desk drawer"); app.buttons["inventory.itemForm.cancelButton"].tap(); tapBackButton(); app.buttons["locations.locationDetail.addItemButton"].tap(); XCTAssertTrue(app.buttons["inventory.itemForm.locationPicker"].waitForExistence(timeout: 3)); XCTAssertTrue(app.buttons["inventory.itemForm.locationPicker"].label.contains("Office")); app.buttons["inventory.itemForm.cancelButton"].tap()
+        launchApp(); openItem(named: "USB-C to HDMI adapter"); tapBackButton(); openPlaceDetail(location: "Office", place: "Desk drawer"); XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 3)); XCTAssertTrue(app.tabBars.buttons["Search inventory"].exists); let placeHero = element(identifier: "locations.placeDetailHero"); XCTAssertTrue(placeHero.waitForExistence(timeout: 3)); XCTAssertTrue(placeHero.label.contains("Desk drawer")); XCTAssertTrue(placeHero.label.contains("Location: Office")); XCTAssertTrue(placeHero.label.contains("1 item")); let parentLocation = element(identifier: "locations.placeDetailHero.parentLocation"); XCTAssertTrue(parentLocation.waitForExistence(timeout: 3)); XCTAssertTrue(parentLocation.label.contains("Office")); XCTAssertEqual(app.staticTexts["locations.placeDetail.path"].label, "Storage path: Office, Desk drawer"); XCTAssertFalse(element(identifier: "locations.placeDetail.countSummary").exists); XCTAssertEqual(element(identifier: "locations.placeDetail.itemsSectionHeader").label, "Items"); XCTAssertEqual(app.buttons["locations.placeDetail.itemRow.USB-C to HDMI adapter"].label, "USB-C to HDMI adapter, Cables & Adapters, Quantity 1"); XCTAssertFalse(element(identifier: "locations.placeRecentItems").exists); XCTAssertFalse(app.staticTexts["All items"].exists); XCTAssertFalse(app.buttons["All items"].exists); app.buttons["locations.placeDetail.addItemButton"].tap(); XCTAssertTrue(app.buttons["inventory.itemForm.locationPicker"].waitForExistence(timeout: 3)); XCTAssertTrue(app.buttons["inventory.itemForm.locationPicker"].label.contains("Office")); assertSelectedPlace(named: "Desk drawer"); app.buttons["inventory.itemForm.cancelButton"].tap(); tapBackButton(); app.buttons["locations.locationDetail.addItemButton"].tap(); XCTAssertTrue(app.buttons["inventory.itemForm.locationPicker"].waitForExistence(timeout: 3)); XCTAssertTrue(app.buttons["inventory.itemForm.locationPicker"].label.contains("Office")); app.buttons["inventory.itemForm.cancelButton"].tap()
     }
+    func testNestedPlaceRetainsExtendedContextWithoutLaunchFlags() {
+        launchStartupApp(arguments: ["--use-sample-inventory-data", "--qa-hierarchy-management-fixture"])
+        openPlaceDetail(location: "Hierarchy Office", place: "Hierarchy Cabinet")
+        XCTAssertTrue(element(identifier: "locations.placeDetail.countSummary").exists)
+        XCTAssertTrue(app.buttons["locations.placeDetail.allContainedItems"].exists)
+        capturePlaceDetailEvidence("hierarchy-root")
+        app.buttons["locations.placeDetail.allContainedItems"].tap()
+        let containedRow = app.buttons["inventory.itemRow.Hierarchy fixture adapter"]
+        XCTAssertTrue(containedRow.waitForExistence(timeout: 3))
+        XCTAssertTrue(containedRow.label.contains("Hierarchy Office"))
+        XCTAssertTrue(containedRow.label.contains("Hierarchy Cabinet › Hierarchy Drawer › Hierarchy Cable box"))
+        capturePlaceDetailEvidence("hierarchy-all-contained")
+        tapBackButton()
+        tapVisibleButton(identifier: "locations.placeDetail.childPlace.B1F0A001-EE01-4E10-9000-000000000504")
+        XCTAssertTrue(element(identifier: "locations.placeDetail.countSummary").exists)
+        capturePlaceDetailEvidence("hierarchy-child")
+        tapVisibleButton(identifier: "locations.placeDetail.childPlace.B1F0A001-EE01-4E10-9000-000000000505")
+        XCTAssertEqual(app.staticTexts["locations.placeDetail.path"].label,
+                       "Storage path: Hierarchy Office, Hierarchy Cabinet, Hierarchy Drawer, Hierarchy Cable box")
+        XCTAssertTrue(element(identifier: "locations.placeDetail.countSummary").exists)
+        XCTAssertEqual(element(identifier: "locations.placeDetail.itemsSectionHeader").label, "Direct Items")
+        let row = app.buttons["locations.placeDetail.itemRow.Hierarchy fixture adapter"]
+        scrollToElement(row, in: app.scrollViews["locations.placeDetail.itemList"])
+        XCTAssertTrue(row.label.contains("Hierarchy Office"))
+        XCTAssertTrue(row.label.contains("Hierarchy Cabinet › Hierarchy Drawer › Hierarchy Cable box"))
+        capturePlaceDetailEvidence("hierarchy-nested-leaf")
+        row.tap()
+        XCTAssertTrue(element(identifier: "inventory.itemDetail.hero").waitForExistence(timeout: 3))
+    }
+
+    private func capturePlaceDetailEvidence(_ name: String) {
+        let evidence = attachment(named: name)
+        evidence.lifetime = .keepAlways
+        add(evidence)
+    }
+
     func testDeletingLastPlaceItemKeepsEmptyPlaceContext() {
         launchApp(); openPlaceDetail(location: "Balcony cabinet", place: "Red organizer"); let itemRow = app.buttons["locations.placeDetail.itemRow.Drill bits"]; XCTAssertTrue(itemRow.waitForExistence(timeout: 3)); itemRow.tap(); tapVisibleButton(identifier: "inventory.deleteItemButton"); let confirmDeleteButton = app.buttons["inventory.confirmDeleteButton"].firstMatch; XCTAssertTrue(confirmDeleteButton.waitForExistence(timeout: 3)); confirmDeleteButton.tap(); let placeHero = element(identifier: "locations.placeDetailHero"); XCTAssertTrue(placeHero.waitForExistence(timeout: 3)); XCTAssertTrue(placeHero.label.contains("Red organizer")); XCTAssertTrue(placeHero.label.contains("Location: Balcony cabinet")); XCTAssertTrue(placeHero.label.contains("0 items")); XCTAssertTrue(app.staticTexts["No Items in This Storage Place"].waitForExistence(timeout: 3))
     }

@@ -464,8 +464,20 @@ final class InventoryItemFormUITests: InventoryUITestCase {
 
     private func assertReturnedToUnsavedForm(name: String, file: StaticString = #filePath, line: UInt = #line) {
         let nameField = app.textFields["inventory.itemForm.nameField"]
-        scrollVisibleForm(up: false)
-        scrollVisibleForm(up: false)
+        let form = element(identifier: "inventory.itemForm")
+        XCTAssertTrue(form.waitForExistence(timeout: 3), file: file, line: line)
+        var revealCount = 0
+        for _ in 0..<4 where !nameField.exists {
+            let viewport = app.frame
+            let bar = app.navigationBars.containing(.button, identifier: "inventory.itemForm.cancelButton").firstMatch
+            let keyboard = app.keyboards.firstMatch
+            let assistant = app.otherElements["SystemInputAssistantView"].firstMatch
+            print("Return reveal before: form=\(form.frame), nameAbsent=true, bar=\(bar.frame), viewport=\(viewport), keyboardIntersection=\(keyboard.exists ? keyboard.frame.intersection(viewport) : .null), assistantIntersection=\(assistant.exists ? assistant.frame.intersection(viewport) : .null)")
+            scrollVisibleForm(up: false)
+            revealCount += 1
+            print("Return reveal after: form=\(form.frame), nameExists=\(nameField.exists), name=\(nameField.exists ? nameField.frame : .zero)")
+        }
+        print("Returned form: reveals=\(revealCount), nameExists=\(nameField.exists)")
         XCTAssertTrue(nameField.waitForExistence(timeout: 3), file: file, line: line)
         XCTAssertEqual(nameField.value as? String, name, file: file, line: line)
         XCTAssertTrue(app.buttons["inventory.itemForm.saveButton"].isHittable, file: file, line: line)

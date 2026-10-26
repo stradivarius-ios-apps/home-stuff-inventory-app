@@ -2,6 +2,20 @@
 
 All notable user-facing and release-track changes for Home Stuff Inventory are recorded here.
 
+## 1.4.0
+
+### Changed
+
+- Make Notes content the editing action (2ce14ec).
+- Avoid scrolling returned forms when the name is present (83a35e8).
+- Ensure form picker tests scroll below navigation bars (8aa802a).
+- Clarify tag entry guidance in item forms (15767e3).
+- Return to the item form after creating a selection (ffc0db2).
+- Group inventory filters into native submenus (e63aa6b).
+- Add contextual location management routes (8d1820b).
+- Clarify Settings data transfer actions (c99e560).
+- Simplify leaf Storage Place details (1972a7f).
+
 ## 1.3.3
 
 ### Internal

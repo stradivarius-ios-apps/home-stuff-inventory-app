@@ -34,9 +34,9 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
         XCTAssertTrue(app.tabBars.buttons["Inventory"].exists)
         add(attachment(named: "primary-action-edit-destructive-tab-negative-controls-en-dark-high-contrast-reduce-transparency-accessibility"))
 
-        let notesCard = app.buttons["inventory.detail.notesCard"]
-        scrollToElement(notesCard)
-        notesCard.tap()
+        let notesContent = app.buttons["inventory.detail.notesContent"]
+        scrollToElement(notesContent)
+        notesContent.tap()
         let editor = app.textViews["inventory.notesEditor.editor"]
         XCTAssertTrue(editor.waitForExistence(timeout: 3))
         XCTAssertTrue(app.buttons["inventory.notesEditor.saveButton"].exists)
@@ -441,7 +441,7 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
         launchApp()
         openItem(named: "USB-C to HDMI adapter")
 
-        let notes = app.buttons["inventory.detail.notesCard"]
+        let notes = element(identifier: "inventory.detail.notesCard")
         let tags = element(identifier: "inventory.itemDetail.tags")
         let showMore = app.buttons["inventory.itemDetail.tags.showMore"]
         scrollToElement(showMore)
@@ -474,7 +474,7 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
         launchApp()
         openItem(named: "USB-C to HDMI adapter")
 
-        let notes = app.buttons["inventory.detail.notesCard"]
+        let notes = element(identifier: "inventory.detail.notesCard")
         let tags = element(identifier: "inventory.itemDetail.tags")
         let dates = element(identifier: "inventory.itemDetail.dates")
         scrollToElement(dates)
@@ -517,13 +517,200 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
         XCTAssertGreaterThanOrEqual(place.frame.minX, app.frame.minX)
         XCTAssertLessThanOrEqual(place.frame.maxX, app.frame.maxX)
     }
-    func testExistingNotesEditorLifecycleSupportsDismissDiscardAndSave() {
-        launchApp(); openItem(named: "USB-C to HDMI adapter"); let notesCard = app.buttons["inventory.detail.notesCard"]; scrollToElement(notesCard); XCTAssertTrue(notesCard.isHittable); XCTAssertFalse(app.buttons["inventory.detail.editNotesButton"].exists)
-        notesCard.tap(); let notesEditor = app.textViews["inventory.notesEditor.editor"]; XCTAssertTrue(notesEditor.waitForExistence(timeout: 3)); XCTAssertTrue(waitForKeyboardFocus(notesEditor, timeout: 3)); dismissNotesEditorInteractively(); XCTAssertFalse(notesEditor.waitForExistence(timeout: 3)); XCTAssertTrue(element(identifier: "inventory.itemDetail").waitForExistence(timeout: 3))
-        notesCard.tap(); XCTAssertTrue(notesEditor.waitForExistence(timeout: 3)); XCTAssertTrue(waitForKeyboardFocus(notesEditor, timeout: 3)); XCTAssertFalse(element(identifier: "inventory.itemForm").exists); notesEditor.tap(); notesEditor.typeText(" Updated"); let keyboard = app.keyboards.firstMatch; XCTAssertTrue(keyboard.waitForExistence(timeout: 3)); XCTAssertTrue(waitForElementAboveKeyboard(notesEditor, keyboard: keyboard, timeout: 3), "Expected detail notes editor to stay above keyboard; editor frame: \(notesEditor.frame), keyboard frame: \(keyboard.frame)"); dismissNotesEditorInteractively(); XCTAssertTrue(notesEditor.exists, "Dirty Notes editor should block interactive dismissal"); app.buttons["inventory.notesEditor.cancelButton"].tap(); XCTAssertTrue(app.buttons["inventory.notesEditor.confirmDiscardButton"].waitForExistence(timeout: 3)); tapAlertButton(identifier: "inventory.notesEditor.confirmDiscardButton"); XCTAssertFalse(notesEditor.waitForExistence(timeout: 1))
-        notesCard.tap(); XCTAssertTrue(notesEditor.waitForExistence(timeout: 3)); XCTAssertTrue(waitForKeyboardFocus(notesEditor, timeout: 3)); notesEditor.tap(); notesEditor.typeText(" Saved"); app.buttons["inventory.notesEditor.saveButton"].tap(); XCTAssertFalse(notesEditor.waitForExistence(timeout: 3)); XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "Saved")).firstMatch.waitForExistence(timeout: 3))
+    func testEmptyNotesUsesNativeTextActionWithoutCardAction() {
+        checkNotesNativeTextAction(filled: false)
     }
-    func testEmptyNotesCardOpensNotesEditor() { launchApp(); let itemName = "Empty Notes \(uniqueTestSuffix())"; app.buttons["inventory.addItemButton"].tap(); let nameField = app.textFields["inventory.itemForm.nameField"]; XCTAssertTrue(nameField.waitForExistence(timeout: 3)); nameField.tap(); nameField.typeText(itemName); app.buttons["inventory.itemForm.saveButton"].tap(); resetToInventoryList(); openSearch(); let searchField = app.searchFields.firstMatch; XCTAssertTrue(searchField.waitForExistence(timeout: 3)); searchField.tap(); searchField.typeText(itemName); openItem(named: itemName); let detail = element(identifier: "inventory.itemDetail"); XCTAssertTrue(detail.waitForExistence(timeout: 3)); let notesCard = app.buttons["inventory.detail.notesCard"]; scrollToElement(notesCard); XCTAssertEqual(notesCard.label, "Notes: No notes"); XCTAssertTrue(notesCard.isHittable); notesCard.tap(); let notesEditor = app.textViews["inventory.notesEditor.editor"]; XCTAssertTrue(notesEditor.waitForExistence(timeout: 3)); XCTAssertTrue(waitForKeyboardFocus(notesEditor, timeout: 3)); XCTAssertFalse(element(identifier: "inventory.itemForm").exists); let savedNotes = "Saved empty Notes \(uniqueTestSuffix())"; notesEditor.tap(); notesEditor.typeText(savedNotes); app.buttons["inventory.notesEditor.saveButton"].tap(); XCTAssertFalse(notesEditor.waitForExistence(timeout: 3)); XCTAssertTrue(detail.exists); XCTAssertTrue(notesCard.waitForExistence(timeout: 3)); XCTAssertTrue(notesCard.isHittable); XCTAssertTrue(notesCard.label.contains(savedNotes)) }
+
+    func testShortNotesUsesNativeTextActionWithoutCardAction() {
+        checkNotesNativeTextAction(filled: true)
+    }
+
+    private func checkNotesNativeTextAction(filled: Bool) {
+        for locale in ["en", "uk"] {
+            for size: String? in [nil, "UICTContentSizeCategoryAccessibilityXXXL"] {
+                launchStartupApp(
+                    arguments: ["--use-sample-inventory-data"],
+                    contentSizeCategory: size,
+                    locale: locale
+                )
+                resetToInventoryList()
+                let itemName = "Notes Target \(uniqueTestSuffix())"
+                app.buttons["inventory.addItemButton"].tap()
+                let nameField = app.textFields["inventory.itemForm.nameField"]
+                XCTAssertTrue(nameField.waitForExistence(timeout: 3))
+                nameField.tap()
+                nameField.typeText(itemName)
+                app.buttons["inventory.itemForm.saveButton"].tap()
+                resetToInventoryList()
+                app.tabBars.buttons[locale == "uk" ? "Шукати в інвентарі" : "Search inventory"].tap()
+                let search = app.searchFields.firstMatch
+                XCTAssertTrue(search.waitForExistence(timeout: 3))
+                search.tap()
+                search.typeText(itemName)
+                openItem(named: itemName)
+
+                let content = app.buttons["inventory.detail.notesContent"]
+                let editor = app.textViews["inventory.notesEditor.editor"]
+                let text = filled ? (locale == "uk" ? "Кабель" : "Cable") : ""
+                if filled {
+                    scrollToElement(content)
+                    content.tap()
+                    XCTAssertTrue(editor.waitForExistence(timeout: 3))
+                    XCTAssertEqual(editor.value as? String, "")
+                    editor.tap()
+                    editor.typeText(text)
+                    app.buttons["inventory.notesEditor.saveButton"].tap()
+                    XCTAssertFalse(editor.waitForExistence(timeout: 3))
+                }
+                positionWholeNotesCardInViewport()
+                let label = locale == "uk"
+                    ? "Нотатки: \(filled ? text : "Без нотаток")"
+                    : "Notes: \(filled ? text : "No notes")"
+                XCTAssertEqual(content.label, label)
+                XCTAssertFalse(editor.exists)
+                XCTAssertFalse(app.buttons["inventory.detail.editNotesButton"].exists)
+                XCTAssertFalse(app.buttons["inventory.detail.notesCard"].exists)
+                XCTAssertFalse(app.buttons["inventory.detail.notesHeader"].exists)
+                for identifier in ["inventory.detail.notesCard", "inventory.detail.notesHeader", "inventory.detail.notesContent"] {
+                    XCTAssertEqual(app.descendants(matching: .any).matching(identifier: identifier).count, 1)
+                }
+                let card = element(identifier: "inventory.detail.notesCard")
+                XCTAssertEqual(card.buttons.count, 1)
+                XCTAssertEqual(card.buttons.firstMatch.identifier, "inventory.detail.notesContent")
+                let capture = attachment(named: "notes-\(locale)-\(size == nil ? "default" : "accessibility")-\(filled ? "short" : "empty")")
+                capture.lifetime = .keepAlways
+                add(capture)
+                for zone in 0..<(filled ? 8 : 7) {
+                    checkNotesZone(zone, expectedLabel: label, expectedNotes: text, configuration: "\(locale)-\(size == nil ? "default" : "accessibility")-\(filled ? "short" : "empty")")
+                }
+                content.tap()
+                XCTAssertTrue(editor.waitForExistence(timeout: 3))
+                XCTAssertEqual(app.textViews.matching(identifier: "inventory.notesEditor.editor").count, 1)
+                XCTAssertEqual(editor.value as? String, text)
+                XCTAssertFalse(element(identifier: "inventory.itemForm").exists)
+                app.buttons["inventory.notesEditor.cancelButton"].tap()
+                XCTAssertFalse(editor.waitForExistence(timeout: 3))
+                XCTAssertEqual(content.label, label)
+                content.tap()
+                XCTAssertTrue(editor.waitForExistence(timeout: 3))
+                XCTAssertEqual(editor.value as? String, text)
+                editor.tap()
+                editor.typeText(" Saved")
+                app.buttons["inventory.notesEditor.saveButton"].tap()
+                XCTAssertFalse(editor.waitForExistence(timeout: 3))
+                XCTAssertTrue(content.label.contains("Saved"))
+                content.tap()
+                XCTAssertTrue(editor.waitForExistence(timeout: 3))
+                XCTAssertEqual(editor.value as? String, (text + " Saved").trimmingCharacters(in: .whitespacesAndNewlines))
+                app.buttons["inventory.notesEditor.cancelButton"].tap()
+                XCTAssertFalse(editor.waitForExistence(timeout: 3))
+                print("NOTES_NATIVE_CONFIGURATION_COMPLETE \(locale)-\(size == nil ? "default" : "accessibility")-\(filled ? "short" : "empty")")
+            }
+        }
+    }
+
+    private var notesVisibleViewport: CGRect {
+        let screen = app.frame
+        let top = max(screen.minY, app.navigationBars.firstMatch.frame.maxY)
+        let bottom = min(screen.maxY, app.tabBars.firstMatch.frame.minY)
+        return CGRect(x: screen.minX, y: top, width: screen.width, height: bottom - top)
+    }
+
+    private func positionWholeNotesCardInViewport() {
+        let card = element(identifier: "inventory.detail.notesCard")
+        XCTAssertTrue(card.waitForExistence(timeout: 3))
+        for _ in 0..<10 {
+            let viewport = notesVisibleViewport.insetBy(dx: 1, dy: 8)
+            let frame = card.frame
+            if viewport.contains(frame) { return }
+            let shift = min(max(frame.midY - viewport.midY, -viewport.height / 2), viewport.height / 2)
+            let origin = app.coordinate(withNormalizedOffset: .zero)
+            let start = CGPoint(x: viewport.midX, y: viewport.midY + shift / 2)
+            let end = CGPoint(x: viewport.midX, y: viewport.midY - shift / 2)
+            origin.withOffset(CGVector(dx: start.x - app.frame.minX, dy: start.y - app.frame.minY))
+                .press(forDuration: 0.1, thenDragTo: origin.withOffset(CGVector(dx: end.x - app.frame.minX, dy: end.y - app.frame.minY)))
+        }
+        XCTAssertTrue(notesVisibleViewport.insetBy(dx: 1, dy: 8).contains(card.frame), "Whole Notes card must be visible: \(card.frame), viewport: \(notesVisibleViewport)")
+    }
+
+    private func checkNotesZone(_ zone: Int, expectedLabel: String, expectedNotes: String, configuration: String) {
+        let card = element(identifier: "inventory.detail.notesCard").frame
+        let header = element(identifier: "inventory.detail.notesHeader").frame
+        let content = app.buttons["inventory.detail.notesContent"]
+        let text = content.frame
+        for frame in [card, header, text] {
+            XCTAssertGreaterThan(frame.width, 0)
+            XCTAssertGreaterThan(frame.height, 0)
+        }
+        XCTAssertTrue(notesVisibleViewport.contains(card))
+        XCTAssertTrue(card.contains(header))
+        XCTAssertTrue(card.contains(text))
+        XCTAssertGreaterThan(text.minY, header.maxY)
+        XCTAssertLessThan(text.width, card.width)
+        let point: CGPoint
+        switch zone {
+        case 0: point = CGPoint(x: header.midX, y: header.midY)
+        case 1: point = CGPoint(x: text.minX + min(8, text.width / 2), y: (header.maxY + text.minY) / 2)
+        case 2: point = CGPoint(x: (card.minX + text.minX) / 2, y: text.midY)
+        case 3: point = CGPoint(x: (text.maxX + card.maxX) / 2, y: text.midY)
+        case 4: point = CGPoint(x: card.midX, y: (text.maxY + card.maxY) / 2)
+        case 5: point = CGPoint(x: card.midX, y: (card.minY + header.minY) / 2)
+        case 6: point = CGPoint(x: card.maxX - min(8, (card.maxX - header.maxX) / 2), y: header.midY)
+        default:
+            XCTAssertLessThan(text.maxX, header.maxX)
+            point = CGPoint(x: (text.maxX + header.maxX) / 2, y: text.midY)
+            XCTAssertLessThan(point.x, header.maxX)
+        }
+        XCTAssertTrue(card.contains(point), "Zone \(zone) must be inside the card")
+        XCTAssertTrue(notesVisibleViewport.contains(point), "Zone \(zone) must be visible")
+        XCTAssertFalse(text.contains(point), "Zone \(zone) must be outside the text: \(point), text: \(text)")
+        app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: point.x - app.frame.minX, dy: point.y - app.frame.minY)).tap()
+        let editor = app.textViews["inventory.notesEditor.editor"]
+        let opened = editor.waitForExistence(timeout: 1)
+        let record = "\(configuration), zone: \(zone), opened: \(opened), card: \(card), header: \(header), text: \(text), point: \(point), viewport: \(notesVisibleViewport)"
+        let observation = XCTAttachment(string: record)
+        observation.name = "notes-native-outcome-\(configuration)-zone-\(zone)"
+        observation.lifetime = .keepAlways
+        add(observation)
+        print("NOTES_NATIVE_OUTCOME \(record)")
+        if [0, 5, 6].contains(zone) {
+            XCTAssertFalse(opened, "Zone must stay inert: \(record)")
+        } else if opened {
+            XCTAssertEqual(app.textViews.matching(identifier: "inventory.notesEditor.editor").count, 1)
+            XCTAssertEqual(editor.value as? String, expectedNotes)
+            XCTAssertFalse(element(identifier: "inventory.itemForm").exists)
+            let cancel = app.buttons["inventory.notesEditor.cancelButton"]
+            XCTAssertTrue(cancel.isHittable)
+            cancel.tap()
+            XCTAssertFalse(editor.waitForExistence(timeout: 3))
+        }
+        XCTAssertFalse(element(identifier: "inventory.itemForm").exists)
+        XCTAssertTrue(element(identifier: "inventory.itemDetail").exists)
+        XCTAssertTrue(content.isHittable)
+        XCTAssertEqual(content.label, expectedLabel)
+    }
+
+    func testExistingNotesEditorLifecycleSupportsDismissDiscardAndSave() {
+        launchApp(); openItem(named: "USB-C to HDMI adapter"); let notesContent = app.buttons["inventory.detail.notesContent"]; scrollToElement(notesContent); XCTAssertTrue(notesContent.isHittable); XCTAssertFalse(app.buttons["inventory.detail.editNotesButton"].exists); XCTAssertFalse(app.buttons["inventory.detail.notesCard"].exists); XCTAssertFalse(app.buttons["inventory.detail.notesHeader"].exists)
+        notesContent.tap(); let notesEditor = app.textViews["inventory.notesEditor.editor"]; XCTAssertTrue(notesEditor.waitForExistence(timeout: 3)); XCTAssertTrue(waitForKeyboardFocus(notesEditor, timeout: 3)); dismissNotesEditorInteractively(); XCTAssertFalse(notesEditor.waitForExistence(timeout: 3)); XCTAssertTrue(element(identifier: "inventory.itemDetail").waitForExistence(timeout: 3))
+        notesContent.tap(); XCTAssertTrue(notesEditor.waitForExistence(timeout: 3)); XCTAssertTrue(waitForKeyboardFocus(notesEditor, timeout: 3)); XCTAssertFalse(element(identifier: "inventory.itemForm").exists); notesEditor.tap(); notesEditor.typeText(" Updated"); let keyboard = app.keyboards.firstMatch; XCTAssertTrue(keyboard.waitForExistence(timeout: 3)); XCTAssertTrue(waitForElementAboveKeyboard(notesEditor, keyboard: keyboard, timeout: 3), "Expected detail notes editor to stay above keyboard; editor frame: \(notesEditor.frame), keyboard frame: \(keyboard.frame)"); dismissNotesEditorInteractively(); XCTAssertTrue(notesEditor.exists, "Dirty Notes editor should block interactive dismissal"); app.buttons["inventory.notesEditor.cancelButton"].tap(); XCTAssertTrue(app.buttons["inventory.notesEditor.confirmDiscardButton"].waitForExistence(timeout: 3)); tapAlertButton(identifier: "inventory.notesEditor.confirmDiscardButton"); XCTAssertFalse(notesEditor.waitForExistence(timeout: 1))
+        notesContent.tap(); XCTAssertTrue(notesEditor.waitForExistence(timeout: 3)); XCTAssertTrue(waitForKeyboardFocus(notesEditor, timeout: 3)); notesEditor.tap(); notesEditor.typeText(" Saved"); app.buttons["inventory.notesEditor.saveButton"].tap(); XCTAssertFalse(notesEditor.waitForExistence(timeout: 3)); XCTAssertTrue(notesContent.waitForExistence(timeout: 3)); XCTAssertTrue(notesContent.label.contains("Saved"))
+    }
+    func testEmptyNotesContentOpensNotesEditor() { launchApp(); let itemName = "Empty Notes \(uniqueTestSuffix())"; app.buttons["inventory.addItemButton"].tap(); let nameField = app.textFields["inventory.itemForm.nameField"]; XCTAssertTrue(nameField.waitForExistence(timeout: 3)); nameField.tap(); nameField.typeText(itemName); app.buttons["inventory.itemForm.saveButton"].tap(); resetToInventoryList(); openSearch(); let searchField = app.searchFields.firstMatch; XCTAssertTrue(searchField.waitForExistence(timeout: 3)); searchField.tap(); searchField.typeText(itemName); openItem(named: itemName); let detail = element(identifier: "inventory.itemDetail"); XCTAssertTrue(detail.waitForExistence(timeout: 3)); let notesContent = app.buttons["inventory.detail.notesContent"]; scrollToElement(notesContent); XCTAssertEqual(notesContent.label, "Notes: No notes"); XCTAssertTrue(notesContent.isHittable); notesContent.tap(); let notesEditor = app.textViews["inventory.notesEditor.editor"]; XCTAssertTrue(notesEditor.waitForExistence(timeout: 3)); XCTAssertTrue(waitForKeyboardFocus(notesEditor, timeout: 3)); XCTAssertFalse(element(identifier: "inventory.itemForm").exists); let savedNotes = "Saved empty Notes \(uniqueTestSuffix())"; notesEditor.tap(); notesEditor.typeText(savedNotes); app.buttons["inventory.notesEditor.saveButton"].tap(); XCTAssertFalse(notesEditor.waitForExistence(timeout: 3)); XCTAssertTrue(detail.exists); XCTAssertTrue(notesContent.waitForExistence(timeout: 3)); XCTAssertTrue(notesContent.isHittable); XCTAssertTrue(notesContent.label.contains(savedNotes)); XCTAssertFalse(app.buttons["inventory.detail.notesCard"].exists); XCTAssertFalse(app.buttons["inventory.detail.notesHeader"].exists)
+        notesContent.tap()
+        XCTAssertTrue(notesEditor.waitForExistence(timeout: 3))
+        XCTAssertEqual(notesEditor.value as? String, savedNotes)
+        notesEditor.tap()
+        notesEditor.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: savedNotes.count))
+        app.buttons["inventory.notesEditor.saveButton"].tap()
+        XCTAssertFalse(notesEditor.waitForExistence(timeout: 3))
+        XCTAssertEqual(notesContent.label, "Notes: No notes")
+        notesContent.tap()
+        XCTAssertTrue(notesEditor.waitForExistence(timeout: 3))
+        XCTAssertEqual(notesEditor.value as? String, "")
+        app.buttons["inventory.notesEditor.cancelButton"].tap()
+        XCTAssertFalse(notesEditor.waitForExistence(timeout: 3))
+    }
 }
 
 extension InventoryBrowseDetailUITests {

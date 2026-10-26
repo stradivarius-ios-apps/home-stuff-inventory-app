@@ -1196,6 +1196,12 @@
         "uk" : { "stringUnit" : { "state" : "translated", "value" : "Редагувати нотатки" } }
       }
     },
+    "inventory.notes.emptyPrompt" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Tap to add a note" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Торкніться, щоб додати нотатку" } }
+      }
+    },
     "inventory.notes.placeholder" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Add details: what it’s for, what’s included, or where to find it." } },

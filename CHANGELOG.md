@@ -2,6 +2,16 @@
 
 All notable user-facing and release-track changes for Home Stuff Inventory are recorded here.
 
+## 1.4.1
+
+### Changed
+
+- Use native screenshots for the required medium iPhone display in both supported languages.
+
+### Internal
+
+- Validate the screenshot display type explicitly and reject legacy optional-size manifests.
+
 ## 1.4.0
 
 ### Changed

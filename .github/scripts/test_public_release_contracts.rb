@@ -15,12 +15,13 @@ class PublicReleaseContractsTest < Minitest::Test
     assert_raises(RuntimeError) { ReleaseContract.strict_sha!("a" * 39, label: "release SHA") }
   end
 
-  def test_public_screenshot_manifest_contract_is_complete
+  def screenshot_manifest
     manifest = {
       "schema_version" => ReleaseScreenshotContract::SCHEMA_VERSION,
       "source_sha" => SHA,
       "device_directory" => ReleaseScreenshotContract::DEVICE_DIRECTORY,
       "app_store_device_slot" => ReleaseScreenshotContract::DEVICE_SLOT,
+      "app_store_display_type" => ReleaseScreenshotContract::DISPLAY_TYPE,
       "required_size" => {
         "width" => ReleaseScreenshotContract::WIDTH,
         "height" => ReleaseScreenshotContract::HEIGHT
@@ -42,7 +43,25 @@ class PublicReleaseContractsTest < Minitest::Test
       end
     }
 
-    assert ReleaseScreenshotContract.validate_manifest!(manifest, expected_source_sha: SHA)
+    manifest
+  end
+
+  def test_public_screenshot_manifest_contract_is_complete
+    assert ReleaseScreenshotContract.validate_manifest!(screenshot_manifest, expected_source_sha: SHA)
+    assert_equal "APP_IPHONE_61", ReleaseScreenshotContract::DISPLAY_TYPE
+    assert_equal [1206, 2622], [ReleaseScreenshotContract::WIDTH, ReleaseScreenshotContract::HEIGHT]
+  end
+
+  def test_screenshot_contract_rejects_legacy_optional_targets
+    [
+      { "schema_version" => 1 },
+      { "app_store_display_type" => "APP_IPHONE_65" },
+      { "app_store_device_slot" => "6.5-inch iPhone" },
+      { "device_directory" => "iPhone-14-Plus" },
+      { "required_size" => { "width" => 1284, "height" => 2778 } }
+    ].each do |change|
+      assert_raises(RuntimeError) { ReleaseScreenshotContract.validate_manifest!(screenshot_manifest.merge(change), expected_source_sha: SHA) }
+    end
   end
 
   def test_public_release_clients_use_public_shared_contracts

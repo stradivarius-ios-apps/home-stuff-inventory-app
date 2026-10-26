@@ -13,8 +13,13 @@ Ordinary app validation and Full Test build/UI jobs use the reviewed Apple Silic
 
 - Xcode 26.6, build `17F113`;
 - iOS 26.5 Simulator runtime;
-- iPhone 17 for build, test, coverage, Full Test Validation, and PR screenshots;
-- iPhone 14 Plus for the existing 6.5-inch App Store screenshot contract.
+- iPhone 17 for build, test, coverage, Full Test Validation, and screenshots;
+- native 1206 × 2622 PNG screenshots for the required iPhone with Dynamic Island
+  (medium display) slot, API display type `APP_IPHONE_61`, in English and Ukrainian.
+
+The App Store screenshot manifest uses schema 2 and explicitly records its API
+display type. Legacy 6.5-inch assets and dimensions fail validation. Capture and
+readiness must target the required medium slot directly.
 
 `.github/scripts/configure_hosted_xcode.sh` selects the pinned toolchain, completes its
 required first-launch setup, and fails instead of changing runner class when the selected

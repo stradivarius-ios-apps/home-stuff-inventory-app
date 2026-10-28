@@ -110,18 +110,16 @@ enum InventorySearch {
                 .map { Result(item: $0, score: 0, matchContext: nil) }
         }
 
-        let pathsByID = Dictionary(uniqueKeysWithValues:
-            Set(filteredItems.compactMap(\.placeID)).compactMap { placeID in
-                placePaths[placeID].map { (placeID, $0) }
+        return Dictionary(grouping: filteredItems, by: \.placeID).flatMap { placeID, group in
+            let path = placePaths[placeID]
+            return group.compactMap { item in
+                result(
+                    for: item,
+                    normalizedQuery: normalizedQuery,
+                    placePath: path,
+                    vocabulary: vocabulary
+                )
             }
-        )
-        return filteredItems.compactMap { item in
-            result(
-                for: item,
-                normalizedQuery: normalizedQuery,
-                placePath: item.placeID.flatMap { pathsByID[$0] },
-                vocabulary: vocabulary
-            )
         }
         .sorted(by: rankedItemOrder)
     }

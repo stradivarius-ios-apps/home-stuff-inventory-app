@@ -192,6 +192,34 @@ struct InventoryPlacePathIndexTests {
         #expect(InventorySearch.matchingResults(in: [item], query: "adapter", placePaths: restored).map(\.id) == [item.id])
     }
 
+    @Test(arguments: [false, true])
+    func groupedCandidatesKeepRankingContextsAndFilters(reversed: Bool) {
+        let locationID = UUID()
+        let root = InventoryPlace(locationID: locationID, name: "Cabinet")
+        let box = InventoryPlace(locationID: locationID, parentPlaceID: root.id, name: "Box")
+        let tray = InventoryPlace(locationID: locationID, parentPlaceID: root.id, name: "Tray")
+        let shared = (1...3).map { offset in
+            InventoryItem(
+                id: UUID(uuidString: String(format: "00000000-0000-0000-0000-%012d", offset))!,
+                name: "Shared cable", category: "Tools", locationName: "Office",
+                containerName: offset == 3 ? "Tray" : "Box", placeID: offset == 3 ? tray.id : box.id
+            )
+        }
+        let direct = InventoryItem(name: "Cabinet manual", category: "Tools", locationName: "Office")
+        let tagged = InventoryItem(name: "Tag match", category: "Tools", locationName: "Office", placeID: UUID(), tags: ["cabinet"])
+        let notes = InventoryItem(name: "Notes match", category: "Tools", locationName: "Office", notes: "cabinet")
+        let excluded = InventoryItem(name: "Cabinet tool", category: "Electronics", locationName: "Office", placeID: box.id)
+        let candidates = shared + [notes, direct, tagged, excluded]
+        let results = InventorySearch.matchingResults(
+            in: reversed ? Array(candidates.reversed()) : candidates, query: "cabinet",
+            filters: .init(category: "Tools", locationName: "Office"), places: [root, box, tray]
+        )
+        #expect(results.map(\.id) == [direct.id] + shared.map(\.id) + [tagged.id, notes.id])
+        #expect(results.first?.matchContext == nil)
+        #expect(results.first { $0.id == tagged.id }?.matchContext == .init(matchedTag: "cabinet", matchedInNotes: false))
+        #expect(results.first { $0.id == notes.id }?.matchContext == .init(matchedTag: nil, matchedInNotes: true))
+    }
+
     @Test func deepHierarchyIndexDoesNotMaterializeUnusedPaths() {
         let locationID = UUID()
         var places: [InventoryPlace] = []

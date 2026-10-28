@@ -1,8 +1,8 @@
-import SwiftData
 import SwiftUI
 
 struct InventoryItemNavigationCard: View {
     let item: InventoryItem
+    let placePath: String?
     let matchContext: InventorySearch.MatchContext?
     let presentation: InventoryListPresentation
     let showsStorageSummary: Bool
@@ -10,10 +10,10 @@ struct InventoryItemNavigationCard: View {
     let reduceMotion: Bool
     let accessibilityIdentifier: String
     let action: () -> Void
-    @Query(sort: \InventoryPlace.name) private var places: [InventoryPlace]
 
     init(
         item: InventoryItem,
+        placePath: String?,
         matchContext: InventorySearch.MatchContext? = nil,
         presentation: InventoryListPresentation = .searchResults,
         showsStorageSummary: Bool = true,
@@ -23,6 +23,7 @@ struct InventoryItemNavigationCard: View {
         action: @escaping () -> Void
     ) {
         self.item = item
+        self.placePath = placePath
         self.matchContext = matchContext
         self.presentation = presentation
         self.showsStorageSummary = showsStorageSummary
@@ -48,15 +49,6 @@ struct InventoryItemNavigationCard: View {
             reduceMotion: reduceMotion
         )
         .accessibilityIdentifier(accessibilityIdentifier)
-    }
-
-    private var placePath: String? {
-        guard let placeID = item.placeID,
-              let place = places.first(where: { $0.id == placeID })
-        else {
-            return nil
-        }
-        return InventoryPlaceHierarchy.path(for: place, places: places).displayName
     }
 }
 

@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 
 struct ScopedInventoryItemsListView<Header: View>: View {
@@ -40,6 +41,7 @@ struct ScopedInventoryItemsListView<Header: View>: View {
     let showsStorageSummary: Bool
     let header: Header
 
+    @Query(sort: \InventoryPlace.name) private var places: [InventoryPlace]
     @State private var selectedItemID: UUID?
     @State private var isShowingNavigationTitle = false
     @State private var bulkSelection = InventoryBulkSelectionState()
@@ -151,11 +153,13 @@ struct ScopedInventoryItemsListView<Header: View>: View {
     }
 
     private var itemsList: some View {
-        scopedItemsScrollView {
+        let placePaths = InventoryPlacePathIndex(places: places)
+        return scopedItemsScrollView {
             LazyVStack(alignment: .leading, spacing: InventoryDesign.rowSpacing) {
                 ForEach(items) { item in
                     InventoryItemNavigationCard(
                         item: item,
+                        placePath: placePaths[item.placeID]?.displayName,
                         presentation: .compactInventory,
                         showsStorageSummary: showsStorageSummary,
                         transitionNamespace: itemNavigationNamespace,

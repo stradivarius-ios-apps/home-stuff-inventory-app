@@ -36,7 +36,7 @@ struct InventoryDataFileDisclosureTests {
     }
 
     @MainActor
-    @Test func transferWorkflowExportsCleansUpAndMapsShareFailures() throws {
+    @Test func transferWorkflowExportsCleansUpAndMapsShareFailures() async throws {
         var cleanupCount = 0
         let artifact = InventoryReadableExportArtifact(
             id: UUID(),
@@ -44,11 +44,12 @@ struct InventoryDataFileDisclosureTests {
             cleanupAction: {}
         )
         let workflow = InventoryDataTransferWorkflow(
-            readableExport: { _, _, _, _, _ in artifact },
+            readableExport: { _ in artifact },
             artifactCleanup: { _ in cleanupCount += 1 }
         )
 
         workflow.export(items: [], locations: [], customCategories: [])
+        await waitUntil { workflow.phase != .generatingReadableExport }
         #expect(workflow.phase == .sharingReadableExport)
         #expect(workflow.exportArtifact === artifact)
 
@@ -63,12 +64,13 @@ struct InventoryDataFileDisclosureTests {
     }
 
     @MainActor
-    @Test func transferWorkflowMapsUnknownExportAndImporterFailuresWithoutRawErrors() {
+    @Test func transferWorkflowMapsUnknownExportAndImporterFailuresWithoutRawErrors() async {
         let workflow = InventoryDataTransferWorkflow(
-            readableExport: { _, _, _, _, _ in throw CocoaError(.fileWriteUnknown) }
+            readableExport: { _ in throw CocoaError(.fileWriteUnknown) }
         )
 
         workflow.export(items: [], locations: [], customCategories: [])
+        await waitUntil { workflow.phase != .generatingReadableExport }
         guard case .readableExport(.generationFailed)? = workflow.transferOutcome else {
             Issue.record("Expected the typed generation failure")
             return
@@ -123,21 +125,23 @@ struct InventoryDataFileDisclosureTests {
     }
 
     @MainActor
-    @Test func transferWorkflowMapsShareCompletionsAndRejectsStaleCallbacks() {
+    @Test func transferWorkflowMapsShareCompletionsAndRejectsStaleCallbacks() async {
         let artifact = InventoryReadableExportArtifact(
             id: UUID(),
             url: URL(fileURLWithPath: "/tmp/inventory-export.txt"),
             cleanupAction: {}
         )
         let workflow = InventoryDataTransferWorkflow(
-            readableExport: { _, _, _, _, _ in artifact }
+            readableExport: { _ in artifact }
         )
 
         workflow.export(items: [], locations: [], customCategories: [])
+        await waitUntil { workflow.phase == .sharingReadableExport }
         workflow.completeShare(.completed)
         #expect(workflow.transferOutcome == nil)
 
         workflow.export(items: [], locations: [], customCategories: [])
+        await waitUntil { workflow.phase == .sharingReadableExport }
         workflow.completeShare(.failed)
         guard case .readableExport(.destinationWriteFailed)? = workflow.transferOutcome else {
             Issue.record("Expected the typed share destination failure")
@@ -191,7 +195,7 @@ struct InventoryDataFileDisclosureTests {
             cleanupAction: {}
         )
         let workflow = InventoryDataTransferWorkflow(
-            readableExport: { _, _, _, _, _ in artifact },
+            readableExport: { _ in artifact },
             backupPreparation: { _ in
                 InventoryPreparedBackup(data: Data([0x7B, 0x7D]), suggestedFilename: "backup.json")
             }
@@ -205,6 +209,7 @@ struct InventoryDataFileDisclosureTests {
         workflow.cancelDisclosure()
 
         workflow.export(items: [], locations: [], customCategories: [])
+        await waitUntil { workflow.phase != .generatingReadableExport }
         #expect(workflow.phase == .sharingReadableExport)
         workflow.prepareBackup(in: context)
         workflow.requestRestoreImport()
@@ -237,7 +242,7 @@ struct InventoryDataFileDisclosureTests {
         let context = ModelContext(container)
         let plan = restorePlanFixture()
         let workflow = InventoryDataTransferWorkflow(
-            readableExport: { _, _, _, _, _ in throw InventoryReadableExportError.generationFailed },
+            readableExport: { _ in throw InventoryReadableExportError.generationFailed },
             backupPreparation: { _ in
                 InventoryPreparedBackup(data: Data(), suggestedFilename: "backup.json")
             },
@@ -272,7 +277,7 @@ struct InventoryDataFileDisclosureTests {
             cleanupAction: {}
         )
         let workflow = InventoryDataTransferWorkflow(
-            readableExport: { _, _, _, _, _ in artifact },
+            readableExport: { _ in artifact },
             backupPreparation: { _ in
                 do {
                     try await Task.sleep(for: .milliseconds(50))

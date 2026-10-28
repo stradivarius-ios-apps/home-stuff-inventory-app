@@ -110,11 +110,16 @@ enum InventorySearch {
                 .map { Result(item: $0, score: 0, matchContext: nil) }
         }
 
+        let pathsByID = Dictionary(uniqueKeysWithValues:
+            Set(filteredItems.compactMap(\.placeID)).compactMap { placeID in
+                placePaths[placeID].map { (placeID, $0) }
+            }
+        )
         return filteredItems.compactMap { item in
             result(
                 for: item,
                 normalizedQuery: normalizedQuery,
-                placePaths: placePaths,
+                placePath: item.placeID.flatMap { pathsByID[$0] },
                 vocabulary: vocabulary
             )
         }
@@ -336,10 +341,10 @@ enum InventorySearch {
     private static func result(
         for item: InventoryItem,
         normalizedQuery: InventorySearchNormalization.Query,
-        placePaths: InventoryPlacePathIndex,
+        placePath: InventoryPlacePath?,
         vocabulary: InventoryBrowseVocabulary
     ) -> Result? {
-        let fields = SearchableFields(item: item, placePaths: placePaths, vocabulary: vocabulary)
+        let fields = SearchableFields(item: item, placePath: placePath, vocabulary: vocabulary)
         var score = 0
         var matchedTag: String?
         var matchedInNotes = false
@@ -450,8 +455,8 @@ private struct SearchableFields {
     let name: NormalizedSearchField
     let fields: [NormalizedSearchField]
 
-    init(item: InventoryItem, placePaths: InventoryPlacePathIndex, vocabulary: InventoryBrowseVocabulary) {
-        let pathComponents = placePaths[item.placeID]?.components ?? []
+    init(item: InventoryItem, placePath: InventoryPlacePath?, vocabulary: InventoryBrowseVocabulary) {
+        let pathComponents = placePath?.components ?? []
         let ancestorComponents = pathComponents.dropLast()
         name = NormalizedSearchField(field: .name, value: InventorySearchNormalization.normalize(item.name).fullText, originalValue: nil)
         fields = [

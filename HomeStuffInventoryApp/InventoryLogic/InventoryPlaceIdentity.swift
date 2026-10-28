@@ -25,17 +25,17 @@ struct InventoryPlacePath: Equatable {
     }
 }
 
-/// Immutable paths for one observed collection evaluation, shared by search and rows.
+/// One ID lookup per collection evaluation; paths are resolved only when requested.
 struct InventoryPlacePathIndex {
-    private let pathsByID: [UUID: InventoryPlacePath]
+    private let placesByID: [UUID: InventoryPlace]
 
     init(places: [InventoryPlace]) {
-        let placesByID = Dictionary(uniqueKeysWithValues: places.map { ($0.id, $0) })
-        pathsByID = placesByID.mapValues { InventoryPlaceHierarchy.path(for: $0, placesByID: placesByID) }
+        placesByID = Dictionary(uniqueKeysWithValues: places.map { ($0.id, $0) })
     }
 
     subscript(placeID: UUID?) -> InventoryPlacePath? {
-        placeID.flatMap { pathsByID[$0] }
+        guard let placeID, let place = placesByID[placeID] else { return nil }
+        return InventoryPlaceHierarchy.path(for: place, placesByID: placesByID)
     }
 }
 

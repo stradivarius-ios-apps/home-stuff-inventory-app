@@ -165,10 +165,10 @@ struct InventoryPlacePathIndexTests {
         let leaf = InventoryPlace(locationID: locationID, parentPlaceID: first.id, name: "Box")
         let item = InventoryItem(name: "Cable", locationName: "Office", containerName: "Box", placeID: leaf.id)
         var places = [first, second, leaf]
-        let original = InventoryPlacePathIndex(places: places)
+        let originalPath = InventoryPlacePathIndex(places: places)[leaf.id]
         first.name = "Closet"
         #expect(InventoryPlacePathIndex(places: places)[leaf.id]?.displayName == "Closet › Box")
-        #expect(original[leaf.id]?.displayName == "Cabinet › Box")
+        #expect(originalPath?.displayName == "Cabinet › Box")
         #expect(InventorySearch.matchingResults(in: [item], query: "closet", places: places).map(\.id) == [item.id])
 
         leaf.parentPlaceID = second.id
@@ -192,6 +192,47 @@ struct InventoryPlacePathIndexTests {
         #expect(InventorySearch.matchingResults(in: [item], query: "adapter", placePaths: restored).map(\.id) == [item.id])
     }
 
+    @Test func deepHierarchyIndexDoesNotMaterializeUnusedPaths() {
+        let locationID = UUID()
+        var places: [InventoryPlace] = []
+        for offset in 0..<5_000 {
+            places.append(InventoryPlace(
+                locationID: locationID, parentPlaceID: places.last?.id, name: "Level \(offset)"
+            ))
+        }
+        let invalidated = OSAllocatedUnfairLock(initialState: false)
+        let index = withObservationTracking {
+            InventoryPlacePathIndex(places: places)
+        } onChange: {
+            invalidated.withLock { $0 = true }
+        }
+        #expect(index[places.first?.id]?.components == ["Level 0"])
+        #expect(index[places.last?.id]?.components.count == 5_000)
+        places[2_500].name = "Renamed unused ancestor"
+        #expect(!invalidated.withLock { $0 })
+    }
+
+    @Test(arguments: [0, 1, 2])
+    func searchDoesNotReadPathsWithoutCandidatesOrQuery(scenario: Int) {
+        let locationID = UUID()
+        let root = InventoryPlace(locationID: locationID, name: "Cabinet")
+        let leaf = InventoryPlace(locationID: locationID, parentPlaceID: root.id, name: "Box")
+        let item = InventoryItem(name: "Cable", locationName: "Office", containerName: "Box", placeID: leaf.id)
+        let invalidated = OSAllocatedUnfairLock(initialState: false)
+        let results = withObservationTracking {
+            InventorySearch.matchingResults(
+                in: scenario == 2 ? [] : [item], query: scenario == 0 ? "" : "cabinet",
+                filters: scenario == 1 ? .init(locationName: "Kitchen") : .init(),
+                places: [root, leaf]
+            )
+        } onChange: {
+            invalidated.withLock { $0 = true }
+        }
+        #expect(results.count == (scenario == 0 ? 1 : 0))
+        root.name = "Closet"
+        #expect(!invalidated.withLock { $0 })
+    }
+
     @Test(arguments: [0, 1, 2])
     func indexReadsRegisterHierarchyObservation(change: Int) {
         let locationID = UUID()
@@ -199,7 +240,7 @@ struct InventoryPlacePathIndexTests {
         let leaf = InventoryPlace(locationID: locationID, parentPlaceID: root.id, name: "Box")
         let invalidated = OSAllocatedUnfairLock(initialState: false)
         _ = withObservationTracking {
-            InventoryPlacePathIndex(places: [root, leaf])
+            InventoryPlacePathIndex(places: [root, leaf])[leaf.id]
         } onChange: {
             invalidated.withLock { $0 = true }
         }

@@ -1,4 +1,6 @@
 import Foundation
+import Observation
+import os
 import Testing
 @testable import HomeStuffInventoryApp
 
@@ -130,5 +132,82 @@ struct InventoryPlaceIdentityTests {
         #expect(path.components.first == "Level 0")
         #expect(path.components.last == "Level 4999")
         #expect(path.status == .complete)
+    }
+}
+
+@MainActor
+struct InventoryPlacePathIndexTests {
+    @Test func indexPreservesPathsAndBrokenHierarchyStatuses() {
+        let locationID = UUID()
+        let root = InventoryPlace(locationID: locationID, name: "Cabinet")
+        let child = InventoryPlace(locationID: locationID, parentPlaceID: root.id, name: "Box")
+        let missingID = UUID()
+        let orphan = InventoryPlace(locationID: locationID, parentPlaceID: missingID, name: "Orphan")
+        let crossLocation = InventoryPlace(locationID: UUID(), parentPlaceID: root.id, name: "Other")
+        let cycle = InventoryPlace(locationID: locationID, name: "Cycle")
+        cycle.parentPlaceID = cycle.id
+        let index = InventoryPlacePathIndex(places: [root, child, orphan, crossLocation, cycle])
+
+        #expect(index[child.id]?.components == ["Cabinet", "Box"])
+        #expect(index[child.id]?.placeIDs == [root.id, child.id])
+        #expect(index[child.id]?.status == .complete)
+        #expect(index[orphan.id]?.status == .missingParent(missingID))
+        #expect(index[crossLocation.id]?.status == .crossLocationParent(root.id))
+        #expect(index[cycle.id]?.status == .cycle(cycle.id))
+        #expect(index[nil] == nil)
+        #expect(index[UUID()] == nil)
+    }
+
+    @Test func rebuildingPathsAndSearchReflectsRenameMoveDeletionAndRestoredModels() {
+        let locationID = UUID()
+        let first = InventoryPlace(locationID: locationID, name: "Cabinet")
+        let second = InventoryPlace(locationID: locationID, name: "Shelf")
+        let leaf = InventoryPlace(locationID: locationID, parentPlaceID: first.id, name: "Box")
+        let item = InventoryItem(name: "Cable", locationName: "Office", containerName: "Box", placeID: leaf.id)
+        var places = [first, second, leaf]
+        let original = InventoryPlacePathIndex(places: places)
+        first.name = "Closet"
+        #expect(InventoryPlacePathIndex(places: places)[leaf.id]?.displayName == "Closet › Box")
+        #expect(original[leaf.id]?.displayName == "Cabinet › Box")
+        #expect(InventorySearch.matchingResults(in: [item], query: "closet", places: places).map(\.id) == [item.id])
+
+        leaf.parentPlaceID = second.id
+        #expect(InventoryPlacePathIndex(places: places)[leaf.id]?.displayName == "Shelf › Box")
+        #expect(InventorySearch.matchingResults(in: [item], query: "closet", places: places).isEmpty)
+        #expect(InventorySearch.matchingResults(in: [item], query: "shelf", places: places).map(\.id) == [item.id])
+        places.removeAll { $0.id == leaf.id }
+        #expect(InventoryPlacePathIndex(places: places)[item.placeID] == nil)
+        #expect(InventorySearch.matchingResults(in: [item], query: "shelf", places: places).isEmpty)
+        #expect(InventorySearch.matchingResults(in: [item], query: "box", places: places).map(\.id) == [item.id])
+
+        let restoredRoot = InventoryPlace(id: second.id, locationID: locationID, name: "Restored shelf")
+        let restoredLeaf = InventoryPlace(id: leaf.id, locationID: locationID, parentPlaceID: second.id, name: "Restored box")
+        let restored = InventoryPlacePathIndex(places: [restoredRoot, restoredLeaf])
+        #expect(restored[item.placeID]?.displayName == "Restored shelf › Restored box")
+        #expect(InventorySearch.matchingResults(in: [item], query: "restored", placePaths: restored).map(\.id) == [item.id])
+        item.name = "Adapter"
+        item.placeID = second.id
+        #expect(restored[item.placeID]?.displayName == "Restored shelf")
+        #expect(InventorySearch.matchingResults(in: [item], query: "cable", placePaths: restored).isEmpty)
+        #expect(InventorySearch.matchingResults(in: [item], query: "adapter", placePaths: restored).map(\.id) == [item.id])
+    }
+
+    @Test(arguments: [0, 1, 2])
+    func indexReadsRegisterHierarchyObservation(change: Int) {
+        let locationID = UUID()
+        let root = InventoryPlace(locationID: locationID, name: "Cabinet")
+        let leaf = InventoryPlace(locationID: locationID, parentPlaceID: root.id, name: "Box")
+        let invalidated = OSAllocatedUnfairLock(initialState: false)
+        _ = withObservationTracking {
+            InventoryPlacePathIndex(places: [root, leaf])
+        } onChange: {
+            invalidated.withLock { $0 = true }
+        }
+        switch change {
+        case 0: root.name = "Closet"
+        case 1: leaf.parentPlaceID = nil
+        default: root.locationID = UUID()
+        }
+        #expect(invalidated.withLock { $0 })
     }
 }

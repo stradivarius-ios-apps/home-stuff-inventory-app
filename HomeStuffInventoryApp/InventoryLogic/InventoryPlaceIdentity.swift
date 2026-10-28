@@ -25,6 +25,20 @@ struct InventoryPlacePath: Equatable {
     }
 }
 
+/// Immutable paths for one observed collection evaluation, shared by search and rows.
+struct InventoryPlacePathIndex {
+    private let pathsByID: [UUID: InventoryPlacePath]
+
+    init(places: [InventoryPlace]) {
+        let placesByID = Dictionary(uniqueKeysWithValues: places.map { ($0.id, $0) })
+        pathsByID = placesByID.mapValues { InventoryPlaceHierarchy.path(for: $0, placesByID: placesByID) }
+    }
+
+    subscript(placeID: UUID?) -> InventoryPlacePath? {
+        placeID.flatMap { pathsByID[$0] }
+    }
+}
+
 enum InventoryPlaceHierarchy {
     static func children(
         of parentPlaceID: UUID?,
@@ -100,7 +114,13 @@ enum InventoryPlaceHierarchy {
         for place: InventoryPlace,
         places: [InventoryPlace]
     ) -> InventoryPlacePath {
-        let placesByID = Dictionary(uniqueKeysWithValues: places.map { ($0.id, $0) })
+        path(for: place, placesByID: Dictionary(uniqueKeysWithValues: places.map { ($0.id, $0) }))
+    }
+
+    static func path(
+        for place: InventoryPlace,
+        placesByID: [UUID: InventoryPlace]
+    ) -> InventoryPlacePath {
         var reversedIDs: [UUID] = []
         var reversedComponents: [String] = []
         var visited = Set<UUID>()

@@ -311,6 +311,197 @@ struct StoreKitEntitlementServiceTests {
         #expect(refreshFailureService.operationState == .failed(.restoreFailed))
     }
 
+    @Test func newerRefreshFinishesSupersededRestoreAndAllowsRetry() async {
+        let active = activeTransaction(id: 51)
+        let sequencer = EntitlementRefreshSequencer(newerResult: [.verifiedLifetime(active)])
+        let cache = LifetimeAccessCacheHarness()
+        let service = StoreKitEntitlementService(
+            client: StoreKitEntitlementClient(
+                loadLifetimeProduct: { throw TestError.failed },
+                purchaseLifetime: { .pending },
+                currentEntitlements: { try await sequencer.next() },
+                transactionUpdates: { AsyncStream { $0.finish() } },
+                synchronize: {}
+            ),
+            cache: cache.cache,
+            now: { now }
+        )
+
+        let restore = Task { await service.restorePurchases() }
+        await eventually { await sequencer.waitingForOlderRequest }
+        await service.refreshEntitlements()
+        await sequencer.completeOlder(with: [])
+        await restore.value
+
+        #expect(service.operationState == .idle)
+        #expect(service.premiumAccess.entitlements.ownsLifetimePro)
+        await service.restorePurchases()
+        #expect(service.operationState == .restored)
+    }
+
+    @Test func cancellationReleasesRestoreWithoutRevokingVerifiedAccess() async {
+        let sequencer = EntitlementRefreshSequencer(newerResult: [])
+        let service = makeRestoreService(
+            sequencer: sequencer,
+            premiumAccess: PremiumAccessState(entitlements: InventoryEntitlements(
+                ownsLifetimePro: true, hasActiveFamilySubscription: false
+            ))
+        )
+        let restore = Task { await service.restorePurchases() }
+        await eventually { await sequencer.waitingForOlderRequest }
+        restore.cancel()
+        await sequencer.completeOlder(with: [])
+        await restore.value
+
+        #expect(service.operationState == .idle)
+        #expect(service.premiumAccess.entitlements.ownsLifetimePro)
+        await service.restorePurchases()
+        #expect(service.operationState == .noPurchase)
+    }
+
+    @Test func stopStartAndNewRestoreKeepTheirOutcomeWhenOldRestoreReturns() async {
+        let sequencer = EntitlementRefreshSequencer(newerResult: [])
+        let service = makeRestoreService(sequencer: sequencer)
+        let oldRestore = Task { await service.restorePurchases() }
+        await eventually { await sequencer.waitingForOlderRequest }
+        service.stop()
+        #expect(service.operationState == .idle)
+        service.start()
+        await eventually { service.lifecycleState == .unavailable }
+        await service.restorePurchases()
+        #expect(service.operationState == .noPurchase)
+
+        await sequencer.completeOlder(with: [.verifiedLifetime(activeTransaction(id: 52))])
+        await oldRestore.value
+        #expect(service.operationState == .noPurchase)
+        #expect(!service.premiumAccess.entitlements.ownsLifetimePro)
+        service.stop()
+    }
+
+    @Test(arguments: [false, true])
+    func stoppedSynchronizationCannotOverwriteNewPurchase(fails: Bool) async {
+        let synchronization = EntitlementOperationGate()
+        let purchase = EntitlementOperationGate()
+        let service = StoreKitEntitlementService(
+            client: StoreKitEntitlementClient(
+                loadLifetimeProduct: { throw TestError.failed },
+                purchaseLifetime: { try await purchase.wait(); return .pending },
+                currentEntitlements: { throw TestError.failed },
+                transactionUpdates: { AsyncStream { $0.finish() } },
+                synchronize: { try await synchronization.wait() }
+            ),
+            cache: LifetimeAccessCacheHarness().cache,
+            now: { now }
+        )
+        let oldRestore = Task { await service.restorePurchases() }
+        await eventually { await synchronization.isWaiting }
+        service.stop()
+        let newPurchase = Task { await service.purchaseLifetime() }
+        await eventually { await purchase.isWaiting }
+        await synchronization.finish(fails: fails)
+        await oldRestore.value
+
+        #expect(service.operationState == .purchasing)
+        #expect(service.lifecycleState == .loading(cachedLifetimeAccess: false))
+        await purchase.finish()
+        await newPurchase.value
+        #expect(service.operationState == .pending)
+    }
+
+    @Test func verifiedPendingPurchaseSupersedesPausedRestoreWithoutLosingAction() async {
+        let sequencer = EntitlementRefreshSequencer(newerResult: [])
+        let harness = EntitlementClientHarness(purchaseResponses: [.success(.pending)])
+        let cache = LifetimeAccessCacheHarness()
+        let client = harness.client
+        let service = StoreKitEntitlementService(
+            client: StoreKitEntitlementClient(
+                loadLifetimeProduct: client.loadLifetimeProduct,
+                purchaseLifetime: client.purchaseLifetime,
+                currentEntitlements: { try await sequencer.next() },
+                transactionUpdates: client.transactionUpdates,
+                synchronize: client.synchronize
+            ),
+            cache: cache.cache,
+            now: { now }
+        )
+        service.start()
+        await eventually { await sequencer.waitingForOlderRequest }
+        await sequencer.completeOlder(with: [])
+        await eventually { service.lifecycleState == .unavailable }
+        let action = PremiumIntendedAction(feature: .roomSweep)
+        await service.purchaseLifetime(intendedAction: action)
+        await sequencer.suspendNextRequest()
+        let restore = Task { await service.restorePurchases() }
+        await eventually { await sequencer.waitingForOlderRequest }
+        await harness.sendUpdate(.verifiedLifetime(activeTransaction(id: 53)))
+        await eventually {
+            if case .purchased = service.operationState { return true }
+            return false
+        }
+        await sequencer.completeOlder(with: [])
+        await restore.value
+
+        guard case let .purchased(resumableAction?) = service.operationState else {
+            Issue.record("Verified pending purchase must retain its outcome")
+            service.stop()
+            return
+        }
+        #expect(resumableAction.id == action.id)
+        #expect(service.premiumAccess.entitlements.ownsLifetimePro)
+        #expect(await cache.record?.transactionID == 53)
+        service.stop()
+    }
+
+    @Test(arguments: [0, 1, 2, 3])
+    func stoppedRestoreCacheAcknowledgementCannotReplaceNewPurchaseLifecycle(mode: Int) async {
+        let gate = EntitlementOperationGate()
+        let old = activeTransaction(id: 60)
+        let newer = activeTransaction(id: 61)
+        let service = StoreKitEntitlementService(
+            client: StoreKitEntitlementClient(
+                loadLifetimeProduct: { throw TestError.failed },
+                purchaseLifetime: { .purchased(newer) },
+                currentEntitlements: { mode < 2 ? [.verifiedLifetime(old)] : [] },
+                transactionUpdates: { AsyncStream { $0.finish() } },
+                synchronize: {}
+            ),
+            cache: LifetimeAccessCache(
+                load: { nil },
+                store: { record in if record.transactionID == old.id { try await gate.wait() } },
+                remove: { try await gate.wait() }
+            ),
+            now: { now }
+        )
+        let restore = Task { await service.restorePurchases() }
+        await eventually { await gate.isWaiting }
+        service.stop()
+        await service.purchaseLifetime()
+        await gate.finish(fails: mode % 2 == 1)
+        await restore.value
+
+        #expect(service.operationState == .purchased(resumableAction: nil))
+        #expect(service.premiumAccess.entitlements.ownsLifetimePro)
+        #expect(service.lifecycleState == .available(service.premiumAccess.entitlements))
+    }
+
+    private func makeRestoreService(
+        sequencer: EntitlementRefreshSequencer,
+        premiumAccess: PremiumAccessState = PremiumAccessState(entitlements: .free)
+    ) -> StoreKitEntitlementService {
+        StoreKitEntitlementService(
+            premiumAccess: premiumAccess,
+            client: StoreKitEntitlementClient(
+                loadLifetimeProduct: { throw TestError.failed },
+                purchaseLifetime: { .pending },
+                currentEntitlements: { try await sequencer.next() },
+                transactionUpdates: { AsyncStream { $0.finish() } },
+                synchronize: {}
+            ),
+            cache: LifetimeAccessCacheHarness().cache,
+            now: { now }
+        )
+    }
+
     @Test func lifecycleStartIsIdempotentAndStopAllowsOneCleanRestart() async {
         let harness = EntitlementClientHarness(
             entitlementResponses: [.success([]), .success([])]
@@ -623,6 +814,7 @@ private actor EntitlementClientHarness {
 private actor EntitlementRefreshSequencer {
     private let newerResult: [StoreTransactionOutcome]
     private var callCount = 0
+    private var suspendedCall = 1
     private var olderContinuation: CheckedContinuation<[StoreTransactionOutcome], Error>?
 
     init(newerResult: [StoreTransactionOutcome]) {
@@ -635,7 +827,7 @@ private actor EntitlementRefreshSequencer {
 
     func next() async throws -> [StoreTransactionOutcome] {
         callCount += 1
-        if callCount == 1 {
+        if callCount == suspendedCall {
             return try await withCheckedThrowingContinuation { continuation in
                 olderContinuation = continuation
             }
@@ -643,8 +835,25 @@ private actor EntitlementRefreshSequencer {
         return newerResult
     }
 
+    func suspendNextRequest() { suspendedCall = callCount + 1 }
+
     func completeOlder(with result: [StoreTransactionOutcome]) {
         olderContinuation?.resume(returning: result)
         olderContinuation = nil
+    }
+}
+
+private actor EntitlementOperationGate {
+    private var continuation: CheckedContinuation<Void, Error>?
+    var isWaiting: Bool { continuation != nil }
+
+    func wait() async throws {
+        try await withCheckedThrowingContinuation { continuation = $0 }
+    }
+
+    func finish(fails: Bool = false) {
+        if fails { continuation?.resume(throwing: TestError.failed) }
+        else { continuation?.resume() }
+        continuation = nil
     }
 }

@@ -269,6 +269,13 @@ struct SettingsHomeView: View {
             workflow.cancelOutstandingWork()
         }
 #if DEBUG
+        .onChange(of: workflow.exportArtifact?.id) { _, artifactID in
+            guard artifactID != nil,
+                  ProcessInfo.processInfo.arguments.contains("--qa-suppress-export-share-sheet")
+            else { return }
+            workflow.cleanupExportArtifact()
+            exportInvocationCompleted = true
+        }
         .onChange(of: workflow.isBackupExporterPresented) { _, isPresented in
             guard isPresented,
                   ProcessInfo.processInfo.arguments.contains("--qa-suppress-backup-file-exporter")
@@ -383,14 +390,6 @@ struct SettingsHomeView: View {
             movementRecords: movementRecords,
             context: modelContext
         )
-#if DEBUG
-        guard action == .readableExport,
-              ProcessInfo.processInfo.arguments.contains("--qa-suppress-export-share-sheet"),
-              workflow.exportArtifact != nil
-        else { return }
-        workflow.cleanupExportArtifact()
-        exportInvocationCompleted = true
-#endif
     }
 }
 

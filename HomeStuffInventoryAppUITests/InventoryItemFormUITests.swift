@@ -133,7 +133,9 @@ final class InventoryItemFormUITests: InventoryUITestCase {
         XCTAssertTrue(itemName.waitForExistence(timeout: 3))
         itemName.tap(); itemName.typeText("Кабель USB-C")
         tapVisibleButton(identifier: "inventory.itemForm.locationPicker")
-        app.buttons["inventory.selection.option.Office"].tap()
+        let office = app.buttons["inventory.selection.option.Office"]
+        scrollToElement(office, in: element(identifier: "inventory.selection"))
+        office.tap()
         tapVisibleButton(identifier: "inventory.itemForm.containerPicker")
         XCTAssertTrue(app.buttons["inventory.placeSelection.createButton"].waitForExistence(timeout: 3))
         app.buttons["inventory.placeSelection.createButton"].tap()
@@ -151,7 +153,8 @@ final class InventoryItemFormUITests: InventoryUITestCase {
         tapVisibleButton(identifier: "inventory.itemForm.containerPicker")
         app.buttons["inventory.placeSelection.createButton"].tap()
         XCTAssertTrue(field.waitForExistence(timeout: 3))
-        app.navigationBars.buttons["Скасувати"].tap()
+        let cancel = app.navigationBars.buttons["Скасувати"]
+        (cancel.exists ? cancel : app.buttons["Скасувати"].firstMatch).tap()
         XCTAssertTrue(app.buttons["inventory.placeSelection.createButton"].waitForExistence(timeout: 3))
         tapBackButton()
         assertReturnedToUnsavedForm(name: "Кабель USB-C")

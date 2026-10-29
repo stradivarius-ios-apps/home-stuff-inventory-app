@@ -158,7 +158,7 @@ final class InventorySettingsUITests: InventoryUITestCase {
 
     func testPlaceDirectoryIsLocalizedInUkrainianAndLeavesLocationCategorySemanticsUntouched() {
         launchStartupApp(arguments: ["--use-sample-inventory-data"], contentSizeCategory: "UICTContentSizeCategoryAccessibilityXXXL", locale: "uk")
-        app.tabBars.buttons["Налаштування"].tap()
+        rootTabButton(named: "Налаштування").tap()
         let places = app.buttons["settings.lists.placesLink"]
         scrollToElement(places)
         XCTAssertEqual(places.label, "Керувати місцями зберігання")

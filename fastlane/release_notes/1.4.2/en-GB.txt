@@ -1,0 +1,1 @@
+Keep navigation titles stable on iPhone Duo. Improve restore reliability, readable exports, and place history and search behavior.

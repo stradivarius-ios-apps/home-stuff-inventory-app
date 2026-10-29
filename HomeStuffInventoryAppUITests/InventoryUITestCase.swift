@@ -101,11 +101,47 @@ class InventoryUITestCase: XCTestCase {
         XCTAssertTrue(locationsTab.waitForExistence(timeout: 3))
         locationsTab.tap()
         let locationRow = app.buttons["locations.locationRow.\(location)"]
-        scrollToElement(locationRow, in: element(identifier: "locations.list"))
-        locationRow.tap()
+        let locationsList = element(identifier: "locations.list")
+        scrollToElement(locationRow, in: locationsList)
+        tapVisibleCenter(of: locationRow, in: locationsList)
+        let locationHero = element(identifier: "locations.detailHero")
+        XCTAssertTrue(locationHero.waitForExistence(timeout: 3))
+        XCTAssertTrue(locationHero.label.contains(location), "Expected Location \(location), got \(locationHero.label)")
         let placeRow = app.buttons["locations.placeRow.\(place)"]
-        scrollToElement(placeRow, in: element(identifier: "locations.locationDetail"))
-        placeRow.tap()
+        let locationDetail = element(identifier: "locations.locationDetail")
+        scrollToElement(placeRow, in: locationDetail)
+        tapVisibleCenter(of: placeRow, in: locationDetail)
+    }
+
+    private func tapVisibleCenter(of element: XCUIElement, in container: XCUIElement) {
+        let visibleFrame = element.frame.intersection(container.frame).intersection(app.frame)
+        guard !visibleFrame.isNull, !visibleFrame.isEmpty else {
+            XCTFail("Expected a visible portion of \(element.identifier)")
+            return
+        }
+        // A large accessibility row can extend past the viewport; avoid its offscreen center.
+        app.coordinate(withNormalizedOffset: .zero).withOffset(
+            CGVector(dx: visibleFrame.midX - app.frame.minX, dy: visibleFrame.midY - app.frame.minY)
+        ).tap()
+    }
+
+    func openPlaceActions() {
+        let actions = element(identifier: "locations.placeDetail.proActions")
+        if !actions.exists {
+            let overflow = app.buttons["BottomOverflowBarButtonItem"]
+            if overflow.waitForExistence(timeout: 3) {
+                overflow.tap()
+                if !actions.exists {
+                    // The native overflow can replace the Menu's identifier and label.
+                    let nestedActions = app.collectionViews.buttons["More"].firstMatch
+                    XCTAssertTrue(nestedActions.waitForExistence(timeout: 3))
+                    nestedActions.tap()
+                    return
+                }
+            }
+        }
+        XCTAssertTrue(actions.waitForExistence(timeout: 3))
+        actions.tap()
     }
 
     func element(identifier: String) -> XCUIElement { app.descendants(matching: .any)[identifier] }

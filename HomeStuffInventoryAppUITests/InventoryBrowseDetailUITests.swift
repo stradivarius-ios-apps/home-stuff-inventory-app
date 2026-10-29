@@ -352,23 +352,31 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
         resetToInventoryList()
         openPlaceDetail(location: "Office", place: "Desk drawer")
 
-        let actions = app.buttons["locations.placeDetail.proActions"]
-        XCTAssertTrue(actions.waitForExistence(timeout: 3))
-        actions.tap()
+        openPlaceActions()
         let moveContents = app.buttons["locations.placeDetail.moveContentsButton"]
         XCTAssertTrue(moveContents.waitForExistence(timeout: 3))
         XCTAssertEqual(moveContents.label, "Move Place Contents")
         moveContents.tap()
         XCTAssertTrue(element(identifier: "premium.upgrade").waitForExistence(timeout: 3))
-        XCTAssertTrue(app.buttons["premium.purchase"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["premium.restore"].waitForExistence(timeout: 3))
+        let upgrade = element(identifier: "premium.upgrade")
         let productName = app.staticTexts["premium.productName"]
         let productPrice = app.staticTexts["premium.price"]
+        scrollToElement(productName, in: upgrade)
         XCTAssertTrue(productName.waitForExistence(timeout: 3))
         XCTAssertTrue(productPrice.waitForExistence(timeout: 3))
         XCTAssertFalse(productName.label.isEmpty)
         XCTAssertFalse(productPrice.label.isEmpty)
-        app.buttons["premium.dismiss"].tap()
+        let purchase = app.buttons["premium.purchase"]
+        scrollToElement(purchase, in: upgrade)
+        XCTAssertTrue(purchase.waitForExistence(timeout: 5))
+        let restore = app.buttons["premium.restore"]
+        scrollToElement(restore, in: upgrade)
+        XCTAssertTrue(restore.waitForExistence(timeout: 3))
+        capturePlaceDetailEvidence("place-contents-upgrade-actions")
+        let dismiss = element(identifier: "premium.dismiss")
+        for _ in 0..<4 where !dismiss.isHittable { upgrade.swipeDown() }
+        XCTAssertTrue(dismiss.waitForExistence(timeout: 3))
+        dismiss.tap()
 
         tapBackButton()
         tapBackButton()
@@ -379,7 +387,7 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
         XCTAssertTrue(confirmDelete.waitForExistence(timeout: 3))
         confirmDelete.tap()
 
-        app.buttons["locations.placeDetail.proActions"].tap()
+        openPlaceActions()
         let emptyMoveContents = app.buttons["locations.placeDetail.moveContentsButton"]
         XCTAssertTrue(emptyMoveContents.waitForExistence(timeout: 3))
         emptyMoveContents.tap()

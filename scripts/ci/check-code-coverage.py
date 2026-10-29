@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -147,7 +148,9 @@ def selected_files(files: list[dict]) -> list[dict]:
 def is_wholly_debug_support(source: str) -> bool:
     lines = [line.strip() for line in source.splitlines()
              if line.strip() and not line.lstrip().startswith("//")]
-    while lines and lines[0].startswith("import "):
+    # Only complete standalone module imports may precede the DEBUG enclosure.
+    import_declaration = r"import[ \t]+[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*[ \t]*(?://.*)?"
+    while lines and re.fullmatch(import_declaration, lines[0]):
         lines.pop(0)
     if not lines or lines[0] != "#if DEBUG":
         return False

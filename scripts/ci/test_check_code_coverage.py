@@ -55,6 +55,15 @@ class CoverageScopeTests(unittest.TestCase):
             with self.subTest(source=source):
                 self.assertFalse(checker.is_wholly_debug_support(source))
 
+    def test_import_prelude_rejects_appended_shipping_statements(self):
+        debug = "#if DEBUG\nstruct Fixture {}\n#endif\n"
+        for prelude in ("import Foundation\n", "import Foundation.Date // module import\n"):
+            self.assertTrue(checker.is_wholly_debug_support(prelude + debug))
+        for prelude in ("import Foundation; struct Shipping {}\n",
+                        "import Foundation\nimport SwiftData; struct Shipping {}\n"):
+            with self.subTest(prelude=prelude):
+                self.assertFalse(checker.is_wholly_debug_support(prelude + debug))
+
     def test_gate_fails_closed_when_an_excluded_file_loses_its_debug_boundary(self):
         with tempfile.TemporaryDirectory() as root:
             for relative in checker.EXCLUDED_DEBUG_SUPPORT_FILES:
@@ -62,7 +71,7 @@ class CoverageScopeTests(unittest.TestCase):
                 path.parent.mkdir(parents=True, exist_ok=True)
                 path.write_text("#if DEBUG\nstruct Fixture {}\n#endif\n")
             broken = checker.EXCLUDED_DEBUG_SUPPORT_FILES[0]
-            (Path(root) / broken).write_text("struct Shipping {}\n")
+            (Path(root) / broken).write_text("import Foundation; struct Shipping {}\n#if DEBUG\nstruct Fixture {}\n#endif\n")
             self.assertEqual(checker.excluded_debug_support_issues(Path(root)), [broken])
             with patch.object(checker, "excluded_debug_support_issues", return_value=[broken]), \
                  patch("sys.argv", ["check-code-coverage.py", root, "--minimum", "90"]), \

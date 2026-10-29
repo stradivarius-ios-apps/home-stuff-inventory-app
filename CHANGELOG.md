@@ -2,6 +2,20 @@
 
 All notable user-facing and release-track changes for Home Stuff Inventory are recorded here.
 
+## 1.4.2
+
+### Changed
+
+- Keep navigation titles stable on iPhone Duo (#94).
+- Finish interrupted restores without replacing newer outcomes (#92).
+- Move readable-export encoding and file work off MainActor (#91).
+- Reuse place paths across inventory search and rows (#90).
+- Avoid duplicate-name traps during place history repair (#89).
+
+### Internal
+
+- Check non-UI coverage and runtime localization keys (#93).
+
 ## 1.4.1
 
 ### Changed

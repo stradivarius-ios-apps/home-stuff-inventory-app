@@ -119,9 +119,9 @@ class InventoryUITestCase: XCTestCase {
             XCTFail("Expected a visible portion of \(element.identifier)")
             return
         }
-        // A large accessibility row can extend past the viewport; avoid its offscreen center.
-        app.coordinate(withNormalizedOffset: .zero).withOffset(
-            CGVector(dx: visibleFrame.midX - app.frame.minX, dy: visibleFrame.midY - app.frame.minY)
+        // Keep the element's display identity when tapping a partially visible row.
+        element.coordinate(withNormalizedOffset: .zero).withOffset(
+            CGVector(dx: visibleFrame.midX - element.frame.minX, dy: visibleFrame.midY - element.frame.minY)
         ).tap()
     }
 

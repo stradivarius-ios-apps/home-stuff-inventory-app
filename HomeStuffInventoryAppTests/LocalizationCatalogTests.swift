@@ -8,12 +8,9 @@ struct LocalizationCatalogTests {
         let appURL = rootURL.appendingPathComponent("HomeStuffInventoryApp", isDirectory: true)
         let catalog = try localizationTestCatalog(at: appURL.appendingPathComponent("Resources/Localizable.xcstrings"))
         let referencedKeys = try codeReferencedLocalizationTestKeys(in: appURL)
-        let missingKeys = referencedKeys.filter { catalog[$0] == nil }.sorted()
-        let missingEnglishValues = referencedKeys.filter { catalog[$0]?.localizedValue(for: "en") == nil }.sorted()
-        let missingUkrainianValues = referencedKeys.filter { catalog[$0]?.localizedValue(for: "uk") == nil }.sorted()
-        #expect(missingKeys.isEmpty, "Missing catalog keys: \(missingKeys.joined(separator: ", "))")
-        #expect(missingEnglishValues.isEmpty, "Missing English values: \(missingEnglishValues.joined(separator: ", "))")
-        #expect(missingUkrainianValues.isEmpty, "Missing Ukrainian values: \(missingUkrainianValues.joined(separator: ", "))")
+            .union(runtimeReferencedLocalizationTestKeys())
+        let issues = localizationTestCatalogIssues(keys: referencedKeys, catalog: catalog)
+        #expect(issues.isEmpty, "Localization catalog issues: \(issues.joined(separator: ", "))")
     }
 
     @Test func appTargetKeepsCompilerStringExtractionDisabled() throws {
@@ -166,5 +163,55 @@ struct LocalizationCatalogTests {
         #expect(localized("settings.backup.error.destination.title") == "Не вдалося зберегти резервну копію")
         #expect(localized("settings.tab.accessibilityLabel") == "Вкладка налаштувань")
         #expect(localized("inventory.condition.good") != "Добрий")
+    }
+}
+
+
+struct LocalizationGuardRegressionTests {
+    @Test func literalScannerIncludesExtendedNamespacesAndExcludesIdentifiers() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        try #"""
+        Text("premium.fixture")
+        Text("placeIcons.fixture")
+        Text("inventory.fixture")
+        .accessibilityIdentifier("premium.identifier")
+        """#.write(to: directory.appendingPathComponent("Fixture.swift"), atomically: true, encoding: .utf8)
+        #expect(try codeReferencedLocalizationTestKeys(in: directory) == [
+            "premium.fixture", "placeIcons.fixture", "inventory.fixture"
+        ])
+    }
+
+    @Test func runtimeKeysFollowTheProductionEnumsAndOptionCatalogs() {
+        let keys = runtimeReferencedLocalizationTestKeys()
+        #expect(keys.isSuperset(of: ItemIconCategory.allCases.map(\.titleKey)))
+        #expect(keys.isSuperset(of: LocationIconCategory.allCases.map(\.titleKey)))
+        #expect(keys.isSuperset(of: PremiumBundleCapability.allCases.map(\.titleKey)))
+        #expect(keys.isSuperset(of: ItemIconCatalog.options.map(\.nameKey)))
+        #expect(keys.isSuperset(of: LocationIconCatalog.options.map(\.nameKey)))
+    }
+
+    @Test(arguments: ["premium.fixture", "placeIcons.fixture", PremiumBundleCapability.roomSweep.titleKey])
+    func missingKeysAndMissingOrBlankTranslationsFailTheGuard(key: String) {
+        #expect(localizationTestCatalogIssues(keys: [key], catalog: [:]) == ["Missing catalog key: \(key)"])
+        #expect(localizationTestCatalogIssues(keys: [key], catalog: fixture(key, en: "English", uk: "Українська")).isEmpty)
+        for language in ["en", "uk"] {
+            for invalid in [nil, "", " \n\t"] as [String?] {
+                let catalog = fixture(key, en: language == "en" ? invalid : "English",
+                                      uk: language == "uk" ? invalid : "Українська")
+                #expect(localizationTestCatalogIssues(keys: [key], catalog: catalog) == [
+                    "Missing or empty \(language) value: \(key)"
+                ])
+            }
+        }
+    }
+
+    private func fixture(_ key: String, en: String?, uk: String?) -> [String: LocalizationCatalogEntry] {
+        var values: [String: LocalizationValue] = [:]
+        for (language, value) in [("en", en), ("uk", uk)] {
+            if let value { values[language] = LocalizationValue(stringUnit: LocalizationStringUnit(value: value)) }
+        }
+        return [key: LocalizationCatalogEntry(localizations: values)]
     }
 }

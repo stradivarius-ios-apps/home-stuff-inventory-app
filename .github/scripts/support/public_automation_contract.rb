@@ -22,6 +22,7 @@ module PublicAutomationContract
     .github/scripts/capture_release_app_store_screenshots.sh
     .github/scripts/configure_hosted_xcode.sh
     scripts/ci/check-code-coverage.py
+    scripts/ci/test_check_code_coverage.py
   ].freeze
 
   PUBLIC_CHECKS = %w[

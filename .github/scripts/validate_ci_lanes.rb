@@ -243,7 +243,7 @@ fail_contract("Validation UI smoke must preserve failure for diagnostics") unles
 fail_contract("Validation UI smoke must reuse built products") unless ui_smoke["run"].to_s.include?("test-without-building")
 ui_result = step!(validation_build_steps, "Reject empty successful UI smoke result")["run"].to_s
 fail_contract("Validation must reject empty successful UI smoke results") unless ui_result.include?("ordinary_validation.rb validate-result")
-coverage = step!(validation_build_steps, "Enforce 90% app-code coverage")["run"].to_s
+coverage = step!(validation_build_steps, "Enforce 90% non-UI layer coverage")["run"].to_s
 fail_contract("Validation coverage must use the authoritative unit result") unless coverage.include?("check-code-coverage.py TestResults/UnitTests.xcresult --minimum 90")
 ui_smoke_upload = step!(validation_build_steps, "Upload result bundles on failure")
 fail_contract("Validation UI smoke diagnostics must include its log") unless ui_smoke_upload.dig("with", "path").to_s.include?("TestResults/UITests.log")

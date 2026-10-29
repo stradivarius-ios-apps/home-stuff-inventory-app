@@ -74,9 +74,17 @@ class InventoryUITestCase: XCTestCase {
         )
     }
 
+    func rootTabButton(named labels: String...) -> XCUIElement {
+        let predicate = NSPredicate(format: "label IN %@", labels)
+        let tabBarButton = app.tabBars.buttons.matching(predicate).firstMatch
+        if tabBarButton.exists { return tabBarButton }
+        // Native vertical tab controls can be exposed as application buttons.
+        return app.buttons.matching(predicate).firstMatch
+    }
+
     func openSearch() {
         if app.searchFields.firstMatch.waitForExistence(timeout: 1) { return }
-        let searchTab = app.tabBars.buttons["Search inventory"]
+        let searchTab = rootTabButton(named: "Search inventory")
         if searchTab.waitForExistence(timeout: 2) { searchTab.tap() }
     }
 
@@ -115,9 +123,7 @@ class InventoryUITestCase: XCTestCase {
     }
 
     func resetToInventoryList() {
-        let inventoryTab = app.tabBars.buttons
-            .matching(NSPredicate(format: "label IN %@", ["Inventory", "Інвентар"]))
-            .firstMatch
+        let inventoryTab = rootTabButton(named: "Inventory", "Інвентар")
         if inventoryTab.waitForExistence(timeout: 1) { inventoryTab.tap() }
         var remainingBackSteps = 3
         while let backButton = hittableNavigationBackButton(), remainingBackSteps > 0 {
@@ -257,10 +263,14 @@ class InventoryUITestCase: XCTestCase {
     }
 
     private func hittableNavigationBackButton() -> XCUIElement? {
-        app.navigationBars.allElementsBoundByIndex.reversed().first { navigationBar in
+        if let navigationBar = app.navigationBars.allElementsBoundByIndex.reversed().first(where: { navigationBar in
             let backButton = navigationBar.buttons["BackButton"]
             return backButton.exists && backButton.isHittable
-        }.map { $0.buttons["BackButton"] }
+        }) {
+            return navigationBar.buttons["BackButton"]
+        }
+        let backButton = app.buttons["BackButton"].firstMatch
+        return backButton.exists && backButton.isHittable ? backButton : nil
     }
     func uniqueTestSuffix() -> String { String(UUID().uuidString.replacingOccurrences(of: "-", with: "").prefix(6)) }
     func row(named name: String) -> XCUIElement {

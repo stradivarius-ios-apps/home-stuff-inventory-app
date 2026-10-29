@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check Home Stuff Inventory app-code coverage from an Xcode result bundle."""
+"""Check Home Stuff Inventory non-UI layer coverage from an Xcode result bundle."""
 
 from __future__ import annotations
 
@@ -16,6 +16,7 @@ APP_SOURCE_PREFIXES = (
     "HomeStuffInventoryApp/InventoryLogic/",
     "HomeStuffInventoryApp/InventoryPresentation/",
     "HomeStuffInventoryApp/Persistence/",
+    "HomeStuffInventoryApp/Monetization/",
 )
 
 EXCLUDED_PATH_PARTS = (
@@ -28,9 +29,15 @@ EXCLUDED_PATH_PARTS = (
 )
 
 
+EXCLUDED_DEBUG_SUPPORT_FILES = (
+    "HomeStuffInventoryApp/InventoryData/InventorySampleData.swift",
+    "HomeStuffInventoryApp/Persistence/InventorySampleDataSeeder.swift",
+)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Fail when selected app-code line coverage is below a threshold."
+        description="Fail when selected non-UI layer line coverage is below a threshold."
     )
     parser.add_argument("result_bundle", help="Path to the coverage .xcresult bundle.")
     parser.add_argument(
@@ -51,6 +58,11 @@ def main() -> int:
         print(f"Coverage result bundle not found: {result_bundle}", file=sys.stderr)
         return 2
 
+    scope_issues = excluded_debug_support_issues(Path(__file__).resolve().parents[2])
+    if scope_issues:
+        print("Excluded support must remain wholly DEBUG-only: " + ", ".join(scope_issues), file=sys.stderr)
+        return 2
+
     report = load_xccov_report(result_bundle)
     target = find_target(report, args.target)
     if target is None:
@@ -60,20 +72,23 @@ def main() -> int:
 
     files = selected_files(target.get("files", []))
     if not files:
-        print("No covered app-code files matched the configured coverage scope.", file=sys.stderr)
+        print("No covered non-UI layer files matched the configured coverage scope.", file=sys.stderr)
         return 2
 
     covered_lines = sum(int(file.get("coveredLines", 0)) for file in files)
     executable_lines = sum(int(file.get("executableLines", 0)) for file in files)
     if executable_lines == 0:
-        print("Matched app-code files have no executable lines.", file=sys.stderr)
+        print("Matched non-UI layer files have no executable lines.", file=sys.stderr)
         return 2
 
     coverage = covered_lines / executable_lines * 100
 
-    print("Coverage scope:")
-    print("  Included: InventoryData, InventoryLogic, InventoryPresentation, Persistence")
+    print("Coverage scope: non-UI layers")
+    print("  Included: InventoryData, InventoryLogic, InventoryPresentation, Persistence, Monetization")
     print("  Excluded: tests, generated/build artifacts, SwiftUI Views, preview support")
+    print("  Excluded whole-file DEBUG support (source boundaries validated):")
+    for path in EXCLUDED_DEBUG_SUPPORT_FILES:
+        print(f"    {path}")
     print("")
     print(f"Covered lines: {covered_lines}/{executable_lines}")
     print(f"Coverage: {coverage:.2f}%")
@@ -122,9 +137,44 @@ def selected_files(files: list[dict]) -> list[dict]:
         normalized = normalized_name(file)
         if any(part in normalized for part in EXCLUDED_PATH_PARTS):
             continue
+        if relative_name(file) in EXCLUDED_DEBUG_SUPPORT_FILES:
+            continue
         if any(relative_name(file).startswith(prefix) for prefix in APP_SOURCE_PREFIXES):
             selected.append(file)
     return selected
+
+
+def is_wholly_debug_support(source: str) -> bool:
+    lines = [line.strip() for line in source.splitlines()
+             if line.strip() and not line.lstrip().startswith("//")]
+    while lines and lines[0].startswith("import "):
+        lines.pop(0)
+    if not lines or lines[0] != "#if DEBUG":
+        return False
+    depth = 0
+    for index, line in enumerate(lines):
+        if line.startswith("#if "):
+            depth += 1
+        elif line == "#endif":
+            depth -= 1
+        elif depth == 1 and line.startswith(("#else", "#elseif")):
+            return False
+        if depth == 0:
+            return index == len(lines) - 1
+    return False
+
+
+def excluded_debug_support_issues(repository_root: Path) -> list[str]:
+    issues = []
+    for path in EXCLUDED_DEBUG_SUPPORT_FILES:
+        try:
+            source = (repository_root / path).read_text(encoding="utf-8")
+        except OSError:
+            issues.append(path)
+            continue
+        if not is_wholly_debug_support(source):
+            issues.append(path)
+    return issues
 
 
 def relative_name(file: dict) -> str:

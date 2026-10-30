@@ -243,7 +243,7 @@ fail_contract("Validation UI smoke must preserve failure for diagnostics") unles
 fail_contract("Validation UI smoke must reuse built products") unless ui_smoke["run"].to_s.include?("test-without-building")
 ui_result = step!(validation_build_steps, "Reject empty successful UI smoke result")["run"].to_s
 fail_contract("Validation must reject empty successful UI smoke results") unless ui_result.include?("ordinary_validation.rb validate-result")
-coverage = step!(validation_build_steps, "Enforce 90% app-code coverage")["run"].to_s
+coverage = step!(validation_build_steps, "Enforce 90% non-UI layer coverage")["run"].to_s
 fail_contract("Validation coverage must use the authoritative unit result") unless coverage.include?("check-code-coverage.py TestResults/UnitTests.xcresult --minimum 90")
 ui_smoke_upload = step!(validation_build_steps, "Upload result bundles on failure")
 fail_contract("Validation UI smoke diagnostics must include its log") unless ui_smoke_upload.dig("with", "path").to_s.include?("TestResults/UITests.log")
@@ -276,7 +276,7 @@ fail_contract("Required CI workflow validation must always aggregate selected ph
 end
 fastlane_steps = Array(fastlane_smoke["steps"])
 setup_ruby = step!(fastlane_steps, "Set up locked Ruby")
-fail_contract("Fastlane smoke test must pin reviewed ruby/setup-ruby") unless setup_ruby["uses"] == "ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b"
+fail_contract("Fastlane smoke test must pin reviewed ruby/setup-ruby") unless setup_ruby["uses"] == "ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8"
 fail_contract("Fastlane smoke test must provision Ruby 4.0.5") unless setup_ruby.dig("with", "ruby-version").to_s == "4.0.5"
 fail_contract("Fastlane smoke test must provision Bundler 2.7.2") unless setup_ruby.dig("with", "bundler").to_s == "2.7.2"
 fail_contract("Fastlane smoke test must not use an implicit gem cache") unless setup_ruby.dig("with", "bundler-cache") == false

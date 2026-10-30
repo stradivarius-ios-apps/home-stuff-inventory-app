@@ -252,33 +252,45 @@ struct InventoryDetailNotesCard: View {
     let editAction: () -> Void
 
     var body: some View {
-        Button(action: editAction) {
-            InventoryCard {
-                VStack(alignment: .leading, spacing: InventoryDesign.rowSpacing) {
-                    InventorySectionHeader("inventory.section.notes")
+        InventoryCard {
+            VStack(alignment: .leading, spacing: InventoryDesign.rowSpacing) {
+                InventorySectionHeader("inventory.section.notes")
+                    .accessibilityIdentifier("inventory.detail.notesHeader")
 
-                    Text(notesText)
+                Button(action: editAction) {
+                    Text(visibleNotesText)
                         .font(.body)
                         .foregroundStyle(notes.isEmpty ? .secondary : .primary)
                         .lineSpacing(2)
-                        .frame(maxWidth: .infinity, alignment: .leading)
                         .fixedSize(horizontal: false, vertical: true)
                 }
+                .buttonStyle(.plain)
+                .accessibilityLabel(
+                    InventoryLocalization.formatted(
+                        "inventory.notes.card.accessibilityLabel",
+                        defaultValue: "Notes: %@",
+                        accessibilityNotesText
+                    )
+                )
+                .accessibilityHint("inventory.notes.card.accessibilityHint")
+                .accessibilityIdentifier("inventory.detail.notesContent")
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel(
-            InventoryLocalization.formatted(
-                "inventory.notes.card.accessibilityLabel",
-                defaultValue: "Notes: %@",
-                notesText
-            )
-        )
-        .accessibilityHint("inventory.notes.card.accessibilityHint")
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("inventory.detail.notesCard")
     }
 
-    private var notesText: String {
+    private var visibleNotesText: String {
+        notes.isEmpty
+            ? InventoryLocalization.string(
+                "inventory.notes.emptyPrompt",
+                defaultValue: "Tap to add a note"
+            )
+            : notes
+    }
+
+    private var accessibilityNotesText: String {
         notes.isEmpty ? InventoryLocalization.noNotes : notes
     }
 }

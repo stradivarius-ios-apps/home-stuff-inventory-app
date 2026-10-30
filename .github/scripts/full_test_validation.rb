@@ -14,11 +14,23 @@ SHARDS = {
     InventoryBrowseDetailUITests/testCompactInventoryRowPreservesRetrievalOrderAndTapTarget
     InventoryBrowseDetailUITests/testPrimaryEditAndNotesSaveKeepDestructiveAndContextControlsAsNegativeControls
     InventoryBrowseDetailUITests/testPlaceFilterNarrowsInventoryAndCanBeCleared
+    InventoryBrowseDetailUITests/testFilterSubmenusKeepFirstLevelCompactAndSelectionsIndependent
+    InventoryBrowseDetailUITests/testInventoryFiltersRemainIndependentOfNativeSearchQuery
+    InventoryBrowseDetailUITests/testFilterLocationReconcilesPlaceAndDistinguishesMissingFromAny
+    InventoryBrowseDetailUITests/testFilterScaleSubmenusReachFortiethOption
+    InventoryBrowseDetailUITests/testFilterSubmenusUseUkrainianLabelsAtMaximumAccessibilitySize
+    InventoryBrowseDetailUITests/testEmptyInventoryKeepsAllFilterSubmenusAndAnyChoices
     InventoryBrowseDetailUITests/testSearchingByItemNameLocationAndPlace
   ],
   "02" => %w[
+    InventoryBrowseDetailUITests/testEmptyLocationsShortcutsKeepAddItemAndFullManagersInLocationsStack
+    InventoryBrowseDetailUITests/testDirectLocationEditRenamesStableRouteAndPreservesLinkedItemContext
+    InventoryBrowseDetailUITests/testLocationEditCancelIconOnlyAndDuplicateRetryKeepSameEditor
+    InventoryBrowseDetailUITests/testMissingLocationHasNoManagementMenuAndKeepsAddItemAvailable
+    InventoryBrowseDetailUITests/testLocationManagementShortcutsReuseGlobalDirectoryAndReturnToTheirSource
     InventoryBrowseDetailUITests/testInventorySearchAndEmptyStateSurfaces
     InventoryBrowseDetailUITests/testLocationAndPlaceDetailContextualAddAndHeroQA
+    InventoryBrowseDetailUITests/testNestedPlaceRetainsExtendedContextWithoutLaunchFlags
     InventoryBrowseDetailUITests/testDeletingLastPlaceItemKeepsEmptyPlaceContext
     InventoryBrowseDetailUITests/testPlaceContentsMovementActionDistinguishesAccessGateFromEmptyState
     InventoryBrowseDetailUITests/testOpeningItemDetailKeepsHeroAndRevealsNavigationTitleAfterScroll
@@ -31,7 +43,9 @@ SHARDS = {
     InventoryBrowseDetailUITests/testExistingNotesEditorLifecycleSupportsDismissDiscardAndSave
   ],
   "04" => %w[
-    InventoryBrowseDetailUITests/testEmptyNotesCardOpensNotesEditor
+    InventoryBrowseDetailUITests/testEmptyNotesContentOpensNotesEditor
+    InventoryBrowseDetailUITests/testEmptyNotesUsesNativeTextActionWithoutCardAction
+    InventoryBrowseDetailUITests/testShortNotesUsesNativeTextActionWithoutCardAction
     InventoryBrowseDetailUITests/testScopedRoomSweepUsesSharedUpgradeWithoutBlockingOrdinaryAddItem
     InventoryBrowseDetailUITests/testProductionPlaceDetailOmitsCommercialActionsAndKeepsAddItemAvailable
     InventoryItemFormUITests/testNewItemFormInitiallyFocusesNameWhileEditFormDoesNotForceFocus
@@ -46,10 +60,15 @@ SHARDS = {
     InventoryItemFormUITests/testAddCategoryCreationSurfaceRendersAtAccessibilitySize
   ],
   "06" => %w[
+    InventoryItemFormUITests/testTagsGuidanceRemainsVisibleAcrossLengthValidationAndCorrection
+    InventoryItemFormUITests/testEditingTagsKeepsStoredValueAfterCancel
     InventoryItemFormUITests/testItemFormDiscardProtectionForNewContextualAndEditFlows
     InventoryItemFormUITests/testEditingLocationReviewsExistingPlaceBeforeSaving
     InventoryItemFormUITests/testPlacePickerCanClearASelectedPlace
     InventoryItemFormUITests/testCreatingLocationAndCategoryFromItemFormSelectsPersistedValues
+    InventoryItemFormUITests/testCanceledAndSwipedCreationsPreserveSelectorQueryAndSelection
+    InventoryItemFormUITests/testExistingAndEmptySelectionsReturnToSameItemForm
+    InventoryItemFormUITests/testCreatedLocationDefersPlaceReviewUntilFormReturns
   ],
   "07" => %w[
     InventoryItemFormUITests/testAddItemFormTextFieldsFocusFromExpandedRows
@@ -111,6 +130,8 @@ SHARDS = {
   ],
   "16" => %w[
     RecentItemsTileLayoutUITests/testPlaceRecentItemsUseFullWidthShelfRowsAndNavigate
+    RecentItemsTileLayoutUITests/testRealLeafRetainsPathAndRecentItemsBeforeDirectList
+    RecentItemsTileLayoutUITests/testLongRealLeafWrapsInUkrainianAccessibilityDarkAppearance
     RecentItemsTileLayoutUITests/testFourItemPlaceDoesNotExposeRecentItems
     RecentItemsTileLayoutUITests/testAccessibilityDynamicTypeKeepsFiveItemPlaceRecentItemsNavigable
     RecentItemsTileLayoutUITests/testAccessibilityDynamicTypeReachesAndActivatesEveryLocationRecentTile
@@ -119,6 +140,7 @@ SHARDS = {
     RecentItemsTileLayoutUITests/testLocationDetailPlacesFollowRecentItemsCard
     RecentItemsTileLayoutUITests/testLocationDetailUsesAllItemsAccessWhenRecentItemsAreAbsent
     RecentItemsTileLayoutUITests/testLocationDetailPlacesEmptyStateFollowsHeader
+    RecentItemsTileLayoutUITests/testOneAndZeroRealLeafKeepContextAndAddPrefillInBothLanguages
     RecentItemsTileLayoutUITests/testLocationRecentItemsShelfAlignsWithStoragePlaceCardInLightAndDarkAppearance
     RecentItemsTileLayoutUITests/testLocationDetailCompositionFitsUkrainianAccessibilityInDarkAppearance
   ],
@@ -127,6 +149,7 @@ SHARDS = {
     RecentItemsTileLayoutUITests/testLocationDetailWithReduceTransparencyKeepsCompositionVisible
     RecentItemsTileLayoutUITests/testLocationDetailWithIncreaseContrastKeepsCompositionVisible
     RecentItemsTileLayoutUITests/testDifferentiateWithoutColorKeepsItemLocationAndPlaceContextDistinct
+    RecentItemsTileLayoutUITests/testRealLeafVisualConfigurations
   ]
 }.freeze
 DEFAULT_UI_SHARD_TIMEOUT_SECONDS = 20 * 60

@@ -149,7 +149,7 @@ class HostedPublicCITest < Minitest::Test
     end
     validation = File.read(".github/workflows/validation.yml")
     assert_equal 1, validation.scan("bash .github/scripts/configure_hosted_xcode.sh").length
-    assert_includes validation, "ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b"
+    assert_includes validation, "ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8"
     assert_includes validation, 'ruby-version: "4.0.5"'
     assert_includes validation, 'bundler: "2.7.2"'
     refute_includes validation, "$RUNNER_TOOL_CACHE/Ruby/"
@@ -160,6 +160,7 @@ class HostedPublicCITest < Minitest::Test
     assert_equal 1, validation.scan("build-for-testing").length
     assert_operator validation.scan("test-without-building").length, :>=, 2
     assert_includes validation, "scripts/ci/check-code-coverage.py TestResults/UnitTests.xcresult --minimum 90"
+    assert_includes validation, "python3 -m unittest discover -s scripts/ci -p 'test_*.py'"
     assert_includes validation, "ordinary_validation.rb validate-result"
     assert_includes validation, "ordinary_validation.rb summarize"
   end

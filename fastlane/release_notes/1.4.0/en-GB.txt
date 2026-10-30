@@ -1,0 +1,1 @@
+Browse your inventory with filters grouped into clearer submenus. Manage Locations from contextual actions, return to item forms after creating a selection, and edit Notes directly from their content. Storage Place details are simpler, with clearer guidance for tags and data transfer.

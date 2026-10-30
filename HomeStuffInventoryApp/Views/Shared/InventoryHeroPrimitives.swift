@@ -1,3 +1,4 @@
+import Darwin
 import SwiftUI
 
 enum InventoryHeroIconPresentation {
@@ -453,6 +454,26 @@ private struct InventoryOptionalAccessibilityIdentifierModifier: ViewModifier {
 }
 
 enum InventoryHeroNavigationTitleMetrics {
+    static let keepsNavigationTitleVisible = requiresStableNavigationTitle(
+        modelIdentifier: currentModelIdentifier
+    )
+
+    static func requiresStableNavigationTitle(modelIdentifier: String) -> Bool {
+        modelIdentifier == "iPhone19,4"
+    }
+
+    private static let currentModelIdentifier: String = {
+        #if targetEnvironment(simulator)
+        return ProcessInfo.processInfo.environment["SIMULATOR_MODEL_IDENTIFIER"] ?? ""
+        #else
+        var systemInfo = utsname()
+        guard uname(&systemInfo) == 0 else { return "" }
+        return withUnsafeBytes(of: systemInfo.machine) { bytes in
+            String(decoding: bytes.prefix(while: { $0 != 0 }), as: UTF8.self)
+        }
+        #endif
+    }()
+
     static let inlineNavigationBarHeight: CGFloat = 44
 
     static let revealScrollDistance: CGFloat = inlineNavigationBarHeight
@@ -508,6 +529,12 @@ private struct InventoryHeroNavigationTitleVisibilityObserverModifier: ViewModif
     func body(content: Content) -> some View {
         observedContent(content)
             .coordinateSpace(name: InventoryHeroNavigationTitleCoordinateSpace.name)
+            .onAppear {
+                // A stable native title avoids scroll-driven vertical bar relayout on Duo.
+                if InventoryHeroNavigationTitleMetrics.keepsNavigationTitleVisible {
+                    isShowingNavigationTitle = true
+                }
+            }
     }
 
     @ViewBuilder
@@ -520,6 +547,7 @@ private struct InventoryHeroNavigationTitleVisibilityObserverModifier: ViewModif
                         restingAnchorMinY: restingAnchorMinY
                     )
                 } action: { _, isScrolledPastHero in
+                    guard !InventoryHeroNavigationTitleMetrics.keepsNavigationTitleVisible else { return }
                     isShowingNavigationTitle = isScrolledPastHero
                 }
         } else {
@@ -529,6 +557,7 @@ private struct InventoryHeroNavigationTitleVisibilityObserverModifier: ViewModif
 
     private func preferenceObservedContent(_ content: Content) -> some View {
         content.onPreferenceChange(InventoryHeroTitleFramePreferenceKey.self) { heroFrame in
+            guard !InventoryHeroNavigationTitleMetrics.keepsNavigationTitleVisible else { return }
             if let isShowing = InventoryHeroNavigationTitleMetrics.shouldShowNavigationTitle(for: heroFrame) {
                 isShowingNavigationTitle = isShowing
             }

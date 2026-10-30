@@ -61,6 +61,9 @@ class ReleaseScreenshotExporterTest < Minitest::Test
     assert_includes stdout, "Exported 12 validated"
     manifest = JSON.parse(File.read(File.join(@output, "screenshots-manifest.json")))
     ReleaseScreenshotContract.validate_manifest!(manifest)
+    assert_equal "APP_IPHONE_61", manifest.fetch("app_store_display_type")
+    assert_equal({ "width" => 1206, "height" => 2622 }, manifest.fetch("required_size"))
+    assert_equal "iPhone-17", manifest.fetch("device_directory")
     assert_equal %w[en uk], manifest.fetch("locales").map { |locale| locale.fetch("source_locale") }
     assert_equal %w[en-GB uk], manifest.fetch("locales").map { |locale| locale.fetch("app_store_locale") }
   end
@@ -78,7 +81,7 @@ class ReleaseScreenshotExporterTest < Minitest::Test
     end
 
     write_fixture(expected_attachments)
-    _stdout, stderr, status = run_exporter("SCREENSHOT_WIDTH" => "1206")
+    _stdout, stderr, status = run_exporter("SCREENSHOT_WIDTH" => "1284")
     refute status.success?
     assert_includes stderr, "Invalid dimensions"
 
@@ -86,6 +89,13 @@ class ReleaseScreenshotExporterTest < Minitest::Test
     _stdout, stderr, status = run_exporter("RELEASE_SCREENSHOT_SOURCE_SHA" => "wrong")
     refute status.success?
     assert_includes stderr, "source SHA"
+  end
+
+  def test_rejects_the_optional_large_face_id_dimensions
+    write_fixture(expected_attachments)
+    _stdout, stderr, status = run_exporter("SCREENSHOT_WIDTH" => "1284", "SCREENSHOT_HEIGHT" => "2778")
+    refute status.success?
+    assert_includes stderr, "expected 1206x2622"
   end
 
   def test_manifest_validation_rejects_misordered_files
@@ -138,8 +148,8 @@ class ReleaseScreenshotExporterTest < Minitest::Test
     File.write(File.join(@bin, "sips"), <<~RUBY)
       #!/usr/bin/env ruby
       puts "format: png"
-      puts "pixelWidth: \#{ENV.fetch("SCREENSHOT_WIDTH", "1284")}"
-      puts "pixelHeight: \#{ENV.fetch("SCREENSHOT_HEIGHT", "2778")}"
+      puts "pixelWidth: \#{ENV.fetch("SCREENSHOT_WIDTH", "1206")}"
+      puts "pixelHeight: \#{ENV.fetch("SCREENSHOT_HEIGHT", "2622")}"
     RUBY
     FileUtils.chmod(0o755, [File.join(@bin, "xcrun"), File.join(@bin, "sips")])
   end

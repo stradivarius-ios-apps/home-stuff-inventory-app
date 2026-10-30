@@ -25,6 +25,20 @@ struct InventoryPlacePath: Equatable {
     }
 }
 
+/// One ID lookup per collection evaluation; paths are resolved only when requested.
+struct InventoryPlacePathIndex {
+    private let placesByID: [UUID: InventoryPlace]
+
+    init(places: [InventoryPlace]) {
+        placesByID = Dictionary(uniqueKeysWithValues: places.map { ($0.id, $0) })
+    }
+
+    subscript(placeID: UUID?) -> InventoryPlacePath? {
+        guard let placeID, let place = placesByID[placeID] else { return nil }
+        return InventoryPlaceHierarchy.path(for: place, placesByID: placesByID)
+    }
+}
+
 enum InventoryPlaceHierarchy {
     static func children(
         of parentPlaceID: UUID?,
@@ -100,7 +114,13 @@ enum InventoryPlaceHierarchy {
         for place: InventoryPlace,
         places: [InventoryPlace]
     ) -> InventoryPlacePath {
-        let placesByID = Dictionary(uniqueKeysWithValues: places.map { ($0.id, $0) })
+        path(for: place, placesByID: Dictionary(uniqueKeysWithValues: places.map { ($0.id, $0) }))
+    }
+
+    static func path(
+        for place: InventoryPlace,
+        placesByID: [UUID: InventoryPlace]
+    ) -> InventoryPlacePath {
         var reversedIDs: [UUID] = []
         var reversedComponents: [String] = []
         var visited = Set<UUID>()

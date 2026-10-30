@@ -128,13 +128,7 @@ enum InventoryDataTransferPhase: Equatable {
 @MainActor
 @Observable
 final class InventoryDataTransferWorkflow {
-    typealias ReadableExport = (
-        [InventoryItem],
-        [StorageLocation],
-        [InventoryCustomCategory],
-        [InventoryPlace],
-        [InventoryMovementRecord]
-    ) throws -> InventoryReadableExportArtifact
+    typealias ReadableExport = @MainActor (InventoryPortabilitySnapshotV1) async throws -> InventoryReadableExportArtifact
     typealias BackupPreparation = @MainActor (ModelContext) async throws -> InventoryPreparedBackup
     typealias BackupFileRead = (URL) async throws -> Data
     typealias RestorePlanning = (Data) async throws -> InventoryBackupRestorePlan
@@ -166,19 +160,14 @@ final class InventoryDataTransferWorkflow {
     private let backupFileRead: BackupFileRead
     private let restorePlanning: RestorePlanning
     private let artifactCleanup: ArtifactCleanup
+    private var readableExportTask: Task<Void, Never>?
     private var backupPreparationTask: Task<Void, Never>?
     private var restorePlanningTask: Task<Void, Never>?
     private var operationID: UUID?
 
     init(
-        readableExport: @escaping ReadableExport = { items, locations, categories, places, movementRecords in
-            try InventoryReadableExportService().export(
-                items: items,
-                locations: locations,
-                customCategories: categories,
-                places: places,
-                movementRecords: movementRecords
-            )
+        readableExport: @escaping ReadableExport = { snapshot in
+            try await InventoryReadableExportWorker().export(snapshot: snapshot)
         },
         backupPreparation: @escaping BackupPreparation = { context in
             try await InventoryBackupService().prepareBackup(in: context)
@@ -192,6 +181,11 @@ final class InventoryDataTransferWorkflow {
         self.backupFileRead = backupFileRead
         self.restorePlanning = restorePlanning
         self.artifactCleanup = artifactCleanup
+    }
+
+    isolated deinit {
+        readableExportTask?.cancel()
+        if let exportArtifact { artifactCleanup(exportArtifact) }
     }
 
     func requestDisclosure(for action: InventoryDataFileAction) {
@@ -240,13 +234,37 @@ final class InventoryDataTransferWorkflow {
                 || isReadableExportOutcome
         else { return }
         phase = .generatingReadableExport
-        do {
-            exportArtifact = try readableExport(items, locations, customCategories, places, movementRecords)
-            phase = .sharingReadableExport
-        } catch let error as InventoryReadableExportError {
-            phase = .outcome(.readableExport(error))
-        } catch {
-            phase = .outcome(.readableExport(.generationFailed))
+        let snapshot = InventoryReadableExportService().makeSnapshot(
+            items: items, locations: locations, customCategories: customCategories,
+            places: places, movementRecords: movementRecords
+        )
+        let operationID = UUID()
+        self.operationID = operationID
+        readableExportTask = Task { [weak self, readableExport, artifactCleanup] in
+            defer {
+                if self?.operationID == operationID {
+                    self?.readableExportTask = nil
+                    self?.operationID = nil
+                }
+            }
+            do {
+                let artifact = try await readableExport(snapshot)
+                guard !Task.isCancelled, let self,
+                      self.operationID == operationID, self.phase == .generatingReadableExport else {
+                    artifactCleanup(artifact)
+                    return
+                }
+                self.exportArtifact = artifact
+                self.phase = .sharingReadableExport
+            } catch {
+                guard let self, self.operationID == operationID,
+                      self.phase == .generatingReadableExport else { return }
+                if error is CancellationError {
+                    self.phase = .idle
+                } else {
+                    self.phase = .outcome(.readableExport(error as? InventoryReadableExportError ?? .generationFailed))
+                }
+            }
         }
     }
 
@@ -413,6 +431,8 @@ final class InventoryDataTransferWorkflow {
 
     func cancelOutstandingWork() {
         operationID = nil
+        readableExportTask?.cancel()
+        readableExportTask = nil
         backupPreparationTask?.cancel()
         backupPreparationTask = nil
         restorePlanningTask?.cancel()

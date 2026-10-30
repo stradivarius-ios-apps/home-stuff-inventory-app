@@ -208,6 +208,7 @@ jobs:
       - name: Validate CI scripts
         run: |
           python3 -m py_compile scripts/ci/check-code-coverage.py
+          python3 -m unittest discover -s scripts/ci -p 'test_*.py'
 
       - name: Run release automation checks
         run: ruby .github/scripts/run_public_automation_checks.rb
@@ -229,7 +230,7 @@ jobs:
         run: test "$(git rev-parse HEAD)" = "${{ github.sha }}"
 
       - name: Set up locked Ruby
-        uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
+        uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
         with:
           ruby-version: "4.0.5"
           bundler: "2.7.2"
@@ -361,7 +362,7 @@ jobs:
         if: steps.unit-tests.outcome == 'success'
         run: ruby .github/scripts/ordinary_validation.rb validate-result TestResults/UnitTests.xcresult unit/localization
 
-      - name: Enforce 90% app-code coverage
+      - name: Enforce 90% non-UI layer coverage
         id: coverage
         if: steps.unit-tests.outcome == 'success' && steps.unit-result.outcome == 'success'
         continue-on-error: true

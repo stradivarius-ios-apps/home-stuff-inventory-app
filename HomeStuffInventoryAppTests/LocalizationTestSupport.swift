@@ -1,4 +1,5 @@
 import Foundation
+@testable import HomeStuffInventoryApp
 
 func localizationTestValue(_ key: String) -> String {
     localizationTestValue(key, language: "uk")
@@ -48,7 +49,7 @@ func localizationTestCatalog(at url: URL) throws -> [String: LocalizationCatalog
 
 func codeReferencedLocalizationTestKeys(in appURL: URL) throws -> Set<String> {
     let sourceURLs = try localizationTestSwiftSourceURLs(in: appURL)
-    let keyPattern = #""((?:inventory|itemIcons|locationIcons|locations|settings)\.[^"\\]+)""#
+    let keyPattern = #""((?:inventory|itemIcons|locationIcons|locations|settings|premium|placeIcons)\.[^"\\]+)""#
     let keyRegex = try NSRegularExpression(pattern: keyPattern)
     var keys: Set<String> = []
 
@@ -70,6 +71,28 @@ func codeReferencedLocalizationTestKeys(in appURL: URL) throws -> Set<String> {
     }
 
     return keys
+}
+
+func runtimeReferencedLocalizationTestKeys() -> Set<String> {
+    Set(ItemIconCategory.allCases.map(\.titleKey)
+        + LocationIconCategory.allCases.map(\.titleKey)
+        + PremiumBundleCapability.allCases.map(\.titleKey)
+        + ItemIconCatalog.options.map(\.nameKey)
+        + LocationIconCatalog.options.map(\.nameKey))
+}
+
+func localizationTestCatalogIssues(
+    keys: Set<String>, catalog: [String: LocalizationCatalogEntry]
+) -> [String] {
+    keys.sorted().flatMap { key -> [String] in
+        guard let entry = catalog[key] else { return ["Missing catalog key: \(key)"] }
+        return ["en", "uk"].compactMap { language in
+            guard let value = entry.localizedValue(for: language),
+                  !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            else { return "Missing or empty \(language) value: \(key)" }
+            return nil
+        }
+    }
 }
 
 private func localizationTestSwiftSourceURLs(in appURL: URL) throws -> [URL] {

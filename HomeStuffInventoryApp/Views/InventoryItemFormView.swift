@@ -12,6 +12,8 @@ struct InventoryItemFormView: View {
     @State private var isShowingSaveError = false
     @State private var isShowingDiscardConfirmation = false
     @State private var placeReviewPrompt: InventoryStorageConsistencyReview.Prompt?
+    @State private var pendingPlaceReviewPrompt: InventoryStorageConsistencyReview.Prompt?
+    @State private var isFormContentVisible = false
     @State private var hasBlurredNameField = false
     @State private var hasRequestedInitialFocus = false
     @FocusState private var focusedField: InventoryItemFormFocusedField?
@@ -125,15 +127,26 @@ struct InventoryItemFormView: View {
                 .inventoryFormRowSurface()
 
                 Section {
-                    TextField("inventory.field.tags.placeholder", text: $draft.tagsText)
-                        .textInputAutocapitalization(.never)
-                        .inventoryFocusableFormRow(focusedField: $focusedField, equals: .tags)
-                        .accessibilityIdentifier("inventory.itemForm.tagsField")
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("inventory.field.tags")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
 
-                    if !draft.isTagsValid {
-                        Text(tagValidationText)
-                            .inventoryValidationMessage()
-                            .accessibilityIdentifier("inventory.itemForm.tagsValidation")
+                        Text(tagsFormatHelper)
+                            .inventoryHelperText()
+
+                        TextField("inventory.field.tags.placeholder", text: $draft.tagsText)
+                            .textInputAutocapitalization(.never)
+                            .inventoryFocusableFormRow(focusedField: $focusedField, equals: .tags)
+                            .accessibilityLabel("inventory.field.tags")
+                            .accessibilityHint(tagsFormatHelper)
+                            .accessibilityIdentifier("inventory.itemForm.tagsField")
+
+                        if !draft.isTagsValid {
+                            Text(tagValidationText)
+                                .inventoryValidationMessage()
+                                .accessibilityIdentifier("inventory.itemForm.tagsValidation")
+                        }
                     }
 
                     VStack(alignment: .leading, spacing: 8) {
@@ -167,9 +180,13 @@ struct InventoryItemFormView: View {
             .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
+                isFormContentVisible = true
+                placeReviewPrompt = pendingPlaceReviewPrompt
+                pendingPlaceReviewPrompt = nil
                 requestInitialNameFocusIfAppropriate()
             }
             .onDisappear {
+                isFormContentVisible = false
                 focusedField = nil
             }
             .onChange(of: focusedField) { previousField, currentField in
@@ -197,10 +214,15 @@ struct InventoryItemFormView: View {
             .onChange(of: draft.locationName) { _, nextLocationName in
                 draft.placeID = nil
                 draft.allowsLegacyPlaceResolution = false
-                placeReviewPrompt = workflow.reviewPlaceAfterLocationChange(
+                let prompt = workflow.reviewPlaceAfterLocationChange(
                     locationName: nextLocationName,
                     placeName: draft.containerName
                 )
+                if isFormContentVisible {
+                    placeReviewPrompt = prompt
+                } else {
+                    pendingPlaceReviewPrompt = prompt
+                }
             }
             .alert(saveErrorTitle, isPresented: $isShowingSaveError) {
                 Button("inventory.action.ok", role: .cancel) { }
@@ -291,6 +313,14 @@ struct InventoryItemFormView: View {
 
     private var isDirty: Bool {
         workflow.isDirty(draft)
+    }
+
+    private var tagsFormatHelper: String {
+        InventoryLocalization.formatted(
+            "inventory.form.tagsFormatHelper",
+            defaultValue: "Separate tags with commas. Maximum %d characters per tag.",
+            InventoryItemDraft.maximumTagLength
+        )
     }
 
     private var tagValidationText: String {

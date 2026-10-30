@@ -54,6 +54,153 @@ final class RecentItemsTileLayoutUITests: XCTestCase {
         assertItemDetail(for: expectedItem.name)
     }
 
+    func testRealLeafRetainsPathAndRecentItemsBeforeDirectList() {
+        launchApp(itemCount: 5)
+        openFixturePlace()
+        let path = app.staticTexts["locations.placeDetail.path"]
+        let heading = element(identifier: "locations.placeDetail.itemsSectionHeader")
+        XCTAssertEqual(path.label, "Storage path: Recent Items Test Location, Recent Items Test Place")
+        XCTAssertEqual(heading.label, "Items")
+        XCTAssertFalse(element(identifier: "locations.placeDetail.countSummary").exists)
+        XCTAssertLessThan(app.otherElements["locations.placeDetailHero"].frame.maxY, path.frame.minY)
+        XCTAssertLessThan(path.frame.maxY, placeRecentItems.frame.minY)
+        XCTAssertLessThan(placeRecentItems.frame.maxY, heading.frame.minY)
+        let tiles = recentItemTiles(in: placeRecentItems)
+        XCTAssertEqual(tiles.allElementsBoundByIndex.map(\.identifier), Fixture.items.map { recentItemIdentifier(for: $0.id) })
+        assertStandardThreeShelfRowGeometry(tiles, in: placeRecentItems)
+        assertOverflowSummary(in: placeRecentItems)
+        let direct = app.buttons["locations.placeDetail.itemRow.Recent layout item four"]
+        XCTAssertLessThan(heading.frame.maxY, direct.frame.minY)
+        XCTAssertEqual(direct.label, "Recent layout item four, Miscellaneous, Quantity 1")
+        for expected in Fixture.items {
+            let tile = placeRecentItems.buttons[recentItemIdentifier(for: expected.id)]
+            scrollToHittable(tile, in: placeDetail)
+            tile.tap()
+            assertItemDetail(for: expected.name)
+            app.navigationBars.buttons.element(boundBy: 0).tap()
+            XCTAssertTrue(placeDetail.waitForExistence(timeout: 3))
+        }
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        let allItems = app.buttons["Show all items in Recent Items Test Location"]
+        scrollToHittable(allItems, in: locationDetail)
+        allItems.tap()
+        let allLocationRow = app.buttons["inventory.itemRow.Recent layout item one"]
+        scrollToHittable(allLocationRow, in: app.scrollViews["locations.scopedItemList"])
+        XCTAssertEqual(allLocationRow.label,
+                       "Recent layout item one, Recent Items Test Location, Recent Items Test Place, Miscellaneous, Quantity 1")
+    }
+
+    func testRealLeafVisualConfigurations() {
+        let configurations: [(String, String, Int, Int, String)] = [
+            ("en", "light", 5, 3, "UICTContentSizeCategoryL"),
+            ("uk", "light", 5, 3, "UICTContentSizeCategoryL"),
+            ("en", "light", 5, 4, "UICTContentSizeCategoryL"),
+            ("uk", "dark", 5, 4, "UICTContentSizeCategoryL"),
+            ("en", "dark", 4, 4, "UICTContentSizeCategoryL"),
+            ("uk", "light", 4, 4, "UICTContentSizeCategoryL"),
+            ("en", "light", 5, 0, "UICTContentSizeCategoryL"),
+            ("uk", "dark", 5, 4, "UICTContentSizeCategoryAccessibilityXXXL")
+        ]
+        for (locale, appearance, count, history, size) in configurations {
+            launchApp(locale: locale, contentSizeCategory: size, itemCount: count,
+                      appearanceArgument: "--qa-force-\(appearance)-appearance", historyCount: history,
+                      additionalArguments: size.hasSuffix("XXXL")
+                        ? ["--qa-reduce-motion", "--qa-reduce-transparency", "--qa-increase-contrast"] : [])
+            openFixturePlace(expectRecentItems: count >= 5 && history > 0, expectLocationRecentItems: history > 0)
+            let name = "\(locale)-\(appearance)-items\(count)-history\(history)-\(size)"
+            captureEvidence(name + "-top")
+            let path = app.staticTexts["locations.placeDetail.path"]
+            XCTAssertTrue(path.isHittable)
+            XCTAssertEqual(path.label, (locale == "uk" ? "Шлях зберігання: " : "Storage path: ")
+                           + "Recent Items Test Location, Recent Items Test Place")
+            XCTAssertEqual(placeRecentItems.exists, count >= 5 && history > 0)
+            if count >= 5 && history > 0 {
+                let third = placeRecentItems.buttons[recentItemIdentifier(for: Fixture.items[2].id)]
+                scrollToHittable(third, in: placeDetail)
+                captureEvidence(name + "-recent")
+            }
+            let direct = app.buttons["locations.placeDetail.itemRow.Recent layout item four"]
+            scrollToHittable(direct, in: placeDetail)
+            XCTAssertGreaterThanOrEqual(direct.frame.height, 44)
+            captureEvidence(name + "-direct")
+            app.terminate()
+        }
+    }
+
+    func testLongRealLeafWrapsInUkrainianAccessibilityDarkAppearance() {
+        let locationName = "Домашній кабінет із довгою назвою для родинних речей і запасних аксесуарів"
+        let placeName = "Верхня шухляда великої шафи з кабелями, зарядними пристроями та перехідниками"
+        let itemName = "Комплект запасних кабелів і перехідників для сімейних подорожей — Recent layout item four"
+        launchApp(locale: "uk", contentSizeCategory: "UICTContentSizeCategoryAccessibilityXXXL",
+                  appearanceArgument: "--qa-force-dark-appearance", additionalArguments: [
+                    "--qa-recent-items-layout-fixture-long-names", "--qa-reduce-motion",
+                    "--qa-reduce-transparency", "--qa-increase-contrast"
+                  ])
+        let location = app.buttons["locations.locationRow.\(locationName)"]
+        scrollToHittable(location, in: locationsList)
+        location.tap()
+        let place = app.buttons["locations.placeRow.\(placeName)"]
+        scrollToHittable(place, in: locationDetail)
+        place.tap()
+        XCTAssertTrue(placeDetail.waitForExistence(timeout: 3))
+        captureEvidence("uk-dark-long-names-accessibility-top")
+        let path = app.staticTexts["locations.placeDetail.path"]
+        XCTAssertEqual(path.label, "Шлях зберігання: \(locationName), \(placeName)")
+        scrollToHittable(path, in: placeDetail)
+        captureEvidence("uk-dark-long-names-accessibility-path")
+        let recent = placeRecentItems.buttons[recentItemIdentifier(for: Fixture.items[2].id)]
+        scrollToHittable(recent, in: placeDetail)
+        XCTAssertGreaterThanOrEqual(recent.frame.height, 44)
+        captureEvidence("uk-dark-long-names-accessibility-recent")
+        let row = app.buttons["locations.placeDetail.itemRow.\(itemName)"]
+        scrollToHittable(row, in: placeDetail)
+        XCTAssertGreaterThanOrEqual(row.frame.height, 44)
+        XCTAssertGreaterThanOrEqual(row.frame.minX, app.frame.minX)
+        XCTAssertLessThanOrEqual(row.frame.maxX, app.frame.maxX)
+        XCTAssertFalse(row.label.contains(locationName))
+        XCTAssertTrue(row.label.contains("Кабелі, зарядні пристрої та різноманітні запасні аксесуари для подорожей"))
+        captureEvidence("uk-dark-long-names-accessibility-direct")
+        row.tap()
+        assertItemDetail(for: itemName)
+    }
+
+    func testOneAndZeroRealLeafKeepContextAndAddPrefillInBothLanguages() {
+        for locale in ["en", "uk"] {
+            launchApp(locale: locale, itemCount: 1, historyCount: 0)
+            openFixturePlace(expectRecentItems: false, expectLocationRecentItems: false)
+            let row = app.buttons["locations.placeDetail.itemRow.Recent layout item one"]
+            XCTAssertTrue(row.isHittable)
+            XCTAssertFalse(row.label.contains(Fixture.locationName))
+            captureEvidence("\(locale)-one-item")
+            row.tap()
+            let delete = app.buttons["inventory.deleteItemButton"]
+            scrollToHittable(delete, in: itemDetail)
+            delete.tap()
+            let confirm = app.buttons["inventory.confirmDeleteButton"].firstMatch
+            XCTAssertTrue(confirm.waitForExistence(timeout: 3))
+            confirm.tap()
+            XCTAssertTrue(app.otherElements["locations.placeDetailHero"].waitForExistence(timeout: 3))
+            XCTAssertTrue(app.staticTexts["locations.placeDetail.path"].isHittable)
+            XCTAssertFalse(element(identifier: "locations.placeDetail.countSummary").exists)
+            XCTAssertTrue(app.otherElements["locations.placeDetailHero"].label.contains(locale == "uk" ? "0 речей" : "0 items"))
+            captureEvidence("\(locale)-zero-items")
+            app.buttons["locations.placeDetail.addItemButton"].tap()
+            let locationPicker = app.buttons["inventory.itemForm.locationPicker"]
+            XCTAssertTrue(locationPicker.waitForExistence(timeout: 3))
+            XCTAssertTrue(locationPicker.label.contains(Fixture.locationName))
+            XCTAssertTrue(app.buttons["inventory.itemForm.containerPicker"].label.contains(Fixture.placeName))
+            app.buttons["inventory.itemForm.cancelButton"].tap()
+            app.terminate()
+        }
+    }
+
+    private func captureEvidence(_ name: String) {
+        let attachment = XCTAttachment(screenshot: app.screenshot())
+        attachment.name = name
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
     func testFourItemPlaceDoesNotExposeRecentItems() {
         launchApp(itemCount: 4)
         openFixturePlace(expectRecentItems: false)
@@ -321,13 +468,16 @@ final class RecentItemsTileLayoutUITests: XCTestCase {
         contentSizeCategory: String = "UICTContentSizeCategoryL",
         itemCount: Int = 5,
         accessibilityArgument: String? = nil,
-        appearanceArgument: String? = nil
+        appearanceArgument: String? = nil,
+        historyCount: Int = 4,
+        additionalArguments: [String] = []
     ) {
         app = XCUIApplication()
         app.launchArguments = [
             "--use-sample-inventory-data",
             Fixture.launchArgument,
             "--qa-recent-items-layout-fixture-count", "\(itemCount)",
+            "--qa-recent-items-layout-fixture-history-count", "\(historyCount)",
             "-AppleLanguages", "(\(locale))",
             "-AppleLocale", locale == "uk" ? "uk_UA" : "en_US",
             "-UIPreferredContentSizeCategoryName", contentSizeCategory
@@ -338,6 +488,7 @@ final class RecentItemsTileLayoutUITests: XCTestCase {
         if let appearanceArgument {
             app.launchArguments.append(appearanceArgument)
         }
+        app.launchArguments += additionalArguments
         app.launch()
         XCTAssertTrue(locationsList.waitForExistence(timeout: 5), "Expected Locations root after fixture launch.")
     }
@@ -374,16 +525,18 @@ final class RecentItemsTileLayoutUITests: XCTestCase {
         XCTAssertTrue(locationsList.waitForExistence(timeout: 5), "Expected Locations root after empty fixture launch.")
     }
 
-    private func openFixtureLocation() {
+    private func openFixtureLocation(expectRecentItems: Bool = true) {
         let location = app.buttons["locations.locationRow.\(Fixture.locationName)"]
         scrollToHittable(location, in: locationsList)
         location.tap()
         XCTAssertTrue(locationDetail.waitForExistence(timeout: 3), "Expected fixture Location Detail.")
-        scrollUntilVisible(locationRecentItems, in: locationDetail)
+        if expectRecentItems {
+            scrollUntilVisible(locationRecentItems, in: locationDetail)
+        }
     }
 
-    private func openFixturePlace(expectRecentItems: Bool = true) {
-        openFixtureLocation()
+    private func openFixturePlace(expectRecentItems: Bool = true, expectLocationRecentItems: Bool = true) {
+        openFixtureLocation(expectRecentItems: expectLocationRecentItems)
         let place = app.buttons["locations.placeRow.\(Fixture.placeName)"]
         scrollToHittable(place, in: locationDetail)
         place.tap()

@@ -13,6 +13,12 @@ SHARD_TESTS = %w[
   testCompactInventoryRowPreservesRetrievalOrderAndTapTarget
   testPrimaryEditAndNotesSaveKeepDestructiveAndContextControlsAsNegativeControls
   testPlaceFilterNarrowsInventoryAndCanBeCleared
+  testFilterSubmenusKeepFirstLevelCompactAndSelectionsIndependent
+  testInventoryFiltersRemainIndependentOfNativeSearchQuery
+  testFilterLocationReconcilesPlaceAndDistinguishesMissingFromAny
+  testFilterScaleSubmenusReachFortiethOption
+  testFilterSubmenusUseUkrainianLabelsAtMaximumAccessibilitySize
+  testEmptyInventoryKeepsAllFilterSubmenusAndAnyChoices
   testSearchingByItemNameLocationAndPlace
 ].freeze
 
@@ -50,10 +56,68 @@ Dir.mktmpdir("full-test-validation-success") do |directory|
   assert(status.success?, "complete shard must succeed: #{output}")
   summary = JSON.parse(File.read(File.join(results, "ui-shard-summary.json")))
   assert(summary.dig(SHARD, "status") == "success", "successful shard status was not recorded")
-  assert(summary.dig(SHARD, "test_identifiers").length == 4, "successful shard did not retain all identifiers")
+  assert(summary.dig(SHARD, "test_identifiers").length == SHARD_TESTS.length, "successful shard did not retain all identifiers")
   published_output = File.read(output_path)
   assert(published_output.include?("status=success"), "successful matrix status was not published")
   assert(published_output.include?("shard_01_status=success"), "named shard status was not published")
+end
+
+# Keep Notes selectors aligned with their explicit UI shard.
+Dir.mktmpdir("full-test-validation-notes") do |directory|
+  methods = %w[
+    testEmptyNotesContentOpensNotesEditor
+    testEmptyNotesUsesNativeTextActionWithoutCardAction
+    testShortNotesUsesNativeTextActionWithoutCardAction
+    testScopedRoomSweepUsesSharedUpgradeWithoutBlockingOrdinaryAddItem
+    testProductionPlaceDetailOmitsCommercialActionsAndKeepsAddItemAvailable
+    testNewItemFormInitiallyFocusesNameWhileEditFormDoesNotForceFocus
+    testPreScopedNewItemFormInitiallyFocusesName
+    testReturningFromItemFormPickersDoesNotRestoreNameFocus
+  ]
+  fake_bin = File.join(directory, "bin")
+  FileUtils.mkdir_p(fake_bin)
+  lines = methods.map do |method|
+    suite = method.start_with?("testNewItemForm", "testPreScoped", "testReturningFrom") ? "InventoryItemFormUITests" : "InventoryBrowseDetailUITests"
+    "Test Case '-[HomeStuffInventoryAppUITests.#{suite} #{method}]' passed (1.0 seconds)."
+  end
+  File.write(File.join(fake_bin, "xcodebuild"), "#!/bin/sh\n" + lines.map { |line| "echo #{line.dump}" }.join("\n") + "\n")
+  File.write(File.join(fake_bin, "xcrun"), "#!/bin/sh\nexit 1\n")
+  FileUtils.chmod("u+x", Dir[File.join(fake_bin, "*")])
+  results = File.join(directory, "results")
+  output, status = Open3.capture2e({ "PATH" => "#{fake_bin}:#{ENV.fetch("PATH")}" },
+    "ruby", SCRIPT, "run-ui-shard", "04", "shared.xctestrun", "platform=iOS Simulator,id=shard-04", results)
+  assert(status.success?, "complete Notes shard must succeed: #{output}")
+  summary = JSON.parse(File.read(File.join(results, "ui-shard-summary.json")))
+  assert(summary.dig("04", "test_identifiers").length == methods.length, "Notes shard did not retain every selector")
+end
+
+# Keep the item-form shard fixture aligned with its explicit UI selectors.
+Dir.mktmpdir("full-test-validation-item-form") do |directory|
+  methods = %w[
+    testTagsGuidanceRemainsVisibleAcrossLengthValidationAndCorrection
+    testEditingTagsKeepsStoredValueAfterCancel
+    testItemFormDiscardProtectionForNewContextualAndEditFlows
+    testEditingLocationReviewsExistingPlaceBeforeSaving
+    testPlacePickerCanClearASelectedPlace
+    testCreatingLocationAndCategoryFromItemFormSelectsPersistedValues
+    testCanceledAndSwipedCreationsPreserveSelectorQueryAndSelection
+    testExistingAndEmptySelectionsReturnToSameItemForm
+    testCreatedLocationDefersPlaceReviewUntilFormReturns
+  ]
+  fake_bin = File.join(directory, "bin")
+  FileUtils.mkdir_p(fake_bin)
+  lines = methods.map do |method|
+    "Test Case '-[HomeStuffInventoryAppUITests.InventoryItemFormUITests #{method}]' passed (1.0 seconds)."
+  end
+  File.write(File.join(fake_bin, "xcodebuild"), "#!/bin/sh\n" + lines.map { |line| "echo #{line.dump}" }.join("\n") + "\n")
+  File.write(File.join(fake_bin, "xcrun"), "#!/bin/sh\nexit 1\n")
+  FileUtils.chmod("u+x", Dir[File.join(fake_bin, "*")])
+  results = File.join(directory, "results")
+  command = ["ruby", SCRIPT, "run-ui-shard", "06", "shared.xctestrun", "platform=iOS Simulator,id=shard-06", results]
+  output, status = Open3.capture2e({ "PATH" => "#{fake_bin}:#{ENV.fetch("PATH")}" }, *command)
+  assert(status.success?, "complete item-form shard must succeed: #{output}")
+  summary = JSON.parse(File.read(File.join(results, "ui-shard-summary.json")))
+  assert(summary.dig("06", "test_identifiers").length == methods.length, "item-form shard did not retain every selector")
 end
 
 Dir.mktmpdir("full-test-validation-failure") do |directory|
@@ -147,7 +211,7 @@ Dir.mktmpdir("full-test-validation-missing-identifiers") do |directory|
   output, status = Open3.capture2e({ "PATH" => "#{fake_bin}:#{ENV.fetch("PATH")}" }, *shard_command(results))
   assert(!status.success?, "missing shard identifiers must fail: #{output}")
   summary = JSON.parse(File.read(File.join(results, "ui-shard-summary.json")))
-  assert(summary.dig(SHARD, "missing_test_identifiers").length == 3, "missing identifiers were not recorded")
+  assert(summary.dig(SHARD, "missing_test_identifiers").length == SHARD_TESTS.length - 1, "missing identifiers were not recorded")
 end
 
 Dir.mktmpdir("full-test-validation-empty-result") do |directory|
@@ -177,7 +241,7 @@ Dir.mktmpdir("full-test-validation-observability") do |directory|
       "duration_seconds" => 5,
       "started_at" => "2026-07-28T12:00:00Z",
       "finished_at" => "2026-07-28T12:00:05Z",
-      "test_count" => 4,
+      "test_count" => SHARD_TESTS.length,
       "test_identifiers" => SHARD_TESTS.map { |method| "HomeStuffInventoryAppUITests.InventoryBrowseDetailUITests #{method}" },
       "test_durations" => SHARD_TESTS.map { |method| { "identifier" => "HomeStuffInventoryAppUITests.InventoryBrowseDetailUITests #{method}", "duration_seconds" => 1.25 } }
     }
@@ -192,7 +256,7 @@ Dir.mktmpdir("full-test-validation-observability") do |directory|
   output, status = Open3.capture2e(environment, "ruby", SCRIPT, "summarize", results)
   assert(status.success?, "shard summary must succeed: #{output}")
   summary = File.read(summary_path)
-  assert(summary.include?("Combined UI tests: 4 tests"), "shard summary did not report its test total")
+  assert(summary.include?("Combined UI tests: #{SHARD_TESTS.length} tests"), "shard summary did not report its test total")
   assert(summary.include?("Missing expected UI identifiers: none"), "shard summary did not scope completeness to its manifest")
 end
 

@@ -207,7 +207,7 @@ class ReleasePrivateHandoffTest < Minitest::Test
     assert_includes flow.dig("jobs", "public-release", "if"), "!inputs.validation_only"
     assert_equal "./.github/workflows/create-github-release.yml", flow.dig("jobs", "public-release", "uses")
     selected_action = JSON.parse(File.read(File.join(ROOT, "docs/security/public-repository-settings-plan.json"))).dig("desired_controls", "actions", "release_tag_token_action")
-    assert_equal "actions/create-github-app-token@064492a9a1762067169d50c792a7dc02bc3d1254", selected_action
+    assert_equal "actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1", selected_action
     assert_equal selected_action, release_steps.find { |step| step["id"] == "release-tag-token" }.fetch("uses")
     create_tag = release_steps.find { |step| step["id"] == "release" }.fetch("run")
     assert_includes create_tag, 'if [[ "$EXISTING_EXACT_TAG" != "true" ]]'

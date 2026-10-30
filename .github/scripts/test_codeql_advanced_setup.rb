@@ -9,8 +9,8 @@ class CodeQLAdvancedSetupTest < Minitest::Test
   CONFIG_PATH = ".github/codeql/codeql-config.yml"
   CODEQL_ACTION = "github/codeql-action"
   CODEQL_SHAS = {
-    "init" => "b96794f015dfd88f77b49b1c93e0fa7110f94c63",
-    "analyze" => "b96794f015dfd88f77b49b1c93e0fa7110f94c63"
+    "init" => "2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2",
+    "analyze" => "2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2"
   }.freeze
 
   def setup

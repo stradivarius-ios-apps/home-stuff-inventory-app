@@ -50,7 +50,10 @@ class InventoryScreenshotUITestCase: XCTestCase {
     func tapTab(named names: [String]) {
         let tab = names
             .lazy
-            .map { self.app.tabBars.buttons[$0] }
+            .map { name in
+                let tabBarButton = self.app.tabBars.buttons[name]
+                return tabBarButton.exists ? tabBarButton : self.app.buttons[name].firstMatch
+            }
             .first { $0.waitForExistence(timeout: 1) }
         XCTAssertNotNil(tab, "Missing tab matching \(names.joined(separator: ", "))")
         guard let tab else { return }

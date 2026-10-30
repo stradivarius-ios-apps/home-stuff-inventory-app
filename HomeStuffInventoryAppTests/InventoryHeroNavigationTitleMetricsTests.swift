@@ -3,6 +3,13 @@ import Testing
 @testable import HomeStuffInventoryApp
 
 struct InventoryHeroNavigationTitleMetricsTests {
+    @Test func stableTitleIsRestrictedToTheSupportedDuoHardware() {
+        #expect(InventoryHeroNavigationTitleMetrics.requiresStableNavigationTitle(modelIdentifier: "iPhone19,4"))
+        for model in ["iPhone19,3", "iPhone19,5", "iPhone18,3", "iPad16,6", "arm64", "x86_64", "", "iPhone19,40"] {
+            #expect(!InventoryHeroNavigationTitleMetrics.requiresStableNavigationTitle(modelIdentifier: model))
+        }
+    }
+
     @Test func navigationTitleStaysHiddenWhileHeroExtendsBelowInlineTitleArea() {
         let frame = CGRect(x: 0, y: 12, width: 320, height: 220)
 

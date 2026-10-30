@@ -5,10 +5,12 @@ struct InventoryCompactItemCard: View {
 
     let item: InventoryItem
     let placePath: String?
+    let showsStorageSummary: Bool
 
-    init(item: InventoryItem, placePath: String? = nil) {
+    init(item: InventoryItem, placePath: String? = nil, showsStorageSummary: Bool = true) {
         self.item = item
         self.placePath = placePath
+        self.showsStorageSummary = showsStorageSummary
     }
 
     var body: some View {
@@ -21,7 +23,9 @@ struct InventoryCompactItemCard: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 title
-                storageSummary
+                if showsStorageSummary {
+                    storageSummary
+                }
                 metadataRow
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -176,7 +180,8 @@ struct InventoryCompactItemCard: View {
     }
 
     private var accessibilityLabel: String {
-        [item.name, locationName, placeName, categoryName, accessibilityQuantityText]
+        let storage = showsStorageSummary ? [locationName, placeName] : []
+        return ([item.name] + storage + [categoryName, accessibilityQuantityText])
             .joined(separator: ", ")
     }
 

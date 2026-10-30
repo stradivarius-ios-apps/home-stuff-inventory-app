@@ -25,9 +25,9 @@ env:
   PROJECT: HomeStuffInventoryApp.xcodeproj
   SCHEME: HomeStuffInventoryApp
   CONFIGURATION: Debug
-  RELEASE_SCREENSHOT_DEVICE: iPhone 14 Plus
-  RELEASE_SCREENSHOT_DEVICE_TYPE: com.apple.CoreSimulator.SimDeviceType.iPhone-14-Plus
-  RELEASE_SCREENSHOT_SIMULATOR_NAME: Home Stuff Release Screenshots iPhone 14 Plus
+  RELEASE_SCREENSHOT_DEVICE: iPhone 17
+  RELEASE_SCREENSHOT_DEVICE_TYPE: com.apple.CoreSimulator.SimDeviceType.iPhone-17
+  RELEASE_SCREENSHOT_SIMULATOR_NAME: Home Stuff Release Screenshots iPhone 17
   RELEASE_SCREENSHOT_OS: "26.5"
   RELEASE_SCREENSHOT_APPEARANCE: Light
 

@@ -19,7 +19,7 @@ final class InventorySmokeUITests: InventoryUITestCase {
         launchStartupApp(arguments: freeGateArguments)
         resetToInventoryList()
 
-        XCTAssertTrue(app.tabBars.buttons["Inventory"].exists)
+        XCTAssertTrue(rootTabButton(named: "Inventory").exists)
         app.buttons["inventory.addItemButton"].tap()
         let nameField = app.textFields["inventory.itemForm.nameField"]
         XCTAssertTrue(nameField.waitForExistence(timeout: 3))
@@ -66,7 +66,7 @@ final class InventorySmokeUITests: InventoryUITestCase {
         XCTAssertTrue(placeHero.label.contains("Desk drawer"))
         XCTAssertTrue(placeHero.label.contains("Location: Office"))
 
-        app.tabBars.buttons["Settings"].tap()
+        rootTabButton(named: "Settings").tap()
         let export = app.buttons["settings.export.action"]
         scrollToElement(export)
         export.tap()

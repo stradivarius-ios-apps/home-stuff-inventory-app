@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 
 struct ScopedInventoryItemsListView<Header: View>: View {
@@ -37,8 +38,10 @@ struct ScopedInventoryItemsListView<Header: View>: View {
     let emptySystemImage: String
     let backgroundStyle: InventoryScreenBackgroundStyle
     let accessibilityContext: AccessibilityContext
+    let showsStorageSummary: Bool
     let header: Header
 
+    @Query(sort: \InventoryPlace.name) private var places: [InventoryPlace]
     @State private var selectedItemID: UUID?
     @State private var isShowingNavigationTitle = false
     @State private var bulkSelection = InventoryBulkSelectionState()
@@ -55,6 +58,7 @@ struct ScopedInventoryItemsListView<Header: View>: View {
         emptySystemImage: String,
         backgroundStyle: InventoryScreenBackgroundStyle = .locationAtmosphere,
         accessibilityContext: AccessibilityContext = .scoped,
+        showsStorageSummary: Bool = true,
         @ViewBuilder header: () -> Header
     ) {
         self.title = title
@@ -66,6 +70,7 @@ struct ScopedInventoryItemsListView<Header: View>: View {
         self.emptySystemImage = emptySystemImage
         self.backgroundStyle = backgroundStyle
         self.accessibilityContext = accessibilityContext
+        self.showsStorageSummary = showsStorageSummary
         self.header = header()
     }
 
@@ -148,12 +153,15 @@ struct ScopedInventoryItemsListView<Header: View>: View {
     }
 
     private var itemsList: some View {
-        scopedItemsScrollView {
+        let placePaths = InventoryPlacePathIndex(places: places)
+        return scopedItemsScrollView {
             LazyVStack(alignment: .leading, spacing: InventoryDesign.rowSpacing) {
                 ForEach(items) { item in
                     InventoryItemNavigationCard(
                         item: item,
+                        placePath: placePaths[item.placeID]?.displayName,
                         presentation: .compactInventory,
+                        showsStorageSummary: showsStorageSummary,
                         transitionNamespace: itemNavigationNamespace,
                         reduceMotion: accessibilityReduceMotion,
                         accessibilityIdentifier: accessibilityContext.rowIdentifier(for: item)

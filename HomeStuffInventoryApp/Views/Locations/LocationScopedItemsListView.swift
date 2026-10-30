@@ -88,6 +88,16 @@ struct PlaceItemsListView: View {
         )
     }
 
+    private var usesSimpleLeafLayout: Bool {
+        InventoryPlaceDetailPresentation.usesSimpleLeafLayout(
+            selectedPlace: place,
+            detailPlace: detailPlace,
+            places: places,
+            locations: locations,
+            childPlaces: childPlaces
+        )
+    }
+
     var body: some View {
         ScopedInventoryItemsListView(
             title: place.name,
@@ -98,10 +108,12 @@ struct PlaceItemsListView: View {
             emptyMessageDefaultValue: "Items moved out of this storage place will appear in their new storage place.",
             emptySystemImage: placeIconSystemName,
             backgroundStyle: .grouped,
-            accessibilityContext: .placeDetail
+            accessibilityContext: .placeDetail,
+            showsStorageSummary: !usesSimpleLeafLayout
         ) {
             PlaceDetailItemsHeader(
                 place: detailPlace,
+                usesSimpleLeafLayout: usesSimpleLeafLayout,
                 matchingItems: matchingItems,
                 childPlaces: childPlaces,
                 onChildPlaceSelected: { selectedChildPlaceID = $0.placeID },
@@ -291,6 +303,7 @@ private struct PlaceDetailItemsHeader: View {
     @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
 
     let place: InventoryBrowseSummaries.PlaceSummary
+    let usesSimpleLeafLayout: Bool
     let matchingItems: [InventoryItem]
     let childPlaces: [InventoryBrowseSummaries.PlaceSummary]
     let onChildPlaceSelected: (InventoryBrowseSummaries.PlaceSummary) -> Void
@@ -314,7 +327,9 @@ private struct PlaceDetailItemsHeader: View {
             PlaceDetailIdentityHeader(place: place)
 
             pathContext
-            countSummary
+            if !usesSimpleLeafLayout {
+                countSummary
+            }
             childPlacesSection
 
             if place.recursiveItemCount > place.directItemCount {
@@ -336,7 +351,12 @@ private struct PlaceDetailItemsHeader: View {
                 recentItemsCard(recentItemsPresentation)
             }
 
-            InventorySectionHeader("locations.placeDetail.directItemsSection")
+            InventorySectionHeader(
+                usesSimpleLeafLayout
+                    ? "locations.placeDetail.itemsSection"
+                    : "locations.placeDetail.directItemsSection"
+            )
+            .accessibilityIdentifier("locations.placeDetail.itemsSectionHeader")
         }
         .navigationDestination(item: $selectedRecentItemID) { itemID in
             if let item = matchingItems.first(where: { $0.id == itemID }) {

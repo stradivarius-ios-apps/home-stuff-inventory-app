@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+@testable import HomeStuffInventoryApp
 
 struct LocalizationCatalogTests {
     @Test func catalogContainsEveryCodeReferencedLocalizationKey() throws {
@@ -7,12 +8,9 @@ struct LocalizationCatalogTests {
         let appURL = rootURL.appendingPathComponent("HomeStuffInventoryApp", isDirectory: true)
         let catalog = try localizationTestCatalog(at: appURL.appendingPathComponent("Resources/Localizable.xcstrings"))
         let referencedKeys = try codeReferencedLocalizationTestKeys(in: appURL)
-        let missingKeys = referencedKeys.filter { catalog[$0] == nil }.sorted()
-        let missingEnglishValues = referencedKeys.filter { catalog[$0]?.localizedValue(for: "en") == nil }.sorted()
-        let missingUkrainianValues = referencedKeys.filter { catalog[$0]?.localizedValue(for: "uk") == nil }.sorted()
-        #expect(missingKeys.isEmpty, "Missing catalog keys: \(missingKeys.joined(separator: ", "))")
-        #expect(missingEnglishValues.isEmpty, "Missing English values: \(missingEnglishValues.joined(separator: ", "))")
-        #expect(missingUkrainianValues.isEmpty, "Missing Ukrainian values: \(missingUkrainianValues.joined(separator: ", "))")
+            .union(runtimeReferencedLocalizationTestKeys())
+        let issues = localizationTestCatalogIssues(keys: referencedKeys, catalog: catalog)
+        #expect(issues.isEmpty, "Localization catalog issues: \(issues.joined(separator: ", "))")
     }
 
     @Test func appTargetKeepsCompilerStringExtractionDisabled() throws {
@@ -63,6 +61,30 @@ struct LocalizationCatalogTests {
         #expect(hierarchySource.contains("Label(\"inventory.action.edit\""))
     }
 
+    @Test func tagsLabelAndFormatHelperResolveInBothLanguages() {
+        for (language, label, format, expected) in [
+            ("en", "Tags", "Separate tags with commas. Maximum %d characters per tag.",
+             "Separate tags with commas. Maximum 16 characters per tag."),
+            ("uk", "Теги", "Розділяйте теги комами. Максимум %d символів у кожному тегу.",
+             "Розділяйте теги комами. Максимум 16 символів у кожному тегу.")
+        ] {
+            #expect(localizationTestValue("inventory.field.tags", language: language) == label)
+            let helper = localizationTestValue("inventory.form.tagsFormatHelper", language: language)
+            #expect(helper == format)
+            #expect(String(format: helper, InventoryItemDraft.maximumTagLength) == expected)
+        }
+    }
+
+    @Test func notesEmptyPromptKeepsDisplayCopySeparateFromNoNotesFallback() {
+        for (language, prompt, fallback) in [
+            ("en", "Tap to add a note", "No notes"),
+            ("uk", "Торкніться, щоб додати нотатку", "Без нотаток")
+        ] {
+            #expect(localizationTestValue("inventory.notes.emptyPrompt", language: language) == prompt)
+            #expect(localizationTestValue("inventory.fallback.noNotes", language: language) == fallback)
+        }
+    }
+
     @Test func ukrainianCoreStringsResolveFromCatalog() {
         #expect(localized("inventory.title") == "Інвентар")
         #expect(localized("inventory.action.addItem") == "Додати річ")
@@ -74,6 +96,7 @@ struct LocalizationCatalogTests {
         #expect(localized("inventory.fallback.noLocation") == "Без локації")
         #expect(localized("inventory.fallback.noContainer") == "Без місця зберігання")
         #expect(localized("inventory.fallback.noNotes") == "Без нотаток")
+        #expect(localized("inventory.notes.emptyPrompt") == "Торкніться, щоб додати нотатку")
         #expect(localized("inventory.field.location") == "Локація")
         #expect(localized("inventory.field.container") == "Місце зберігання")
         #expect(localized("inventory.field.itemIcon") == "Іконка речі")
@@ -130,6 +153,9 @@ struct LocalizationCatalogTests {
         #expect(localized("settings.lists.locations") == "Локації")
         #expect(localized("settings.lists.categories") == "Категорії")
         #expect(localized("settings.section.data") == "Дані")
+        #expect(localized("settings.export.subtitle") == "Для перегляду або поширення. Не підходить для відновлення інвентарю.")
+        #expect(localized("settings.backup.subtitle") == "Повна копія для відновлення інвентарю.")
+        #expect(localized("settings.restore.subtitle") == "Замінює інвентар на цьому пристрої даними резервної копії.")
         #expect(localized("settings.backup.title") == "Створити резервну копію")
         #expect(localized("settings.backup.accessibilityLabel") == "Створити резервну копію інвентарю")
         #expect(localized("settings.backup.error.encoding.title") == "Не вдалося створити резервну копію")
@@ -137,5 +163,55 @@ struct LocalizationCatalogTests {
         #expect(localized("settings.backup.error.destination.title") == "Не вдалося зберегти резервну копію")
         #expect(localized("settings.tab.accessibilityLabel") == "Вкладка налаштувань")
         #expect(localized("inventory.condition.good") != "Добрий")
+    }
+}
+
+
+struct LocalizationGuardRegressionTests {
+    @Test func literalScannerIncludesExtendedNamespacesAndExcludesIdentifiers() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        try #"""
+        Text("premium.fixture")
+        Text("placeIcons.fixture")
+        Text("inventory.fixture")
+        .accessibilityIdentifier("premium.identifier")
+        """#.write(to: directory.appendingPathComponent("Fixture.swift"), atomically: true, encoding: .utf8)
+        #expect(try codeReferencedLocalizationTestKeys(in: directory) == [
+            "premium.fixture", "placeIcons.fixture", "inventory.fixture"
+        ])
+    }
+
+    @Test func runtimeKeysFollowTheProductionEnumsAndOptionCatalogs() {
+        let keys = runtimeReferencedLocalizationTestKeys()
+        #expect(keys.isSuperset(of: ItemIconCategory.allCases.map(\.titleKey)))
+        #expect(keys.isSuperset(of: LocationIconCategory.allCases.map(\.titleKey)))
+        #expect(keys.isSuperset(of: PremiumBundleCapability.allCases.map(\.titleKey)))
+        #expect(keys.isSuperset(of: ItemIconCatalog.options.map(\.nameKey)))
+        #expect(keys.isSuperset(of: LocationIconCatalog.options.map(\.nameKey)))
+    }
+
+    @Test(arguments: ["premium.fixture", "placeIcons.fixture", PremiumBundleCapability.roomSweep.titleKey])
+    func missingKeysAndMissingOrBlankTranslationsFailTheGuard(key: String) {
+        #expect(localizationTestCatalogIssues(keys: [key], catalog: [:]) == ["Missing catalog key: \(key)"])
+        #expect(localizationTestCatalogIssues(keys: [key], catalog: fixture(key, en: "English", uk: "Українська")).isEmpty)
+        for language in ["en", "uk"] {
+            for invalid in [nil, "", " \n\t"] as [String?] {
+                let catalog = fixture(key, en: language == "en" ? invalid : "English",
+                                      uk: language == "uk" ? invalid : "Українська")
+                #expect(localizationTestCatalogIssues(keys: [key], catalog: catalog) == [
+                    "Missing or empty \(language) value: \(key)"
+                ])
+            }
+        }
+    }
+
+    private func fixture(_ key: String, en: String?, uk: String?) -> [String: LocalizationCatalogEntry] {
+        var values: [String: LocalizationValue] = [:]
+        for (language, value) in [("en", en), ("uk", uk)] {
+            if let value { values[language] = LocalizationValue(stringUnit: LocalizationStringUnit(value: value)) }
+        }
+        return [key: LocalizationCatalogEntry(localizations: values)]
     }
 }

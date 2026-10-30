@@ -92,6 +92,9 @@ enum InventoryModelContainer {
         let container = try make(inMemory: inMemory)
         let context = ModelContext(container)
         try InventorySampleDataSeeder.seedIfNeeded(in: context)
+        if inMemory, InventoryFilterMenuScaleFixture.isEnabled(arguments: ProcessInfo.processInfo.arguments) {
+            try InventoryFilterMenuScaleFixture.seed(in: context)
+        }
         if InventoryLocationDetailEmptyFixture.isEnabled(arguments: ProcessInfo.processInfo.arguments) {
             try InventoryLocationDetailEmptyFixture.seed(in: context)
         }

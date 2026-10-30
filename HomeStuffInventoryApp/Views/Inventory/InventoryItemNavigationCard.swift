@@ -1,28 +1,32 @@
-import SwiftData
 import SwiftUI
 
 struct InventoryItemNavigationCard: View {
     let item: InventoryItem
+    let placePath: String?
     let matchContext: InventorySearch.MatchContext?
     let presentation: InventoryListPresentation
+    let showsStorageSummary: Bool
     let transitionNamespace: Namespace.ID
     let reduceMotion: Bool
     let accessibilityIdentifier: String
     let action: () -> Void
-    @Query(sort: \InventoryPlace.name) private var places: [InventoryPlace]
 
     init(
         item: InventoryItem,
+        placePath: String?,
         matchContext: InventorySearch.MatchContext? = nil,
         presentation: InventoryListPresentation = .searchResults,
+        showsStorageSummary: Bool = true,
         transitionNamespace: Namespace.ID,
         reduceMotion: Bool,
         accessibilityIdentifier: String? = nil,
         action: @escaping () -> Void
     ) {
         self.item = item
+        self.placePath = placePath
         self.matchContext = matchContext
         self.presentation = presentation
+        self.showsStorageSummary = showsStorageSummary
         self.transitionNamespace = transitionNamespace
         self.reduceMotion = reduceMotion
         self.accessibilityIdentifier = accessibilityIdentifier ?? "inventory." + "itemRow.\(item.name)"
@@ -33,7 +37,7 @@ struct InventoryItemNavigationCard: View {
         Button(action: action) {
             switch presentation {
             case .compactInventory:
-                InventoryCompactItemCard(item: item, placePath: placePath)
+                InventoryCompactItemCard(item: item, placePath: placePath, showsStorageSummary: showsStorageSummary)
             case .searchResults:
                 InventoryItemRowView(item: item, matchContext: matchContext, placePath: placePath)
             }
@@ -45,15 +49,6 @@ struct InventoryItemNavigationCard: View {
             reduceMotion: reduceMotion
         )
         .accessibilityIdentifier(accessibilityIdentifier)
-    }
-
-    private var placePath: String? {
-        guard let placeID = item.placeID,
-              let place = places.first(where: { $0.id == placeID })
-        else {
-            return nil
-        }
-        return InventoryPlaceHierarchy.path(for: place, places: places).displayName
     }
 }
 

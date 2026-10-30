@@ -34,7 +34,7 @@ if ! xcrun simctl list runtimes available | grep -Fq "$simulator_runtime"; then
   exit 1
 fi
 
-for device_type in "iPhone 17" "iPhone 14 Plus"; do
+for device_type in "iPhone 17"; do
   if ! xcrun simctl list devicetypes | grep -Fq "$device_type"; then
     echo "Required simulator device type is unavailable: $device_type"
     exit 1

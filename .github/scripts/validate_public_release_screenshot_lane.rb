@@ -9,8 +9,8 @@ CANONICAL_ENV = {
   "PROJECT" => "HomeStuffInventoryApp.xcodeproj",
   "SCHEME" => "HomeStuffInventoryApp",
   "CONFIGURATION" => "Debug",
-  "RELEASE_SCREENSHOT_DEVICE_TYPE" => "com.apple.CoreSimulator.SimDeviceType.iPhone-14-Plus",
-  "RELEASE_SCREENSHOT_SIMULATOR_NAME" => "Home Stuff Release Screenshots iPhone 14 Plus",
+  "RELEASE_SCREENSHOT_DEVICE_TYPE" => "com.apple.CoreSimulator.SimDeviceType.iPhone-17",
+  "RELEASE_SCREENSHOT_SIMULATOR_NAME" => "Home Stuff Release Screenshots iPhone 17",
   "RELEASE_SCREENSHOT_OS" => "26.5"
 }.freeze
 HELPER = ".github/scripts/capture_release_app_store_screenshots.sh"
@@ -58,7 +58,7 @@ fail_lane("release tag commit must match checked-out HEAD") unless
 CANONICAL_ENV.each do |key, value|
   fail_lane("workflow must configure #{key}") unless workflow.dig("env", key).to_s == value
 end
-fail_lane("workflow must configure the display device") unless workflow.dig("env", "RELEASE_SCREENSHOT_DEVICE") == "iPhone 14 Plus"
+fail_lane("workflow must configure the display device") unless workflow.dig("env", "RELEASE_SCREENSHOT_DEVICE") == "iPhone 17"
 fail_lane("workflow must configure light appearance") unless workflow.dig("env", "RELEASE_SCREENSHOT_APPEARANCE") == "Light"
 fail_lane("workflow must invoke the shared capture helper once") unless text.scan("bash #{HELPER}").length == 1
 

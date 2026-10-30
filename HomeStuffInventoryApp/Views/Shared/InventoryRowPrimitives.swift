@@ -263,15 +263,18 @@ struct InventorySettingsNavigationRow: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     private let title: LocalizedStringKey
+    private let subtitle: LocalizedStringKey?
     private let systemImage: String
     private let iconRole: InventoryDesign.AccentRole
 
     init(
         _ title: LocalizedStringKey,
         systemImage: String,
-        iconRole: InventoryDesign.AccentRole = .secondary
+        iconRole: InventoryDesign.AccentRole = .secondary,
+        subtitle: LocalizedStringKey? = nil
     ) {
         self.title = title
+        self.subtitle = subtitle
         self.systemImage = systemImage
         self.iconRole = iconRole
     }
@@ -280,11 +283,25 @@ struct InventorySettingsNavigationRow: View {
         HStack(spacing: 12) {
             InventoryContentGlyph(systemName: systemImage, role: iconRole)
 
-            Text(title)
-                .foregroundStyle(.primary)
-                .lineLimit(dynamicTypeSize.isAccessibilitySize ? 3 : 2)
-                .fixedSize(horizontal: false, vertical: true)
+            if let subtitle {
+                VStack(alignment: .leading) {
+                    Text(title)
+                        .foregroundStyle(.primary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text(subtitle)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityHidden(true)
+                }
                 .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                Text(title)
+                    .foregroundStyle(.primary)
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? 3 : 2)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
         }
         .accessibilityElement(children: .combine)
     }

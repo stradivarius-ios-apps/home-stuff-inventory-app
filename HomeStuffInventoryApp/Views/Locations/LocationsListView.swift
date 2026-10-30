@@ -58,6 +58,29 @@ struct LocationsListView: View {
         .navigationTitle("locations.title")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
+                Menu {
+                    NavigationLink {
+                        InventoryListManagementView(scope: .locations)
+                    } label: {
+                        Label("settings.lists.locations.accessibilityLabel", systemImage: "map")
+                    }
+                    .accessibilityIdentifier("locations.manageLocations")
+
+                    NavigationLink {
+                        PlaceManagementView()
+                    } label: {
+                        Label("settings.lists.places.accessibilityLabel", systemImage: "shippingbox")
+                    }
+                    .accessibilityIdentifier("locations.managePlaces")
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                        .frame(minWidth: 44, minHeight: 44)
+                }
+                .accessibilityLabel("locations.management.menu.accessibilityLabel")
+                .accessibilityIdentifier("locations.managementMenu")
+            }
+
+            ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     isShowingItemForm = true
                 } label: {
@@ -95,7 +118,12 @@ struct LocationsListView: View {
     private func currentLocation(
         for selectedLocation: SelectedLocation
     ) -> InventoryBrowseSummaries.LocationSummary {
-        locationSummaries.first(where: { $0.id == selectedLocation.id })
+        locationSummaries.first(where: {
+            if let storageLocationID = selectedLocation.storageLocationID {
+                return $0.storageLocationID == storageLocationID
+            }
+            return $0.id == selectedLocation.id
+        })
             ?? InventoryBrowseSummaries.LocationSummary(
                 name: selectedLocation.name,
                 iconID: selectedLocation.iconID,
@@ -107,12 +135,14 @@ struct LocationsListView: View {
     private struct SelectedLocation: Hashable, Identifiable {
         let id: String
         let name: String
+        let storageLocationID: UUID?
         let iconID: String?
         let isMissingLocation: Bool
 
         init(_ location: InventoryBrowseSummaries.LocationSummary) {
             id = location.id
             name = location.name
+            storageLocationID = location.storageLocationID
             iconID = location.iconID
             isMissingLocation = location.isMissingLocation
         }

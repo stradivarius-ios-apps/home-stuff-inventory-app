@@ -8,7 +8,10 @@ class CodeQLAdvancedSetupTest < Minitest::Test
   WORKFLOW_PATH = ".github/workflows/codeql.yml"
   CONFIG_PATH = ".github/codeql/codeql-config.yml"
   CODEQL_ACTION = "github/codeql-action"
-  CODEQL_SHA = "b96794f015dfd88f77b49b1c93e0fa7110f94c63"
+  CODEQL_SHAS = {
+    "init" => "b96794f015dfd88f77b49b1c93e0fa7110f94c63",
+    "analyze" => "b96794f015dfd88f77b49b1c93e0fa7110f94c63"
+  }.freeze
 
   def setup
     @workflow = YAML.load_file(WORKFLOW_PATH)
@@ -81,7 +84,10 @@ class CodeQLAdvancedSetupTest < Minitest::Test
     codeql_uses = uses.select { |value| value.start_with?("#{CODEQL_ACTION}/") }
 
     refute_empty codeql_uses
-    codeql_uses.each { |value| assert_match(/\A#{Regexp.escape(CODEQL_ACTION)}\/[^@]+@#{CODEQL_SHA}\z/, value) }
+    codeql_uses.each do |value|
+      action, revision = value.delete_prefix("#{CODEQL_ACTION}/").split("@", 2)
+      assert_equal CODEQL_SHAS.fetch(action), revision
+    end
   end
 
   def test_existing_remote_and_local_threat_model_is_preserved

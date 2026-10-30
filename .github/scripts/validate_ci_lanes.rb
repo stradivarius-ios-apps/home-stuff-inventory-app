@@ -276,7 +276,7 @@ fail_contract("Required CI workflow validation must always aggregate selected ph
 end
 fastlane_steps = Array(fastlane_smoke["steps"])
 setup_ruby = step!(fastlane_steps, "Set up locked Ruby")
-fail_contract("Fastlane smoke test must pin reviewed ruby/setup-ruby") unless setup_ruby["uses"] == "ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b"
+fail_contract("Fastlane smoke test must pin reviewed ruby/setup-ruby") unless setup_ruby["uses"] == "ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8"
 fail_contract("Fastlane smoke test must provision Ruby 4.0.5") unless setup_ruby.dig("with", "ruby-version").to_s == "4.0.5"
 fail_contract("Fastlane smoke test must provision Bundler 2.7.2") unless setup_ruby.dig("with", "bundler").to_s == "2.7.2"
 fail_contract("Fastlane smoke test must not use an implicit gem cache") unless setup_ruby.dig("with", "bundler-cache") == false

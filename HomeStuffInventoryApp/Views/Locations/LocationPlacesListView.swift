@@ -9,11 +9,12 @@ struct LocationPlacesListView: View {
     let items: [InventoryItem]
     let recentViewEvents: [InventoryItemViewEvent]
     @Query(sort: \InventoryPlace.name) private var places: [InventoryPlace]
+    @Query(sort: \StorageLocation.name) private var locations: [StorageLocation]
 
     @State private var isAllItemsPresented = false
     @State private var selectedPlace: SelectedPlace?
     @State private var selectedRecentItemID: UUID?
-    @State private var isShowingItemForm = false
+    @State private var sheet: Sheet?
     @State private var isShowingNavigationTitle = false
     @Namespace private var recentItemNavigationNamespace
 
@@ -53,7 +54,7 @@ struct LocationPlacesListView: View {
                     location: location,
                     places: placeSummaries,
                     onPlaceSelected: selectPlace,
-                    onAddItem: { isShowingItemForm = true }
+                    onAddItem: { sheet = .addItem }
                 )
             }
             .inventoryDetailContentWidth()
@@ -90,9 +91,34 @@ struct LocationPlacesListView: View {
         .navigationTitle(isShowingNavigationTitle ? location.name : "")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            if let managedLocation {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Button {
+                            sheet = .editLocation(InventoryLocationEditorTarget(location: managedLocation))
+                        } label: {
+                            Label("inventory.lists.editLocation", systemImage: "pencil")
+                        }
+                        .accessibilityIdentifier("locations.locationDetail.editLocation")
+
+                        NavigationLink {
+                            PlaceManagementView()
+                        } label: {
+                            Label("settings.lists.places.accessibilityLabel", systemImage: "shippingbox")
+                        }
+                        .accessibilityIdentifier("locations.locationDetail.managePlaces")
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                            .frame(minWidth: 44, minHeight: 44)
+                    }
+                    .accessibilityLabel("locations.management.menu.accessibilityLabel")
+                    .accessibilityIdentifier("locations.locationDetail.managementMenu")
+                }
+            }
+
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    isShowingItemForm = true
+                    sheet = .addItem
                 } label: {
                     Image(systemName: "plus")
                 }
@@ -101,8 +127,30 @@ struct LocationPlacesListView: View {
                 .accessibilityIdentifier("locations.locationDetail.addItemButton")
             }
         }
-        .sheet(isPresented: $isShowingItemForm) {
-            InventoryItemFormView(createContext: createContext)
+        .sheet(item: $sheet) { sheet in
+            switch sheet {
+            case .addItem:
+                InventoryItemFormView(createContext: createContext)
+            case let .editLocation(target):
+                InventoryLocationEditorSheet(target: target)
+            }
+        }
+    }
+
+    private var managedLocation: StorageLocation? {
+        guard let id = location.storageLocationID else { return nil }
+        return locations.first { $0.id == id }
+    }
+
+    private enum Sheet: Identifiable {
+        case addItem
+        case editLocation(InventoryLocationEditorTarget)
+
+        var id: String {
+            switch self {
+            case .addItem: "add-item"
+            case let .editLocation(target): "edit-location-\(target.id)"
+            }
         }
     }
 

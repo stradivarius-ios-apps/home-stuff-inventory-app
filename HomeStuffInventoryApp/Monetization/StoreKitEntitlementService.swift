@@ -138,6 +138,7 @@ final class StoreKitEntitlementService {
     @ObservationIgnored private var processedUpdates: Set<TransactionUpdateIdentity> = []
     @ObservationIgnored private var reconciliationGeneration = 0
     @ObservationIgnored private var hasLoadedCache = false
+    @ObservationIgnored private var restoreOperationID: UUID?
 
     static func live() -> StoreKitEntitlementService {
         StoreKitEntitlementService(
@@ -206,6 +207,8 @@ final class StoreKitEntitlementService {
         observationTask?.cancel()
         observationTask = nil
         reconciliationGeneration += 1
+        restoreOperationID = nil
+        if operationState == .restoring { operationState = .idle }
     }
 
     func loadLifetimeProduct() async {
@@ -260,16 +263,28 @@ final class StoreKitEntitlementService {
 
     func restorePurchases() async {
         guard !operationState.isInProgress else { return }
+        let operationID = UUID()
+        restoreOperationID = operationID
         operationState = .restoring
+        defer {
+            if restoreOperationID == operationID {
+                restoreOperationID = nil
+                if operationState == .restoring { operationState = .idle }
+            }
+        }
 
         do {
             try await client.synchronize()
         } catch {
+            guard ownsRestoreOperation(operationID) else { return }
             operationState = .failed(.restoreFailed)
             return
         }
+        guard !Task.isCancelled, ownsRestoreOperation(operationID) else { return }
 
-        switch await reconcileCurrentEntitlements() {
+        let result = await reconcileCurrentEntitlements(restoring: operationID)
+        guard ownsRestoreOperation(operationID) else { return }
+        switch result {
         case .available:
             operationState = .restored
         case .unavailable:
@@ -279,6 +294,15 @@ final class StoreKitEntitlementService {
         case .superseded:
             break
         }
+    }
+
+    private func ownsRestoreOperation(_ operationID: UUID) -> Bool {
+        restoreOperationID == operationID && operationState == .restoring
+    }
+
+    private func restoreCanPublish(_ operationID: UUID?, generation: Int) -> Bool {
+        guard let operationID else { return true }
+        return !Task.isCancelled && generation == reconciliationGeneration && ownsRestoreOperation(operationID)
     }
 
     func refreshEntitlements() async {
@@ -304,13 +328,14 @@ final class StoreKitEntitlementService {
         }
     }
 
-    private func reconcileCurrentEntitlements() async -> ReconciliationResult {
+    private func reconcileCurrentEntitlements(restoring operationID: UUID? = nil) async -> ReconciliationResult {
         reconciliationGeneration += 1
         let generation = reconciliationGeneration
 
         do {
             let outcomes = try await client.currentEntitlements()
-            guard !Task.isCancelled, generation == reconciliationGeneration else {
+            guard !Task.isCancelled, generation == reconciliationGeneration,
+                  operationID.map(ownsRestoreOperation) ?? true else {
                 return .superseded
             }
 
@@ -321,7 +346,11 @@ final class StoreKitEntitlementService {
             if let active = verified
                 .filter(isActiveLifetimeTransaction)
                 .max(by: { $0.originalPurchaseDate < $1.originalPurchaseDate }) {
-                return await applyVerifiedLifetime(active) ? .available : .failed
+                let applied = await applyVerifiedLifetime(active, canPublish: {
+                    self.restoreCanPublish(operationID, generation: generation)
+                })
+                guard restoreCanPublish(operationID, generation: generation) else { return .superseded }
+                return applied ? .available : .failed
             }
 
             let hasUnverifiedLifetime = outcomes.contains {
@@ -335,14 +364,17 @@ final class StoreKitEntitlementService {
             applyLifetimeOwnership(false)
             do {
                 try await cache.remove()
+                guard restoreCanPublish(operationID, generation: generation) else { return .superseded }
                 publishLifecycleState()
                 return .unavailable
             } catch {
+                guard restoreCanPublish(operationID, generation: generation) else { return .superseded }
                 lifecycleState = .error(.cacheUnavailable)
                 return .failed
             }
         } catch {
-            guard generation == reconciliationGeneration else { return .superseded }
+            guard generation == reconciliationGeneration,
+                  operationID.map(ownsRestoreOperation) ?? true else { return .superseded }
             lifecycleState = .error(.entitlementRefreshFailed)
             return .failed
         }
@@ -376,7 +408,10 @@ final class StoreKitEntitlementService {
         }
     }
 
-    private func applyVerifiedLifetime(_ transaction: StoreTransactionInfo) async -> Bool {
+    private func applyVerifiedLifetime(
+        _ transaction: StoreTransactionInfo,
+        canPublish: @MainActor () -> Bool = { true }
+    ) async -> Bool {
         let timestamp = now()
         guard let record = VerifiedLifetimeAccessRecord(
             transaction: transaction,
@@ -388,9 +423,9 @@ final class StoreKitEntitlementService {
         applyLifetimeOwnership(true)
         do {
             try await cache.store(record)
-            publishLifecycleState()
+            if canPublish() { publishLifecycleState() }
         } catch {
-            lifecycleState = .error(.cacheUnavailable)
+            if canPublish() { lifecycleState = .error(.cacheUnavailable) }
         }
         return true
     }

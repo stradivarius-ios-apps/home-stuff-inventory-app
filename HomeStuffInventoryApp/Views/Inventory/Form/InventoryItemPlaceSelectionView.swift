@@ -10,6 +10,7 @@ struct InventoryItemPlaceSelectionView: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var isShowingCreateSheet = false
+    @State private var hasPendingCreationSuccess = false
     @State private var searchText = ""
 
     private var scopedPlaces: [InventoryItemPlaceLink.DestinationOption] {
@@ -67,7 +68,10 @@ struct InventoryItemPlaceSelectionView: View {
 
             if location != nil {
                 Section {
-                    Button { isShowingCreateSheet = true } label: {
+                    Button {
+                        hasPendingCreationSuccess = false
+                        isShowingCreateSheet = true
+                    } label: {
                         InventoryAddNewRow("inventory.selection.place.addNew")
                     }
                     .inventoryPrimaryActionTint()
@@ -80,10 +84,14 @@ struct InventoryItemPlaceSelectionView: View {
         .navigationTitle("inventory.field.container")
         .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $searchText)
-        .sheet(isPresented: $isShowingCreateSheet) {
+        .sheet(isPresented: $isShowingCreateSheet, onDismiss: {
+            let didCreateValue = hasPendingCreationSuccess
+            hasPendingCreationSuccess = false
+            if didCreateValue { dismiss() }
+        }) {
             InventoryItemPlaceCreationView { name, iconID in
                 let outcome = createPlace(name, iconID)
-                if case .success = outcome { dismiss() }
+                if case .success = outcome { hasPendingCreationSuccess = true }
                 return outcome
             }
         }

@@ -2,6 +2,44 @@
 
 All notable user-facing and release-track changes for Home Stuff Inventory are recorded here.
 
+## 1.4.2
+
+### Changed
+
+- Keep navigation titles stable on iPhone Duo (#94).
+- Finish interrupted restores without replacing newer outcomes (#92).
+- Move readable-export encoding and file work off MainActor (#91).
+- Reuse place paths across inventory search and rows (#90).
+- Avoid duplicate-name traps during place history repair (#89).
+
+### Internal
+
+- Check non-UI coverage and runtime localization keys (#93).
+
+## 1.4.1
+
+### Changed
+
+- Use native screenshots for the required medium iPhone display in both supported languages.
+
+### Internal
+
+- Validate the screenshot display type explicitly and reject legacy optional-size manifests.
+
+## 1.4.0
+
+### Changed
+
+- Group inventory filters into native submenus for clearer browsing.
+- Add contextual routes for managing Locations.
+- Return to item forms after creating a selection and keep the form position.
+- Clarify tag entry and Settings data transfer guidance.
+- Simplify details for leaf Storage Places.
+
+### Fixed
+
+- Make Notes content the direct editing action.
+
 ## 1.3.3
 
 ### Internal

@@ -32,25 +32,10 @@ struct InventoryListView: View {
         self.presentation = presentation
     }
 
-    private var filteredResults: [InventorySearch.Result] {
-        InventorySearch.matchingResults(
-            in: items,
-            query: searchText,
-            filters: filters,
-            places: places,
-            vocabulary: .localized
-        )
-    }
-
-    private var filteredItems: [InventoryItem] { filteredResults.map(\.item) }
-
-    private var filterContext: InventoryFilterContext {
-        InventoryFilterContext(
-            resultCount: filteredItems.count,
-            searchText: searchText,
-            category: selectedCategory,
-            locationName: selectedLocationName,
-            place: selectedPlace
+    private func currentFilteredItems() -> [InventoryItem] {
+        InventorySearch.matchingItems(
+            in: items, query: searchText, filters: filters,
+            places: places, vocabulary: .localized
         )
     }
 
@@ -95,13 +80,13 @@ struct InventoryListView: View {
         )
     }
 
-    private var filteredEmptyStateActionTitle: String {
-        filterContext.clearAction?.localizedTitle
+    private func filteredEmptyStateActionTitle(context: InventoryFilterContext) -> String {
+        context.clearAction?.localizedTitle
             ?? InventoryLocalization.string("inventory.action.clearFilters", defaultValue: "Clear Filters")
     }
 
-    private var filteredEmptyStateSystemImage: String {
-        switch filterContext.clearAction {
+    private func filteredEmptyStateSystemImage(context: InventoryFilterContext) -> String {
+        switch context.clearAction {
         case .search:
             "magnifyingglass"
         case .filters:
@@ -113,11 +98,18 @@ struct InventoryListView: View {
         }
     }
 
-    private var contentState: InventoryListContentState {
-        InventoryListContentState.make(itemCount: items.count, filteredItemCount: filteredItems.count)
-    }
-
     var body: some View {
+        let placePaths = InventoryPlacePathIndex(places: places)
+        let filteredResults = InventorySearch.matchingResults(
+            in: items, query: searchText, filters: filters,
+            placePaths: placePaths, vocabulary: .localized
+        )
+        let filteredItems = filteredResults.map(\.item)
+        let filterContext = InventoryFilterContext(
+            resultCount: filteredItems.count, searchText: searchText,
+            category: selectedCategory, locationName: selectedLocationName, place: selectedPlace
+        )
+        let contentState = InventoryListContentState.make(itemCount: items.count, filteredItemCount: filteredItems.count)
         Group {
             if bulkSelection.isActive {
                 InventoryBulkSelectionList(
@@ -129,7 +121,7 @@ struct InventoryListView: View {
                     isShowingItemForm = true
                 }
             } else if filteredItems.isEmpty {
-                filteredEmptyState
+                filteredEmptyState(context: filterContext)
             } else {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: InventoryDesign.gridSpacing) {
@@ -140,7 +132,7 @@ struct InventoryListView: View {
                         }
 
                         LazyVStack(alignment: .leading, spacing: itemRowSpacing) {
-                            inventoryRows
+                            inventoryRows(results: filteredResults, placePaths: placePaths)
                         }
                     }
                     .inventoryDetailContentWidth()
@@ -189,35 +181,49 @@ struct InventoryListView: View {
             } else {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
-                        Picker("inventory.field.category", selection: $selectedCategory) {
-                            Text("inventory.filter.anyCategory").tag(String?.none)
+                        Menu("inventory.field.category") {
+                            Picker("inventory.field.category", selection: $selectedCategory) {
+                                Text("inventory.filter.anyCategory").tag(String?.none)
 
-                            ForEach(availableCategories, id: \.self) { category in
-                                Text(category).tag(Optional(category))
-                            }
-                        }
-
-                        Picker("inventory.field.location", selection: $selectedLocationName) {
-                            Text("inventory.filter.anyLocation").tag(String?.none)
-
-                            ForEach(availableLocations, id: \.self) { locationName in
-                                Text(locationName).tag(Optional(locationName))
-                            }
-                        }
-
-                        Picker("inventory.field.container", selection: $selectedPlace) {
-                            Text("inventory.filter.anyPlace").tag(InventorySearch.PlaceFilter?.none)
-
-                            ForEach(availablePlaces, id: \.self) { place in
-                                switch place {
-                                case let .named(name):
-                                    Text(name).tag(Optional(place))
-                                case .missing:
-                                    Text(InventoryLocalization.noContainer).tag(Optional(place))
+                                ForEach(availableCategories, id: \.self) { category in
+                                    Text(category).tag(Optional(category))
                                 }
                             }
+                            .pickerStyle(.inline)
+                            .accessibilityIdentifier("inventory.filter.categoryPicker")
                         }
-                        .accessibilityIdentifier("inventory.filter.placePicker")
+                        .accessibilityIdentifier("inventory.filter.categoryMenu")
+
+                        Menu("inventory.field.location") {
+                            Picker("inventory.field.location", selection: $selectedLocationName) {
+                                Text("inventory.filter.anyLocation").tag(String?.none)
+
+                                ForEach(availableLocations, id: \.self) { locationName in
+                                    Text(locationName).tag(Optional(locationName))
+                                }
+                            }
+                            .pickerStyle(.inline)
+                            .accessibilityIdentifier("inventory.filter.locationPicker")
+                        }
+                        .accessibilityIdentifier("inventory.filter.locationMenu")
+
+                        Menu("inventory.field.container") {
+                            Picker("inventory.field.container", selection: $selectedPlace) {
+                                Text("inventory.filter.anyPlace").tag(InventorySearch.PlaceFilter?.none)
+
+                                ForEach(availablePlaces, id: \.self) { place in
+                                    switch place {
+                                    case let .named(name):
+                                        Text(name).tag(Optional(place))
+                                    case .missing:
+                                        Text(InventoryLocalization.noContainer).tag(Optional(place))
+                                    }
+                                }
+                            }
+                            .pickerStyle(.inline)
+                            .accessibilityIdentifier("inventory.filter.placePicker")
+                        }
+                        .accessibilityIdentifier("inventory.filter.placeMenu")
 
                         if hasActiveFilters {
                             Divider()
@@ -227,6 +233,7 @@ struct InventoryListView: View {
                             } label: {
                                 Label("inventory.action.clearFilters", systemImage: "xmark.circle")
                             }
+                            .accessibilityIdentifier("inventory.filter.clearFiltersButton")
                         }
                     } label: {
                         Label("inventory.filter.menu", systemImage: filterMenuSystemImage)
@@ -309,10 +316,13 @@ struct InventoryListView: View {
         }
     }
 
-    private var inventoryRows: some View {
-        ForEach(filteredResults) { result in
+    private func inventoryRows(
+        results: [InventorySearch.Result], placePaths: InventoryPlacePathIndex
+    ) -> some View {
+        ForEach(results) { result in
             InventoryItemNavigationCard(
                 item: result.item,
+                placePath: placePaths[result.item.placeID]?.displayName,
                 matchContext: result.matchContext,
                 presentation: presentation,
                 transitionNamespace: itemNavigationNamespace,
@@ -329,7 +339,7 @@ struct InventoryListView: View {
             set: {
                 bulkSelection.replaceSelection(
                     with: $0,
-                    visibleItemIDs: filteredItems.map(\.id)
+                    visibleItemIDs: currentFilteredItems().map(\.id)
                 )
             }
         )
@@ -343,7 +353,7 @@ struct InventoryListView: View {
         presentation == .compactInventory ? InventoryDesign.rowSpacing : InventoryDesign.gridSpacing
     }
 
-    private var filteredEmptyState: some View {
+    private func filteredEmptyState(context filterContext: InventoryFilterContext) -> some View {
         InventoryEmptyStateScreen(maxWidth: InventoryDesign.emptyStateWideMaxWidth) {
             if filterContext.isActive {
                 ActiveInventoryFilterContextHeader(context: filterContext) {
@@ -357,9 +367,9 @@ struct InventoryListView: View {
                     defaultValue: "No Matching Items"
                 ),
                 message: filteredEmptyStateMessage,
-                systemImage: filteredEmptyStateSystemImage
+                systemImage: filteredEmptyStateSystemImage(context: filterContext)
             ) {
-                Button(filteredEmptyStateActionTitle) {
+                Button(filteredEmptyStateActionTitle(context: filterContext)) {
                     clearSearchAndFilters()
                 }
                 .inventoryEmptyStatePrimaryAction()
@@ -391,7 +401,7 @@ struct InventoryListView: View {
     private func beginBulkSelection() {
         upgradeCoordinator.request(.selectedItemMovement) {
             _ = bulkSelection.begin(
-                visibleItemIDs: filteredItems.map(\.id),
+                visibleItemIDs: currentFilteredItems().map(\.id),
                 availability: .available
             )
         }

@@ -4,11 +4,12 @@
 require "open3"
 
 module ReleaseScreenshotContract
-  SCHEMA_VERSION = 1
-  WIDTH = 1284
-  HEIGHT = 2778
-  DEVICE_DIRECTORY = "iPhone-14-Plus"
-  DEVICE_SLOT = "6.5-inch iPhone"
+  SCHEMA_VERSION = 2
+  WIDTH = 1206
+  HEIGHT = 2622
+  DEVICE_DIRECTORY = "iPhone-17"
+  DEVICE_SLOT = "iPhone with Dynamic Island (medium display)"
+  DISPLAY_TYPE = "APP_IPHONE_61"
   LOCALE_MAPPING = { "en" => "en-GB", "uk" => "uk" }.freeze
   SHA = /\A[0-9a-f]{40}\z/
   LOCALES = LOCALE_MAPPING.keys.freeze
@@ -30,6 +31,7 @@ module ReleaseScreenshotContract
   def validate_manifest!(manifest, expected_source_sha: nil)
     raise "Unsupported screenshot manifest schema." unless manifest["schema_version"] == SCHEMA_VERSION
     raise "Unexpected device directory." unless manifest["device_directory"] == DEVICE_DIRECTORY
+    raise "Unexpected App Store display type." unless manifest["app_store_display_type"] == DISPLAY_TYPE
     raise "Unexpected App Store device slot." unless manifest["app_store_device_slot"] == DEVICE_SLOT
     raise "Unexpected required dimensions." unless manifest["required_size"] == { "width" => WIDTH, "height" => HEIGHT }
     source_sha = manifest["source_sha"]

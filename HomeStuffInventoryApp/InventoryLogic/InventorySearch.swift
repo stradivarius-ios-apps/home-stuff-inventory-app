@@ -84,6 +84,19 @@ enum InventorySearch {
         places: [InventoryPlace] = [],
         vocabulary: InventoryBrowseVocabulary = .default
     ) -> [Result] {
+        matchingResults(
+            in: items, query: query, filters: filters,
+            placePaths: InventoryPlacePathIndex(places: places), vocabulary: vocabulary
+        )
+    }
+
+    static func matchingResults(
+        in items: [InventoryItem],
+        query: String,
+        filters: Filters = Filters(),
+        placePaths: InventoryPlacePathIndex,
+        vocabulary: InventoryBrowseVocabulary = .default
+    ) -> [Result] {
         let normalizedQuery = InventorySearchNormalization.normalize(query)
         let filteredItems = items.filter {
             matchesCategory($0, category: filters.normalizedCategory)
@@ -97,13 +110,16 @@ enum InventorySearch {
                 .map { Result(item: $0, score: 0, matchContext: nil) }
         }
 
-        return filteredItems.compactMap { item in
-            result(
-                for: item,
-                normalizedQuery: normalizedQuery,
-                places: places,
-                vocabulary: vocabulary
-            )
+        return Dictionary(grouping: filteredItems, by: \.placeID).flatMap { placeID, group in
+            let path = placePaths[placeID]
+            return group.compactMap { item in
+                result(
+                    for: item,
+                    normalizedQuery: normalizedQuery,
+                    placePath: path,
+                    vocabulary: vocabulary
+                )
+            }
         }
         .sorted(by: rankedItemOrder)
     }
@@ -323,10 +339,10 @@ enum InventorySearch {
     private static func result(
         for item: InventoryItem,
         normalizedQuery: InventorySearchNormalization.Query,
-        places: [InventoryPlace],
+        placePath: InventoryPlacePath?,
         vocabulary: InventoryBrowseVocabulary
     ) -> Result? {
-        let fields = SearchableFields(item: item, places: places, vocabulary: vocabulary)
+        let fields = SearchableFields(item: item, placePath: placePath, vocabulary: vocabulary)
         var score = 0
         var matchedTag: String?
         var matchedInNotes = false
@@ -437,14 +453,8 @@ private struct SearchableFields {
     let name: NormalizedSearchField
     let fields: [NormalizedSearchField]
 
-    init(item: InventoryItem, places: [InventoryPlace], vocabulary: InventoryBrowseVocabulary) {
-        let pathComponents: [String]
-        if let placeID = item.placeID,
-           let place = places.first(where: { $0.id == placeID }) {
-            pathComponents = InventoryPlaceHierarchy.path(for: place, places: places).components
-        } else {
-            pathComponents = []
-        }
+    init(item: InventoryItem, placePath: InventoryPlacePath?, vocabulary: InventoryBrowseVocabulary) {
+        let pathComponents = placePath?.components ?? []
         let ancestorComponents = pathComponents.dropLast()
         name = NormalizedSearchField(field: .name, value: InventorySearchNormalization.normalize(item.name).fullText, originalValue: nil)
         fields = [

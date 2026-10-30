@@ -62,14 +62,17 @@ enum InventoryPlaceOpenPersistence {
         let validLegacyIdentities = Set(items.map(InventoryPlaceIdentity.make(for:)).map(\.rawValue))
         let locationsByID = Dictionary(uniqueKeysWithValues: locations.map { ($0.id, $0) })
         let placesByID = Dictionary(uniqueKeysWithValues: places.map { ($0.id, $0) })
-        let placesByLegacyIdentity = Dictionary(uniqueKeysWithValues: places.compactMap { place -> (String, InventoryPlace)? in
+        let placesByLegacyIdentity = Dictionary(grouping: places.compactMap { place -> (String, InventoryPlace)? in
             guard let location = locationsByID[place.locationID] else { return nil }
             return (InventoryPlaceIdentity.make(locationName: location.name, placeName: place.name).rawValue, place)
-        })
+        }, by: \.0).mapValues { $0.map(\.1) }
         var associatedLegacyRecord = false
         let grouped = Dictionary(grouping: records.compactMap { record -> (String, InventoryPlaceOpenRecord)? in
             if let placeID = record.placeID, placesByID[placeID] != nil { return ("place:\(placeID.uuidString)", record) }
-            if let place = placesByLegacyIdentity[record.placeIdentity] {
+            if let candidates = placesByLegacyIdentity[record.placeIdentity] {
+                // A legacy leaf name cannot identify a branch. Drop only its ambiguous
+                // statistics so a later open cannot adopt them for an arbitrary Place.
+                guard candidates.count == 1, let place = candidates.first else { return nil }
                 associatedLegacyRecord = associatedLegacyRecord || record.placeID != place.id
                 record.placeID = place.id
                 return ("place:\(place.id.uuidString)", record)

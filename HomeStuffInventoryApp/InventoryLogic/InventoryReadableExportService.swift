@@ -30,17 +30,17 @@ final class InventoryReadableExportArtifact: Identifiable {
     }
 }
 
-struct InventoryReadableExportFileSystem {
-    var temporaryDirectory: () -> URL = { FileManager.default.temporaryDirectory }
-    var createDirectory: (URL) throws -> Void = {
+struct InventoryReadableExportFileSystem: Sendable {
+    var temporaryDirectory: @Sendable () -> URL = { FileManager.default.temporaryDirectory }
+    var createDirectory: @Sendable (URL) throws -> Void = {
         try FileManager.default.createDirectory(at: $0, withIntermediateDirectories: true)
     }
-    var write: (Data, URL) throws -> Void = { try $0.write(to: $1, options: .atomic) }
-    var read: (URL) throws -> Data = { try Data(contentsOf: $0) }
-    var remove: (URL) -> Void = { try? FileManager.default.removeItem(at: $0) }
+    var write: @Sendable (Data, URL) throws -> Void = { try $0.write(to: $1, options: .atomic) }
+    var read: @Sendable (URL) throws -> Data = { try Data(contentsOf: $0) }
+    var remove: @Sendable (URL) -> Void = { try? FileManager.default.removeItem(at: $0) }
 }
 
-struct InventoryReadableExportService {
+struct InventoryReadableExportService: Sendable {
     private let fileSystem: InventoryReadableExportFileSystem
     private let bundle: Bundle
     private let limits: InventoryPortabilityLimits
@@ -71,6 +71,15 @@ struct InventoryReadableExportService {
             places: places,
             movementRecords: movementRecords
         )
+        return try prepare(snapshot: snapshot, createdAt: createdAt, artifactID: artifactID).makeArtifact()
+    }
+
+    func prepare(
+        snapshot: InventoryPortabilitySnapshotV1,
+        createdAt: Date = .now,
+        artifactID: UUID = UUID()
+    ) throws -> InventoryPreparedReadableExport {
+        try Task.checkCancellation()
         let metadata = InventoryPortabilityMetadataV1(
             createdAt: createdAt,
             appVersion: bundle.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown",
@@ -85,6 +94,8 @@ struct InventoryReadableExportService {
                 prettyPrinted: true,
                 limits: limits
             )
+        } catch is CancellationError {
+            throw CancellationError()
         } catch let error as InventoryPortabilityCodecError {
             if error == .resourceLimitExceeded || error == .documentTooLarge { throw InventoryReadableExportError.unsupportedPortabilityLimits }
             throw InventoryReadableExportError.generationFailed
@@ -92,27 +103,33 @@ struct InventoryReadableExportService {
             throw InventoryReadableExportError.generationFailed
         }
 
+        try Task.checkCancellation()
         let directory = fileSystem.temporaryDirectory()
             .appendingPathComponent("HomeStuffInventoryExports", isDirectory: true)
             .appendingPathComponent(artifactID.inventoryPortabilityString, isDirectory: true)
         let fileURL = directory.appendingPathComponent(fileName(for: createdAt))
         do {
             try fileSystem.createDirectory(directory)
+            try Task.checkCancellation()
             try fileSystem.write(data, fileURL)
+            try Task.checkCancellation()
             let writtenData = try fileSystem.read(fileURL)
+            try Task.checkCancellation()
             let writtenDocument = try InventoryPortabilityEncoder.decodeAndVerify(writtenData, limits: limits)
             guard writtenDocument.artifactType == .readableExport else {
                 throw InventoryReadableExportError.destinationWriteFailed
             }
+            try Task.checkCancellation()
         } catch {
             fileSystem.remove(directory)
+            if error is CancellationError { throw CancellationError() }
             if isCapacityError(error) {
                 throw InventoryReadableExportError.lowStorage
             }
             throw InventoryReadableExportError.destinationWriteFailed
         }
 
-        return InventoryReadableExportArtifact(id: artifactID, url: fileURL) {
+        return InventoryPreparedReadableExport(id: artifactID, url: fileURL) {
             fileSystem.remove(directory)
         }
     }
@@ -124,22 +141,26 @@ struct InventoryReadableExportService {
         places: [InventoryPlace] = [],
         movementRecords: [InventoryMovementRecord] = []
     ) -> InventoryPortabilitySnapshotV1 {
+        // Reuse setup within this capture without sharing mutable formatter state across actors.
+        let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
         let locationRecords = locations.map {
             InventoryPortabilityLocationV1(
                 id: $0.id.inventoryPortabilityString,
                 name: $0.name,
                 iconID: $0.iconID,
                 notes: $0.notes,
-                createdAt: InventoryPortabilityDate.string(from: $0.createdAt),
-                updatedAt: InventoryPortabilityDate.string(from: $0.updatedAt)
+                createdAt: dateFormatter.string(from: $0.createdAt),
+                updatedAt: dateFormatter.string(from: $0.updatedAt)
             )
         }
         let categoryRecords = customCategories.map {
             InventoryPortabilityCustomCategoryV1(
                 id: $0.id.inventoryPortabilityString,
                 name: $0.name,
-                createdAt: InventoryPortabilityDate.string(from: $0.createdAt),
-                updatedAt: InventoryPortabilityDate.string(from: $0.updatedAt)
+                createdAt: dateFormatter.string(from: $0.createdAt),
+                updatedAt: dateFormatter.string(from: $0.updatedAt)
             )
         }
         let locationsByName = locationRecords.reduce(into: [String: String]()) {
@@ -155,8 +176,8 @@ struct InventoryReadableExportService {
                 parentPlaceID: $0.parentPlaceID?.inventoryPortabilityString,
                 name: $0.name,
                 iconID: PlaceIconCatalog.normalizedIconID($0.iconID),
-                createdAt: InventoryPortabilityDate.string(from: $0.createdAt),
-                updatedAt: InventoryPortabilityDate.string(from: $0.updatedAt)
+                createdAt: dateFormatter.string(from: $0.createdAt),
+                updatedAt: dateFormatter.string(from: $0.updatedAt)
             )
         }
         let placesByID = Dictionary(uniqueKeysWithValues: placeRecords.map { ($0.id, $0) })
@@ -178,8 +199,8 @@ struct InventoryReadableExportService {
                 conditionStorageValue: item.condition,
                 tags: item.tags,
                 notes: item.notes,
-                createdAt: InventoryPortabilityDate.string(from: item.createdAt),
-                updatedAt: InventoryPortabilityDate.string(from: item.updatedAt)
+                createdAt: dateFormatter.string(from: item.createdAt),
+                updatedAt: dateFormatter.string(from: item.updatedAt)
             )
         }
         let itemIDs = Set(items.map(\.id))
@@ -190,7 +211,7 @@ struct InventoryReadableExportService {
                     id: record.id.inventoryPortabilityString,
                     operationID: record.operationID.inventoryPortabilityString,
                     itemID: record.itemID.inventoryPortabilityString,
-                    occurredAt: InventoryPortabilityDate.string(from: record.occurredAt),
+                    occurredAt: dateFormatter.string(from: record.occurredAt),
                     originStorageValue: record.originStorageValue,
                     reversedOperationID: record.reversedOperationID?.inventoryPortabilityString,
                     sourceLocationID: record.sourceLocationID?.inventoryPortabilityString,
@@ -225,5 +246,48 @@ struct InventoryReadableExportService {
     private func isCapacityError(_ error: Error) -> Bool {
         let error = error as NSError
         return error.domain == NSCocoaErrorDomain && error.code == CocoaError.fileWriteOutOfSpace.rawValue
+    }
+}
+
+struct InventoryPreparedReadableExport: Sendable {
+    let id: UUID
+    let url: URL
+    let cleanup: @Sendable () -> Void
+
+    func makeArtifact() -> InventoryReadableExportArtifact {
+        InventoryReadableExportArtifact(id: id, url: url, cleanupAction: cleanup)
+    }
+}
+
+actor InventoryReadableExportWorker {
+    private let service: InventoryReadableExportService
+
+    init(service: InventoryReadableExportService = InventoryReadableExportService()) {
+        self.service = service
+    }
+
+    func prepare(
+        snapshot: InventoryPortabilitySnapshotV1,
+        createdAt: Date = .now,
+        artifactID: UUID = UUID()
+    ) throws -> InventoryPreparedReadableExport {
+        try service.prepare(snapshot: snapshot, createdAt: createdAt, artifactID: artifactID)
+    }
+
+    func cleanup(_ prepared: InventoryPreparedReadableExport) {
+        prepared.cleanup()
+    }
+
+    @MainActor
+    func export(snapshot: InventoryPortabilitySnapshotV1) async throws -> InventoryReadableExportArtifact {
+        let prepared = try await prepare(snapshot: snapshot)
+        guard !Task.isCancelled else {
+            await cleanup(prepared)
+            throw CancellationError()
+        }
+        return InventoryReadableExportArtifact(id: prepared.id, url: prepared.url) {
+            // Share completion and deinitialization keep removal on the file owner actor.
+            Task { await self.cleanup(prepared) }
+        }
     }
 }

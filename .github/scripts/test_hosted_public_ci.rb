@@ -160,6 +160,7 @@ class HostedPublicCITest < Minitest::Test
     assert_equal 1, validation.scan("build-for-testing").length
     assert_operator validation.scan("test-without-building").length, :>=, 2
     assert_includes validation, "scripts/ci/check-code-coverage.py TestResults/UnitTests.xcresult --minimum 90"
+    assert_includes validation, "python3 -m unittest discover -s scripts/ci -p 'test_*.py'"
     assert_includes validation, "ordinary_validation.rb validate-result"
     assert_includes validation, "ordinary_validation.rb summarize"
   end

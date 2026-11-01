@@ -78,3 +78,7 @@ Do not add per-record colors, category palettes, raw light/dark pairs, or a para
 `InventoryPresentation/InventoryDesign.swift` owns adaptive appearance assets, semantic-to-accent mapping, text roles, shared dimensions, opacity, depth, and glass constants. `Views/Shared/` owns reusable visual structure and modifiers. Feature views own screen composition and pass semantic intent into those shared owners.
 
 Prefer the smallest existing abstraction. A new reusable view is for repeated structure, a modifier is for repeated decoration or behavior, a constant is for intentionally coordinated values, and one-off composition stays local. A visual approval does not authorize navigation, persistence, localization, privacy, Search, Tab Bar, or unrelated feature changes.
+
+## Reference Proposals
+
+[Design Code Reference v1](references/design-code-v1/README.md) contains the accepted app-icon composition concept, a proposed visual handbook, adaptive token references, and component/screen boards. It is a versioned comparison reference, not a replacement for this shipped guide or evidence that the proposed interface is implemented. Current source, tests, and repository instructions retain their authority.

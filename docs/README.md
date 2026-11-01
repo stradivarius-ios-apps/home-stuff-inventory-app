@@ -10,6 +10,7 @@ This index defines which repository documents are authoritative, which are opera
 - **Release gate** — revalidated for each affected release or submission.
 - **Historical guardrail** — concise completed direction retained to prevent regressions; current approved tasks may supersede it explicitly.
 - **Audit evidence** — dated validation facts retained in the private historical archive, separate from this clean public Git history and from current operational gates.
+- **Reference proposal** — versioned visual material used for comparison; publication does not establish shipped behavior or replace the current implementation guide.
 - **Fixture** — machine-consumed compatibility evidence; change only with its owning format contract and tests.
 
 ## Authority Map
@@ -38,6 +39,7 @@ This index defines which repository documents are authoritative, which are opera
 | [`ci/ios-26-compatibility.md`](ci/ios-26-compatibility.md) | iOS 26.0 static and runtime compatibility procedure | Release gate | Product/release owner | iOS 26 API, deployment target, simulator contract, or release validation change | Preserve the distinction between compile-time, runtime, and actual smoke evidence |
 | [`ci/ios-27-compatibility.md`](ci/ios-27-compatibility.md) | iOS 27 SDK, runtime smoke, and manual platform-review procedure | Release gate | Product/release owner | Xcode/iOS 27 SDK, simulator contract, or release validation change | Preserve the iOS 26.0 minimum-support gate and record unavailable device evidence honestly |
 | [`design/README.md`](design/README.md) | Current shipped visual direction, semantic hierarchy, and design-code ownership | Active guide | Design/UI owner | Approved visual direction, semantic role, or shared design-code change | Replace current guidance in place; former delivery and audit material remains only in the private historical archive |
+| [design/references/design-code-v1/README.md](design/references/design-code-v1/README.md) and adjacent reference assets | Accepted app-icon composition concept and proposed visual specification | Reference proposal | Design/UI owner | Explicit visual-reference revision | Keep versioned; current shipped guidance, source, and tests remain authoritative |
 
 ## Conflict Resolution
 

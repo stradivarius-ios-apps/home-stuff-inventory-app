@@ -12,7 +12,8 @@ struct InventoryAppearanceTests {
         "InventoryPlaceAccent",
         "InventoryPrimaryAction",
         "InventorySecondaryAccent",
-        "InventoryContextHighlight"
+        "InventoryContextHighlight",
+        "InventoryBrandText"
     ]
 
     @Test func semanticRolesProvideLightDarkAndHighContrastValues() throws {
@@ -41,7 +42,8 @@ struct InventoryAppearanceTests {
             "InventoryPlaceAccent",
             "InventoryPrimaryAction",
             "InventorySecondaryAccent",
-            "InventoryContextHighlight"
+            "InventoryContextHighlight",
+            "InventoryBrandText"
         ]
         let colorSets = try accentNames.map(loadColorSet(named:))
         let appearanceKeys = try #require(colorSets.first).colors.map(\.appearanceKey)
@@ -55,72 +57,56 @@ struct InventoryAppearanceTests {
         }
     }
 
-    @Test func approvedLightSurfaceSignaturesAndDarkBaselinesRemainExact() throws {
-        let expectedSignatures = [
-            "InventoryGroupedBackground": [
-                "default": "0.949:0.941:0.957:1.000",
-                "contrast:high": "0.925:0.914:0.937:1.000",
-                "luminosity:dark": "0.090:0.086:0.114:1.000",
-                "contrast:high|luminosity:dark": "0.063:0.059:0.078:1.000"
-            ],
-            "InventoryContentSurface": [
-                "default": "0.984:0.980:0.988:1.000",
-                "contrast:high": "1.000:1.000:1.000:1.000",
-                "luminosity:dark": "0.141:0.145:0.173:1.000",
-                "contrast:high|luminosity:dark": "0.169:0.173:0.204:1.000"
-            ],
-            "InventoryLocationAtmosphere": [
-                "default": "0.882:0.945:0.929:1.000",
-                "contrast:high": "0.847:0.925:0.906:1.000",
-                "luminosity:dark": "0.063:0.161:0.165:1.000",
-                "contrast:high|luminosity:dark": "0.043:0.133:0.137:1.000"
-            ]
+    @Test func adaptivePaletteMatchesReferenceValues() throws {
+        let referenceURL = try repositoryRootURL()
+            .appendingPathComponent("docs/design/references/design-code-v1/design-tokens.json")
+        let reference = try #require(
+            JSONSerialization.jsonObject(with: Data(contentsOf: referenceURL)) as? [String: Any]
+        )
+        let colors = try #require(reference["colors"] as? [String: Any])
+        let roles = try #require(colors["roles"] as? [[String: Any]])
+        let mappings = [
+            "location": "InventoryStorageAccent",
+            "storagePlace": "InventoryPlaceAccent",
+            "item": "InventorySecondaryAccent",
+            "primaryAction": "InventoryPrimaryAction",
+            "context": "InventoryContextHighlight",
+            "brandText": "InventoryBrandText",
+            "background": "InventoryGroupedBackground",
+            "surface": "InventoryContentSurface",
+            "stroke": "InventoryContentStroke",
+            "locationAtmosphere": "InventoryLocationAtmosphere"
+        ]
+        let appearanceNames = [
+            "default": "light",
+            "luminosity:dark": "dark",
+            "contrast:high": "increasedContrastLight",
+            "contrast:high|luminosity:dark": "increasedContrastDark"
         ]
 
-        for (roleName, expected) in expectedSignatures {
-            let colorSet = try loadColorSet(named: roleName)
-            let actual = Dictionary(
-                uniqueKeysWithValues: colorSet.colors.map { definition in
-                    (definition.appearanceKey, definition.color.components.signature)
-                }
-            )
-
-            #expect(actual == expected)
+        for (role, assetName) in mappings {
+            let values = try #require(roles.first { $0["name"] as? String == role } ?? colors[role] as? [String: Any])
+            for definition in try loadColorSet(named: assetName).colors {
+                let name = try #require(appearanceNames[definition.appearanceKey])
+                let expected = try #require(values[name] as? String)
+                #expect(definition.color.components.hex == expected, "\(assetName) \(name)")
+            }
         }
     }
 
-    @Test func placeAccentMatchesApprovedPalette() throws {
-        let expectedSignatures = [
-            "default": "0.455:0.357:0.518:1.000",
-            "luminosity:dark": "0.788:0.698:0.835:1.000",
-            "contrast:high": "0.337:0.239:0.400:1.000",
-            "contrast:high|luminosity:dark": "0.906:0.824:0.937:1.000"
-        ]
-        let colorSet = try loadColorSet(named: "InventoryPlaceAccent")
-        let actualSignatures = Dictionary(
-            uniqueKeysWithValues: colorSet.colors.map { definition in
-                (definition.appearanceKey, definition.color.components.signature)
+    @Test func opaqueAccentsKeepReadableContrastOnContentAndGroupedSurfaces() throws {
+        let surfaces = try ["InventoryGroupedBackground", "InventoryContentSurface"].map(loadColorSet(named:))
+        for name in ["InventoryStorageAccent", "InventoryPlaceAccent", "InventorySecondaryAccent",
+                     "InventoryPrimaryAction", "InventoryContextHighlight", "InventoryBrandText"] {
+            for accent in try loadColorSet(named: name).colors {
+                for surface in surfaces {
+                    let background = try #require(surface.colors.first { $0.appearanceKey == accent.appearanceKey })
+                    let luminances = [accent.color.components.luminance, background.color.components.luminance].sorted()
+                    let ratio = (luminances[1] + 0.05) / (luminances[0] + 0.05)
+                    #expect(ratio >= 4.5, "\(name) \(accent.appearanceKey): \(ratio)")
+                }
             }
-        )
-
-        #expect(actualSignatures == expectedSignatures)
-    }
-
-    @Test func primaryActionMatchesApprovedBrandIndigoPalette() throws {
-        let expectedSignatures = [
-            "default": "0.400:0.329:0.761:1.000",
-            "luminosity:dark": "0.659:0.608:1.000:1.000",
-            "contrast:high": "0.294:0.224:0.624:1.000",
-            "contrast:high|luminosity:dark": "0.788:0.757:1.000:1.000"
-        ]
-        let colorSet = try loadColorSet(named: "InventoryPrimaryAction")
-        let actualSignatures = Dictionary(
-            uniqueKeysWithValues: colorSet.colors.map { definition in
-                (definition.appearanceKey, definition.color.components.signature)
-            }
-        )
-
-        #expect(actualSignatures == expectedSignatures)
+        }
     }
 
     @Test func globalAccentColorRemainsOutsideThePrimaryActionPalette() throws {
@@ -247,6 +233,18 @@ private struct InventoryColorComponents: Decodable {
     let blue: String
     let green: String
     let red: String
+
+    var hex: String {
+        "#" + [red, green, blue].map { String(format: "%02X", Int((Double($0)! * 255).rounded())) }.joined()
+    }
+
+    var luminance: Double {
+        let channels = [red, green, blue].map { value in
+            let channel = Double(value)!
+            return channel <= 0.04045 ? channel / 12.92 : pow((channel + 0.055) / 1.055, 2.4)
+        }
+        return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722
+    }
 
     var signature: String {
         [red, green, blue, alpha].joined(separator: ":")

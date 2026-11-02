@@ -286,6 +286,66 @@ class PublicSurfaceValidationTest < Minitest::Test
     end
   end
 
+  def test_accepts_exact_reviewed_design_references_including_large_pdf
+    files = PublicSurfaceValidation::APPROVED_DESIGN_REFERENCE_SHA256.keys
+    pdf = files.find { |path| path.end_with?(".pdf") }
+    assert_operator File.size(File.join(REPOSITORY_ROOT, pdf)), :>, PublicSurfaceValidation::MAX_TRACKED_FILE_BYTES
+    assert_valid(REPOSITORY_ROOT, files)
+  end
+
+  def test_rejects_modified_bytes_at_every_reviewed_design_reference_path
+    with_repository do |root|
+      PublicSurfaceValidation::APPROVED_DESIGN_REFERENCE_SHA256.each_key do |path|
+        contents = File.binread(File.join(REPOSITORY_ROOT, path))
+        write(root, path, contents + "modified")
+        assert_rule(root, path, "approved design reference content mismatch")
+      end
+    end
+  end
+
+  def test_design_reference_mismatch_never_prints_contents_or_hashes
+    with_repository do |root|
+      path, expected_hash = PublicSurfaceValidation::APPROVED_DESIGN_REFERENCE_SHA256.first
+      contents = "private-reference-content-never-print"
+      write(root, path, contents)
+      error = validation_error(root, [path])
+
+      assert_includes error.message, "approved design reference content mismatch"
+      refute_includes error.message, contents
+      refute_includes error.message, expected_hash
+      refute_includes error.message, Digest::SHA256.hexdigest(contents)
+    end
+  end
+
+  def test_rejects_missing_reviewed_design_reference_in_candidate
+    with_repository do |root|
+      path = PublicSurfaceValidation::APPROVED_DESIGN_REFERENCE_SHA256.keys.first
+      assert_rule(root, path, "approved design reference content mismatch")
+    end
+  end
+
+  def test_rejects_symlink_at_reviewed_design_reference_path
+    with_repository do |root|
+      path = PublicSurfaceValidation::APPROVED_DESIGN_REFERENCE_SHA256.keys.first
+      write(root, "target", "contents")
+      FileUtils.mkdir_p(File.dirname(File.join(root, path)))
+      File.symlink(File.join(root, "target"), File.join(root, path))
+      assert_rule(root, path, "symbolic link")
+    end
+  end
+
+  def test_unlisted_design_reference_images_and_large_files_remain_rejected
+    with_repository do |root|
+      image = "docs/design/references/design-code-v1/boards/unreviewed.png"
+      write(root, image, "\x89PNG\r\n\x1A\n\0payload".b)
+      assert_rule(root, image, "unapproved binary file")
+
+      pdf = "docs/design/references/design-code-v1/unreviewed.pdf"
+      write(root, pdf, "x" * (PublicSurfaceValidation::MAX_TRACKED_FILE_BYTES + 1))
+      assert_rule(root, pdf, "tracked file exceeds 5 MiB review limit")
+    end
+  end
+
   def test_rejects_absolute_macos_home_paths
     with_repository do |root|
       path = "notes.txt"

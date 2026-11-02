@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B54F50A10000000000000002 /* Inventory-app.icon in Resources */ = {isa = PBXBuildFile; fileRef = B54F50A10000000000000001 /* Inventory-app.icon */; };
 		AD6580000000000000000001 /* InventoryPlaceHierarchyManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD6580000000000000000002 /* InventoryPlaceHierarchyManagement.swift */; };
 		AD6580000000000000000003 /* InventoryPlaceHierarchyMutationViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD6580000000000000000004 /* InventoryPlaceHierarchyMutationViews.swift */; };
 		AF7000000000000000000001 /* PremiumUpgradeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF7000000000000000000011 /* PremiumUpgradeCoordinator.swift */; };
@@ -229,6 +230,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		B54F50A10000000000000001 /* Inventory-app.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.icon; path = "Inventory-app.icon"; sourceTree = "<group>"; };
 		AF7000000000000000000011 /* PremiumUpgradeCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumUpgradeCoordinator.swift; sourceTree = "<group>"; };
 		AF7000000000000000000012 /* PremiumUpgradeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumUpgradeView.swift; sourceTree = "<group>"; };
 		AF7000000000000000000013 /* PremiumUpgradeCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumUpgradeCoordinatorTests.swift; sourceTree = "<group>"; };
@@ -723,6 +725,7 @@
 			isa = PBXGroup;
 			children = (
 				A10000000000000000000019 /* Assets.xcassets */,
+				B54F50A10000000000000001 /* Inventory-app.icon */,
 				A10000000000000000000266 /* HomeStuffInventory.storekit */,
 				A10000000000000000000090 /* Localizable.xcstrings */,
 				A1000000000000000000012A /* PrivacyInfo.xcprivacy */,
@@ -926,6 +929,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A10000000000000000000029 /* Assets.xcassets in Resources */,
+				B54F50A10000000000000002 /* Inventory-app.icon in Resources */,
 				A10000000000000000000091 /* Localizable.xcstrings in Resources */,
 				A1000000000000000000012B /* PrivacyInfo.xcprivacy in Resources */,
 			);

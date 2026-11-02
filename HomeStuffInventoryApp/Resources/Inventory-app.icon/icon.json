@@ -1,0 +1,134 @@
+{
+  "fill-specializations": [
+    {
+      "value": {
+        "solid": "extended-srgb:0.98039,0.96863,0.94510,1.00000"
+      }
+    },
+    {
+      "appearance": "dark",
+      "value": {
+        "solid": "extended-srgb:0.09020,0.09412,0.10980,1.00000"
+      }
+    }
+  ],
+  "groups": [
+    {
+      "name": "BlueDrawer",
+      "layers": [
+        {
+          "name": "BlueDrawer",
+          "image-name": "BlueDrawer.svg",
+          "glass": true,
+          "position": {
+            "scale": 1,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "lighting": "combined",
+      "shadow": {
+        "kind": "layer-color",
+        "opacity": 0.18
+      },
+      "specular": true,
+      "translucency": {
+        "enabled": false,
+        "value": 0
+      },
+      "blur-material": null
+    },
+    {
+      "name": "AmberDrawer",
+      "layers": [
+        {
+          "name": "AmberDrawer",
+          "image-name": "AmberDrawer.svg",
+          "glass": true,
+          "position": {
+            "scale": 1,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "lighting": "combined",
+      "shadow": {
+        "kind": "layer-color",
+        "opacity": 0.18
+      },
+      "specular": true,
+      "translucency": {
+        "enabled": false,
+        "value": 0
+      },
+      "blur-material": null
+    },
+    {
+      "name": "Roof",
+      "layers": [
+        {
+          "name": "Roof",
+          "image-name": "Roof.svg",
+          "glass": true,
+          "position": {
+            "scale": 1,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "lighting": "combined",
+      "shadow": {
+        "kind": "layer-color",
+        "opacity": 0.18
+      },
+      "specular": true,
+      "translucency": {
+        "enabled": false,
+        "value": 0
+      },
+      "blur-material": null
+    },
+    {
+      "name": "Cabinet",
+      "layers": [
+        {
+          "name": "Cabinet",
+          "image-name": "Cabinet.svg",
+          "glass": true,
+          "position": {
+            "scale": 1,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "lighting": "combined",
+      "shadow": {
+        "kind": "layer-color",
+        "opacity": 0.22
+      },
+      "specular": true,
+      "translucency": {
+        "enabled": false,
+        "value": 0
+      },
+      "blur-material": null
+    }
+  ],
+  "supported-platforms": {
+    "squares": [
+      "iOS"
+    ]
+  }
+}

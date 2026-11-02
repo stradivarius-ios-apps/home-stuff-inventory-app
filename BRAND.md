@@ -10,7 +10,8 @@ reserved materials:
 
 - the product name **Home Stuff Inventory** and any related names or logos;
 - app icons and visual brand assets under
-  `HomeStuffInventoryApp/Resources/Assets.xcassets/`;
+  `HomeStuffInventoryApp/Resources/Assets.xcassets/` and
+  `HomeStuffInventoryApp/Resources/Inventory-app.icon/`;
 - screenshots and screenshot-derived promotional artwork;
 - App Store listing copy under `fastlane/metadata/`;
 - product design artwork and presentation assets, including materials under

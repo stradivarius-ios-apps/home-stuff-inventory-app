@@ -44,8 +44,10 @@ struct InventoryItemPlaceSelectionView: View {
                             dismiss()
                         } label: {
                             HStack {
-                                Image(systemName: PlaceIconCatalog.symbolName(for: place.iconID))
-                                    .foregroundStyle(InventoryDesign.ContentRole.place.color)
+                                InventoryContentGlyph(
+                                    systemName: PlaceIconCatalog.symbolName(for: place.iconID),
+                                    role: InventoryDesign.ContentRole.place.accentRole
+                                )
                                 VStack(alignment: .leading, spacing: 2) {
                                     InventorySelectionRow(verbatim: place.name, isSelected: selection == place.id)
                                     if place.depth > 0 {
@@ -80,7 +82,7 @@ struct InventoryItemPlaceSelectionView: View {
                 .inventoryFormRowSurface()
             }
         }
-        .inventoryFormPresentation()
+        .inventoryFormPresentation(contentRole: .place)
         .navigationTitle("inventory.field.container")
         .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $searchText)

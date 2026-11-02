@@ -47,7 +47,7 @@ struct InventoryEditorSurfaceModifier: ViewModifier {
 
     private var strokeColor: Color {
         if isFocused {
-            InventoryDesign.Appearance.secondaryAccent.opacity(InventoryDesign.Opacity.editorFocusedStroke)
+            InventoryDesign.Appearance.primaryAction.opacity(InventoryDesign.Opacity.editorFocusedStroke)
         } else {
             InventoryDesign.Appearance.contentStroke.opacity(InventoryDesign.Opacity.editorStroke)
         }
@@ -100,7 +100,7 @@ struct InventoryFormPresentationModifier: ViewModifier {
             content
                 .scrollContentBackground(.hidden)
                 .background(InventoryDesign.Appearance.groupedBackground)
-                .tint(InventoryDesign.Appearance.secondaryAccent)
+                .tint(InventoryDesign.Appearance.primaryAction)
         }
     }
 

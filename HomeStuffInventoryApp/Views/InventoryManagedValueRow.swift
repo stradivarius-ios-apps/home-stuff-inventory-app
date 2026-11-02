@@ -76,7 +76,7 @@ struct InventoryManagedValueRow: View {
     @ViewBuilder
     private var leadingIcon: some View {
         if let systemImage {
-            InventoryContentGlyph(systemName: systemImage, role: iconRole, presentation: .identity)
+            InventoryContentGlyph(systemName: systemImage, role: iconRole, presentation: .compact)
         }
     }
 
@@ -95,6 +95,7 @@ struct InventoryManagedValueRow: View {
 
     private var titleText: some View {
         Text(verbatim: title)
+            .inventoryTextRole(.rowTitle)
             .foregroundStyle(.primary)
             .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, alignment: .leading)

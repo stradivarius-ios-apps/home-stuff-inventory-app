@@ -30,6 +30,8 @@ struct InventoryItemDetailIdentityHeader: View {
 }
 
 struct InventoryDetailStorageAnswerCard: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     let viewModel: InventoryItemDetailViewModel
 
     var body: some View {
@@ -73,29 +75,42 @@ struct InventoryDetailStorageAnswerCard: View {
         isExactAnswer: Bool,
         identifier: String
     ) -> some View {
-        HStack(alignment: .top, spacing: InventoryDesign.cardPadding) {
-            InventoryContentGlyph(
-                systemName: systemImage,
-                role: hasValue ? contentRole.accentRole : .muted
-            )
-
-            VStack(alignment: .leading, spacing: InventoryDesign.rowSpacing) {
-                Text(title)
-                    .inventoryTextRole(
-                        .fieldLabel,
-                        accentRole: hasValue ? contentRole.accentRole : .muted
-                    )
-                    .textCase(.uppercase)
-
-                Text(verbatim: value)
-                    .font(isExactAnswer ? .title3.weight(.bold) : .headline.weight(.medium))
-                    .foregroundStyle(hasValue ? .primary : .secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: InventoryDesign.rowSpacing) {
+                    glyph(systemImage: systemImage, hasValue: hasValue, contentRole: contentRole)
+                    storageText(title: title, value: value, hasValue: hasValue, contentRole: contentRole, isExactAnswer: isExactAnswer)
+                }
+            } else {
+                HStack(alignment: .top, spacing: InventoryDesign.cardPadding) {
+                    glyph(systemImage: systemImage, hasValue: hasValue, contentRole: contentRole)
+                    storageText(title: title, value: value, hasValue: hasValue, contentRole: contentRole, isExactAnswer: isExactAnswer)
+                }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier(identifier)
+    }
+
+    private func glyph(systemImage: String, hasValue: Bool, contentRole: InventoryDesign.ContentRole) -> some View {
+        InventoryContentGlyph(systemName: systemImage, role: hasValue ? contentRole.accentRole : .muted)
+    }
+
+    private func storageText(title: LocalizedStringKey, value: String, hasValue: Bool, contentRole: InventoryDesign.ContentRole, isExactAnswer: Bool) -> some View {
+        VStack(alignment: .leading, spacing: InventoryDesign.rowSpacing) {
+            Text(title)
+                .inventoryTextRole(
+                    .fieldLabel,
+                    accentRole: hasValue ? contentRole.accentRole : .muted
+                )
+                .textCase(.uppercase)
+
+            Text(verbatim: value)
+                .font(isExactAnswer ? InventoryDesign.TextRole.fieldValue.font : .headline.weight(.medium))
+                .foregroundStyle(hasValue ? .primary : .secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -105,7 +120,7 @@ struct InventoryDetailPropertiesCard: View {
     let viewModel: InventoryItemDetailViewModel
 
     var body: some View {
-        InventoryCard {
+        InventoryCard(padding: InventoryDesign.compactCardPadding, cornerRadius: InventoryDesign.compactCornerRadius) {
             if dynamicTypeSize.isAccessibilitySize {
                 VStack(alignment: .leading, spacing: InventoryDesign.cardPadding) {
                     quantityProperty
@@ -154,7 +169,7 @@ struct InventoryDetailPropertiesCard: View {
                 .textCase(.uppercase)
 
             Text(verbatim: value)
-                .font(.title3.weight(.semibold))
+                .font(InventoryDesign.TextRole.fieldValue.font)
                 .foregroundStyle(.primary)
                 .fixedSize(horizontal: false, vertical: true)
         }

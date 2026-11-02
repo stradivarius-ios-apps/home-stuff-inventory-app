@@ -1,0 +1,247 @@
+{
+  "version": "1.0",
+  "date": "2026-11-01",
+  "name": "Home Stuff Inventory — Впорядкований дім",
+  "status": {
+    "appIcon": "accepted concept",
+    "interface": "proposed design code; not implemented",
+    "authority": "Within this reference bundle, PDF tables and JSON define exact values over the rendered boards. The current shipped guide, source, tests, and repository instructions retain implementation authority."
+  },
+  "source": {
+    "repository": "https://github.com/stradivarius-ios-apps/home-stuff-inventory-app",
+    "primaryOwners": [
+      "HomeStuffInventoryApp/InventoryPresentation/InventoryDesign.swift",
+      "HomeStuffInventoryApp/Views/Shared/InventoryIconPrimitives.swift",
+      "HomeStuffInventoryApp/Views/Shared/InventoryGlassSurfaces.swift",
+      "HomeStuffInventoryApp/Resources/Assets.xcassets"
+    ],
+    "reviewedPublicMain": "9b9f9a06de81cf7b082e4228a146bfc021be57fc"
+  },
+  "colors": {
+    "roles": [
+      {
+        "name": "location",
+        "light": "#147872",
+        "dark": "#5CC5BC",
+        "increasedContrastLight": "#006F6A",
+        "increasedContrastDark": "#78DDD3",
+        "contrastLightGrouped": 4.75,
+        "contrastLightSurface": 5.22,
+        "contrastDarkSurface": 7.31
+      },
+      {
+        "name": "storagePlace",
+        "light": "#745B84",
+        "dark": "#C9B2D5",
+        "increasedContrastLight": "#563D66",
+        "increasedContrastDark": "#E7D2EF",
+        "contrastLightGrouped": 5.26,
+        "contrastLightSurface": 5.79,
+        "contrastDarkSurface": 7.78
+      },
+      {
+        "name": "item",
+        "light": "#386CB3",
+        "dark": "#78A9EF",
+        "increasedContrastLight": "#255A9F",
+        "increasedContrastDark": "#9AC3FF",
+        "contrastLightGrouped": 4.74,
+        "contrastLightSurface": 5.22,
+        "contrastDarkSurface": 6.27
+      },
+      {
+        "name": "primaryAction",
+        "light": "#6654C2",
+        "dark": "#A89BFF",
+        "increasedContrastLight": "#4B399F",
+        "increasedContrastDark": "#C9C1FF",
+        "contrastLightGrouped": 5.21,
+        "contrastLightSurface": 5.73,
+        "contrastDarkSurface": 6.33
+      },
+      {
+        "name": "context",
+        "light": "#936400",
+        "dark": "#F2C34D",
+        "increasedContrastLight": "#795100",
+        "increasedContrastDark": "#FFE07A",
+        "contrastLightGrouped": 4.63,
+        "contrastLightSurface": 5.09,
+        "contrastDarkSurface": 9.13
+      },
+      {
+        "name": "brandText",
+        "light": "#B34F32",
+        "dark": "#F49773",
+        "increasedContrastLight": "#8F351F",
+        "increasedContrastDark": "#FFB79A",
+        "contrastLightGrouped": 4.61,
+        "contrastLightSurface": 5.07,
+        "contrastDarkSurface": 6.85
+      }
+    ],
+    "background": {
+      "light": "#F5F2ED",
+      "dark": "#17181C",
+      "increasedContrastLight": "#ECE9EF",
+      "increasedContrastDark": "#100F14"
+    },
+    "surface": {
+      "light": "#FFFDFA",
+      "dark": "#24262D",
+      "increasedContrastLight": "#FFFFFF",
+      "increasedContrastDark": "#2B2C34"
+    },
+    "stroke": {
+      "light": "#D9D6D1",
+      "dark": "#3D414B",
+      "increasedContrastLight": "#AAA4B5",
+      "increasedContrastDark": "#70747F"
+    },
+    "locationAtmosphere": {
+      "light": "#E1F1ED",
+      "dark": "#10292A",
+      "increasedContrastLight": "#D8ECE7",
+      "increasedContrastDark": "#0B2223"
+    },
+    "text": {
+      "implementation": "native semantic primary/secondary, not fixed RGB text colors",
+      "primaryPreview": {
+        "light": "#25262C",
+        "dark": "#F5F2EE"
+      },
+      "secondaryPreview": {
+        "light": "#676872",
+        "dark": "#B4B4BE"
+      }
+    },
+    "brandArtwork": {
+      "terracotta": "#C76648",
+      "mint": "#DCEBE3",
+      "amber": "#EAC46C",
+      "blue": "#80A6CF",
+      "usage": "Illustrative fills only. Do not sample rendered glass pixels to create UI tokens."
+    }
+  },
+  "dimensions": {
+    "unit": "pt",
+    "rhythm": 4,
+    "screenPadding": 20,
+    "cardPadding": 16,
+    "compactPadding": 12,
+    "rowGap": 8,
+    "gridGap": 12,
+    "sectionGap": 24,
+    "radii": {
+      "compact": 14,
+      "card": 20,
+      "identity": 24
+    },
+    "tapTargetMinimum": 44,
+    "detailMaxWidth": 520,
+    "cardStroke": 1,
+    "focusStroke": 1.5,
+    "contentGlyphFrame": 32,
+    "identityGlyphFrame": 40,
+    "locationGlyph": 36,
+    "locationGlyphFrame": 60,
+    "layout": "Content driven heights; wrap/reflow for Dynamic Type and long Ukrainian."
+  },
+  "typography": {
+    "family": "iOS system SF Pro",
+    "dynamicType": true,
+    "screenTitle": "largeTitle bold",
+    "entityTitle": "title2 semibold",
+    "sectionTitle": "headline semibold",
+    "rowTitle": "headline/body semibold",
+    "fieldLabel": "caption semibold",
+    "fieldValue": "headline semibold",
+    "supportingText": "subheadline medium",
+    "metadata": "caption",
+    "action": "body semibold",
+    "referencePointSizes": {
+      "largeTitle": 34,
+      "title2": 22,
+      "headline": 17,
+      "body": 17,
+      "subheadline": 15,
+      "caption": 12
+    }
+  },
+  "iconography": {
+    "constructionGrid": 24,
+    "activeArea": 20,
+    "strokeRange": [
+      1.75,
+      2
+    ],
+    "minimumGap": 2,
+    "baseRadius": 3,
+    "drawerNotch": {
+      "width": 5.5,
+      "depth": 2.25
+    },
+    "smallStyle": "frontal outline + at most one solid detail; no glass bevel or perspective",
+    "largeStyle": "optically redrawn at48–64pt; at most two meaningful fitted planes; restrained illustrative translucency",
+    "contentFamily": [
+      "kitchen",
+      "office",
+      "bedroom",
+      "cabinet",
+      "drawer",
+      "box",
+      "shelf",
+      "organizer",
+      "cable",
+      "keys",
+      "battery",
+      "tools"
+    ],
+    "systemActions": [
+      "plus",
+      "chevron.backward",
+      "pencil",
+      "line.3.horizontal.decrease",
+      "magnifyingglass",
+      "ellipsis",
+      "gearshape",
+      "trash"
+    ],
+    "semanticRule": "Color follows entity role; do not assign a permanent color to a glyph across unrelated roles."
+  },
+  "material": {
+    "navigation": "native system Liquid Glass",
+    "content": "opaque semantic content surfaces",
+    "identityArtwork": "limited colored-glass illustration, never live stacked glass under text",
+    "reduceTransparency": "opaque/native adaptive fallback; preserve visible structure without translucency"
+  },
+  "navigation": {
+    "initial": "Locations",
+    "tabs": [
+      "Locations",
+      "Inventory",
+      "Settings"
+    ],
+    "search": "Separate native Search role; current activation and placement preserved",
+    "modal": "Native add/edit Form sheet; no root Tab Bar in sheet"
+  },
+  "validation": {
+    "contrast": "Computed WCAG relative-luminance ratios for opaque sRGB pairs only; not a full accessibility audit.",
+    "required": [
+      "320pt width",
+      "reference iPhone width",
+      "long Ukrainian and English",
+      "accessibility Dynamic Type",
+      "Light/Dark",
+      "Increase Contrast",
+      "Reduce Transparency",
+      "VoiceOver labels/order",
+      "Reduce Motion"
+    ]
+  },
+  "references": [
+    "https://developer.apple.com/design/human-interface-guidelines/materials",
+    "https://developer.apple.com/design/human-interface-guidelines/layout",
+    "https://developer.apple.com/design/human-interface-guidelines/app-icons"
+  ]
+}

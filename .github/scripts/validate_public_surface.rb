@@ -26,6 +26,23 @@ module PublicSurfaceValidation
   }.freeze
   APPROVED_SYNTHETIC_DATA_FILES = APPROVED_SYNTHETIC_DATA_SHA256.keys.to_set.freeze
 
+  # Only these reviewed bytes may bypass the generic binary and size limits.
+  # New or revised reference artwork needs an explicit checksum review.
+  APPROVED_DESIGN_REFERENCE_SHA256 = {
+    "docs/design/references/design-code-v1/accepted-app-icon.png" =>
+      "ce3b2ce9b7d76577717a8c3d7e09d4e25c56d587073ce47721b8e1151800ba66",
+    "docs/design/references/design-code-v1/boards/01-foundations-icons.png" =>
+      "38d42da236bb71e04b15c4c8a66cf13645dae8f7e36de28b84b465c8eb6c360e",
+    "docs/design/references/design-code-v1/boards/02-components.png" =>
+      "adda34610f28ae6cc650fe0bcb8086414e3f9392be17a3e311d47058543ed2ca",
+    "docs/design/references/design-code-v1/boards/03-light-screens.png" =>
+      "a58b5915562bddb585c9336d91e7f42173e358634d5342bbe13c3e18ae819241",
+    "docs/design/references/design-code-v1/boards/04-dark-screens.png" =>
+      "595ac260cb18e62d8221f618f5a37374e4f990671f005de035d36dc87f6f24db",
+    "docs/design/references/design-code-v1/home-stuff-design-code-v1.pdf" =>
+      "a0b998956905deed56a59ef60d4bc3c0f2d4bdf5d96705042f56c0e3d81dd91e"
+  }.freeze
+
   APPROVED_BINARY_ASSET_ROOTS = Set.new([
     "HomeStuffInventoryApp/Resources/Assets.xcassets/"
   ]).freeze
@@ -165,6 +182,11 @@ module PublicSurfaceValidation
     return [{ path: path, rule: "symbolic link" }] if File.symlink?(absolute_path)
     if APPROVED_SYNTHETIC_DATA_FILES.include?(path) && !File.file?(absolute_path)
       return [{ path: path, rule: "approved synthetic fixture content mismatch" }]
+    end
+    if (expected_hash = APPROVED_DESIGN_REFERENCE_SHA256[path])
+      return [] if File.file?(absolute_path) && Digest::SHA256.file(absolute_path).hexdigest == expected_hash
+
+      return [{ path: path, rule: "approved design reference content mismatch" }]
     end
     return [] unless File.file?(absolute_path)
 

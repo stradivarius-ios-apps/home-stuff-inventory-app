@@ -2,6 +2,27 @@
 
 All notable user-facing and release-track changes for Home Stuff Inventory are recorded here.
 
+## 1.5.0
+
+### Changed
+
+- Document the implemented visual system (#109).
+- Give accessibility management names the full row width (#108).
+- Submit native search before accessibility detail navigation (#107).
+- Reflow accessible Recent rows and use row title typography (#106).
+- Open remaining household glyph details (#104).
+- Refine layered cabinet app icon (#103).
+- Align adaptive inventory palette with visual reference (#102).
+- Approve reviewed visual reference assets in public-surface checks (#101).
+- Merge branch 'feature/refresh-init-action-contract' into feature/refresh-token-action-contract (#76).
+- Align upgrade ancestry while keeping CodeQL versions matched (#77).
+- Keep CodeQL actions coordinated until both upgrade together (#75).
+- Bump ruby/setup-ruby to 1.327.0 (69b650b).
+
+### Fixed
+
+- Fix shared surface initialization and multiline tag sizing (#105).
+
 ## 1.4.2
 
 ### Changed

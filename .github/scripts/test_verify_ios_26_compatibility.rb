@@ -45,6 +45,36 @@ class IOS26CompatibilityTest < Minitest::Test
     end
   end
 
+  def test_allows_opaque_content_without_custom_glass
+    with_repository do |root|
+      File.write(File.join(root, "HomeStuffInventoryApp/Views/Shared/InventoryGlassSurfaces.swift"), "content.background(Color.primary)\n")
+      output, status = Open3.capture2e("ruby", SCRIPT, chdir: root)
+
+      assert status.success?, output
+      assert_includes output, "iOS 26.0 static compatibility gate passed"
+    end
+  end
+
+  def test_rejects_custom_glass_without_availability_guard
+    with_repository do |root|
+      File.write(File.join(root, "HomeStuffInventoryApp/Views/Shared/InventoryGlassSurfaces.swift"), "content.glassEffect(.regular)\n")
+      output, status = Open3.capture2e("ruby", SCRIPT, chdir: root)
+
+      refute status.success?
+      assert_includes output, "uses custom glass without required iOS 26.0 guard evidence"
+    end
+  end
+
+  def test_rejects_missing_native_search_availability_guard
+    with_repository do |root|
+      File.write(File.join(root, "HomeStuffInventoryApp/Views/RootView.swift"), "tabViewSearchActivation(.searchTabSelection)\n")
+      output, status = Open3.capture2e("ruby", SCRIPT, chdir: root)
+
+      refute status.success?
+      assert_includes output, "RootView.swift is missing required iOS 26.0 guard evidence"
+    end
+  end
+
   private
 
   def with_repository

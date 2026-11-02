@@ -267,6 +267,10 @@ private struct InventoryBadgeSurfaceModifier: ViewModifier {
 
     let role: InventoryDesign.AccentRole
 
+    init(role: InventoryDesign.AccentRole) {
+        self.role = role
+    }
+
     func body(content: Content) -> some View {
         content
             .background {
@@ -291,6 +295,10 @@ private struct InventoryStorageIconSurfaceModifier: ViewModifier {
     private var accessibility = InventoryGlassAccessibility()
 
     let role: InventoryDesign.AccentRole
+
+    init(role: InventoryDesign.AccentRole) {
+        self.role = role
+    }
 
     func body(content: Content) -> some View {
         content

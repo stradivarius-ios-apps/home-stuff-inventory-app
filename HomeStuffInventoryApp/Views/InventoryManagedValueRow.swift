@@ -63,10 +63,8 @@ struct InventoryManagedValueRow: View {
 
     private var accessibilityRow: some View {
         VStack(alignment: .leading, spacing: InventoryDesign.rowSpacing) {
-            HStack(alignment: .top, spacing: 12) {
-                leadingIcon
-                identityColumn
-            }
+            leadingIcon
+            identityColumn
 
             trailingActions
                 .frame(maxWidth: .infinity, alignment: .trailing)

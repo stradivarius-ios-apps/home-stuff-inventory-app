@@ -46,6 +46,7 @@ struct InventoryBadge: View {
 }
 
 struct InventoryTagBadge: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     private let title: String
     private let role: InventoryDesign.AccentRole
 
@@ -61,8 +62,9 @@ struct InventoryTagBadge: View {
                 .accessibilityHidden(true)
 
             Text(verbatim: title)
-                .lineLimit(1)
+                .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
                 .truncationMode(.tail)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .font(.caption.weight(.semibold))
         .foregroundStyle(role.color)

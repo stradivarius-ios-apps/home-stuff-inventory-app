@@ -33,17 +33,20 @@ struct InventoryEmptyStateCard<Actions: View>: View {
     private let title: Text
     private let message: Text
     private let systemImage: String
+    private let iconRole: InventoryDesign.AccentRole
     private let actions: Actions
 
     init(
         title: LocalizedStringKey,
         message: LocalizedStringKey,
         systemImage: String = "shippingbox",
+        iconRole: InventoryDesign.AccentRole = .muted,
         @ViewBuilder actions: () -> Actions
     ) {
         self.title = Text(title)
         self.message = Text(message)
         self.systemImage = systemImage
+        self.iconRole = iconRole
         self.actions = actions()
     }
 
@@ -51,34 +54,38 @@ struct InventoryEmptyStateCard<Actions: View>: View {
         title: String,
         message: String,
         systemImage: String = "shippingbox",
+        iconRole: InventoryDesign.AccentRole = .muted,
         @ViewBuilder actions: () -> Actions
     ) {
         self.title = Text(verbatim: title)
         self.message = Text(verbatim: message)
         self.systemImage = systemImage
+        self.iconRole = iconRole
         self.actions = actions()
     }
 
     var body: some View {
         InventoryCard(cornerRadius: InventoryDesign.heroCornerRadius) {
-            VStack(alignment: .leading, spacing: InventoryDesign.rowSpacing) {
-                InventoryStorageIcon(systemName: systemImage)
+            VStack(spacing: InventoryDesign.rowSpacing) {
+                InventoryContentGlyph(systemName: systemImage, role: iconRole, presentation: .identity)
                     .padding(.bottom, 4)
                     .accessibilityHidden(true)
 
                 title
-                    .font(.title3.weight(.semibold))
+                    .inventoryTextRole(.sectionTitle)
                     .foregroundStyle(.primary)
                     .fixedSize(horizontal: false, vertical: true)
 
                 message
-                    .font(.body)
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
 
                 actions
                     .padding(.top, 6)
             }
+            .frame(maxWidth: .infinity)
+            .multilineTextAlignment(.center)
         }
         .accessibilityElement(children: .contain)
     }
@@ -126,6 +133,7 @@ struct InventoryEmptyStatePrimaryActionModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .buttonStyle(.borderedProminent)
+            .foregroundStyle(InventoryDesign.Appearance.groupedBackground)
             .controlSize(.large)
             .inventoryPrimaryActionTint()
     }
@@ -141,9 +149,10 @@ extension InventoryEmptyStateCard where Actions == EmptyView {
     init(
         title: LocalizedStringKey,
         message: LocalizedStringKey,
-        systemImage: String = "shippingbox"
+        systemImage: String = "shippingbox",
+        iconRole: InventoryDesign.AccentRole = .muted
     ) {
-        self.init(title: title, message: message, systemImage: systemImage) {
+        self.init(title: title, message: message, systemImage: systemImage, iconRole: iconRole) {
             EmptyView()
         }
     }
@@ -151,9 +160,10 @@ extension InventoryEmptyStateCard where Actions == EmptyView {
     init(
         title: String,
         message: String,
-        systemImage: String = "shippingbox"
+        systemImage: String = "shippingbox",
+        iconRole: InventoryDesign.AccentRole = .muted
     ) {
-        self.init(title: title, message: message, systemImage: systemImage) {
+        self.init(title: title, message: message, systemImage: systemImage, iconRole: iconRole) {
             EmptyView()
         }
     }

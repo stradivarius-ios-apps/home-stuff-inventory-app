@@ -33,7 +33,7 @@ struct InventoryCompactItemCard: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, InventoryDesign.compactInventoryCardHorizontalPadding)
-        .padding(.vertical, InventoryDesign.rowSpacing)
+        .padding(.vertical, InventoryDesign.compactInventoryCardVerticalPadding)
         .frame(minHeight: InventoryDesign.minimumTapTarget)
         .inventorySemanticSurface(.item, cornerRadius: InventoryDesign.compactCornerRadius)
         .contentShape(RoundedRectangle(cornerRadius: InventoryDesign.compactCornerRadius, style: .continuous))

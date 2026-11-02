@@ -104,7 +104,8 @@ struct LocationsListView: View {
                     "locations.empty.message",
                     defaultValue: "Add items with a location and exact storage place so this list can show where things live."
                 ),
-                systemImage: "map"
+                systemImage: "map",
+                iconRole: InventoryDesign.ContentRole.location.accentRole
             ) {
                 Button(InventoryLocalization.string("inventory.action.addItem", defaultValue: "Add Item")) {
                     isShowingItemForm = true

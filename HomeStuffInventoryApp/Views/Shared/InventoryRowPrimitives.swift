@@ -17,7 +17,7 @@ struct InventorySectionHeader: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             title
-                .font(.title3.weight(.semibold))
+                .inventoryTextRole(.sectionTitle)
                 .foregroundStyle(.primary)
                 .fixedSize(horizontal: false, vertical: true)
 

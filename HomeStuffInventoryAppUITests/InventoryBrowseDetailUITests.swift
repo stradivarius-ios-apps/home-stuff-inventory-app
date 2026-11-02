@@ -506,7 +506,8 @@ final class InventoryBrowseDetailUITests: InventoryUITestCase {
         let searchField = app.searchFields.firstMatch
         XCTAssertTrue(searchField.waitForExistence(timeout: 3))
         searchField.tap()
-        searchField.typeText("USB-C to HDMI adapter")
+        searchField.typeText("USB-C to HDMI adapter\n")
+        XCTAssertEqual(searchField.value as? String, "USB-C to HDMI adapter")
         openItem(named: "USB-C to HDMI adapter")
 
         let hero = element(identifier: "inventory.itemDetail.hero")

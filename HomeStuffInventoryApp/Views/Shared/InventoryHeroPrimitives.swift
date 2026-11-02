@@ -296,7 +296,7 @@ struct InventoryDetailIdentityHeader: View {
         )
         .padding(InventoryDesign.rowSpacing)
         .background {
-            Circle()
+            RoundedRectangle(cornerRadius: InventoryDesign.heroCornerRadius, style: .continuous)
                 .fill(contentRole.color.opacity(InventoryDesign.Opacity.identityHeaderIconFill))
         }
         .accessibilityHidden(true)

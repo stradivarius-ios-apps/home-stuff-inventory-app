@@ -123,7 +123,7 @@ struct PlaceSummaryRowView: View {
         InventoryContentGlyph(
             systemName: placeIconSystemName,
             role: place.isMissingPlace ? .muted : InventoryDesign.ContentRole.place.accentRole,
-            presentation: .identity
+            presentation: .compact
         )
         .accessibilityHidden(true)
     }

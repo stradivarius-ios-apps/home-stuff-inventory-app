@@ -323,12 +323,13 @@ private struct PlaceDetailItemsHeader: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: InventoryDesign.gridSpacing) {
-            PlaceDetailIdentityHeader(place: place)
-
-            pathContext
-            if !usesSimpleLeafLayout {
-                countSummary
+        VStack(alignment: .leading, spacing: InventoryDesign.sectionSpacing) {
+            VStack(alignment: .leading, spacing: InventoryDesign.gridSpacing) {
+                PlaceDetailIdentityHeader(place: place)
+                pathContext
+                if !usesSimpleLeafLayout {
+                    countSummary
+                }
             }
             childPlacesSection
 

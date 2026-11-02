@@ -123,7 +123,9 @@ private struct LocationRecentItemTilesSection: View {
 
                 if index < presentation.visibleChips.count - 1 {
                     Divider()
-                        .padding(.leading, RecentItemsShelfMetric.dividerLeadingInset)
+                        .padding(.leading, dynamicTypeSize.isAccessibilitySize
+                            ? RecentItemsShelfMetric.horizontalPadding
+                            : RecentItemsShelfMetric.dividerLeadingInset)
                         .padding(.trailing, RecentItemsShelfMetric.horizontalPadding)
                 }
             }
@@ -157,9 +159,18 @@ private struct LocationRecentItemTilesSection: View {
     }
 
     private func recentItemRow(_ chip: InventoryPreviewGroupPresentation.Chip) -> some View {
-        HStack(alignment: .top, spacing: RecentItemsShelfMetric.glyphTitleSpacing) {
-            recentItemIcon(chip)
-            recentItemTitle(chip)
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: InventoryDesign.rowSpacing) {
+                    recentItemIcon(chip)
+                    recentItemTitle(chip)
+                }
+            } else {
+                HStack(alignment: .top, spacing: RecentItemsShelfMetric.glyphTitleSpacing) {
+                    recentItemIcon(chip)
+                    recentItemTitle(chip)
+                }
+            }
         }
         .padding(.horizontal, RecentItemsShelfMetric.horizontalPadding)
         .padding(.vertical, RecentItemsShelfMetric.verticalPadding)
@@ -170,15 +181,15 @@ private struct LocationRecentItemTilesSection: View {
     private func recentItemIcon(_ chip: InventoryPreviewGroupPresentation.Chip) -> some View {
         InventoryContentGlyph(
             systemName: recentItemSystemImage(chip),
-            role: .context,
-            presentation: .identity
+            role: InventoryDesign.ContentRole.item.accentRole,
+            presentation: .compact
         )
         .accessibilityHidden(true)
     }
 
     private func recentItemTitle(_ chip: InventoryPreviewGroupPresentation.Chip) -> some View {
         Text(verbatim: chip.title)
-            .font(.subheadline.weight(.semibold))
+            .font(InventoryDesign.TextRole.rowTitle.font)
             .foregroundStyle(.primary)
             .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 3)
             .fixedSize(horizontal: false, vertical: true)
@@ -189,11 +200,11 @@ private struct LocationRecentItemTilesSection: View {
 
 private enum RecentItemsShelfMetric {
     static let horizontalPadding: CGFloat = 12
-    static let verticalPadding: CGFloat = 10
+    static let verticalPadding: CGFloat = InventoryDesign.compactCardPadding
     static let glyphTitleSpacing: CGFloat = 12
     static let titleMinimumHeight: CGFloat = 40
     static let minimumRowHeight: CGFloat = 60
-    static let dividerLeadingInset: CGFloat = horizontalPadding + 40 + glyphTitleSpacing
+    static let dividerLeadingInset: CGFloat = horizontalPadding + InventoryDesign.contentGlyphSize + glyphTitleSpacing
 }
 
 private struct LocationRecentItemsHeader: View {

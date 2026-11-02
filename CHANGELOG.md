@@ -2,6 +2,14 @@
 
 All notable user-facing and release-track changes for Home Stuff Inventory are recorded here.
 
+## 1.5.0
+
+### Changed
+
+- Refine the app icon, household icons, and adaptive colors.
+- Improve inventory, location, and storage place presentation and detail hierarchy.
+- Refine shared surfaces, forms, and management screens for accessibility and consistency.
+
 ## 1.4.2
 
 ### Changed

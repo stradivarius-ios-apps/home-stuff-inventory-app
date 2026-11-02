@@ -63,10 +63,8 @@ struct InventoryManagedValueRow: View {
 
     private var accessibilityRow: some View {
         VStack(alignment: .leading, spacing: InventoryDesign.rowSpacing) {
-            HStack(alignment: .top, spacing: 12) {
-                leadingIcon
-                identityColumn
-            }
+            leadingIcon
+            identityColumn
 
             trailingActions
                 .frame(maxWidth: .infinity, alignment: .trailing)
@@ -76,7 +74,7 @@ struct InventoryManagedValueRow: View {
     @ViewBuilder
     private var leadingIcon: some View {
         if let systemImage {
-            InventoryContentGlyph(systemName: systemImage, role: iconRole, presentation: .identity)
+            InventoryContentGlyph(systemName: systemImage, role: iconRole, presentation: .compact)
         }
     }
 
@@ -95,6 +93,7 @@ struct InventoryManagedValueRow: View {
 
     private var titleText: some View {
         Text(verbatim: title)
+            .inventoryTextRole(.rowTitle)
             .foregroundStyle(.primary)
             .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, alignment: .leading)

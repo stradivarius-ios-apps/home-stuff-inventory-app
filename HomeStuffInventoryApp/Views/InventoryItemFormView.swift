@@ -81,6 +81,7 @@ struct InventoryItemFormView: View {
                     }
                     .disabled(selectedStorageLocation == nil)
                     .accessibilityIdentifier("inventory.itemForm.containerPicker")
+                    .tint(InventoryDesign.ContentRole.place.color)
                 } header: {
                     Text("inventory.section.whereIsIt")
                 } footer: {
@@ -129,8 +130,7 @@ struct InventoryItemFormView: View {
                 Section {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("inventory.field.tags")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .inventoryTextRole(.fieldLabel)
 
                         Text(tagsFormatHelper)
                             .inventoryHelperText()
@@ -151,8 +151,7 @@ struct InventoryItemFormView: View {
 
                     VStack(alignment: .leading, spacing: 8) {
                         Text("inventory.field.notes")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .inventoryTextRole(.fieldLabel)
 
                         TextEditor(text: $draft.notes)
                             .focused($focusedField, equals: .notes)

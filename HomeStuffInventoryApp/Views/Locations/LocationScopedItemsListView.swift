@@ -376,7 +376,7 @@ private struct PlaceDetailItemsHeader: View {
             Text(verbatim: ([place.locationName] + place.pathComponents).joined(separator: " › "))
                 .fixedSize(horizontal: false, vertical: true)
         } icon: {
-            Image(systemName: "point.topleft.down.to.point.bottomright.curvepath")
+            InventoryInlineGlyph(systemName: "map", role: .muted, domain: .location)
         }
         .font(.subheadline)
         .foregroundStyle(.secondary)

@@ -12,6 +12,7 @@ enum InventoryDesign {
         static let primaryAction = Color("InventoryPrimaryAction")
         static let secondaryAccent = Color("InventorySecondaryAccent")
         static let contextHighlight = Color("InventoryContextHighlight")
+        static let brandText = Color("InventoryBrandText")
     }
 
     /// Palette accents describe visual treatment, not Item, Location, or Place meaning.

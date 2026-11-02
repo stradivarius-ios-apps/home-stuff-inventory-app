@@ -14,7 +14,8 @@ struct InventoryEmptyStateView: View {
             InventoryEmptyStateCard(
                 title: viewModel.title,
                 message: viewModel.message,
-                systemImage: "shippingbox"
+                systemImage: "shippingbox",
+                iconRole: InventoryDesign.ContentRole.item.accentRole
             ) {
                 Button(viewModel.primaryActionTitle) {
                     onAddItem()

@@ -46,6 +46,7 @@ struct InventoryBadge: View {
 }
 
 struct InventoryTagBadge: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     private let title: String
     private let role: InventoryDesign.AccentRole
 
@@ -61,8 +62,9 @@ struct InventoryTagBadge: View {
                 .accessibilityHidden(true)
 
             Text(verbatim: title)
-                .lineLimit(1)
+                .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
                 .truncationMode(.tail)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .font(.caption.weight(.semibold))
         .foregroundStyle(role.color)
@@ -125,7 +127,7 @@ struct InventoryTagCloudLayout: Layout {
             var x = bounds.minX + xOffset(for: row, in: bounds.width)
 
             for index in row.range {
-                let size = subviews[index].sizeThatFits(.unspecified)
+                let size = fittedSize(of: subviews[index], in: bounds.width)
                 subviews[index].place(
                     at: CGPoint(x: x, y: y + (row.height - size.height) / 2),
                     anchor: .topLeading,
@@ -155,6 +157,14 @@ struct InventoryTagCloudLayout: Layout {
         return contentWidth + spacingWidth
     }
 
+    private func fittedSize(of subview: LayoutSubview, in availableWidth: CGFloat) -> CGSize {
+        let idealWidth = subview.sizeThatFits(.unspecified).width
+        // Measure wrapping text with the same width that placement will propose.
+        return subview.sizeThatFits(
+            ProposedViewSize(width: min(idealWidth, availableWidth), height: nil)
+        )
+    }
+
     private func rows(in availableWidth: CGFloat, subviews: Subviews) -> [Row] {
         guard !subviews.isEmpty else {
             return []
@@ -166,7 +176,7 @@ struct InventoryTagCloudLayout: Layout {
         var rowHeight: CGFloat = 0
 
         for index in subviews.indices {
-            let size = subviews[index].sizeThatFits(.unspecified)
+            let size = fittedSize(of: subviews[index], in: availableWidth)
             let proposedWidth = rowWidth == 0 ? size.width : rowWidth + horizontalSpacing + size.width
 
             if proposedWidth > availableWidth, rowWidth > 0 {

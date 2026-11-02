@@ -5,12 +5,24 @@ enum InventoryScreenBackgroundStyle {
     case locationAtmosphere
 }
 
-private struct InventoryGlassAccessibility {
-    let reduceTransparency: Bool
-    let contrast: ColorSchemeContrast
+private struct InventoryGlassAccessibility: DynamicProperty {
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.colorSchemeContrast) private var contrast
 
-    var allowsGlass: Bool {
-        !reduceTransparency && contrast != .increased
+    var reducesTransparency: Bool {
+        #if DEBUG
+        reduceTransparency || InventoryQAAccessibilityConfiguration.current.reduceTransparency
+        #else
+        reduceTransparency
+        #endif
+    }
+
+    var increasesContrast: Bool {
+        #if DEBUG
+        contrast == .increased || InventoryQAAccessibilityConfiguration.current.increaseContrast
+        #else
+        contrast == .increased
+        #endif
     }
 }
 
@@ -46,24 +58,6 @@ private enum InventoryGlassMetrics {
             InventoryDesign.Opacity.compactHeroIconStroke
         }
     }
-
-    static func heroCardGlassTint(for presentation: InventoryHeroCardPresentation) -> CGFloat {
-        switch presentation {
-        case .detail:
-            InventoryDesign.Glass.detailHeroTint
-        case .compact:
-            InventoryDesign.Glass.compactHeroTint
-        }
-    }
-
-    static func heroCardFallbackTint(for presentation: InventoryHeroCardPresentation) -> CGFloat {
-        switch presentation {
-        case .detail:
-            InventoryDesign.Opacity.detailHeroFallbackTint
-        case .compact:
-            InventoryDesign.Opacity.compactHeroFallbackTint
-        }
-    }
 }
 
 extension View {
@@ -72,7 +66,7 @@ extension View {
         accentRole: InventoryDesign.AccentRole,
         cornerRadius: CGFloat
     ) -> some View {
-        modifier(InventoryHeroCardSurfaceModifier(presentation: presentation, accentRole: accentRole, cornerRadius: cornerRadius))
+        inventoryCardSurface(.content, cornerRadius: cornerRadius)
     }
 
     func inventoryHeroIconSurface(
@@ -120,14 +114,15 @@ extension View {
     }
 
     func inventoryCardSurface(_ surface: InventoryCardSurface, cornerRadius: CGFloat) -> some View {
-        modifier(InventoryCardSurfaceModifier(surface: surface, cornerRadius: cornerRadius))
+        modifier(InventoryCardSurfaceModifier(cornerRadius: cornerRadius))
     }
 
+    /// Entity color belongs to the glyph or label; dense content shares one opaque base.
     func inventorySemanticSurface(
         _ role: InventoryDesign.SurfaceRole,
         cornerRadius: CGFloat
     ) -> some View {
-        modifier(InventorySemanticSurfaceModifier(role: role, cornerRadius: cornerRadius))
+        inventoryCardSurface(.content, cornerRadius: cornerRadius)
     }
 
     func inventoryBadgeSurface(role: InventoryDesign.AccentRole) -> some View {
@@ -161,8 +156,7 @@ extension View {
 }
 
 private struct InventoryLocationAtmosphereBackground: View {
-    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
-    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
+    private var accessibility = InventoryGlassAccessibility()
 
     var body: some View {
         ZStack {
@@ -192,90 +186,17 @@ private struct InventoryLocationAtmosphereBackground: View {
 
     /// The opaque grouped base preserves Reduce Transparency while the Location color stays atmospheric.
     private var leadingOpacity: Double {
-        if increasesContrast {
+        if accessibility.increasesContrast {
             return 0.68
         }
 
-        if reducesTransparency {
+        if accessibility.reducesTransparency {
             return 0.60
         }
 
         return 0.52
     }
 
-    private var reducesTransparency: Bool {
-        #if DEBUG
-        reduceTransparency || InventoryQAAccessibilityConfiguration.current.reduceTransparency
-        #else
-        reduceTransparency
-        #endif
-    }
-
-    private var increasesContrast: Bool {
-        #if DEBUG
-        colorSchemeContrast == .increased || InventoryQAAccessibilityConfiguration.current.increaseContrast
-        #else
-        colorSchemeContrast == .increased
-        #endif
-    }
-}
-
-private struct InventoryHeroCardSurfaceModifier: ViewModifier {
-    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
-    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
-
-    let presentation: InventoryHeroCardPresentation
-    let accentRole: InventoryDesign.AccentRole
-    let cornerRadius: CGFloat
-
-    func body(content: Content) -> some View {
-        let accessibility = InventoryGlassAccessibility(
-            reduceTransparency: reducesTransparency,
-            contrast: increasesContrast ? .increased : colorSchemeContrast
-        )
-
-        if #available(iOS 26.0, *), accessibility.allowsGlass {
-            content
-                .glassEffect(
-                    .regular.tint(accentRole.color.opacity(InventoryGlassMetrics.heroCardGlassTint(for: presentation))),
-                    in: .rect(cornerRadius: cornerRadius)
-                )
-        } else {
-            content
-                .background {
-                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                        .fill(InventoryDesign.Appearance.contentSurface)
-                        .overlay {
-                            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                                .fill(accentRole.color.opacity(InventoryGlassMetrics.heroCardFallbackTint(for: presentation)))
-                        }
-                }
-                .overlay {
-                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                        .strokeBorder(
-                            InventoryDesign.Appearance.contentStroke,
-                            lineWidth: InventoryDesign.Stroke.card
-                        )
-                        .allowsHitTesting(false)
-                }
-        }
-    }
-
-    private var reducesTransparency: Bool {
-        #if DEBUG
-        reduceTransparency || InventoryQAAccessibilityConfiguration.current.reduceTransparency
-        #else
-        reduceTransparency
-        #endif
-    }
-
-    private var increasesContrast: Bool {
-        #if DEBUG
-        colorSchemeContrast == .increased || InventoryQAAccessibilityConfiguration.current.increaseContrast
-        #else
-        colorSchemeContrast == .increased
-        #endif
-    }
 }
 
 private struct InventoryHeroIconSurfaceModifier: ViewModifier {
@@ -322,10 +243,6 @@ private struct InventoryHeroIconSurfaceModifier: ViewModifier {
 }
 
 private struct InventoryCardSurfaceModifier: ViewModifier {
-    @Environment(\.colorScheme) private var colorScheme
-    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
-
-    let surface: InventoryCardSurface
     let cornerRadius: CGFloat
 
     func body(content: Content) -> some View {
@@ -333,98 +250,26 @@ private struct InventoryCardSurfaceModifier: ViewModifier {
             .background {
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                     .fill(InventoryDesign.Appearance.contentSurface)
-            }
-            .overlay {
-                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .strokeBorder(strokeColor, lineWidth: strokeWidth)
-                    .allowsHitTesting(false)
-            }
-            .shadow(
-                color: shadowColor,
-                radius: surface == .interactive ? InventoryDesign.Depth.interactiveRadius : 0,
-                y: surface == .interactive ? InventoryDesign.Depth.interactiveY : 0
-            )
-    }
-
-    private var strokeColor: Color {
-        switch surface {
-        case .content:
-            InventoryDesign.Appearance.contentStroke
-        case .interactive:
-            InventoryDesign.Appearance.storageAccent.opacity(
-                increasesContrast ? 1 : InventoryDesign.Opacity.interactiveStroke
-            )
-        }
-    }
-
-    private var strokeWidth: CGFloat {
-        surface == .interactive ? InventoryDesign.Stroke.interactiveCard : InventoryDesign.Stroke.card
-    }
-
-    private var shadowColor: Color {
-        guard surface == .interactive, !increasesContrast else {
-            return .clear
-        }
-
-        return .black.opacity(
-            colorScheme == .dark
-                ? InventoryDesign.Opacity.darkSurfaceShadow
-                : InventoryDesign.Opacity.lightSurfaceShadow
-        )
-    }
-
-    private var increasesContrast: Bool {
-        #if DEBUG
-        colorSchemeContrast == .increased || InventoryQAAccessibilityConfiguration.current.increaseContrast
-        #else
-        colorSchemeContrast == .increased
-        #endif
-    }
-}
-
-private struct InventorySemanticSurfaceModifier: ViewModifier {
-    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
-
-    let role: InventoryDesign.SurfaceRole
-    let cornerRadius: CGFloat
-
-    func body(content: Content) -> some View {
-        content
-            .background {
-                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .fill(InventoryDesign.Appearance.contentSurface)
-                    .overlay {
-                        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                            .fill(role.tint.opacity(InventoryDesign.Opacity.badgeFill))
-                    }
             }
             .overlay {
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                     .strokeBorder(
-                        role.tint.opacity(
-                            increasesContrast
-                                ? 0.8
-                                : InventoryDesign.Opacity.badgeStroke
-                        ),
+                        InventoryDesign.Appearance.contentStroke,
                         lineWidth: InventoryDesign.Stroke.card
                     )
                     .allowsHitTesting(false)
             }
     }
-
-    private var increasesContrast: Bool {
-        #if DEBUG
-        colorSchemeContrast == .increased || InventoryQAAccessibilityConfiguration.current.increaseContrast
-        #else
-        colorSchemeContrast == .increased
-        #endif
-    }
 }
 
 private struct InventoryBadgeSurfaceModifier: ViewModifier {
-    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
+    private var accessibility = InventoryGlassAccessibility()
 
     let role: InventoryDesign.AccentRole
+
+    init(role: InventoryDesign.AccentRole) {
+        self.role = role
+    }
 
     func body(content: Content) -> some View {
         content
@@ -433,13 +278,13 @@ private struct InventoryBadgeSurfaceModifier: ViewModifier {
                     .fill(InventoryDesign.Appearance.contentSurface)
                     .overlay {
                         Capsule(style: .continuous)
-                            .fill(role.color.opacity(InventoryDesign.Opacity.badgeFill))
+                            .fill(role.color.opacity(accessibility.reducesTransparency ? 0 : InventoryDesign.Opacity.badgeFill))
                     }
             }
             .overlay {
                 Capsule(style: .continuous)
                     .strokeBorder(
-                        role.color.opacity(colorSchemeContrast == .increased ? 0.8 : InventoryDesign.Opacity.badgeStroke),
+                        role.color.opacity(accessibility.increasesContrast ? 0.8 : InventoryDesign.Opacity.badgeStroke),
                         lineWidth: InventoryDesign.Stroke.badge
                     )
             }
@@ -447,9 +292,13 @@ private struct InventoryBadgeSurfaceModifier: ViewModifier {
 }
 
 private struct InventoryStorageIconSurfaceModifier: ViewModifier {
-    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
+    private var accessibility = InventoryGlassAccessibility()
 
     let role: InventoryDesign.AccentRole
+
+    init(role: InventoryDesign.AccentRole) {
+        self.role = role
+    }
 
     func body(content: Content) -> some View {
         content
@@ -458,13 +307,13 @@ private struct InventoryStorageIconSurfaceModifier: ViewModifier {
                     .fill(InventoryDesign.Appearance.contentSurface)
                     .overlay {
                         Circle()
-                            .fill(role.color.opacity(InventoryDesign.Opacity.storageIconFill))
+                            .fill(role.color.opacity(accessibility.reducesTransparency ? 0 : InventoryDesign.Opacity.storageIconFill))
                     }
             }
             .overlay {
                 Circle()
                     .strokeBorder(
-                        role.color.opacity(colorSchemeContrast == .increased ? 0.8 : InventoryDesign.Opacity.badgeStroke),
+                        role.color.opacity(accessibility.increasesContrast ? 0.8 : InventoryDesign.Opacity.badgeStroke),
                         lineWidth: InventoryDesign.Stroke.badge
                     )
             }

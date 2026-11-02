@@ -162,11 +162,12 @@ enum InventoryDesign {
     static let compactCardPadding: CGFloat = 12
     static let compactInventoryCardMinHeight: CGFloat = 88
     static let compactInventoryCardHorizontalPadding: CGFloat = 12
-    static let compactInventoryCardVerticalPadding: CGFloat = 10
+    static let compactInventoryCardVerticalPadding: CGFloat = 12
     static let cardCornerRadius: CGFloat = 20
     static let heroCornerRadius: CGFloat = 24
     static let compactCornerRadius: CGFloat = 14
     static let gridSpacing: CGFloat = 12
+    static let sectionSpacing: CGFloat = 24
     static let rowSpacing: CGFloat = 8
     static let badgeHorizontalPadding: CGFloat = 10
     static let badgeVerticalPadding: CGFloat = 6
@@ -196,7 +197,6 @@ enum InventoryDesign {
 
     enum Stroke {
         static let card: CGFloat = 1
-        static let interactiveCard: CGFloat = 1.5
         static let badge: CGFloat = 1
         static let editorFocused: CGFloat = 1.5
     }
@@ -210,28 +210,12 @@ enum InventoryDesign {
         static let placeIconStroke: CGFloat = 0.34
         static let editorStroke: CGFloat = 0.28
         static let editorFocusedStroke: CGFloat = 0.7
-        static let detailHeroFallbackTint: CGFloat = 0.12
-        static let compactHeroFallbackTint: CGFloat = 0.08
         static let storageIconFill: CGFloat = 0.12
         static let detailHeroIconFill: CGFloat = 0.14
         static let detailHeroIconStroke: CGFloat = 0.18
         static let compactHeroIconFill: CGFloat = 0.10
         static let compactHeroIconStroke: CGFloat = 0.14
         static let identityHeaderIconFill: CGFloat = 0.12
-        static let interactiveStroke: CGFloat = 0.72
-        static let lightSurfaceShadow: CGFloat = 0.08
-        static let darkSurfaceShadow: CGFloat = 0.28
-    }
-
-    enum Depth {
-        static let interactiveRadius: CGFloat = 10
-        static let interactiveY: CGFloat = 3
-    }
-
-    enum Glass {
-        // Keep custom glass selective: coordinated hero surfaces only.
-        static let detailHeroTint: CGFloat = 0.18
-        static let compactHeroTint: CGFloat = 0.12
     }
 }
 

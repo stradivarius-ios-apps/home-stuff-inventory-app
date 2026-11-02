@@ -44,7 +44,7 @@ struct LocationPlacesListView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: InventoryDesign.gridSpacing) {
+            VStack(alignment: .leading, spacing: InventoryDesign.sectionSpacing) {
                 LocationDetailIdentityHeader(location: location)
                     .inventoryHeroNavigationTitleVisibilityAnchor()
 
@@ -305,7 +305,8 @@ private struct LocationDetailPlacesSection: View {
             ),
             systemImage: location.isMissingLocation
                 ? LocationIconCatalog.missingLocationSymbolName
-                : LocationIconCatalog.symbolName(for: location.iconID)
+                : LocationIconCatalog.symbolName(for: location.iconID),
+            iconRole: InventoryDesign.ContentRole.location.accentRole
         ) {
             Button(InventoryLocalization.string("inventory.action.addItem", defaultValue: "Add Item")) {
                 onAddItem()

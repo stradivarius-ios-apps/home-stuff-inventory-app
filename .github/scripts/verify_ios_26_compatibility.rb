@@ -7,9 +7,9 @@ module IOS26Compatibility
 
   PROJECT_PATH = "HomeStuffInventoryApp.xcodeproj/project.pbxproj"
   REQUIRED_GUARDS = {
-    "HomeStuffInventoryApp/Views/RootView.swift" => ["if #available(iOS 26.0, *)", "tabViewSearchActivation"],
-    "HomeStuffInventoryApp/Views/Shared/InventoryGlassSurfaces.swift" => ["if #available(iOS 26.0, *)", ".glassEffect("]
+    "HomeStuffInventoryApp/Views/RootView.swift" => ["if #available(iOS 26.0, *)", "tabViewSearchActivation"]
   }.freeze
+  CUSTOM_GLASS_PATH = "HomeStuffInventoryApp/Views/Shared/InventoryGlassSurfaces.swift"
 
   def fail!(message)
     warn "iOS 26 compatibility gate failed: #{message}"
@@ -32,6 +32,11 @@ module IOS26Compatibility
       markers.each do |marker|
         fail!("#{relative_path} is missing required iOS 26.0 guard evidence: #{marker}") unless source.include?(marker)
       end
+    end
+
+    source = File.read(File.join(root, CUSTOM_GLASS_PATH))
+    if source.match?(/\.glassEffect\s*\(/) && !source.include?("if #available(iOS 26.0, *)")
+      fail!("#{CUSTOM_GLASS_PATH} uses custom glass without required iOS 26.0 guard evidence")
     end
   end
 

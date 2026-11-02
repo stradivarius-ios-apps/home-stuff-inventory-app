@@ -27,9 +27,9 @@ Feature composition declares product meaning through `InventoryDesign.ContentRol
 
 | Semantic role | Identity accent | Surface treatment |
 | --- | --- | --- |
-| Item | Existing blue `InventorySecondaryAccent` | Blue semantic tint on Item surfaces; primary text remains neutral |
+| Item | Existing blue `InventorySecondaryAccent` | Opaque neutral content surface; blue identity accents |
 | Location | Existing green `InventoryStorageAccent` | Green identity accents; `InventoryLocationAtmosphere` is reserved for the Location surface/background tint |
-| Storage Place | Existing lavender `InventoryPlaceAccent` | Lavender identity, relationship, badge, and restrained semantic-surface tint |
+| Storage Place | Existing lavender `InventoryPlaceAccent` | Lavender identity, relationship and compact badge accents on opaque neutral content surfaces |
 
 `InventoryDesign.Appearance` is the asset-backed adaptive-color layer. `AccentRole` describes palette treatments such as storage, Storage Place, primary action, secondary, context, muted, and tag colors. It does not stand in for Item, Location, or Storage Place meaning in feature composition.
 
@@ -48,10 +48,10 @@ Do not add per-record colors, category palettes, raw light/dark pairs, or a para
 ## Surfaces, Depth, And Liquid Glass
 
 - Keep native navigation, lists, forms, sheets, toolbars, menus, controls, SF Symbols, semantic colors, system typography, and platform spacing.
-- Use native iOS Liquid Glass selectively for system chrome, compact controls, and calm identity heroes. Identity heroes are not controls, so their glass remains non-interactive.
+- Use native iOS Liquid Glass for system chrome and controls. Shared textual hero cards use the same opaque content base as other dense surfaces.
 - Keep rows, Item cards, property cards, Notes, Tags, form fields, warnings, destructive states, and other dense text on stable readable content surfaces.
 - Reuse the shared card, hero, row, badge, icon, form, empty-state, and glass primitives under `Views/Shared/`.
-- Keep glass recipes and accessibility fallbacks centralized in `InventoryGlassSurfaces.swift`; do not copy them into feature views.
+- Keep shared material and accessibility handling centralized in `InventoryGlassSurfaces.swift`; dense surfaces remain opaque in every transparency setting. Do not copy recipes into feature views.
 - Avoid custom blurs, shaders, fake reflections, glow, colored shadows, decorative gradients, stacked transparency, and animation-heavy atmosphere unless a task explicitly approves them.
 
 ## Shipped Screen Composition
@@ -64,6 +64,8 @@ Do not add per-record colors, category palettes, raw light/dark pairs, or a para
 - Storage Place Detail uses the neutral grouped screen background, lavender Storage Place identity, and a clearly labeled green parent-Location relationship.
 - Add/Edit Item remains a forgiving native form. Name is the only required value; Location and Storage Place are strongly encouraged.
 - Settings remains a native list. Preserve Search and the root system Tab Bar unless a focused approved task changes them.
+
+Shared cards use 16 pt padding and 20 pt corners; compact rows and property cards use 12 pt padding and 14 pt corners. Location Detail separates its major sections by 24 pt, while row and grid gaps remain 8 and 12 pt. Native semantic text roles and content-driven height preserve hierarchy. Empty-state cards center their explanation and native action; callers declare the meaningful icon accent. Tags can wrap at accessibility text sizes. Prominent empty-state actions use the adaptive grouped-background color for their inverse label on the indigo fill.
 
 ## Accessibility And Adaptation
 

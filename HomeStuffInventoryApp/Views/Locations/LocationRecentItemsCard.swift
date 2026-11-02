@@ -170,8 +170,8 @@ private struct LocationRecentItemTilesSection: View {
     private func recentItemIcon(_ chip: InventoryPreviewGroupPresentation.Chip) -> some View {
         InventoryContentGlyph(
             systemName: recentItemSystemImage(chip),
-            role: .context,
-            presentation: .identity
+            role: InventoryDesign.ContentRole.item.accentRole,
+            presentation: .compact
         )
         .accessibilityHidden(true)
     }
@@ -189,11 +189,11 @@ private struct LocationRecentItemTilesSection: View {
 
 private enum RecentItemsShelfMetric {
     static let horizontalPadding: CGFloat = 12
-    static let verticalPadding: CGFloat = 10
+    static let verticalPadding: CGFloat = InventoryDesign.compactCardPadding
     static let glyphTitleSpacing: CGFloat = 12
     static let titleMinimumHeight: CGFloat = 40
     static let minimumRowHeight: CGFloat = 60
-    static let dividerLeadingInset: CGFloat = horizontalPadding + 40 + glyphTitleSpacing
+    static let dividerLeadingInset: CGFloat = horizontalPadding + InventoryDesign.contentGlyphSize + glyphTitleSpacing
 }
 
 private struct LocationRecentItemsHeader: View {

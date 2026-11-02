@@ -97,7 +97,8 @@ struct LocationSummaryRowView: View {
                 .accessibilityHidden(true)
 
             Text(verbatim: placeSummary.text ?? placeSummary.placeCountText)
-                .inventoryTextRole(.supportingText)
+                .font(InventoryDesign.TextRole.supportingText.font)
+                .foregroundStyle(InventoryDesign.ContentRole.place.color)
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }

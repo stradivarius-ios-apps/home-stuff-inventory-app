@@ -57,13 +57,13 @@ private struct InventoryGlyphDrawing {
             var chair = Path()
             chair.move(to: CGPoint(x: 13.5, y: 18))
             chair.addQuadCurve(to: CGPoint(x: 14.5, y: 14), control: CGPoint(x: 13.6, y: 15))
-            chair.addQuadCurve(to: CGPoint(x: 20, y: 14), control: CGPoint(x: 17.5, y: large ? 10 : 11))
-            chair.addLine(to: CGPoint(x: 20, y: 18))
-            chair.addQuadCurve(to: CGPoint(x: 13.5, y: 18), control: CGPoint(x: 18, y: 20.2))
+            chair.addQuadCurve(to: CGPoint(x: 18, y: 14), control: CGPoint(x: 16.5, y: large ? 10 : 11))
+            chair.addLine(to: CGPoint(x: 18, y: 18))
+            chair.addQuadCurve(to: CGPoint(x: 13.5, y: 18), control: CGPoint(x: 16.5, y: 20.2))
             chair.closeSubpath()
             backPlane.addPath(chair)
             line([(15, 19.5), (14, 22)])
-            line([(19, 19.5), (20, 22)])
+            line([(17, 19.5), (18, 22)])
         case .bedroom:
             backPlane.move(to: CGPoint(x: 3, y: 12))
             backPlane.addLine(to: CGPoint(x: 3, y: 6))
@@ -103,7 +103,7 @@ private struct InventoryGlyphDrawing {
             }
         case .box:
             backPlane.move(to: CGPoint(x: 2.5, y: 8.5))
-            for point in [CGPoint(x: 5, y: large ? 4 : 5), CGPoint(x: 19, y: large ? 4 : 5), CGPoint(x: 21.5, y: 8.5)] { backPlane.addLine(to: point) }
+            for point in [CGPoint(x: 5, y: large ? 4 : 4.5), CGPoint(x: 19, y: large ? 4 : 4.5), CGPoint(x: 21.5, y: 8.5)] { backPlane.addLine(to: point) }
             silhouette = drawer(x: 2.5, y: 8.5, width: 19, height: 12, notch: large ? 6 : 5.5, depth: large ? 2.7 : 2.25, radius: large ? 2.3 : 2)
         case .shelf:
             rect(4, 2.5, 16, 19, radius: large ? 0.7 : 0.5)
@@ -157,19 +157,14 @@ private struct InventoryGlyphDrawing {
             line([(large ? 9.5 : 10.5, 13.5), (large ? 14.5 : 13.5, 13.5)])
         case .tools:
             silhouette.move(to: CGPoint(x: large ? 2.5 : 3, y: large ? 3.2 : 3))
-            for point in [CGPoint(x: 5, y: large ? 1.8 : 2), CGPoint(x: large ? 8.5 : 8, y: large ? 5.3 : 5), CGPoint(x: large ? 8.1 : 8, y: large ? 7.2 : 7), CGPoint(x: 20.5, y: 18.5)] { silhouette.addLine(to: point) }
-            silhouette.addQuadCurve(to: CGPoint(x: 18, y: 21), control: CGPoint(x: 22.5, y: 22))
-            for point in [CGPoint(x: 6, y: 8), CGPoint(x: 4, y: 8), CGPoint(x: 2, y: 5)] { silhouette.addLine(to: point) }
+            for point in [CGPoint(x: 5, y: large ? 1.8 : 2), CGPoint(x: large ? 8.5 : 8, y: large ? 5.3 : 5), CGPoint(x: large ? 8.1 : 8, y: large ? 7.2 : 7), CGPoint(x: 6, y: 8), CGPoint(x: 4, y: 8), CGPoint(x: 2, y: 5)] { silhouette.addLine(to: point) }
             silhouette.closeSubpath()
-            backPlane.move(to: CGPoint(x: large ? 22 : 21.5, y: large ? 2.5 : 3))
-            backPlane.addQuadCurve(to: CGPoint(x: 15, y: 8), control: CGPoint(x: 14, y: 0))
-            backPlane.addLine(to: CGPoint(x: large ? 3.5 : 3, y: large ? 17.8 : 18))
-            backPlane.addQuadCurve(to: CGPoint(x: 6, y: 21), control: CGPoint(x: 1, y: 22.5))
-            backPlane.addLine(to: CGPoint(x: 17, y: 10))
-            backPlane.addQuadCurve(to: CGPoint(x: 22, y: 5), control: CGPoint(x: 23, y: 11))
-            backPlane.addLine(to: CGPoint(x: 19, y: 6))
-            backPlane.addLine(to: CGPoint(x: 18, y: 5))
-            backPlane.closeSubpath()
+            line([(7, 7.5), (20, 20.5)])
+            backPlane.move(to: CGPoint(x: 22, y: large ? 2.5 : 3))
+            backPlane.addQuadCurve(to: CGPoint(x: 15, y: 9), control: CGPoint(x: 14, y: 0))
+            backPlane.addQuadCurve(to: CGPoint(x: 22, y: large ? 7.5 : 7), control: CGPoint(x: 23, y: 12))
+            line([(15.8, 9.3), (large ? 3 : 3.5, 20.5)])
+
         }
     }
 

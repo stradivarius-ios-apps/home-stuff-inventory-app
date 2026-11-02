@@ -122,7 +122,7 @@ When adding or changing user-facing UI text, update both `en` and `uk` values an
 
 `AGENTS.md` is the canonical instruction file for Codex and future AI/code agents working in this repository. It contains the product scope, privacy posture, localization rules, persistence guidance, testing expectations, and working style for this app.
 
-The shipped visual direction, semantic hierarchy, and design-code ownership are documented in [`docs/design/README.md`](docs/design/README.md). Current implementation routing and product rules come from `AGENTS.md`, the approved task, and current source. Former delivery and audit records are retained only in the private historical archive and are not transferred in this repository's clean public Git history.
+The implemented visual system, semantic hierarchy, and design-code ownership are documented in [`docs/design/README.md`](docs/design/README.md). Current implementation routing and product rules come from `AGENTS.md`, the approved task, and current source. Former delivery and audit records are retained only in the private historical archive and are not transferred in this repository's clean public Git history.
 
 Repository documentation authority, ownership, update triggers, replacements, and retention are indexed in [`docs/README.md`](docs/README.md).
 

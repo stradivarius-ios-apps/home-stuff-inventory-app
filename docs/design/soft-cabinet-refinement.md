@@ -1,27 +1,20 @@
 # Soft Cabinet Refinement Contract
 
-Status: Approved implementation contract
+Status: Historical density and functional guardrail
 
-This document freezes the target for the SCU refinement. It translates the approved visual direction into implementation boundaries that can be verified in source, tests, and rendered SwiftUI. It is an incremental refinement of the shipped app, not a new design system or product redesign.
+This document retains earlier density, retrieval and quick-capture decisions. The [current visual guide](README.md) owns implemented palette values, geometry, glyphs and materials and supersedes the former visual freeze below. The retained screen decisions describe existing behavior, not a new work queue or a restriction on explicitly approved visual changes.
 
 ## Authority And Conflict Resolution
 
-Use this order when requirements appear to conflict:
+[`AGENTS.md`](../../AGENTS.md) owns repository and product guardrails. Current source and tests own Search, navigation, data and persistence behavior. The [current visual guide](README.md), [`InventoryDesign.swift`](../../HomeStuffInventoryApp/InventoryPresentation/InventoryDesign.swift) and existing adaptive assets own the implemented visual system.
 
-1. [`AGENTS.md`](../../AGENTS.md) owns repository and product guardrails.
-2. Current source and tests own shipped Search, navigation, data, and persistence behavior.
-3. [`InventoryDesign.swift`](../../HomeStuffInventoryApp/InventoryPresentation/InventoryDesign.swift) owns semantic colors, surfaces, typography, spacing, depth, and glass constants.
-4. This contract owns only the approved SCU structural changes.
-5. Issue-specific acceptance criteria may narrow an SCU task but may not expand it.
-6. Static mockups and screenshots illustrate composition only. They are never authoritative for Search placement, system chrome, color values, or semantic color assignments.
-
-If a visual mockup disagrees with current Search or `InventoryDesign`, ignore the mockup on that point. An agent must stop and report an unresolved contradiction instead of selecting a new interpretation.
+The [versioned visual reference](references/design-code-v1/README.md) remains an immutable comparison specification. Its PDF/JSON values take precedence over its rendered boards; painted controls do not replace native navigation or accessibility. This historical document cannot override the current guide with an older palette or surface rule.
 
 ## Product Outcome
 
 Home Stuff Inventory remains a private, local-first household inventory that answers “Where did I put this thing?” through the visible hierarchy `Location → Place → Item`.
 
-The SCU outcome is a calmer soft cabinet:
+The retained density outcome is a calmer soft cabinet:
 
 - more Locations and Items can be scanned without hiding storage context;
 - repeated chrome is quieter, especially in dark appearance;
@@ -32,9 +25,9 @@ The SCU outcome is a calmer soft cabinet:
 
 The target is not maximum density. Readability, spatial meaning, Dynamic Type, and forgiving data entry remain more important than fitting a fixed number of rows on screen.
 
-## Frozen Product And Navigation Contract
+## Retained Product And Navigation Contract
 
-The following behavior is already correct and is outside the epic:
+The following behavior remains a regression boundary:
 
 - [`RootView.swift`](../../HomeStuffInventoryApp/Views/RootView.swift) retains the existing root `TabView`, tab order, independent `NavigationStack` values, and the native Search role.
 - On supported iOS versions, Search remains `Tab(role: .search)` with `.tabViewSearchActivation(.searchTabSelection)` and `.searchable(..., placement: .automatic)`.
@@ -43,11 +36,11 @@ The following behavior is already correct and is outside the epic:
 - Locations remains the initially selected root tab. Inventory and Settings retain their current root roles.
 - No custom Tab Bar, navigation bar, search field, activation behavior, or tab-selection coordinator is authorized.
 
-No SCU implementation issue should edit `RootView.swift` or a Search-specific view. If a shared component change would alter Search results, split the minimum presentation boundary so Search keeps its shipped appearance and behavior.
+A density or content-style change does not authorize edits to `RootView.swift` or Search behavior. If a shared component change would alter Search results, split the minimum presentation boundary so Search keeps its shipped appearance and behavior.
 
-## Frozen Semantic Palette
+## Semantic Role Guardrails
 
-Do not add, recalibrate, swap, alias, or repurpose colors in this epic. Do not infer domain meaning from a mockup color. Feature composition declares one of the current semantic roles and lets `InventoryDesign` resolve the shipped adaptive asset.
+The earlier palette-value freeze is superseded by the current adaptive assets and [visual guide](README.md). The domain-to-role mapping remains stable: Item blue, Location teal and Storage Place plum; neutral actions are indigo, context is amber and brand detail is terracotta. Feature composition declares semantic meaning and lets `InventoryDesign` resolve its adaptive asset.
 
 | Meaning | Canonical source | Approved use |
 | --- | --- | --- |
@@ -57,20 +50,19 @@ Do not add, recalibrate, swap, alias, or repurpose colors in this epic. Do not i
 | Place | `InventoryDesign.ContentRole.place` → `InventoryPlaceAccent` | Place identity, Place relationships, badges, and restrained Place semantic tint |
 | Neutral primary action | `InventoryPrimaryAction` | Add, Create, Save, Edit, and Retry through the existing semantic tint helpers |
 | Context | `InventoryContextHighlight` | Existing Recent/context emphasis only |
-| Coral | Existing brand/icon assets | Brand or icon detail only; never a general action, Item, Location, or Place semantic |
+| Terracotta | Existing brand/icon assets | Brand or icon detail only; never a general action, Item, Location, or Place semantic |
 | Destructive | System destructive role | Delete and destructive confirmations only |
 
 Primary titles and values remain neutral. Supporting text and metadata remain secondary. Color supports meaning but does not replace labels, icons, geometry, or reading order.
 
 The following are prohibited:
 
-- changing color-set values or appearance variants;
 - introducing a new color set, theme, category palette, or per-record color;
-- showing an Item in Location green, a Location in Place lavender, or a Place in Item blue;
+- showing an Item in Location teal, a Location in Place plum, or a Place in Item blue;
 - using Brand Indigo as a domain identity or a domain accent as a neutral action tint;
 - compensating for a visual concern by silently changing the shared palette.
 
-Any future palette calibration requires a separate explicitly approved task with light, dark, Increase Contrast, and regression evidence.
+A palette calibration requires an explicitly approved task with light, dark, Increase Contrast, and regression evidence.
 
 ## Shared Visual Rules
 
@@ -82,7 +74,7 @@ Any future palette calibration requires a separate explicitly approved task with
 - Preserve 44×44 pt targets, full-row hit regions, native control traits, predictable VoiceOver order, and meaning without color.
 - Keep English and Ukrainian together for every changed user-facing string or localization call site.
 
-## Approved Screen Changes
+## Retained Screen Decisions
 
 ### Locations Overview
 
@@ -95,7 +87,7 @@ Keep:
 - existing Place-preview ranking from browse summaries;
 - Location identity and surface semantics.
 
-Change:
+Retained refinement:
 
 - replace the repeated divider plus standalone Places preview block with one compact summary line;
 - show the localized Place count followed by no more than two ranked Place names;
@@ -106,7 +98,7 @@ Do not:
 
 - alter Place ranking, Location ordering, navigation, summary data, or empty-state behavior;
 - introduce a carousel, horizontally scrolling chips, manual ordering, or a new summary model unrelated to bounded presentation;
-- change Location or Place colors.
+- repurpose Location or Storage Place semantic roles.
 
 ### Location Detail Place Index
 
@@ -118,7 +110,7 @@ Keep:
 - Recent Items / All Items behavior, destinations, and ranking;
 - Places section, current Place order, Place glyph, name, Item count, category context, disclosure, empty state, and Add Item action.
 
-Change:
+Retained refinement:
 
 - remove `PlaceSpatialIndexMarker` and its vertical connector/dots;
 - render Places as equal-priority native rows without visual sequence or route semantics.
@@ -140,17 +132,17 @@ Keep:
 - Item glyph and `InventorySecondaryAccent`, Location icon/relationship and `InventoryStorageAccent`, and Place icon/relationship and `InventoryPlaceAccent`;
 - navigation, filters, ordering, matching, actions, accessibility, and list state.
 
-Change:
+Retained refinement:
 
-- retain `inventorySemanticSurface(.item)` and the current blue Item semantic tint;
-- make repeated rows quieter only through composition and existing spacing, depth, and stroke behavior, without changing their semantic surface or color;
-- reduce redundant outline/shadow emphasis only where the existing shared surface API and accessibility paths support it, while retaining the stronger current Increase Contrast treatment.
+- retain `inventorySemanticSurface(.item)` as the existing semantic owner; its current dense surface is opaque and neutral, with blue Item identity;
+- keep exact storage context legible through existing spacing and adaptive layout;
+- preserve the shared Increase Contrast treatment.
 
 Do not:
 
 - remove any displayed information;
 - change rich Search result rows or the Search presentation;
-- replace the Item surface with neutral, Location, Place, action, or context color treatment;
+- substitute another domain identity or an action/context role for the Item role;
 - create new neutral, border, dark-mode, or domain colors;
 - apply a global card redesign to other features.
 
@@ -178,7 +170,7 @@ Keep:
 - Notes edit sheet and persistence outcomes;
 - delete confirmation, toolbar edit, recent-view recording, and navigation behavior.
 
-Change:
+Retained refinement:
 
 - remove the raw last-updated timestamp from the compact identity header;
 - present dates as clearly labeled, low-emphasis metadata near the bottom;
@@ -210,7 +202,7 @@ Keep:
 - delayed Name validation, discard protection, Location-change Place review, save/rollback outcomes, reusable selections, and all persistence behavior;
 - native `Form`, `NavigationLink`, `Picker`, `Stepper`, sheets, alerts, and current semantic tints.
 
-Change:
+Retained refinement:
 
 - when a new global or pre-scoped Add Item form is first presented, focus Name and show the keyboard when platform and accessibility focus permit;
 - do not force focus for edit mode, picker returns, restored validation state, or a VoiceOver flow that has already established focus;
@@ -220,36 +212,15 @@ Do not:
 
 - add required storage, a wizard, new fields, icon/category inference, a custom keyboard toolbar, picker redesign, or persistence changes.
 
-## Explicitly Unchanged Screens And Assets
+## Retained Functional Boundary
 
-The epic does not modify:
+Visual refinement does not authorize changes to Search or the root Tab Bar, persisted data, backup/restore transactions, ranking, matching, filters, recent-view logic, feature availability, permissions, privacy or release metadata. Settings, Storage Place Detail, icon artwork and shared content surfaces follow the current visual guide; their former exclusion from the density refinement is not a current visual freeze.
 
-- Search or root Tab Bar;
-- Settings;
-- Place Detail except where an already-shared compact Inventory row receives the approved SCU-04 treatment;
-- App icon or App Store artwork;
-- empty-state visual language outside named screens;
-- semantic color assets or `InventoryDesign` mappings;
-- backup/restore, list management, persistence models, ranking, matching, filters, and recent-view logic;
-- product capabilities, permissions, privacy behavior, or release metadata.
-
-## Delivery Boundaries And Dependencies
-
-Freeze this contract before implementation. Inventory, Item Detail, and Item Form may then proceed independently. Keep the Location lane ordered: compact the Location overview before simplifying the Location Storage Place index when their shared primitives overlap. Integrated validation is last and may fix only contract regressions; a new idea requires a separate approved change.
-
-### Integrated Validation
-
-Owner: current source, tests, and this contract record the shipped facts. The former
-integrated audit evidence is retained only in the private historical archive and is not
-part of the clean public Git history. Integrated validation may not introduce a design
-decision, expand implementation scope, or revise this contract to authorize a new
-idea; any out-of-contract finding requires a separate issue.
-
-Each implementation change remains focused and independently reviewable.
+Each change remains focused and independently reviewable. Current source and tests establish implementation; historical validation or a document alone does not establish runtime success.
 
 ## Validation Matrix
 
-Every implementation change validates its changed surface. Final integrated validation repeats the full matrix.
+Every implementation change validates its changed surface. Integrated validation records the representative states actually exercised and their source identity.
 
 | Surface | Required states | Required regression proof |
 | --- | --- | --- |
@@ -262,15 +233,15 @@ Every implementation change validates its changed surface. Final integrated vali
 
 For app changes, run focused deterministic tests, localization tests when strings or call sites change, `git diff --check`, and the baseline iPhone 17 simulator build. Use rendered SwiftUI or Simulator evidence; static mockups do not prove completion.
 
-## Epic Exit Criteria
+## Retained Regression Checks
 
-The epic can close only when:
+Validate that:
 
 - the approved density and hierarchy refinements are present without fixed-size regressions;
 - exact Place remains the strongest retrieval answer;
 - Notes precede bounded Tags and date metadata is clearly secondary;
 - new Item capture starts with Name and storage before optional icon choice;
 - Search and the root Tab Bar are demonstrably unchanged;
-- no semantic color asset or domain assignment changed;
+- semantic domain assignments remain intact and current adaptive assets match the visual guide;
 - EN/UK, light/dark, accessibility settings, focused tests, localization tests, and baseline build pass;
-- the final evidence contains no unapproved redesign, feature, abstraction, or palette work.
+- evidence describes the actual source and settings without asserting a release or an unperformed check.

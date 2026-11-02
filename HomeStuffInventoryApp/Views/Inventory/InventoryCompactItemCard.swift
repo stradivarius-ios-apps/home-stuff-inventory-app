@@ -14,22 +14,18 @@ struct InventoryCompactItemCard: View {
     }
 
     var body: some View {
-        HStack(alignment: .top, spacing: InventoryDesign.rowSpacing) {
-            InventoryContentGlyph(
-                systemName: ItemIconCatalog.symbolName(for: item.iconID),
-                role: InventoryDesign.ContentRole.item.accentRole,
-                presentation: .compact
-            )
-
-            VStack(alignment: .leading, spacing: 4) {
-                title
-                if showsStorageSummary {
-                    storageSummary
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: InventoryDesign.rowSpacing) {
+                    itemGlyph
+                    content
                 }
-                metadataRow
+            } else {
+                HStack(alignment: .top, spacing: InventoryDesign.rowSpacing) {
+                    itemGlyph
+                    content
+                }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .layoutPriority(1)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, InventoryDesign.compactInventoryCardHorizontalPadding)
@@ -39,6 +35,26 @@ struct InventoryCompactItemCard: View {
         .contentShape(RoundedRectangle(cornerRadius: InventoryDesign.compactCornerRadius, style: .continuous))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityLabel)
+    }
+
+    private var itemGlyph: some View {
+        InventoryContentGlyph(
+            systemName: ItemIconCatalog.symbolName(for: item.iconID),
+            role: InventoryDesign.ContentRole.item.accentRole,
+            presentation: .compact
+        )
+    }
+
+    private var content: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            title
+            if showsStorageSummary {
+                storageSummary
+            }
+            metadataRow
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .layoutPriority(1)
     }
 
     private var title: some View {
@@ -86,41 +102,43 @@ struct InventoryCompactItemCard: View {
     @ViewBuilder
     private var storageSummary: some View {
         if dynamicTypeSize.isAccessibilitySize {
-            VStack(alignment: .leading, spacing: 4) {
-                storageValue(
-                    locationName,
-                    systemImage: "mappin.and.ellipse",
-                    hasValue: hasLocation,
-                    contentRole: .location
-                )
-                storageValue(
-                    placeName,
-                    systemImage: "shippingbox",
-                    hasValue: hasPlace,
-                    contentRole: .place
-                )
-            }
+            stackedStorageSummary
         } else {
-            HStack(alignment: .firstTextBaseline, spacing: 6) {
-                storageValue(
-                    locationName,
-                    systemImage: "mappin.and.ellipse",
-                    hasValue: hasLocation,
-                    contentRole: .location
-                )
-
-                Image(systemName: "chevron.forward")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                    .accessibilityHidden(true)
-
-                storageValue(
-                    placeName,
-                    systemImage: "shippingbox",
-                    hasValue: hasPlace,
-                    contentRole: .place
-                )
+            ViewThatFits(in: .horizontal) {
+                inlineStorageSummary
+                    .fixedSize(horizontal: true, vertical: false)
+                stackedStorageSummary
             }
+        }
+    }
+
+    private var stackedStorageSummary: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            storageValue(locationName, systemImage: "mappin.and.ellipse", hasValue: hasLocation, contentRole: .location)
+            storageValue(placeName, systemImage: "shippingbox", hasValue: hasPlace, contentRole: .place)
+        }
+    }
+
+    private var inlineStorageSummary: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 6) {
+            storageValue(
+                locationName,
+                systemImage: "mappin.and.ellipse",
+                hasValue: hasLocation,
+                contentRole: .location
+            )
+
+            Image(systemName: "chevron.forward")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .accessibilityHidden(true)
+
+            storageValue(
+                placeName,
+                systemImage: "shippingbox",
+                hasValue: hasPlace,
+                contentRole: .place
+            )
         }
     }
 

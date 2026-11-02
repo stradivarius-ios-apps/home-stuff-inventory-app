@@ -65,9 +65,13 @@ struct LocationSummaryRowView: View {
     }
 
     private var locationIcon: some View {
-        Image(systemName: locationIconSystemName)
-            .font(.system(size: InventoryDesign.locationSummaryIconSize, weight: .semibold))
-            .foregroundStyle(location.isMissingLocation ? Color.secondary : InventoryDesign.ContentRole.location.color)
+        InventoryGlyphImage(
+            systemName: locationIconSystemName,
+            role: location.isMissingLocation ? .muted : InventoryDesign.ContentRole.location.accentRole,
+            size: InventoryDesign.locationSummaryIconSize,
+            font: .system(size: InventoryDesign.locationSummaryIconSize, weight: .semibold),
+            identity: true
+        )
             .frame(
                 width: InventoryDesign.locationSummaryIconFrame,
                 height: InventoryDesign.locationSummaryIconFrame

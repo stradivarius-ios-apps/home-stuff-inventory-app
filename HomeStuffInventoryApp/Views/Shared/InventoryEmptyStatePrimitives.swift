@@ -132,6 +132,7 @@ struct InventoryEmptyStateScreen<Content: View>: View {
 struct InventoryEmptyStatePrimaryActionModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
+            .font(InventoryDesign.TextRole.actionLabel.font)
             .buttonStyle(.borderedProminent)
             .foregroundStyle(InventoryDesign.Appearance.groupedBackground)
             .controlSize(.large)

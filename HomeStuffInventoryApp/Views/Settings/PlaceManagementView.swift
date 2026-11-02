@@ -376,8 +376,12 @@ private struct TopLevelPlaceEditorView: View {
                         .accessibilityIdentifier("settings.places.nameField")
                     Picker("inventory.selection.place.icon", selection: $iconID) {
                         ForEach(PlaceIconCatalog.options) { option in
-                            Label(option.localizedName, systemImage: option.symbolName)
-                                .tag(option.id)
+                            Label {
+                                Text(verbatim: option.localizedName)
+                            } icon: {
+                                InventoryInlineGlyph(systemName: option.symbolName, role: .place, domain: .place, isSelected: iconID == option.id)
+                            }
+                            .tag(option.id)
                         }
                     }
                     .tint(InventoryDesign.ContentRole.place.color)

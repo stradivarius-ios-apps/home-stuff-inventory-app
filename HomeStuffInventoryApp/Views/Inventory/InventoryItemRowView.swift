@@ -176,8 +176,7 @@ struct InventoryItemRowView: View {
         contentRole: InventoryDesign.ContentRole
     ) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 6) {
-            Image(systemName: systemImage)
-                .imageScale(.small)
+            InventoryInlineGlyph(systemName: systemImage, role: hasValue ? contentRole.accentRole : .muted, domain: .init(contentRole: contentRole))
                 .foregroundStyle(hasValue ? contentRole.color : Color.secondary)
                 .accessibilityHidden(true)
 

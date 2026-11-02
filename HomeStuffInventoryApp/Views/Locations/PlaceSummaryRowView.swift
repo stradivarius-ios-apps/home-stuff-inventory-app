@@ -24,10 +24,11 @@ struct PlaceSummaryRowView: View {
             VStack(alignment: .leading, spacing: 3) {
                 titleAndCount
                 if place.childPlaceCount > 0 {
-                    Label(
-                        InventoryLocalization.placeCount(place.childPlaceCount),
-                        systemImage: "shippingbox"
-                    )
+                    Label {
+                        Text(verbatim: InventoryLocalization.placeCount(place.childPlaceCount))
+                    } icon: {
+                        InventoryInlineGlyph(systemName: "shippingbox", role: .place, domain: .place)
+                    }
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 }
@@ -102,7 +103,7 @@ struct PlaceSummaryRowView: View {
             ForEach(presentation.visibleCategories) { category in
                 let entry = PlaceCategoryEntryPresentation(category: category)
                 HStack(spacing: 4) {
-                    Image(systemName: entry.symbolName)
+                    InventoryInlineGlyph(systemName: entry.symbolName, role: .secondary, domain: .item)
                         .accessibilityHidden(true)
                     Text(verbatim: entry.displayName)
                 }
@@ -123,7 +124,8 @@ struct PlaceSummaryRowView: View {
         InventoryContentGlyph(
             systemName: placeIconSystemName,
             role: place.isMissingPlace ? .muted : InventoryDesign.ContentRole.place.accentRole,
-            presentation: .compact
+            presentation: .compact,
+            domain: .place
         )
         .accessibilityHidden(true)
     }

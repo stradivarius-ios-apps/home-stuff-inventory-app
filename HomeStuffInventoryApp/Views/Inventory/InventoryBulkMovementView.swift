@@ -118,11 +118,15 @@ struct InventoryBulkMovementView: View {
 
             Section("inventory.bulkMove.destination.section") {
                 if destinations.isEmpty {
-                    ContentUnavailableView(
-                        "inventory.bulkMove.destination.empty.title",
-                        systemImage: "shippingbox",
-                        description: Text("inventory.bulkMove.destination.empty.message")
-                    )
+                    ContentUnavailableView {
+                        Label {
+                            Text("inventory.bulkMove.destination.empty.title")
+                        } icon: {
+                            InventoryContentGlyph(systemName: "shippingbox", role: .place, presentation: .identity, domain: .place)
+                        }
+                    } description: {
+                        Text("inventory.bulkMove.destination.empty.message")
+                    }
                 } else {
                     Picker(
                         "inventory.bulkMove.destination.picker",

@@ -46,7 +46,8 @@ struct InventoryItemPlaceSelectionView: View {
                             HStack {
                                 InventoryContentGlyph(
                                     systemName: PlaceIconCatalog.symbolName(for: place.iconID),
-                                    role: InventoryDesign.ContentRole.place.accentRole
+                                    role: InventoryDesign.ContentRole.place.accentRole,
+                                    isSelected: selection == place.id
                                 )
                                 VStack(alignment: .leading, spacing: 2) {
                                     InventorySelectionRow(verbatim: place.name, isSelected: selection == place.id)
@@ -115,7 +116,12 @@ private struct InventoryItemPlaceCreationView: View {
                     .accessibilityIdentifier("inventory.placeSelection.nameField")
                 Picker("inventory.selection.place.icon", selection: $iconID) {
                     ForEach(PlaceIconCatalog.options) { option in
-                        Label(option.localizedName, systemImage: option.symbolName).tag(option.id)
+                        Label {
+                            Text(verbatim: option.localizedName)
+                        } icon: {
+                            InventoryInlineGlyph(systemName: option.symbolName, role: .place, domain: .place, isSelected: iconID == option.id)
+                        }
+                        .tag(option.id)
                     }
                 }
                 .accessibilityIdentifier("inventory.placeSelection.iconPicker")

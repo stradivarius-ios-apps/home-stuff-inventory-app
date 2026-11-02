@@ -22,8 +22,7 @@ struct InventoryPreviewGroupRow: View {
 
     private var sectionLabel: some View {
         HStack(spacing: 4) {
-            Image(systemName: presentation.systemImage)
-                .imageScale(.small)
+            InventoryInlineGlyph(systemName: presentation.systemImage, role: presentation.kind.role)
                 .accessibilityHidden(true)
 
             Text(presentation.label)
@@ -100,8 +99,7 @@ private struct InventoryPlacePreviewBadge: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .foregroundStyle(.primary)
         } icon: {
-            Image(systemName: "shippingbox")
-                .imageScale(.small)
+            InventoryInlineGlyph(systemName: "shippingbox", role: .place, domain: .place)
                 .foregroundStyle(InventoryDesign.ContentRole.place.color)
                 .accessibilityHidden(true)
         }

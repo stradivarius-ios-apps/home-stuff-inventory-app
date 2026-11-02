@@ -13,45 +13,46 @@ struct InventoryContentGlyph: View {
     private let role: InventoryDesign.AccentRole
     private let accessibilityLabel: Text?
     private let presentation: InventoryContentGlyphPresentation
+    private let domain: InventoryGlyph.Domain?
+    private let isSelected: Bool
 
     init(
         systemName: String,
         role: InventoryDesign.AccentRole = .storage,
         accessibilityLabel: LocalizedStringKey? = nil,
-        presentation: InventoryContentGlyphPresentation = .compact
+        presentation: InventoryContentGlyphPresentation = .compact,
+        domain: InventoryGlyph.Domain? = nil,
+        isSelected: Bool = false
     ) {
         self.systemName = systemName
         self.role = role
         self.accessibilityLabel = accessibilityLabel.map { Text($0) }
         self.presentation = presentation
+        self.domain = domain
+        self.isSelected = isSelected
     }
 
     init(
         systemName: String,
         role: InventoryDesign.AccentRole = .storage,
         accessibilityLabel: String?,
-        presentation: InventoryContentGlyphPresentation = .compact
+        presentation: InventoryContentGlyphPresentation = .compact,
+        domain: InventoryGlyph.Domain? = nil,
+        isSelected: Bool = false
     ) {
         self.systemName = systemName
         self.role = role
         self.accessibilityLabel = accessibilityLabel.map { Text(verbatim: $0) }
         self.presentation = presentation
+        self.domain = domain
+        self.isSelected = isSelected
     }
 
     var body: some View {
-        InventoryGlyphImage(systemName: systemName, role: role, size: size, font: font, identity: presentation == .identity)
+        InventoryGlyphImage(systemName: systemName, role: role, size: size, identity: presentation == .identity, domain: domain, isSelected: isSelected)
             .frame(width: size, height: size)
             .accessibilityHidden(accessibilityLabel == nil)
             .accessibilityLabel(accessibilityLabel ?? Text(verbatim: ""))
-    }
-
-    private var font: Font {
-        switch presentation {
-        case .compact:
-            .title3.weight(.semibold)
-        case .identity:
-            .title2.weight(.semibold)
-        }
     }
 
     private var size: CGFloat {
@@ -92,7 +93,7 @@ struct InventoryStorageIcon: View {
     }
 
     var body: some View {
-        InventoryGlyphImage(systemName: systemName, role: role, size: size * 32 / 44, font: .title3.weight(.semibold))
+        InventoryGlyphImage(systemName: systemName, role: role, size: size * 32 / 44)
             .frame(width: size, height: size)
             .inventoryStorageIconSurface(role: role)
             .accessibilityHidden(accessibilityLabel == nil)
@@ -137,7 +138,7 @@ struct InventoryCompactIconBubble: View {
     }
 
     var body: some View {
-        InventoryGlyphImage(systemName: systemName, role: role, size: size * 24 / 34, font: .subheadline.weight(.semibold))
+        InventoryGlyphImage(systemName: systemName, role: role, size: size * 24 / 34)
             .frame(width: size, height: size)
             .inventoryStorageIconSurface(role: role)
             .accessibilityHidden(accessibilityLabel == nil)
@@ -149,27 +150,53 @@ struct InventoryGlyphImage: View {
     let systemName: String
     let role: InventoryDesign.AccentRole
     let size: CGFloat
-    let font: Font
     var identity = false
+    var domain: InventoryGlyph.Domain? = nil
+    var isSelected = false
 
     var body: some View {
-        if let domain, let glyph = InventoryGlyph.resolve(systemName: systemName, domain: domain) {
-            InventoryGlyphArtwork(glyph: glyph, identity: identity, tint: role.color)
-                .frame(width: size, height: size)
-        } else {
-            Image(systemName: systemName)
-                .font(font)
-                .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(role.color)
+        InventoryGlyphArtwork(
+            glyph: InventoryGlyph.content(systemName: systemName, domain: domain ?? .init(accentRole: role)),
+            variant: .resolve(identity: identity, isSelected: isSelected),
+            tint: role.color
+        )
+        .frame(width: size, height: size)
+    }
+}
+
+struct InventoryInlineGlyph: View {
+    @ScaledMetric(relativeTo: .caption) private var size: CGFloat = 14
+    let systemName: String
+    var role: InventoryDesign.AccentRole = .muted
+    var domain: InventoryGlyph.Domain? = nil
+    var isSelected = false
+
+    var body: some View {
+        InventoryGlyphImage(
+            systemName: systemName,
+            role: role,
+            size: size,
+            domain: domain,
+            isSelected: isSelected
+        )
+        .accessibilityHidden(true)
+    }
+}
+
+extension InventoryGlyph.Domain {
+    init(contentRole: InventoryDesign.ContentRole) {
+        switch contentRole {
+        case .location: self = .location
+        case .place: self = .place
+        case .item: self = .item
         }
     }
 
-    private var domain: InventoryGlyph.Domain? {
-        switch role {
-        case .storage: .location
-        case .place: .place
-        case .secondary: .item
-        default: nil
+    init(accentRole: InventoryDesign.AccentRole) {
+        switch accentRole {
+        case .storage: self = .location
+        case .place: self = .place
+        default: self = .item
         }
     }
 }

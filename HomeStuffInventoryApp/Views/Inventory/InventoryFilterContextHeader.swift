@@ -68,7 +68,8 @@ struct ActiveInventoryFilterContextHeader: View {
         if let searchText = context.searchText {
             InventoryBadge(
                 verbatim: badgeText("inventory.filterContext.search", defaultValue: "Search: %@", value: searchText),
-                systemImage: "magnifyingglass"
+                systemImage: "magnifyingglass",
+                usesSystemSearchIcon: true
             )
         }
 
@@ -94,7 +95,8 @@ struct ActiveInventoryFilterContextHeader: View {
                     defaultValue: "Storage Place: %@",
                     value: place.displayName(vocabulary: .localized)
                 ),
-                systemImage: "archivebox"
+                systemImage: "archivebox",
+                role: .place
             )
         }
     }

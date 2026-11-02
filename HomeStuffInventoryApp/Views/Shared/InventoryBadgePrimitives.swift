@@ -4,33 +4,42 @@ struct InventoryBadge: View {
     private let title: Text
     private let systemImage: String?
     private let role: InventoryDesign.AccentRole
+    private let usesSystemSearchIcon: Bool
 
     init(
         _ title: LocalizedStringKey,
         systemImage: String? = nil,
-        role: InventoryDesign.AccentRole = .storage
+        role: InventoryDesign.AccentRole = .storage,
+        usesSystemSearchIcon: Bool = false
     ) {
         self.title = Text(title)
         self.systemImage = systemImage
         self.role = role
+        self.usesSystemSearchIcon = usesSystemSearchIcon
     }
 
     init(
         verbatim title: String,
         systemImage: String? = nil,
-        role: InventoryDesign.AccentRole = .storage
+        role: InventoryDesign.AccentRole = .storage,
+        usesSystemSearchIcon: Bool = false
     ) {
         self.title = Text(verbatim: title)
         self.systemImage = systemImage
         self.role = role
+        self.usesSystemSearchIcon = usesSystemSearchIcon
     }
 
     var body: some View {
         HStack(spacing: 5) {
             if let systemImage {
-                Image(systemName: systemImage)
-                    .imageScale(.small)
-                    .accessibilityHidden(true)
+                if usesSystemSearchIcon {
+                    Image(systemName: "magnifyingglass")
+                        .imageScale(.small)
+                        .accessibilityHidden(true)
+                } else {
+                    InventoryInlineGlyph(systemName: systemImage, role: role)
+                }
             }
 
             title
@@ -57,8 +66,7 @@ struct InventoryTagBadge: View {
 
     var body: some View {
         HStack(spacing: 5) {
-            Image(systemName: "tag")
-                .imageScale(.small)
+            InventoryInlineGlyph(systemName: "tag", role: role, domain: .item)
                 .accessibilityHidden(true)
 
             Text(verbatim: title)

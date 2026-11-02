@@ -1,0 +1,347 @@
+{
+  "InventoryGlyph-archive-box-material": {
+    "bodyFraction": 0.6634768740031898,
+    "offsetX": 0.001594896331738437,
+    "offsetY": -0.008771929824561403
+  },
+  "InventoryGlyph-archive-box-selected": {
+    "bodyFraction": 0.6674641148325359,
+    "offsetX": 0.0011961722488038277,
+    "offsetY": -0.007974481658692184
+  },
+  "InventoryGlyph-bandage-material": {
+    "bodyFraction": 0.6921850079744817,
+    "offsetX": 0.0007974481658692185,
+    "offsetY": -0.01674641148325359
+  },
+  "InventoryGlyph-bandage-selected": {
+    "bodyFraction": 0.689792663476874,
+    "offsetX": 0.0027910685805422647,
+    "offsetY": -0.01634768740031898
+  },
+  "InventoryGlyph-basket-material": {
+    "bodyFraction": 0.8229665071770335,
+    "offsetX": 0.0,
+    "offsetY": -0.014354066985645933
+  },
+  "InventoryGlyph-basket-selected": {
+    "bodyFraction": 0.8189792663476874,
+    "offsetX": -0.00039872408293460925,
+    "offsetY": -0.01076555023923445
+  },
+  "InventoryGlyph-battery-material": {
+    "bodyFraction": 0.6363636363636364,
+    "offsetX": 0.001594896331738437,
+    "offsetY": -0.0007974481658692185
+  },
+  "InventoryGlyph-battery-selected": {
+    "bodyFraction": 0.6339712918660287,
+    "offsetX": 0.0011961722488038277,
+    "offsetY": -0.00039872408293460925
+  },
+  "InventoryGlyph-bedroom-material": {
+    "bodyFraction": 0.715311004784689,
+    "offsetX": 0.001993620414673046,
+    "offsetY": -0.03787878787878788
+  },
+  "InventoryGlyph-bedroom-selected": {
+    "bodyFraction": 0.7145135566188198,
+    "offsetX": 0.001594896331738437,
+    "offsetY": -0.037480063795853266
+  },
+  "InventoryGlyph-bicycle-material": {
+    "bodyFraction": 0.7615629984051037,
+    "offsetX": 0.0011961722488038277,
+    "offsetY": -0.025119617224880382
+  },
+  "InventoryGlyph-bicycle-selected": {
+    "bodyFraction": 0.7503987240829346,
+    "offsetX": 0.0027910685805422647,
+    "offsetY": -0.02631578947368421
+  },
+  "InventoryGlyph-books-material": {
+    "bodyFraction": 0.6602870813397129,
+    "offsetX": 0.0,
+    "offsetY": -0.009569377990430622
+  },
+  "InventoryGlyph-books-selected": {
+    "bodyFraction": 0.664274322169059,
+    "offsetX": 0.001993620414673046,
+    "offsetY": -0.01036682615629984
+  },
+  "InventoryGlyph-box-material": {
+    "bodyFraction": 0.6858054226475279,
+    "offsetX": 0.0007974481658692185,
+    "offsetY": -0.014752791068580542
+  },
+  "InventoryGlyph-box-selected": {
+    "bodyFraction": 0.7137161084529505,
+    "offsetX": 0.0011961722488038277,
+    "offsetY": -0.013157894736842105
+  },
+  "InventoryGlyph-cabinet-material": {
+    "bodyFraction": 0.5637958532695375,
+    "offsetX": 0.00039872408293460925,
+    "offsetY": -0.00039872408293460925
+  },
+  "InventoryGlyph-cabinet-selected": {
+    "bodyFraction": 0.562200956937799,
+    "offsetX": 0.0011961722488038277,
+    "offsetY": -0.00039872408293460925
+  },
+  "InventoryGlyph-cable-material": {
+    "bodyFraction": 0.6570972886762361,
+    "offsetX": 0.005582137161084529,
+    "offsetY": -0.0023923444976076554
+  },
+  "InventoryGlyph-cable-selected": {
+    "bodyFraction": 0.6578947368421053,
+    "offsetX": 0.005980861244019139,
+    "offsetY": -0.0027910685805422647
+  },
+  "InventoryGlyph-car-material": {
+    "bodyFraction": 0.7304625199362041,
+    "offsetX": 0.0,
+    "offsetY": -0.019138755980861243
+  },
+  "InventoryGlyph-car-selected": {
+    "bodyFraction": 0.7200956937799043,
+    "offsetX": 0.0011961722488038277,
+    "offsetY": -0.019138755980861243
+  },
+  "InventoryGlyph-clothing-material": {
+    "bodyFraction": 0.6610845295055822,
+    "offsetX": 0.001993620414673046,
+    "offsetY": -0.003189792663476874
+  },
+  "InventoryGlyph-clothing-selected": {
+    "bodyFraction": 0.6555023923444976,
+    "offsetX": 0.0007974481658692185,
+    "offsetY": -0.001594896331738437
+  },
+  "InventoryGlyph-cup-and-saucer-material": {
+    "bodyFraction": 0.7208931419457735,
+    "offsetX": -0.0215311004784689,
+    "offsetY": -0.03787878787878788
+  },
+  "InventoryGlyph-cup-and-saucer-selected": {
+    "bodyFraction": 0.715311004784689,
+    "offsetX": -0.018740031897926633,
+    "offsetY": -0.03987240829346093
+  },
+  "InventoryGlyph-cutlery-material": {
+    "bodyFraction": 0.7009569377990431,
+    "offsetX": 0.022328548644338118,
+    "offsetY": -0.01076555023923445
+  },
+  "InventoryGlyph-cutlery-selected": {
+    "bodyFraction": 0.6913875598086124,
+    "offsetX": 0.023923444976076555,
+    "offsetY": -0.008373205741626795
+  },
+  "InventoryGlyph-desktop-computer-material": {
+    "bodyFraction": 0.7535885167464115,
+    "offsetX": 0.00039872408293460925,
+    "offsetY": -0.0171451355661882
+  },
+  "InventoryGlyph-desktop-computer-selected": {
+    "bodyFraction": 0.7575757575757576,
+    "offsetX": 0.0007974481658692185,
+    "offsetY": -0.01634768740031898
+  },
+  "InventoryGlyph-display-material": {
+    "bodyFraction": 0.6961722488038278,
+    "offsetX": -0.00039872408293460925,
+    "offsetY": -0.009968102073365232
+  },
+  "InventoryGlyph-display-selected": {
+    "bodyFraction": 0.7017543859649122,
+    "offsetX": 0.0007974481658692185,
+    "offsetY": -0.01036682615629984
+  },
+  "InventoryGlyph-document-material": {
+    "bodyFraction": 0.5917065390749602,
+    "offsetX": 0.0,
+    "offsetY": -0.001594896331738437
+  },
+  "InventoryGlyph-document-selected": {
+    "bodyFraction": 0.5940988835725678,
+    "offsetX": 0.00039872408293460925,
+    "offsetY": -0.001993620414673046
+  },
+  "InventoryGlyph-drawer-material": {
+    "bodyFraction": 0.740829346092504,
+    "offsetX": 0.00039872408293460925,
+    "offsetY": -0.008373205741626795
+  },
+  "InventoryGlyph-drawer-selected": {
+    "bodyFraction": 0.7416267942583732,
+    "offsetX": 0.0,
+    "offsetY": -0.005980861244019139
+  },
+  "InventoryGlyph-entryway-door-material": {
+    "bodyFraction": 0.6578947368421053,
+    "offsetX": 0.0,
+    "offsetY": 0.009170653907496013
+  },
+  "InventoryGlyph-entryway-door-selected": {
+    "bodyFraction": 0.6547049441786283,
+    "offsetX": 0.0,
+    "offsetY": 0.01076555023923445
+  },
+  "InventoryGlyph-eyeglasses-material": {
+    "bodyFraction": 0.8070175438596491,
+    "offsetX": 0.0,
+    "offsetY": -0.008373205741626795
+  },
+  "InventoryGlyph-eyeglasses-selected": {
+    "bodyFraction": 0.8054226475279107,
+    "offsetX": 0.0007974481658692185,
+    "offsetY": -0.007177033492822967
+  },
+  "InventoryGlyph-first-aid-material": {
+    "bodyFraction": 0.6092503987240829,
+    "offsetX": 0.0,
+    "offsetY": -0.005980861244019139
+  },
+  "InventoryGlyph-first-aid-selected": {
+    "bodyFraction": 0.613237639553429,
+    "offsetX": 0.0011961722488038277,
+    "offsetY": -0.0035885167464114833
+  },
+  "InventoryGlyph-floor-lamp-material": {
+    "bodyFraction": 0.7304625199362041,
+    "offsetX": 0.0011961722488038277,
+    "offsetY": -0.007974481658692184
+  },
+  "InventoryGlyph-floor-lamp-selected": {
+    "bodyFraction": 0.7320574162679426,
+    "offsetX": 0.0007974481658692185,
+    "offsetY": -0.009569377990430622
+  },
+  "InventoryGlyph-folder-material": {
+    "bodyFraction": 0.6259968102073366,
+    "offsetX": 0.00039872408293460925,
+    "offsetY": -0.007177033492822967
+  },
+  "InventoryGlyph-folder-selected": {
+    "bodyFraction": 0.6068580542264753,
+    "offsetX": 0.0035885167464114833,
+    "offsetY": -0.0043859649122807015
+  },
+  "InventoryGlyph-gear-material": {
+    "bodyFraction": 0.7232854864433812,
+    "offsetX": 0.00039872408293460925,
+    "offsetY": -0.004784688995215311
+  },
+  "InventoryGlyph-gear-selected": {
+    "bodyFraction": 0.7192982456140351,
+    "offsetX": 0.0007974481658692185,
+    "offsetY": -0.0027910685805422647
+  },
+  "InventoryGlyph-hammer-material": {
+    "bodyFraction": 0.7368421052631579,
+    "offsetX": -0.006778309409888357,
+    "offsetY": -0.012759170653907496
+  },
+  "InventoryGlyph-hammer-selected": {
+    "bodyFraction": 0.7280701754385965,
+    "offsetX": -0.00039872408293460925,
+    "offsetY": -0.011562998405103669
+  },
+  "InventoryGlyph-hanger-material": {
+    "bodyFraction": 0.7511961722488039,
+    "offsetX": 0.001594896331738437,
+    "offsetY": -0.012759170653907496
+  },
+  "InventoryGlyph-hanger-selected": {
+    "bodyFraction": 0.7456140350877193,
+    "offsetX": 0.0011961722488038277,
+    "offsetY": -0.012360446570972886
+  },
+  "InventoryGlyph-headphones-material": {
+    "bodyFraction": 0.6953748006379585,
+    "offsetX": 0.0023923444976076554,
+    "offsetY": -0.0171451355661882
+  },
+  "InventoryGlyph-home-material": {
+    "bodyFraction": 0.6499202551834131,
+    "offsetX": 0.00039872408293460925,
+    "offsetY": 0.0
+  },
+  "InventoryGlyph-keys-material": {
+    "bodyFraction": 0.7543859649122807,
+    "offsetX": -0.01594896331738437,
+    "offsetY": -0.0007974481658692185
+  },
+  "InventoryGlyph-keys-selected": {
+    "bodyFraction": 0.751993620414673,
+    "offsetX": -0.012759170653907496,
+    "offsetY": 0.0027910685805422647
+  },
+  "InventoryGlyph-kitchen-scene-material": {
+    "bodyFraction": 0.6124401913875598,
+    "offsetX": 0.0,
+    "offsetY": -0.0023923444976076554
+  },
+  "InventoryGlyph-kitchen-scene-selected": {
+    "bodyFraction": 0.6028708133971292,
+    "offsetX": 0.0,
+    "offsetY": -0.0027910685805422647
+  },
+  "InventoryGlyph-laptop-material": {
+    "bodyFraction": 0.6810207336523126,
+    "offsetX": 0.0007974481658692185,
+    "offsetY": -0.0171451355661882
+  },
+  "InventoryGlyph-leaf-material": {
+    "bodyFraction": 0.722488038277512,
+    "offsetX": -0.019138755980861243,
+    "offsetY": -0.01036682615629984
+  },
+  "InventoryGlyph-office-scene-material": {
+    "bodyFraction": 0.751993620414673,
+    "offsetX": -0.00039872408293460925,
+    "offsetY": -0.005980861244019139
+  },
+  "InventoryGlyph-office-scene-selected": {
+    "bodyFraction": 0.75518341307815,
+    "offsetX": 0.00039872408293460925,
+    "offsetY": -0.006778309409888357
+  },
+  "InventoryGlyph-organizer-material": {
+    "bodyFraction": 0.6028708133971292,
+    "offsetX": 0.0,
+    "offsetY": 0.0023923444976076554
+  },
+  "InventoryGlyph-organizer-selected": {
+    "bodyFraction": 0.6100478468899522,
+    "offsetX": 0.0011961722488038277,
+    "offsetY": 0.00039872408293460925
+  },
+  "InventoryGlyph-phone-material": {
+    "bodyFraction": 0.6483253588516746,
+    "offsetX": 0.001594896331738437,
+    "offsetY": -0.006778309409888357
+  },
+  "InventoryGlyph-shelf-material": {
+    "bodyFraction": 0.5909090909090909,
+    "offsetX": 0.0,
+    "offsetY": -0.00039872408293460925
+  },
+  "InventoryGlyph-shelf-selected": {
+    "bodyFraction": 0.5909090909090909,
+    "offsetX": 0.0,
+    "offsetY": -0.00039872408293460925
+  },
+  "InventoryGlyph-tools-material": {
+    "bodyFraction": 0.70414673046252,
+    "offsetX": -0.00039872408293460925,
+    "offsetY": -0.01036682615629984
+  },
+  "InventoryGlyph-tools-selected": {
+    "bodyFraction": 0.69377990430622,
+    "offsetX": 0.0007974481658692185,
+    "offsetY": -0.011164274322169059
+  }
+}

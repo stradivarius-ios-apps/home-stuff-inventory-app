@@ -69,8 +69,8 @@ struct LocationSummaryRowView: View {
             systemName: locationIconSystemName,
             role: location.isMissingLocation ? .muted : InventoryDesign.ContentRole.location.accentRole,
             size: InventoryDesign.locationSummaryIconSize,
-            font: .system(size: InventoryDesign.locationSummaryIconSize, weight: .semibold),
-            identity: true
+            identity: true,
+            domain: .location
         )
             .frame(
                 width: InventoryDesign.locationSummaryIconFrame,
@@ -91,8 +91,7 @@ struct LocationSummaryRowView: View {
 
     private var placeSummaryLine: some View {
         HStack(alignment: .firstTextBaseline, spacing: 4) {
-            Image(systemName: "shippingbox")
-                .imageScale(.small)
+            InventoryInlineGlyph(systemName: "shippingbox", role: .place, domain: .place)
                 .foregroundStyle(InventoryDesign.ContentRole.place.color)
                 .accessibilityHidden(true)
 

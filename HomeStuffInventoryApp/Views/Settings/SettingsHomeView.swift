@@ -107,7 +107,8 @@ struct SettingsHomeView: View {
                     InventorySettingsNavigationRow(
                         "settings.lists.locations",
                         systemImage: "map",
-                        iconRole: .storage
+                        iconRole: .storage,
+                        contentDomain: .location
                     )
                 }
                 .accessibilityLabel("settings.lists.locations.accessibilityLabel")
@@ -116,7 +117,7 @@ struct SettingsHomeView: View {
                 NavigationLink {
                     PlaceManagementView()
                 } label: {
-                    InventorySettingsNavigationRow("settings.lists.places", systemImage: "shippingbox", iconRole: .place)
+                    InventorySettingsNavigationRow("settings.lists.places", systemImage: "shippingbox", iconRole: .place, contentDomain: .place)
                 }
                 .accessibilityLabel("settings.lists.places.accessibilityLabel")
                 .accessibilityIdentifier("settings.lists.placesLink")
@@ -124,7 +125,7 @@ struct SettingsHomeView: View {
                 NavigationLink {
                     InventoryListManagementView(scope: .categories)
                 } label: {
-                    InventorySettingsNavigationRow("settings.lists.categories", systemImage: "tag")
+                    InventorySettingsNavigationRow("settings.lists.categories", systemImage: "tag", contentDomain: .item)
                 }
                 .accessibilityLabel("settings.lists.categories.accessibilityLabel")
                 .accessibilityIdentifier("settings.lists.categoriesLink")

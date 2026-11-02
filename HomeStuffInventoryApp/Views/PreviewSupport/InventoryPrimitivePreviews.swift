@@ -295,7 +295,8 @@ import SwiftUI
         InventoryEmptyStateCard(
             title: "No matching household items",
             message: "Clear the search or record a new item with a location and exact storage place.",
-            systemImage: "magnifyingglass"
+            systemImage: "magnifyingglass",
+            usesSystemIcon: true
         ) {
             Button("Clear search") { }
                 .inventoryEmptyStatePrimaryAction()
@@ -424,7 +425,7 @@ private struct InventorySemanticSurfaceRolesPreview: View {
                 ForEach(InventoryDesign.SurfaceRole.allCases) { role in
                     VStack(alignment: .leading, spacing: InventoryDesign.rowSpacing) {
                         HStack(spacing: 6) {
-                            Image(systemName: role.systemImage)
+                            InventoryInlineGlyph(systemName: role.systemImage, role: .muted)
                                 .foregroundStyle(.secondary)
                                 .accessibilityHidden(true)
 

@@ -39,10 +39,7 @@ struct InventoryContentGlyph: View {
     }
 
     var body: some View {
-        Image(systemName: systemName)
-            .font(font)
-            .symbolRenderingMode(.hierarchical)
-            .foregroundStyle(role.color)
+        InventoryGlyphImage(systemName: systemName, role: role, size: size, font: font, identity: presentation == .identity)
             .frame(width: size, height: size)
             .accessibilityHidden(accessibilityLabel == nil)
             .accessibilityLabel(accessibilityLabel ?? Text(verbatim: ""))
@@ -95,9 +92,7 @@ struct InventoryStorageIcon: View {
     }
 
     var body: some View {
-        Image(systemName: systemName)
-            .font(.title3.weight(.semibold))
-            .foregroundStyle(role.color)
+        InventoryGlyphImage(systemName: systemName, role: role, size: size * 32 / 44, font: .title3.weight(.semibold))
             .frame(width: size, height: size)
             .inventoryStorageIconSurface(role: role)
             .accessibilityHidden(accessibilityLabel == nil)
@@ -142,12 +137,39 @@ struct InventoryCompactIconBubble: View {
     }
 
     var body: some View {
-        Image(systemName: systemName)
-            .font(.subheadline.weight(.semibold))
-            .foregroundStyle(role.color)
+        InventoryGlyphImage(systemName: systemName, role: role, size: size * 24 / 34, font: .subheadline.weight(.semibold))
             .frame(width: size, height: size)
             .inventoryStorageIconSurface(role: role)
             .accessibilityHidden(accessibilityLabel == nil)
             .accessibilityLabel(accessibilityLabel ?? Text(verbatim: ""))
+    }
+}
+
+struct InventoryGlyphImage: View {
+    let systemName: String
+    let role: InventoryDesign.AccentRole
+    let size: CGFloat
+    let font: Font
+    var identity = false
+
+    var body: some View {
+        if let domain, let glyph = InventoryGlyph.resolve(systemName: systemName, domain: domain) {
+            InventoryGlyphArtwork(glyph: glyph, identity: identity, tint: role.color)
+                .frame(width: size, height: size)
+        } else {
+            Image(systemName: systemName)
+                .font(font)
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(role.color)
+        }
+    }
+
+    private var domain: InventoryGlyph.Domain? {
+        switch role {
+        case .storage: .location
+        case .place: .place
+        case .secondary: .item
+        default: nil
+        }
     }
 }

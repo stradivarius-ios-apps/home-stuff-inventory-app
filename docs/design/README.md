@@ -86,3 +86,5 @@ The [production app-icon guide](app-icon.md) documents the editable four-layer c
 ## Reference Proposals
 
 [Design Code Reference v1](references/design-code-v1/README.md) contains the accepted app-icon composition concept, a proposed visual handbook, adaptive token references, and component/screen boards. It is a versioned comparison reference, not a replacement for this shipped guide or evidence that the proposed interface is implemented. Current source, tests, and repository instructions retain their authority.
+
+The [content icon family](content-icons.md) documents the editable vector source, optical drawings and catalog fallback coverage.

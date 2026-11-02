@@ -210,6 +210,9 @@
 		A10000000000000000000113 /* InventoryRecentItemViewsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000112 /* InventoryRecentItemViewsTests.swift */; };
 		A10000000000000000000129 /* InventoryTagStyleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000128 /* InventoryTagStyleTests.swift */; };
 		A100000000000000000000BD /* SettingsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000BE /* SettingsHomeView.swift */; };
+		C70000000000000000000002 /* InventoryGlyph.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70000000000000000000001 /* InventoryGlyph.swift */; };
+		C70000000000000000000004 /* InventoryGlyphArtwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70000000000000000000003 /* InventoryGlyphArtwork.swift */; };
+		C70000000000000000000006 /* InventoryGlyphTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70000000000000000000005 /* InventoryGlyphTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -436,6 +439,9 @@
 		A10000000000000000000253 /* PlaceManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceManagementView.swift; sourceTree = "<group>"; };
 		AD6580000000000000000002 /* InventoryPlaceHierarchyManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPlaceHierarchyManagement.swift; sourceTree = "<group>"; };
 		AD6580000000000000000004 /* InventoryPlaceHierarchyMutationViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryPlaceHierarchyMutationViews.swift; sourceTree = "<group>"; };
+		C70000000000000000000001 /* InventoryGlyph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryGlyph.swift; sourceTree = "<group>"; };
+		C70000000000000000000003 /* InventoryGlyphArtwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryGlyphArtwork.swift; sourceTree = "<group>"; };
+		C70000000000000000000005 /* InventoryGlyphTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryGlyphTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -583,6 +589,7 @@
 				A100000000000000000000A1 /* InventorySelectionOptions.swift */,
 				A100000000000000000000BA /* LocationPlaceSummary.swift */,
 				A100000000000000000000AE /* InventoryDesign.swift */,
+				C70000000000000000000001 /* InventoryGlyph.swift */,
 				A10000000000000000000126 /* InventoryTagStyle.swift */,
 				A100000000000000000001E1 /* InventoryDataTransferWorkflow.swift */,
 				A100000000000000000001E3 /* InventoryItemFormWorkflow.swift */,
@@ -672,6 +679,7 @@
 				A100000000000000000000D0 /* InventoryGlassSurfaces.swift */,
 				A100000000000000000000CA /* InventoryHeroPrimitives.swift */,
 				A100000000000000000000CB /* InventoryIconPrimitives.swift */,
+				C70000000000000000000003 /* InventoryGlyphArtwork.swift */,
 				A10000000000000000000151 /* InventoryAppBootstrapView.swift */,
 				A10000000000000000000121 /* InventoryPreviewGroupPrimitives.swift */,
 				A100000000000000000000CD /* InventoryRowPrimitives.swift */,
@@ -789,6 +797,7 @@
 				A10000000000000000000236 /* InventoryPlaceReconcilerTests.swift */,
 				A10000000000000000000128 /* InventoryTagStyleTests.swift */,
 				A10000000000000000000137 /* InventoryAppearanceTests.swift */,
+				C70000000000000000000005 /* InventoryGlyphTests.swift */,
 				A10000000000000000000153 /* InventoryAppBootstrapTests.swift */,
 				A10000000000000000000144 /* InventoryNotesEditorStateTests.swift */,
 			);
@@ -1062,6 +1071,8 @@
 				A100000000000000000000C0 /* InventoryCardPrimitives.swift in Sources */,
 				A100000000000000000000C1 /* InventoryHeroPrimitives.swift in Sources */,
 				A100000000000000000000C2 /* InventoryIconPrimitives.swift in Sources */,
+				C70000000000000000000002 /* InventoryGlyph.swift in Sources */,
+				C70000000000000000000004 /* InventoryGlyphArtwork.swift in Sources */,
 				A100000000000000000000C3 /* InventoryBadgePrimitives.swift in Sources */,
 				A100000000000000000000C4 /* InventoryRowPrimitives.swift in Sources */,
 				A100000000000000000000C5 /* InventoryFormPrimitives.swift in Sources */,
@@ -1131,6 +1142,7 @@
 				A10000000000000000000077 /* InventoryItemDetailViewModelTests.swift in Sources */,
 				A1000000000000000000012D /* InventoryHeroNavigationTitleMetricsTests.swift in Sources */,
 				A10000000000000000000136 /* InventoryAppearanceTests.swift in Sources */,
+				C70000000000000000000006 /* InventoryGlyphTests.swift in Sources */,
 				A10000000000000000000152 /* InventoryAppBootstrapTests.swift in Sources */,
 				A100000000000000000000A4 /* InventorySelectionOptionsTests.swift in Sources */,
 				A100000000000000000000AC /* InventoryListManagementTests.swift in Sources */,

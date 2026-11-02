@@ -110,9 +110,7 @@ struct InventoryHeroIcon: View {
     }
 
     var body: some View {
-        Image(systemName: systemName)
-            .font(.system(size: symbolSize, weight: .semibold))
-            .foregroundStyle(contentRole.color)
+        InventoryGlyphImage(systemName: systemName, role: contentRole.accentRole, size: symbolSize, font: .system(size: symbolSize, weight: .semibold), identity: true)
             .frame(width: size, height: size)
             .inventoryHeroIconSurface(
                 presentation,

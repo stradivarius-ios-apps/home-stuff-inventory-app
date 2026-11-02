@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="material" x1="0" y1="0" x2="0.75" y2="1">
+      <stop offset="0" stop-color="#FBE1A1"/>
+      <stop offset="0.5" stop-color="#EAC46C"/>
+      <stop offset="1" stop-color="#DDB25D"/>
+    </linearGradient>
+    <linearGradient id="recess" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#986B26"/>
+      <stop offset="1" stop-color="#CFA34E"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0" stop-color="#FFF0B4"/>
+      <stop offset="1" stop-color="#D5A14D"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#recess)" d="M 441 387 L 583 387 L 568 417 Q 559 437 533 437 L 491 437 Q 465 437 456 417 Z"/>
+  <path fill="url(#material)" stroke="url(#rim)" stroke-width="5" d="M 350 387 L 441 387 Q 452 387 454 399 C 457 426 467 437 491 437 L 533 437 C 557 437 567 426 570 399 Q 572 387 583 387 L 674 387 C 702 387 716 401 716 429 L 716 510 C 716 538 702 552 674 552 L 350 552 C 322 552 308 538 308 510 L 308 429 C 308 401 322 387 350 387 Z"/>
+  <path fill="none" stroke="#FFF0B6" stroke-width="3" stroke-linecap="round" d="M 441 390 Q 451 390 453 402 C 457 428 468 437 491 437 L 533 437 C 556 437 567 428 571 402 Q 573 390 583 390"/>
+</svg>

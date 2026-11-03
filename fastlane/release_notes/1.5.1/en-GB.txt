@@ -1,0 +1,1 @@
+Refine household icons and their colours, and restore icons in empty and recovery screens.

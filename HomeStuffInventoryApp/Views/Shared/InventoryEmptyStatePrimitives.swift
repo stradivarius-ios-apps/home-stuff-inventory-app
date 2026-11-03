@@ -34,6 +34,7 @@ struct InventoryEmptyStateCard<Actions: View>: View {
     private let message: Text
     private let systemImage: String
     private let iconRole: InventoryDesign.AccentRole
+    private let iconDomain: InventoryGlyph.Domain?
     private let usesSystemIcon: Bool
     private let actions: Actions
 
@@ -42,6 +43,7 @@ struct InventoryEmptyStateCard<Actions: View>: View {
         message: LocalizedStringKey,
         systemImage: String = "shippingbox",
         iconRole: InventoryDesign.AccentRole = .muted,
+        iconDomain: InventoryGlyph.Domain? = nil,
         usesSystemIcon: Bool = false,
         @ViewBuilder actions: () -> Actions
     ) {
@@ -49,6 +51,7 @@ struct InventoryEmptyStateCard<Actions: View>: View {
         self.message = Text(message)
         self.systemImage = systemImage
         self.iconRole = iconRole
+        self.iconDomain = iconDomain
         self.usesSystemIcon = usesSystemIcon
         self.actions = actions()
     }
@@ -58,6 +61,7 @@ struct InventoryEmptyStateCard<Actions: View>: View {
         message: String,
         systemImage: String = "shippingbox",
         iconRole: InventoryDesign.AccentRole = .muted,
+        iconDomain: InventoryGlyph.Domain? = nil,
         usesSystemIcon: Bool = false,
         @ViewBuilder actions: () -> Actions
     ) {
@@ -65,6 +69,7 @@ struct InventoryEmptyStateCard<Actions: View>: View {
         self.message = Text(verbatim: message)
         self.systemImage = systemImage
         self.iconRole = iconRole
+        self.iconDomain = iconDomain
         self.usesSystemIcon = usesSystemIcon
         self.actions = actions()
     }
@@ -79,7 +84,12 @@ struct InventoryEmptyStateCard<Actions: View>: View {
                             .foregroundStyle(iconRole.color)
                             .frame(width: InventoryDesign.identityContentGlyphSize, height: InventoryDesign.identityContentGlyphSize)
                     } else {
-                        InventoryContentGlyph(systemName: systemImage, role: iconRole, presentation: .identity)
+                        InventoryContentGlyph(
+                            systemName: systemImage,
+                            role: iconRole,
+                            presentation: .identity,
+                            domain: iconDomain
+                        )
                     }
                 }
                 .padding(.bottom, 4)
@@ -176,9 +186,10 @@ extension InventoryEmptyStateCard where Actions == EmptyView {
         title: String,
         message: String,
         systemImage: String = "shippingbox",
-        iconRole: InventoryDesign.AccentRole = .muted
+        iconRole: InventoryDesign.AccentRole = .muted,
+        iconDomain: InventoryGlyph.Domain? = nil
     ) {
-        self.init(title: title, message: message, systemImage: systemImage, iconRole: iconRole) {
+        self.init(title: title, message: message, systemImage: systemImage, iconRole: iconRole, iconDomain: iconDomain) {
             EmptyView()
         }
     }

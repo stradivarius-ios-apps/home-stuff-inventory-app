@@ -295,14 +295,16 @@ struct InventoryListManagementView: View {
     }
 
     private func managedItemsList(_ selection: InventoryManagedItemsSelection) -> some View {
-        ScopedInventoryItemsListView(
+        let icon = selection.emptyStateIcon
+        return ScopedInventoryItemsListView(
             title: selection.title,
             items: InventoryListManagement.items(in: items, matching: selection),
             emptyTitleKey: "inventory.lists.items.empty.title",
             emptyTitleDefaultValue: "No Items",
             emptyMessageKey: "inventory.lists.items.empty.message",
             emptyMessageDefaultValue: "Items that use this value appear here.",
-            emptySystemImage: selection.emptySystemImage
+            emptySystemImage: icon.systemName,
+            emptyIconDomain: icon.domain
         )
     }
 

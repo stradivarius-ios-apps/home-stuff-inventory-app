@@ -36,6 +36,7 @@ struct ScopedInventoryItemsListView<Header: View>: View {
     let emptyMessageKey: StaticString
     let emptyMessageDefaultValue: String
     let emptySystemImage: String
+    let emptyIconDomain: InventoryGlyph.Domain
     let backgroundStyle: InventoryScreenBackgroundStyle
     let accessibilityContext: AccessibilityContext
     let showsStorageSummary: Bool
@@ -56,6 +57,7 @@ struct ScopedInventoryItemsListView<Header: View>: View {
         emptyMessageKey: StaticString,
         emptyMessageDefaultValue: String,
         emptySystemImage: String,
+        emptyIconDomain: InventoryGlyph.Domain,
         backgroundStyle: InventoryScreenBackgroundStyle = .locationAtmosphere,
         accessibilityContext: AccessibilityContext = .scoped,
         showsStorageSummary: Bool = true,
@@ -68,6 +70,7 @@ struct ScopedInventoryItemsListView<Header: View>: View {
         self.emptyMessageKey = emptyMessageKey
         self.emptyMessageDefaultValue = emptyMessageDefaultValue
         self.emptySystemImage = emptySystemImage
+        self.emptyIconDomain = emptyIconDomain
         self.backgroundStyle = backgroundStyle
         self.accessibilityContext = accessibilityContext
         self.showsStorageSummary = showsStorageSummary
@@ -213,7 +216,8 @@ struct ScopedInventoryItemsListView<Header: View>: View {
                     emptyMessageKey,
                     defaultValue: emptyMessageDefaultValue
                 ),
-                systemImage: emptySystemImage
+                systemImage: emptySystemImage,
+                iconDomain: emptyIconDomain
             )
         }
     }
@@ -286,6 +290,7 @@ extension ScopedInventoryItemsListView where Header == EmptyView {
         emptyMessageKey: StaticString,
         emptyMessageDefaultValue: String,
         emptySystemImage: String,
+        emptyIconDomain: InventoryGlyph.Domain,
         backgroundStyle: InventoryScreenBackgroundStyle = .locationAtmosphere
     ) {
         self.init(
@@ -296,6 +301,7 @@ extension ScopedInventoryItemsListView where Header == EmptyView {
             emptyMessageKey: emptyMessageKey,
             emptyMessageDefaultValue: emptyMessageDefaultValue,
             emptySystemImage: emptySystemImage,
+            emptyIconDomain: emptyIconDomain,
             backgroundStyle: backgroundStyle,
             accessibilityContext: .scoped
         ) {

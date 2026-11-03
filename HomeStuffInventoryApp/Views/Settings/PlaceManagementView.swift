@@ -84,6 +84,7 @@ struct PlaceManagementView: View {
             }
         }
         .navigationDestination(item: $itemsSelection) { selection in
+            let icon = selection.emptyStateIcon
             ScopedInventoryItemsListView(
                 title: selection.title,
                 items: InventoryListManagement.items(in: items, matching: selection),
@@ -91,7 +92,8 @@ struct PlaceManagementView: View {
                 emptyTitleDefaultValue: "No Items",
                 emptyMessageKey: "inventory.lists.items.empty.message",
                 emptyMessageDefaultValue: "Items that use this value appear here.",
-                emptySystemImage: selection.emptySystemImage
+                emptySystemImage: icon.systemName,
+                emptyIconDomain: icon.domain
             )
         }
     }

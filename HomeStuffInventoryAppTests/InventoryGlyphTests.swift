@@ -45,6 +45,7 @@ struct InventoryGlyphTests {
         #expect(InventoryGlyph.content(systemName: PlaceIconCatalog.symbolName(for: "unknown-saved-id"), domain: .place) == .box)
         #expect(InventoryGlyph.content(systemName: ItemIconCatalog.symbolName(for: "unknown-saved-id"), domain: .item) == .box)
         #expect(InventoryGlyph.content(systemName: "mappin.slash", domain: .location) == .missingLocationMarker)
+        #expect(InventoryGlyph.content(systemName: "location.slash", domain: .location) == .missingLocationMarker)
     }
 
     @Test func metadataAliasesRetainTheirContentMeaning() {

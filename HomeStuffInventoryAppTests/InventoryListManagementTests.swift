@@ -219,7 +219,7 @@ struct InventoryListManagementTests {
     @Test func placeUsageAndSelectionAreScopedAndKeepPlaceIcon() throws {
         let office = StorageLocation(name: "Office")
         let garage = StorageLocation(name: "Garage")
-        let officePlace = InventoryPlace(locationID: office.id, name: "Red Box", iconID: "archive")
+        let officePlace = InventoryPlace(locationID: office.id, name: "Red Box", iconID: "hanger")
         let garagePlace = InventoryPlace(locationID: garage.id, name: "Red Box")
         let officeItem = InventoryItem(name: "Tape", locationName: "Office", containerName: "Red Box", placeID: officePlace.id)
         let garageItem = InventoryItem(name: "Screw", locationName: "Garage", containerName: "Red Box", placeID: garagePlace.id)
@@ -227,7 +227,9 @@ struct InventoryListManagementTests {
         let selection = try InventoryListManagement.selection(for: officePlace, in: office)
         #expect(InventoryListManagement.usageCount(for: officePlace, in: office, items: [officeItem, garageItem]) == 1)
         #expect(InventoryListManagement.items(in: [officeItem, garageItem], matching: selection).map(\.id) == [officeItem.id])
-        #expect(selection.emptySystemImage == "archivebox")
+        let icon = selection.emptyStateIcon
+        #expect(icon.systemName == "hanger")
+        #expect(InventoryGlyph.content(systemName: icon.systemName, domain: icon.domain) == .hanger)
     }
 
     @Test func deletingUsedPlaceIsBlockedButUnusedPlaceIsAllowed() throws {

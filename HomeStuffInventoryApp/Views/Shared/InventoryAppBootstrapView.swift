@@ -106,7 +106,8 @@ struct InventoryAppBootstrapView: View {
             InventoryEmptyStateCard(
                 title: "inventory.startup.unavailable.title",
                 message: "inventory.startup.unavailable.message",
-                systemImage: "externaldrive.badge.exclamationmark"
+                systemImage: "externaldrive.badge.exclamationmark",
+                usesSystemIcon: true
             ) {
                 Button("inventory.startup.tryAgain") {
                     bootstrap.retry()

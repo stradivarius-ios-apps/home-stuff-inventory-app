@@ -20,6 +20,7 @@ struct LocationItemsListView: View {
             emptySystemImage: location.isMissingLocation
                 ? LocationIconCatalog.missingLocationSymbolName
                 : LocationIconCatalog.symbolName(for: location.iconID),
+            emptyIconDomain: .location,
             backgroundStyle: .locationAtmosphere
         )
     }
@@ -107,6 +108,7 @@ struct PlaceItemsListView: View {
             emptyMessageKey: "locations.placeItems.empty.message",
             emptyMessageDefaultValue: "Items moved out of this storage place will appear in their new storage place.",
             emptySystemImage: placeIconSystemName,
+            emptyIconDomain: .place,
             backgroundStyle: .grouped,
             accessibilityContext: .placeDetail,
             showsStorageSummary: !usesSimpleLeafLayout
@@ -141,6 +143,7 @@ struct PlaceItemsListView: View {
                 emptyMessageKey: "locations.placeItems.empty.message",
                 emptyMessageDefaultValue: "Items moved out of this storage place will appear in their new storage place.",
                 emptySystemImage: placeIconSystemName,
+                emptyIconDomain: .place,
                 backgroundStyle: .grouped
             )
         }

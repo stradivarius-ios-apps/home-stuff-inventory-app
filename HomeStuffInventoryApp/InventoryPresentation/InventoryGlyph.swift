@@ -145,7 +145,7 @@ enum InventoryGlyph: String, CaseIterable {
         case (_, "pills"): .pills
         case (_, "stethoscope"): .stethoscope
         case (_, "mappin.and.ellipse"), (_, "mappin.circle"): .locationMarker
-        case (_, "mappin.slash"): .missingLocationMarker
+        case (_, "mappin.slash"), (_, "location.slash"): .missingLocationMarker
         case (_, "location"): .locationArrow
         case (_, "map"): .map
         case (_, "tag"): .tag

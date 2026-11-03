@@ -48,14 +48,14 @@ enum InventoryManagedItemsSelection: Hashable, Identifiable {
         }
     }
 
-    var emptySystemImage: String {
+    var emptyStateIcon: (systemName: String, domain: InventoryGlyph.Domain) {
         switch self {
         case let .location(_, _, iconID):
-            return LocationIconCatalog.symbolName(for: iconID)
+            return (LocationIconCatalog.symbolName(for: iconID), .location)
         case let .place(_, _, _, _, iconID):
-            return PlaceIconCatalog.symbolName(for: iconID)
+            return (PlaceIconCatalog.symbolName(for: iconID), .place)
         case .category:
-            return "tag"
+            return ("tag", .item)
         }
     }
 }

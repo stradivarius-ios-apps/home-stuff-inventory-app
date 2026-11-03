@@ -97,4 +97,4 @@ The [production app-icon guide](app-icon.md) documents the editable four-layer c
 
 [Design Code Reference v1](references/design-code-v1/README.md) preserves the accepted app-icon composition, visual handbook, token specification and component/screen boards. Its files and publication-time proposal status remain unchanged. The current source implements the visual system described here; that original status is not a current implementation report. Within the bundle, PDF tables and JSON specify exact parameters and boards illustrate composition. Native navigation, behavior and accessibility remain governed by current source, tests and repository instructions.
 
-The [content icon family](content-icons.md) documents the editable vector source, optical drawings and catalog fallback coverage.
+The [content icon family](content-icons.md) documents the three artwork states, adaptive roles and full catalog coverage.

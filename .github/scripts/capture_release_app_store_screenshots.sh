@@ -26,17 +26,23 @@ xcrun simctl list devicetypes --json | ruby -rjson -e '
   abort "Required device type is unavailable: #{expected}" unless JSON.parse(STDIN.read).fetch("devicetypes").any? { |device| device["identifier"] == expected }
 '
 
-release_udid="$(xcrun simctl list devices available --json | ruby -rjson -e '
-  runtime = ENV.fetch("runtime_identifier")
-  type = ENV.fetch("RELEASE_SCREENSHOT_DEVICE_TYPE")
-  device = JSON.parse(STDIN.read).fetch("devices").fetch(runtime, []).find { |candidate| candidate["deviceTypeIdentifier"] == type && candidate["isAvailable"] }
-  puts device["udid"] if device
-')"
-if [[ -z "$release_udid" ]]; then
-  release_udid="$(xcrun simctl create "$RELEASE_SCREENSHOT_SIMULATOR_NAME" "$RELEASE_SCREENSHOT_DEVICE_TYPE" "$runtime_identifier")"
-fi
+# A fresh device prevents unrelated simulator state or apps from affecting capture.
+release_udid="$(xcrun simctl create "${RELEASE_SCREENSHOT_SIMULATOR_NAME}-$$" "$RELEASE_SCREENSHOT_DEVICE_TYPE" "$runtime_identifier")"
+cleanup_simulator() {
+  local result=$?
+  trap - EXIT
+  xcrun simctl shutdown "$release_udid" >/dev/null 2>&1 || true
+  if ! xcrun simctl delete "$release_udid"; then
+    echo "Failed to delete the release screenshot simulator." >&2
+    if [[ "$result" -eq 0 ]]; then result=1; fi
+  fi
+  exit "$result"
+}
+trap cleanup_simulator EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 
-xcrun simctl boot "$release_udid" || true
+xcrun simctl boot "$release_udid"
 xcrun simctl bootstatus "$release_udid" -b
 xcrun simctl ui "$release_udid" appearance light
 xcrun simctl status_bar "$release_udid" override \

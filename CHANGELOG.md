@@ -2,6 +2,17 @@
 
 All notable user-facing and release-track changes for Home Stuff Inventory are recorded here.
 
+## 1.5.1
+
+### Changed
+
+- Complete the household icon artwork across its display states.
+- Preserve adaptive icon colours in storage place menus.
+
+### Fixed
+
+- Restore icons in empty, missing, and recovery states.
+
 ## 1.5.0
 
 ### Changed

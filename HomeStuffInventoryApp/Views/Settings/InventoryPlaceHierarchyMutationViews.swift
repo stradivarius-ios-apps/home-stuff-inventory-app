@@ -370,16 +370,7 @@ struct InventoryPlaceHierarchyEditorView: View {
                     TextField("inventory.places.name", text: $name)
                         .textInputAutocapitalization(.words)
                         .accessibilityIdentifier("settings.places.hierarchy.nameField")
-                    Picker("inventory.selection.place.icon", selection: $iconID) {
-                        ForEach(PlaceIconCatalog.options) { option in
-                            Label {
-                                Text(verbatim: option.localizedName)
-                            } icon: {
-                                InventoryInlineGlyph(systemName: option.symbolName, role: .place, domain: .place, isSelected: iconID == option.id)
-                            }
-                            .tag(option.id)
-                        }
-                    }
+                    InventoryPlaceIconPicker(selection: $iconID)
                     .tint(InventoryDesign.ContentRole.place.color)
                     .accessibilityHint("inventory.places.icon.help")
                     .accessibilityIdentifier("settings.places.hierarchy.iconPicker")

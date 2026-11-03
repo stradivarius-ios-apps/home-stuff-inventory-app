@@ -183,6 +183,31 @@ struct InventoryInlineGlyph: View {
     }
 }
 
+struct InventoryPlaceIconPicker: View {
+    @Environment(\.self) private var environment
+    @Binding var selection: String
+
+    var body: some View {
+        // Native menus can snapshot labels outside the form's color environment.
+        let tint = InventoryDesign.ContentRole.place.color.resolve(in: environment)
+        Picker("inventory.selection.place.icon", selection: $selection) {
+            ForEach(PlaceIconCatalog.options) { option in
+                Label {
+                    Text(verbatim: option.localizedName)
+                } icon: {
+                    InventoryGlyphArtwork.menuImage(
+                        glyph: InventoryGlyph.content(systemName: option.symbolName, domain: .place),
+                        variant: selection == option.id ? .selected : .outline,
+                        tint: tint,
+                        displayScale: environment.displayScale
+                    )
+                }
+                .tag(option.id)
+            }
+        }
+    }
+}
+
 extension InventoryGlyph.Domain {
     init(contentRole: InventoryDesign.ContentRole) {
         switch contentRole {

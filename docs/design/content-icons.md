@@ -10,7 +10,7 @@ All 68 Location, Storage Place and Item catalog IDs resolve to authored content 
 | Material | Restrained tinted planes | Location, Storage Place and Item identity |
 | Selected | Filled shapes with deliberate openings | Selected options in icon and value pickers |
 
-Each subject has three separately authored transparent PNGs in `Assets.xcassets/ContentGlyphs`. Selection takes precedence over identity when both apply. The semantic role determines the adaptive color in Light, Dark and both Increase Contrast variants. `InventoryGlyphArtwork.swift` tints outline and selected artwork as masks and retains the tonal separation in material artwork. Native menus apply their own sampling and tint to the drawings.
+Each subject has three separately authored transparent PNGs in `Assets.xcassets/ContentGlyphs`. Selection takes precedence over identity when both apply. The semantic role determines the adaptive color in Light, Dark and both Increase Contrast variants. `InventoryGlyphArtwork.swift` tints outline and selected artwork as masks and retains the tonal separation in material artwork. The Storage Place picker resolves its adaptive tint before passing the drawings to the native menu.
 
 Compact drawings preserve the subject silhouette and meaningful details. Evaluate optical weight and the smallest gaps at the actual display size. Narrower lines and gaps can preserve recognizable detail in dense compositions. Cabinet doors, the low notched drawer and the open-top box have distinct silhouettes.
 

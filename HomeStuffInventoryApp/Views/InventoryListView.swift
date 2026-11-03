@@ -367,7 +367,8 @@ struct InventoryListView: View {
                     defaultValue: "No Matching Items"
                 ),
                 message: filteredEmptyStateMessage,
-                systemImage: filteredEmptyStateSystemImage(context: filterContext)
+                systemImage: filteredEmptyStateSystemImage(context: filterContext),
+                usesSystemIcon: filterContext.clearAction != nil
             ) {
                 Button(filteredEmptyStateActionTitle(context: filterContext)) {
                     clearSearchAndFilters()

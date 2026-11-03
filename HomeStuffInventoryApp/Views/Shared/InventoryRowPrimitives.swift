@@ -164,7 +164,7 @@ struct InventorySelectionRow: View {
     var body: some View {
         HStack(spacing: 12) {
             if let systemImage {
-                InventoryContentGlyph(systemName: systemImage, role: iconRole)
+                InventoryContentGlyph(systemName: systemImage, role: iconRole, isSelected: isSelected)
             }
 
             title
@@ -266,22 +266,33 @@ struct InventorySettingsNavigationRow: View {
     private let subtitle: LocalizedStringKey?
     private let systemImage: String
     private let iconRole: InventoryDesign.AccentRole
+    private let contentDomain: InventoryGlyph.Domain?
 
     init(
         _ title: LocalizedStringKey,
         systemImage: String,
         iconRole: InventoryDesign.AccentRole = .secondary,
-        subtitle: LocalizedStringKey? = nil
+        subtitle: LocalizedStringKey? = nil,
+        contentDomain: InventoryGlyph.Domain? = nil
     ) {
         self.title = title
         self.subtitle = subtitle
         self.systemImage = systemImage
         self.iconRole = iconRole
+        self.contentDomain = contentDomain
     }
 
     var body: some View {
         HStack(spacing: 12) {
-            InventoryContentGlyph(systemName: systemImage, role: iconRole)
+            if let contentDomain {
+                InventoryContentGlyph(systemName: systemImage, role: iconRole, domain: contentDomain)
+            } else {
+                Image(systemName: systemImage)
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(iconRole.color)
+                    .frame(width: InventoryDesign.contentGlyphSize, height: InventoryDesign.contentGlyphSize)
+                    .accessibilityHidden(true)
+            }
 
             if let subtitle {
                 VStack(alignment: .leading) {

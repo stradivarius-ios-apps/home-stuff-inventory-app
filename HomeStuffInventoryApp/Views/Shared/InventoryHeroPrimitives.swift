@@ -110,7 +110,7 @@ struct InventoryHeroIcon: View {
     }
 
     var body: some View {
-        InventoryGlyphImage(systemName: systemName, role: contentRole.accentRole, size: symbolSize, font: .system(size: symbolSize, weight: .semibold), identity: true)
+        InventoryGlyphImage(systemName: systemName, role: contentRole.accentRole, size: symbolSize, identity: true)
             .frame(width: size, height: size)
             .inventoryHeroIconSurface(
                 presentation,
@@ -403,10 +403,7 @@ struct InventoryHeroMetadataLine: View {
 
     var body: some View {
         HStack(alignment: showsTitle ? .top : .firstTextBaseline, spacing: 10) {
-            Image(systemName: systemImage)
-                .font(.headline)
-                .foregroundStyle(role.color)
-                .imageScale(.medium)
+            InventoryGlyphImage(systemName: systemImage, role: role, size: iconWidth)
                 .frame(width: iconWidth)
                 .padding(.top, showsTitle ? 2 : 0)
                 .accessibilityHidden(true)

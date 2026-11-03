@@ -215,8 +215,7 @@ private struct LocationRecentItemsHeader: View {
             Text(presentation.label)
                 .fixedSize(horizontal: false, vertical: true)
         } icon: {
-            Image(systemName: presentation.systemImage)
-                .imageScale(.small)
+            InventoryInlineGlyph(systemName: presentation.systemImage, role: .context)
                 .accessibilityHidden(true)
         }
         .font(.headline)
@@ -276,8 +275,7 @@ private struct LocationAllItemsAccessRow: View {
                     .foregroundStyle(.primary)
                     .fixedSize(horizontal: false, vertical: true)
                 } icon: {
-                    Image(systemName: "tray.full")
-                        .imageScale(.medium)
+                    InventoryInlineGlyph(systemName: "tray.full", role: .secondary, domain: .item)
                         .foregroundStyle(.secondary)
                         .accessibilityHidden(true)
                 }

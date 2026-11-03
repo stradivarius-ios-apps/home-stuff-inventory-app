@@ -34,6 +34,7 @@ struct InventoryEmptyStateCard<Actions: View>: View {
     private let message: Text
     private let systemImage: String
     private let iconRole: InventoryDesign.AccentRole
+    private let usesSystemIcon: Bool
     private let actions: Actions
 
     init(
@@ -41,12 +42,14 @@ struct InventoryEmptyStateCard<Actions: View>: View {
         message: LocalizedStringKey,
         systemImage: String = "shippingbox",
         iconRole: InventoryDesign.AccentRole = .muted,
+        usesSystemIcon: Bool = false,
         @ViewBuilder actions: () -> Actions
     ) {
         self.title = Text(title)
         self.message = Text(message)
         self.systemImage = systemImage
         self.iconRole = iconRole
+        self.usesSystemIcon = usesSystemIcon
         self.actions = actions()
     }
 
@@ -55,21 +58,32 @@ struct InventoryEmptyStateCard<Actions: View>: View {
         message: String,
         systemImage: String = "shippingbox",
         iconRole: InventoryDesign.AccentRole = .muted,
+        usesSystemIcon: Bool = false,
         @ViewBuilder actions: () -> Actions
     ) {
         self.title = Text(verbatim: title)
         self.message = Text(verbatim: message)
         self.systemImage = systemImage
         self.iconRole = iconRole
+        self.usesSystemIcon = usesSystemIcon
         self.actions = actions()
     }
 
     var body: some View {
         InventoryCard(cornerRadius: InventoryDesign.heroCornerRadius) {
             VStack(spacing: InventoryDesign.rowSpacing) {
-                InventoryContentGlyph(systemName: systemImage, role: iconRole, presentation: .identity)
-                    .padding(.bottom, 4)
-                    .accessibilityHidden(true)
+                Group {
+                    if usesSystemIcon {
+                        Image(systemName: systemImage)
+                            .font(.title2.weight(.semibold))
+                            .foregroundStyle(iconRole.color)
+                            .frame(width: InventoryDesign.identityContentGlyphSize, height: InventoryDesign.identityContentGlyphSize)
+                    } else {
+                        InventoryContentGlyph(systemName: systemImage, role: iconRole, presentation: .identity)
+                    }
+                }
+                .padding(.bottom, 4)
+                .accessibilityHidden(true)
 
                 title
                     .inventoryTextRole(.sectionTitle)

@@ -93,7 +93,7 @@ struct InventoryDetailStorageAnswerCard: View {
     }
 
     private func glyph(systemImage: String, hasValue: Bool, contentRole: InventoryDesign.ContentRole) -> some View {
-        InventoryContentGlyph(systemName: systemImage, role: hasValue ? contentRole.accentRole : .muted)
+        InventoryContentGlyph(systemName: systemImage, role: hasValue ? contentRole.accentRole : .muted, domain: .init(contentRole: contentRole))
     }
 
     private func storageText(title: LocalizedStringKey, value: String, hasValue: Bool, contentRole: InventoryDesign.ContentRole, isExactAnswer: Bool) -> some View {
@@ -163,7 +163,7 @@ struct InventoryDetailPropertiesCard: View {
         identifier: String
     ) -> some View {
         VStack(alignment: .leading, spacing: InventoryDesign.rowSpacing) {
-            Label(title, systemImage: systemImage)
+            Label { Text(title) } icon: { InventoryInlineGlyph(systemName: systemImage, role: .muted, domain: .item) }
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)
                 .textCase(.uppercase)

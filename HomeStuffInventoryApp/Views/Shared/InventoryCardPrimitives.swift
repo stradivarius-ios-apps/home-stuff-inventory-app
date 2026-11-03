@@ -82,8 +82,7 @@ struct InventoryPropertyCard: View {
             VStack(alignment: .leading, spacing: InventoryDesign.rowSpacing) {
                 HStack(spacing: 6) {
                     if let systemImage {
-                        Image(systemName: systemImage)
-                            .imageScale(.small)
+                        InventoryInlineGlyph(systemName: systemImage, role: role)
                             .foregroundStyle(role.color)
                             .accessibilityHidden(true)
                     }

@@ -149,8 +149,7 @@ struct InventoryCompactItemCard: View {
         contentRole: InventoryDesign.ContentRole
     ) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 4) {
-            Image(systemName: systemImage)
-                .font(.caption)
+            InventoryInlineGlyph(systemName: systemImage, role: hasValue ? contentRole.accentRole : .muted, domain: .init(contentRole: contentRole))
                 .foregroundStyle(hasValue ? contentRole.color : Color.secondary)
                 .accessibilityHidden(true)
 

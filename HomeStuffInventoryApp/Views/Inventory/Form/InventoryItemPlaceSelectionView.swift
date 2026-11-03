@@ -114,16 +114,7 @@ private struct InventoryItemPlaceCreationView: View {
                 TextField("inventory.selection.place.newPrompt", text: $name)
                     .textInputAutocapitalization(.words)
                     .accessibilityIdentifier("inventory.placeSelection.nameField")
-                Picker("inventory.selection.place.icon", selection: $iconID) {
-                    ForEach(PlaceIconCatalog.options) { option in
-                        Label {
-                            Text(verbatim: option.localizedName)
-                        } icon: {
-                            InventoryInlineGlyph(systemName: option.symbolName, role: .place, domain: .place, isSelected: iconID == option.id)
-                        }
-                        .tag(option.id)
-                    }
-                }
+                InventoryPlaceIconPicker(selection: $iconID)
                 .accessibilityIdentifier("inventory.placeSelection.iconPicker")
                 .accessibilityLabel("inventory.selection.place.icon")
                 .accessibilityHint("inventory.selection.place.icon.help")

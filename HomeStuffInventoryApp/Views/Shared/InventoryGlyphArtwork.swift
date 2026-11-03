@@ -54,6 +54,38 @@ struct InventoryGlyphArtwork: View {
             .resizable()
             .aspectRatio(contentMode: .fit)
     }
+
+    static func menuImage(
+        glyph: InventoryGlyph,
+        variant: InventoryGlyph.Variant,
+        tint: Color.Resolved,
+        displayScale: CGFloat
+    ) -> Image? {
+        let side: CGFloat = 22
+        let name = glyph.assetName(for: variant)
+        let layout = InventoryGlyphRasterStore.layout(for: name)
+        let canvasSide = side * (20.0 / 24.0) / layout.bodyFraction
+        let pixels = Int(ceil(canvasSide * displayScale / 32)) * 32
+        guard let source = InventoryGlyphRasterStore.image(named: name, maximumPixelSize: pixels) else {
+            return nil
+        }
+
+        let fit = canvasSide / max(source.size.width, source.size.height)
+        let width = source.size.width * fit
+        let height = source.size.height * fit
+        let drawing = CGRect(
+            x: (side - width) / 2 + layout.offsetX * canvasSide,
+            y: (side - height) / 2 + layout.offsetY * canvasSide,
+            width: width,
+            height: height
+        )
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = displayScale
+        let image = UIGraphicsImageRenderer(size: CGSize(width: side, height: side), format: format).image { _ in
+            source.withTintColor(UIColor(cgColor: tint.cgColor), renderingMode: .alwaysOriginal).draw(in: drawing)
+        }
+        return Image(uiImage: image.withRenderingMode(.alwaysOriginal))
+    }
 }
 
 @MainActor

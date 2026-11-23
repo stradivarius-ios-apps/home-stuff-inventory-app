@@ -362,17 +362,7 @@ private struct TopLevelPlaceEditorView: View {
         NavigationStack {
             Form {
                 Section {
-                    Picker("inventory.places.location", selection: $locationID) {
-                        ForEach(locations) { location in
-                            Text(verbatim: location.name)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .tag(location.id)
-                        }
-                    }
-                    .labelsHidden()
-                    .lineLimit(nil)
-                    .accessibilityHint("inventory.places.location.help")
-                    .accessibilityIdentifier("settings.places.locationPicker")
+                    locationPicker
                 } header: {
                     VStack(alignment: .leading, spacing: InventoryDesign.rowSpacing) {
                         Text("inventory.places.add")
@@ -381,6 +371,13 @@ private struct TopLevelPlaceEditorView: View {
                             .accessibilityAddTraits(.isHeader)
 
                         Text("inventory.places.location")
+
+                        if #unavailable(iOS 26.0), let selectedLocation {
+                            Text(verbatim: selectedLocation.name)
+                                .foregroundStyle(.primary)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .accessibilityHidden(true)
+                        }
                     }
                     .textCase(nil)
                 }
@@ -405,10 +402,8 @@ private struct TopLevelPlaceEditorView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("inventory.action.save") {
-                        guard let location = locations.first(where: {
-                            $0.id == locationID
-                        }) else { return }
-                        save(name, iconID, location)
+                        guard let selectedLocation else { return }
+                        save(name, iconID, selectedLocation)
                     }
                     .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     .inventoryPrimaryActionTint()
@@ -416,5 +411,61 @@ private struct TopLevelPlaceEditorView: View {
                 }
             }
         }
+    }
+
+    private var selectedLocation: StorageLocation? {
+        locations.first { $0.id == locationID }
+    }
+
+    @ViewBuilder
+    private var locationPicker: some View {
+        Group {
+            if #available(iOS 26.0, *) {
+                locationMenu
+            } else {
+                Picker("inventory.places.location", selection: $locationID) {
+                    ForEach(locations) { location in
+                        Text(verbatim: location.name)
+                            .tag(location.id)
+                    }
+                }
+                .labelsHidden()
+            }
+        }
+        .accessibilityHint("inventory.places.location.help")
+        .accessibilityIdentifier("settings.places.locationPicker")
+    }
+
+    private var locationMenu: some View {
+        let selectedName = selectedLocation?.name ?? ""
+
+        return Menu {
+            ForEach(locations) { location in
+                Button {
+                    locationID = location.id
+                } label: {
+                    if location.id == locationID {
+                        Label(location.name, systemImage: "checkmark")
+                    } else {
+                        Text(verbatim: location.name)
+                    }
+                }
+                .accessibilityAddTraits(location.id == locationID ? .isSelected : [])
+            }
+        } label: {
+            HStack(alignment: .firstTextBaseline, spacing: InventoryDesign.rowSpacing) {
+                Text(verbatim: selectedName)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.caption.weight(.semibold))
+                    .accessibilityHidden(true)
+            }
+            .contentShape(Rectangle())
+        }
+        .accessibilityLabel("inventory.places.location")
+        .accessibilityValue(Text(verbatim: selectedName))
     }
 }

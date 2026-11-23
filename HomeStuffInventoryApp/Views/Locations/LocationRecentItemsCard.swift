@@ -275,7 +275,7 @@ private struct LocationAllItemsAccessRow: View {
                     .foregroundStyle(.primary)
                     .fixedSize(horizontal: false, vertical: true)
                 } icon: {
-                    InventoryInlineGlyph(systemName: "tray.full", role: .secondary, domain: .item)
+                    InventoryInlineGlyph(systemName: "list.bullet", role: .secondary)
                         .foregroundStyle(.secondary)
                         .accessibilityHidden(true)
                 }

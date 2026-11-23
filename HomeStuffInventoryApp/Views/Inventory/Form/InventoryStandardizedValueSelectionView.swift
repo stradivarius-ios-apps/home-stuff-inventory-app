@@ -9,6 +9,7 @@ struct InventoryStandardizedValueSelectionView: View {
     let createButtonTitle: LocalizedStringKey
     let createSheetTitle: LocalizedStringKey
     let resolveCreatedValue: (String) -> InventoryValueCreationOutcome
+    var locationSymbolName: ((InventorySelectionOption) -> String?)? = nil
 
     @Environment(\.dismiss) private var dismiss
     @State private var isShowingCreateSheet = false
@@ -111,7 +112,12 @@ struct InventoryStandardizedValueSelectionView: View {
     }
 
     private func optionRow(_ option: InventorySelectionOption) -> some View {
-        InventorySelectionRow(verbatim: option.displayName, isSelected: isSelected(option))
+        InventorySelectionRow(
+            verbatim: option.displayName,
+            systemImage: locationSymbolName?(option),
+            iconRole: .storage,
+            isSelected: isSelected(option)
+        )
     }
 
     private func isSelected(_ option: InventorySelectionOption) -> Bool {

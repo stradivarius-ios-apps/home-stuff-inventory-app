@@ -8,6 +8,7 @@ struct LocationDetailIdentityHeader: View {
         InventoryDetailIdentityHeader(
             iconSystemName: locationIconSystemName,
             contentRole: .location,
+            isMissing: location.isMissingLocation,
             title: location.name,
             secondary: Text(verbatim: itemCountText),
             accessibilityLabel: Text(summaryAccessibilityLabel),
@@ -45,6 +46,7 @@ struct PlaceDetailIdentityHeader: View {
         InventoryDetailIdentityHeader(
             iconSystemName: placeIconSystemName,
             contentRole: .place,
+            isMissing: place.isMissingPlace,
             title: place.name,
             secondary: Text(verbatim: itemCountText),
             secondaryLeadingMetadata: parentLocationText,

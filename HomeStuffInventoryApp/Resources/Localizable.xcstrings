@@ -325,6 +325,12 @@
         "uk" : { "stringUnit" : { "state" : "translated", "value" : "Офіс" } }
       }
     },
+    "locationIcons.option.pantry" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Pantry" } },
+        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Комора" } }
+      }
+    },
     "locationIcons.option.refrigerator" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Refrigerator" } },

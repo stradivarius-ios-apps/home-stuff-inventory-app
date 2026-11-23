@@ -365,11 +365,24 @@ private struct TopLevelPlaceEditorView: View {
                     Picker("inventory.places.location", selection: $locationID) {
                         ForEach(locations) { location in
                             Text(verbatim: location.name)
+                                .fixedSize(horizontal: false, vertical: true)
                                 .tag(location.id)
                         }
                     }
+                    .labelsHidden()
+                    .lineLimit(nil)
                     .accessibilityHint("inventory.places.location.help")
                     .accessibilityIdentifier("settings.places.locationPicker")
+                } header: {
+                    VStack(alignment: .leading, spacing: InventoryDesign.rowSpacing) {
+                        Text("inventory.places.add")
+                            .inventoryTextRole(.screenTitle)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .accessibilityAddTraits(.isHeader)
+
+                        Text("inventory.places.location")
+                    }
+                    .textCase(nil)
                 }
 
                 Section {
@@ -384,7 +397,6 @@ private struct TopLevelPlaceEditorView: View {
                 .inventoryFormRowSurface()
             }
             .inventoryFormPresentation(contentRole: .place)
-            .navigationTitle("inventory.places.add")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("inventory.action.cancel") {

@@ -43,25 +43,24 @@ struct InventoryItemPlaceSelectionView: View {
                             placeName = place.name
                             dismiss()
                         } label: {
-                            HStack {
-                                InventoryContentGlyph(
-                                    systemName: PlaceIconCatalog.symbolName(for: place.iconID),
-                                    role: InventoryDesign.ContentRole.place.accentRole,
+                            VStack(alignment: .leading, spacing: 2) {
+                                InventorySelectionRow(
+                                    verbatim: place.name,
+                                    systemImage: PlaceIconCatalog.symbolName(for: place.iconID),
+                                    iconRole: .place,
                                     isSelected: selection == place.id
                                 )
-                                VStack(alignment: .leading, spacing: 2) {
-                                    InventorySelectionRow(verbatim: place.name, isSelected: selection == place.id)
-                                    if place.depth > 0 {
-                                        Text(verbatim: place.pathText)
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
-                                            .fixedSize(horizontal: false, vertical: true)
-                                    }
+                                if place.depth > 0 {
+                                    Text(verbatim: place.pathText)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                        .fixedSize(horizontal: false, vertical: true)
                                 }
                             }
                         }
                         .buttonStyle(.plain)
                         .accessibilityLabel(Text(place.pathText))
+                        .accessibilityAddTraits(selection == place.id ? .isSelected : [])
                         .accessibilityHint("inventory.placeSelection.option.accessibilityHint")
                         .accessibilityIdentifier("inventory.placeSelection.option.\(place.id.uuidString)")
                     }

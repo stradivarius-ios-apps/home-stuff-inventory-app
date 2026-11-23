@@ -32,6 +32,18 @@ struct InventoryItemDetailViewModelTests {
         #expect(viewModel.notesText == "Tiny bits for laptop repairs.")
     }
 
+    @Test func linkedPlaceCountsAsPresentWithoutLegacyName() {
+        let locationID = UUID()
+        let cabinet = InventoryPlace(locationID: locationID, name: "Cabinet")
+        let drawer = InventoryPlace(locationID: locationID, parentPlaceID: cabinet.id, name: "Drawer")
+        let item = InventoryItem(name: "Cable", locationName: "Office", placeID: drawer.id)
+
+        let viewModel = InventoryItemDetailViewModel(item: item, places: [cabinet, drawer])
+
+        #expect(viewModel.containerName == "Cabinet › Drawer")
+        #expect(viewModel.hasContainer)
+    }
+
     @Test func viewModelUsesNeutralItemFallbackIcon() {
         let item = InventoryItem(
             name: "Mystery cable",

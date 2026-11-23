@@ -1,6 +1,6 @@
 # Content Icon Family
 
-All 68 Location, Storage Place and Item catalog IDs resolve to authored content artwork through `InventoryGlyph.swift`. The family covers 62 subjects, including shared drawings and metadata such as maps, tags, quantity, condition, notes and history. The resolver preserves the saved IDs and their domain meanings. An unknown Location uses the authored location marker, while unknown Storage Places and Items use the authored box. Native search, navigation and action symbols retain their platform roles.
+All 69 Location, Storage Place and Item catalog IDs resolve to authored content artwork through `InventoryGlyph.swift`. The family covers 62 subjects, including shared drawings and metadata such as maps, tags, quantity, condition, notes and history. The resolver preserves the saved IDs and their domain meanings. An unknown Location uses the authored location marker, while unknown Storage Places and Items use the authored box. Native search, navigation and action symbols retain their platform roles.
 
 ## Artwork and states
 

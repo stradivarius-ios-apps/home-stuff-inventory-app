@@ -46,7 +46,7 @@ struct LocationAllItemsRowView: View {
 
     private var allItemsIcon: some View {
         InventoryHeroIcon(
-            systemName: "tray.full",
+            systemName: "list.bullet",
             size: 52,
             symbolSize: 24,
             cornerRadius: 18,

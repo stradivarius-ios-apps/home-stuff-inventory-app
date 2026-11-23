@@ -29,8 +29,10 @@ struct InventoryItemDetailViewModel: Equatable {
         if let placeID = item.placeID,
            let place = places.first(where: { $0.id == placeID }) {
             containerName = InventoryPlaceHierarchy.path(for: place, places: places).displayName
+            hasContainer = true
         } else {
             containerName = Self.displayText(item.containerName, fallback: InventoryLocalization.noContainer)
+            hasContainer = Self.hasDisplayableText(item.containerName)
         }
         category = InventoryCategory.displayName(forStoredValue: item.category)
         quantityText = item.quantity.formatted()
@@ -42,7 +44,6 @@ struct InventoryItemDetailViewModel: Equatable {
         createdAt = item.createdAt
         updatedAt = item.updatedAt
         hasLocation = Self.hasDisplayableText(item.locationName)
-        hasContainer = Self.hasDisplayableText(item.containerName)
         hasNotes = Self.hasDisplayableText(item.notes)
     }
 

@@ -13,6 +13,11 @@ struct LocalizationCatalogTests {
         #expect(issues.isEmpty, "Localization catalog issues: \(issues.joined(separator: ", "))")
     }
 
+    @Test func pantryIconNameIsLocalized() {
+        #expect(localizationTestValue("locationIcons.option.pantry", language: "en") == "Pantry")
+        #expect(localizationTestValue("locationIcons.option.pantry", language: "uk") == "Комора")
+    }
+
     @Test func appTargetKeepsCompilerStringExtractionDisabled() throws {
         let projectFile = try String(
             contentsOf: localizationTestRepositoryRootURL().appendingPathComponent("HomeStuffInventoryApp.xcodeproj/project.pbxproj"),

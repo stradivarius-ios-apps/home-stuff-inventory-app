@@ -60,10 +60,22 @@ struct InventoryItemFormView: View {
                             createPrompt: "inventory.selection.location.newPrompt",
                             createButtonTitle: "inventory.selection.location.addNew",
                             createSheetTitle: "inventory.selection.location.create",
-                            resolveCreatedValue: resolveLocationName
+                            resolveCreatedValue: resolveLocationName,
+                            locationSymbolName: { option in
+                                let location = locations.first {
+                                    InventoryNormalizedName.location($0.name)
+                                        == InventoryNormalizedName.location(option.storageValue)
+                                }
+                                return location.map { LocationIconCatalog.symbolName(for: $0.iconID) }
+                            }
                         )
                     } label: {
-                        LabeledContent("inventory.field.location", value: selectedLocationDisplayName)
+                        InventoryStorageSelectionLabel(
+                            title: "inventory.field.location",
+                            value: selectedLocationDisplayName,
+                            systemImage: selectedStorageLocation?.iconID.map(LocationIconCatalog.symbolName(for:)),
+                            contentRole: .location
+                        )
                     }
                     .accessibilityIdentifier("inventory.itemForm.locationPicker")
                     .tint(InventoryDesign.ContentRole.location.color)
@@ -77,7 +89,12 @@ struct InventoryItemFormView: View {
                             createPlace: createPlace
                         )
                     } label: {
-                        LabeledContent("inventory.field.container", value: selectedPlaceDisplayName)
+                        InventoryStorageSelectionLabel(
+                            title: "inventory.field.container",
+                            value: selectedPlaceDisplayName,
+                            systemImage: selectedPlace?.iconID.map(PlaceIconCatalog.symbolName(for:)),
+                            contentRole: .place
+                        )
                     }
                     .disabled(selectedStorageLocation == nil)
                     .accessibilityIdentifier("inventory.itemForm.containerPicker")
@@ -429,8 +446,12 @@ struct InventoryItemFormView: View {
         }
     }
 
+    private var selectedPlace: InventoryPlace? {
+        places.first { $0.id == draft.placeID }
+    }
+
     private var selectedPlaceDisplayName: String {
-        if let id = draft.placeID, let place = places.first(where: { $0.id == id }) {
+        if let place = selectedPlace {
             return InventoryPlaceHierarchy.path(for: place, places: places).displayName
         }
         let trimmed = draft.containerName.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -502,6 +523,40 @@ struct InventoryItemFormView: View {
             "inventory.selection.creation.error.message",
             defaultValue: "Couldn't save this value. Please try again."
         )
+    }
+}
+
+private struct InventoryStorageSelectionLabel: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    let title: LocalizedStringKey
+    let value: String
+    let systemImage: String?
+    let contentRole: InventoryDesign.ContentRole
+
+    var body: some View {
+        LabeledContent {
+            if let systemImage, !dynamicTypeSize.isAccessibilitySize {
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 6) {
+                        InventoryInlineGlyph(systemName: systemImage, role: contentRole.accentRole, domain: .init(contentRole: contentRole))
+                        Text(verbatim: value)
+                    }
+                    .fixedSize(horizontal: true, vertical: false)
+
+                    valueText
+                }
+            } else {
+                valueText
+            }
+        } label: {
+            Text(title)
+        }
+    }
+
+    private var valueText: some View {
+        Text(verbatim: value)
+            .fixedSize(horizontal: false, vertical: true)
     }
 }
 

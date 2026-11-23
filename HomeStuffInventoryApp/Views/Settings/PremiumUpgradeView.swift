@@ -195,7 +195,7 @@ private extension PremiumBundleCapability {
         switch self {
         case .roomSweep: "square.stack.3d.up"
         case .selectedItemMovement: "checklist"
-        case .placeContentsMovement: "shippingbox.and.arrow.forward"
+        case .placeContentsMovement: "arrow.right.square"
         case .extendedMovementUndo: "arrow.uturn.backward.circle"
         case .nestedStoragePlaces: "square.3.layers.3d"
         }

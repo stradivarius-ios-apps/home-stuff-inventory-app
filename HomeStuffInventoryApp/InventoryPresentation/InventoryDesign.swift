@@ -182,7 +182,8 @@ enum InventoryDesign {
     static let previewOverflowChipHorizontalPadding: CGFloat = 7
     static let previewOverflowChipVerticalPadding: CGFloat = 4
     static let storageIconSize: CGFloat = 44
-    static let locationSummaryIconSize: CGFloat = 36
+    static let locationSummaryIconSize: CGFloat = 46
+    static let locationDetailIconSize: CGFloat = 52
     static let locationSummaryIconFrame: CGFloat = 60
     static let compactIconSize: CGFloat = 34
     static let contentGlyphSize: CGFloat = 32

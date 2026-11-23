@@ -3,11 +3,13 @@ import SwiftUI
 enum InventoryContentGlyphPresentation {
     case compact
     case identity
+    case locationIdentity
 }
 
 struct InventoryContentGlyph: View {
     @ScaledMetric(relativeTo: .title3) private var compactSize = InventoryDesign.contentGlyphSize
     @ScaledMetric(relativeTo: .title2) private var identitySize = InventoryDesign.identityContentGlyphSize
+    @ScaledMetric(relativeTo: .title2) private var locationIdentitySize = InventoryDesign.locationDetailIconSize
 
     private let systemName: String
     private let role: InventoryDesign.AccentRole
@@ -49,10 +51,11 @@ struct InventoryContentGlyph: View {
     }
 
     var body: some View {
-        InventoryGlyphImage(systemName: systemName, role: role, size: size, identity: presentation == .identity, domain: domain, isSelected: isSelected)
+        InventoryGlyphImage(systemName: systemName, role: role, size: size, identity: presentation != .compact, domain: domain, isSelected: isSelected)
             .frame(width: size, height: size)
-            .accessibilityHidden(accessibilityLabel == nil)
+            .accessibilityElement(children: .ignore)
             .accessibilityLabel(accessibilityLabel ?? Text(verbatim: ""))
+            .accessibilityHidden(accessibilityLabel == nil)
     }
 
     private var size: CGFloat {
@@ -61,6 +64,8 @@ struct InventoryContentGlyph: View {
             compactSize
         case .identity:
             identitySize
+        case .locationIdentity:
+            locationIdentitySize
         }
     }
 }
@@ -155,11 +160,20 @@ struct InventoryGlyphImage: View {
     var isSelected = false
 
     var body: some View {
-        InventoryGlyphArtwork(
-            glyph: InventoryGlyph.content(systemName: systemName, domain: domain ?? .init(accentRole: role)),
-            variant: .resolve(identity: identity, isSelected: isSelected),
-            tint: role.color
-        )
+        Group {
+            if systemName == InventoryPlaceIconPresentation.missingPlaceSymbolName || systemName == "list.bullet" {
+                Image(systemName: systemName)
+                    .font(.system(size: size * 20 / 24, weight: .medium))
+                    .foregroundStyle(role.color)
+                    .accessibilityHidden(true)
+            } else {
+                InventoryGlyphArtwork(
+                    glyph: InventoryGlyph.content(systemName: systemName, domain: domain ?? .init(accentRole: role)),
+                    variant: .resolve(identity: identity, isSelected: isSelected),
+                    tint: role.color
+                )
+            }
+        }
         .frame(width: size, height: size)
     }
 }

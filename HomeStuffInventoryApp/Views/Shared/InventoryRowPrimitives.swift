@@ -162,25 +162,31 @@ struct InventorySelectionRow: View {
     }
 
     var body: some View {
-        HStack(spacing: 12) {
+        let layout = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: InventoryDesign.rowSpacing))
+            : AnyLayout(HStackLayout(spacing: 12))
+
+        layout {
             if let systemImage {
                 InventoryContentGlyph(systemName: systemImage, role: iconRole, isSelected: isSelected)
             }
 
             title
                 .foregroundStyle(.primary)
-                .lineLimit(dynamicTypeSize.isAccessibilitySize ? 3 : 2)
+                .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .layoutPriority(1)
 
             if isSelected {
                 InventoryRowCheckmark()
+                    .accessibilityHidden(true)
             }
         }
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
         .optionalAccessibilityLabel(accessibilityLabel)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 
@@ -261,6 +267,7 @@ struct InventoryAddNewRow: View {
 
 struct InventorySettingsNavigationRow: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @ScaledMetric(relativeTo: .title3) private var iconColumnSize = InventoryDesign.contentGlyphSize
 
     private let title: LocalizedStringKey
     private let subtitle: LocalizedStringKey?
@@ -290,7 +297,7 @@ struct InventorySettingsNavigationRow: View {
                 Image(systemName: systemImage)
                     .font(.title3.weight(.semibold))
                     .foregroundStyle(iconRole.color)
-                    .frame(width: InventoryDesign.contentGlyphSize, height: InventoryDesign.contentGlyphSize)
+                    .frame(width: iconColumnSize, height: iconColumnSize)
                     .accessibilityHidden(true)
             }
 

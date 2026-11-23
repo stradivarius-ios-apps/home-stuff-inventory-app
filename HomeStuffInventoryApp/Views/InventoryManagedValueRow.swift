@@ -114,8 +114,9 @@ struct InventoryManagedValueRow: View {
     private var viewItemsButton: some View {
         if let viewItemsAccessibilityLabel, let viewItemsAction {
             Button(action: viewItemsAction) {
-                Image(systemName: "tray.full")
-                    .frame(width: 44, height: 44)
+                Image(systemName: "list.bullet")
+                    .frame(width: InventoryDesign.minimumTapTarget, height: InventoryDesign.minimumTapTarget)
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.borderless)
             .accessibilityLabel(Text(verbatim: viewItemsAccessibilityLabel))

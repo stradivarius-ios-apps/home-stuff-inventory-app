@@ -95,8 +95,10 @@ struct ActiveInventoryFilterContextHeader: View {
                     defaultValue: "Storage Place: %@",
                     value: place.displayName(vocabulary: .localized)
                 ),
-                systemImage: "archivebox",
-                role: .place
+                systemImage: place == .missing
+                    ? InventoryPlaceIconPresentation.missingPlaceSymbolName
+                    : PlaceIconCatalog.fallbackSymbolName,
+                role: place == .missing ? .muted : .place
             )
         }
     }

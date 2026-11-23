@@ -25,7 +25,7 @@ struct InventoryItemRowView: View {
                     systemName: ItemIconCatalog.symbolName(for: item.iconID),
                     role: InventoryDesign.ContentRole.item.accentRole,
                     accessibilityLabel: itemIconAccessibilityLabel,
-                    presentation: .identity
+                    domain: .item
                 )
 
                 VStack(alignment: .leading, spacing: 10) {
@@ -64,6 +64,9 @@ struct InventoryItemRowView: View {
     }
 
     private var containerName: String {
+        if let placePath, !placePath.isEmpty {
+            return placePath
+        }
         guard let name = item.containerName?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty else {
             return InventoryLocalization.noContainer
         }
@@ -77,6 +80,9 @@ struct InventoryItemRowView: View {
     }
 
     private var hasContainer: Bool {
+        if let placePath, !placePath.isEmpty {
+            return true
+        }
         guard let name = item.containerName else {
             return false
         }
@@ -106,7 +112,7 @@ struct InventoryItemRowView: View {
                 "inventory.field.location",
                 defaultValue: "Location",
                 value: locationName,
-                systemImage: "mappin.and.ellipse",
+                systemImage: hasLocation ? LocationIconCatalog.fallbackSymbolName : LocationIconCatalog.missingLocationSymbolName,
                 hasValue: hasLocation,
                 contentRole: .location
             )
@@ -116,7 +122,7 @@ struct InventoryItemRowView: View {
                 "inventory.field.container",
                 defaultValue: "Storage Place",
                 value: containerName,
-                systemImage: "shippingbox",
+                systemImage: hasContainer ? PlaceIconCatalog.fallbackSymbolName : InventoryPlaceIconPresentation.missingPlaceSymbolName,
                 hasValue: hasContainer,
                 contentRole: .place
             )

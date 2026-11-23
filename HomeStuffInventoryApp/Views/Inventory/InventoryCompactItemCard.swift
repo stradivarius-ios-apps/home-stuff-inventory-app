@@ -114,8 +114,8 @@ struct InventoryCompactItemCard: View {
 
     private var stackedStorageSummary: some View {
         VStack(alignment: .leading, spacing: 4) {
-            storageValue(locationName, systemImage: "mappin.and.ellipse", hasValue: hasLocation, contentRole: .location)
-            storageValue(placeName, systemImage: "shippingbox", hasValue: hasPlace, contentRole: .place)
+            storageValue(locationName, systemImage: locationSymbolName, hasValue: hasLocation, contentRole: .location)
+            storageValue(placeName, systemImage: placeSymbolName, hasValue: hasPlace, contentRole: .place)
         }
     }
 
@@ -123,7 +123,7 @@ struct InventoryCompactItemCard: View {
         HStack(alignment: .firstTextBaseline, spacing: 6) {
             storageValue(
                 locationName,
-                systemImage: "mappin.and.ellipse",
+                systemImage: locationSymbolName,
                 hasValue: hasLocation,
                 contentRole: .location
             )
@@ -135,7 +135,7 @@ struct InventoryCompactItemCard: View {
 
             storageValue(
                 placeName,
-                systemImage: "shippingbox",
+                systemImage: placeSymbolName,
                 hasValue: hasPlace,
                 contentRole: .place
             )
@@ -176,11 +176,23 @@ struct InventoryCompactItemCard: View {
         return name
     }
 
+    private var locationSymbolName: String {
+        hasLocation ? LocationIconCatalog.fallbackSymbolName : LocationIconCatalog.missingLocationSymbolName
+    }
+
+    private var placeSymbolName: String {
+        hasPlace ? PlaceIconCatalog.fallbackSymbolName : InventoryPlaceIconPresentation.missingPlaceSymbolName
+    }
+
     private var hasLocation: Bool {
         !item.locationName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
     private var hasPlace: Bool {
+        if let placePath, !placePath.isEmpty {
+            return true
+        }
+
         guard let name = item.containerName else {
             return false
         }

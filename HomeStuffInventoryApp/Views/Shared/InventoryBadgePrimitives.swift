@@ -31,7 +31,7 @@ struct InventoryBadge: View {
     }
 
     var body: some View {
-        HStack(spacing: 5) {
+        HStack(alignment: .firstTextBaseline, spacing: 5) {
             if let systemImage {
                 if usesSystemSearchIcon {
                     Image(systemName: "magnifyingglass")
@@ -65,7 +65,7 @@ struct InventoryTagBadge: View {
     }
 
     var body: some View {
-        HStack(spacing: 5) {
+        HStack(alignment: .firstTextBaseline, spacing: 5) {
             InventoryInlineGlyph(systemName: "tag", role: role, domain: .item)
                 .accessibilityHidden(true)
 

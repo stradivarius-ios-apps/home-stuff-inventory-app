@@ -42,7 +42,7 @@ struct InventoryDetailStorageAnswerCard: View {
                 storageRow(
                     title: "inventory.field.location",
                     value: viewModel.locationName,
-                    systemImage: viewModel.hasLocation ? "location" : "location.slash",
+                    systemImage: viewModel.hasLocation ? LocationIconCatalog.fallbackSymbolName : LocationIconCatalog.missingLocationSymbolName,
                     hasValue: viewModel.hasLocation,
                     contentRole: .location,
                     isExactAnswer: false,
@@ -54,7 +54,7 @@ struct InventoryDetailStorageAnswerCard: View {
                 storageRow(
                     title: "inventory.field.container",
                     value: viewModel.containerName,
-                    systemImage: viewModel.hasContainer ? "shippingbox" : "shippingbox.circle",
+                    systemImage: viewModel.hasContainer ? PlaceIconCatalog.fallbackSymbolName : InventoryPlaceIconPresentation.missingPlaceSymbolName,
                     hasValue: viewModel.hasContainer,
                     contentRole: .place,
                     isExactAnswer: true,

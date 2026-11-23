@@ -20,7 +20,7 @@ struct InventoryGlyphTests {
     }
 
     @Test func everyStableCatalogIDHasAnAuthoredSubject() {
-        #expect(LocationIconCatalog.options.count == 28)
+        #expect(LocationIconCatalog.options.count == 29)
         #expect(PlaceIconCatalog.options.count == 9)
         #expect(ItemIconCatalog.options.count == 31)
         for option in LocationIconCatalog.options {
@@ -35,6 +35,25 @@ struct InventoryGlyphTests {
             #expect(PlaceIconCatalog.option(for: option.id)?.id == option.id)
             #expect(InventoryGlyph.resolve(systemName: option.symbolName, domain: .place) != nil)
         }
+    }
+
+    @Test func pantryUsesShelfArtworkAndPreservesExistingLocationChoices() {
+        let pantry = LocationIconCatalog.option(for: "pantry")
+        #expect(pantry?.category == .storage)
+        #expect(LocationIconCatalog.normalizedIconID("pantry") == "pantry")
+        #expect(StorageLocation(name: "Pantry", iconID: "entryway").iconID == "entryway")
+        #expect(StorageLocation(name: "Pantry").iconID == nil)
+        #expect(InventoryGlyph.resolve(systemName: LocationIconCatalog.symbolName(for: "pantry"), domain: .location) == .shelf)
+        #expect(InventoryGlyph.resolve(systemName: LocationIconCatalog.symbolName(for: "entryway"), domain: .location) == .entrywayDoor)
+        #expect(InventoryGlyph.resolve(systemName: LocationIconCatalog.symbolName(for: "living-room"), domain: .location) == .sofa)
+    }
+
+    @Test func missingPlaceUsesADistinctSystemSymbol() {
+        let missing = InventoryPlaceIconPresentation.symbolName(placeID: nil, isMissingPlace: true, places: [])
+        let known = InventoryPlaceIconPresentation.symbolName(placeID: nil, isMissingPlace: false, places: [])
+        #expect(missing == "minus.circle")
+        #expect(UIImage(systemName: missing) != nil)
+        #expect(InventoryGlyph.resolve(systemName: known, domain: .place) == .box)
     }
 
     @Test func unknownAndMissingContentUseAuthoredFallbacks() {

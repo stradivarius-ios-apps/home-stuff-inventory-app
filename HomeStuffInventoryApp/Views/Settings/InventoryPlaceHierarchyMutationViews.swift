@@ -2,6 +2,7 @@ import SwiftData
 import SwiftUI
 
 struct InventoryPlaceHierarchyDirectoryView: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.modelContext) private var modelContext
     @Environment(PremiumAccessState.self) private var premiumAccess
     @Environment(PremiumUpgradeCoordinator.self) private var upgradeCoordinator
@@ -113,21 +114,40 @@ struct InventoryPlaceHierarchyDirectoryView: View {
             row,
             entitlements: premiumAccess.entitlements
         )
-        return HStack(alignment: .top, spacing: 12) {
-            Color.clear
-                .frame(width: CGFloat(row.depth) * 16)
-                .accessibilityHidden(true)
+        let layout = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: InventoryDesign.rowSpacing))
+            : AnyLayout(HStackLayout(alignment: .top, spacing: 12))
 
+        return layout {
+            placeIdentity(row, isEditable: isEditable)
+            placeActions(row, isEditable: isEditable)
+                .frame(maxWidth: dynamicTypeSize.isAccessibilitySize ? .infinity : nil, alignment: .trailing)
+        }
+        .padding(.vertical, 3)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("settings.places.hierarchy.row.\(row.placeID.uuidString)")
+    }
+
+    private func placeIdentity(_ row: InventoryPlaceHierarchyManagement.Row, isEditable: Bool) -> some View {
+        let layout = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: InventoryDesign.rowSpacing))
+            : AnyLayout(HStackLayout(alignment: .top, spacing: 12))
+        let metadataLayout = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 4))
+            : AnyLayout(HStackLayout(spacing: 8))
+
+        return layout {
             InventoryContentGlyph(
                 systemName: PlaceIconCatalog.symbolName(for: row.iconID),
                 role: .place,
-                presentation: .identity
+                domain: .place
             )
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(verbatim: row.name)
                     .font(.body)
                     .foregroundStyle(.primary)
+                    .fixedSize(horizontal: false, vertical: true)
                     .accessibilityIdentifier("inventory.lists.valueTitle")
                 if row.depth > 0 {
                     Text(verbatim: row.pathText)
@@ -135,7 +155,7 @@ struct InventoryPlaceHierarchyDirectoryView: View {
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                HStack(spacing: 8) {
+                metadataLayout {
                     InventoryRowCountBadge(
                         InventoryLocalization.itemCount(row.containedItemCount),
                         role: .muted
@@ -147,6 +167,7 @@ struct InventoryPlaceHierarchyDirectoryView: View {
                         )
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier(
                             "settings.places.hierarchy.readOnly.\(row.placeID.uuidString)"
                         )
@@ -154,13 +175,20 @@ struct InventoryPlaceHierarchyDirectoryView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
+            .layoutPriority(1)
+        }
+        .padding(.leading, dynamicTypeSize.isAccessibilitySize ? 0 : CGFloat(min(row.depth, 3)) * 12)
+    }
 
+    private func placeActions(_ row: InventoryPlaceHierarchyManagement.Row, isEditable: Bool) -> some View {
+        HStack(spacing: 8) {
             if row.directItemCount > 0 {
                 Button {
                     onViewItems(row.placeID)
                 } label: {
-                    Image(systemName: "tray.full")
-                        .frame(width: 44, height: 44)
+                    Image(systemName: "list.bullet")
+                        .frame(width: InventoryDesign.minimumTapTarget, height: InventoryDesign.minimumTapTarget)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.borderless)
                 .accessibilityLabel(
@@ -216,7 +244,8 @@ struct InventoryPlaceHierarchyDirectoryView: View {
                     }
                 } label: {
                     Image(systemName: "ellipsis.circle")
-                        .frame(width: 44, height: 44)
+                        .frame(width: InventoryDesign.minimumTapTarget, height: InventoryDesign.minimumTapTarget)
+                        .contentShape(Rectangle())
                 }
                 .accessibilityLabel(
                     Text(
@@ -233,11 +262,7 @@ struct InventoryPlaceHierarchyDirectoryView: View {
                 )
             }
         }
-        .padding(.vertical, 3)
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier(
-            "settings.places.hierarchy.row.\(row.placeID.uuidString)"
-        )
+        .fixedSize(horizontal: true, vertical: false)
     }
 
     private var hierarchyHistory: some View {

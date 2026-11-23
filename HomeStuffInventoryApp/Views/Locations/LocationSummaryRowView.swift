@@ -38,7 +38,7 @@ struct LocationSummaryRowView: View {
                     }
                 }
             } else {
-                HStack(alignment: .top, spacing: 16) {
+                HStack(alignment: .center, spacing: 16) {
                     titleStack
                     locationIcon
                     InventoryRowChevron()
@@ -69,7 +69,6 @@ struct LocationSummaryRowView: View {
             systemName: locationIconSystemName,
             role: location.isMissingLocation ? .muted : InventoryDesign.ContentRole.location.accentRole,
             size: InventoryDesign.locationSummaryIconSize,
-            identity: true,
             domain: .location
         )
             .frame(

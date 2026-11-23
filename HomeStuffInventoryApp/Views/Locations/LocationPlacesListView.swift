@@ -303,10 +303,8 @@ private struct LocationDetailPlacesSection: View {
                 "locations.places.empty.message",
                 defaultValue: "Add an item to start organizing this location by storage place."
             ),
-            systemImage: location.isMissingLocation
-                ? LocationIconCatalog.missingLocationSymbolName
-                : LocationIconCatalog.symbolName(for: location.iconID),
-            iconRole: InventoryDesign.ContentRole.location.accentRole
+            systemImage: "tray",
+            usesSystemIcon: true
         ) {
             Button(InventoryLocalization.string("inventory.action.addItem", defaultValue: "Add Item")) {
                 onAddItem()

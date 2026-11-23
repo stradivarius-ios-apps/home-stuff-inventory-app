@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct InventoryItemIconSelectionLabel: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     let iconID: String?
 
     private var symbolName: String {
@@ -16,18 +18,25 @@ struct InventoryItemIconSelectionLabel: View {
     }
 
     var body: some View {
-        LabeledContent {
-            HStack(spacing: 8) {
-                InventoryContentGlyph(
-                    systemName: symbolName,
-                    role: InventoryDesign.ContentRole.item.accentRole
-                )
-
-                Text(verbatim: displayName)
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: InventoryDesign.rowSpacing) {
+                    Text("inventory.field.itemIcon")
+                    glyph
+                    value
+                }
+            } else {
+                LabeledContent {
+                    HStack(spacing: 8) {
+                        glyph
+                        value
+                    }
+                } label: {
+                    Text("inventory.field.itemIcon")
+                }
             }
-        } label: {
-            Text("inventory.field.itemIcon")
         }
+        .accessibilityElement(children: .ignore)
         .accessibilityLabel(
             Text(
                 InventoryLocalization.formatted(
@@ -37,5 +46,18 @@ struct InventoryItemIconSelectionLabel: View {
                 )
             )
         )
+    }
+
+    private var glyph: some View {
+        InventoryContentGlyph(
+            systemName: symbolName,
+            role: InventoryDesign.ContentRole.item.accentRole,
+            domain: .item
+        )
+    }
+
+    private var value: some View {
+        Text(verbatim: displayName)
+            .fixedSize(horizontal: false, vertical: true)
     }
 }

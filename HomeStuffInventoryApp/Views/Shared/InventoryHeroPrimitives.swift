@@ -232,6 +232,7 @@ struct InventoryDetailIdentityHeader: View {
 
     let systemName: String
     let contentRole: InventoryDesign.ContentRole
+    let isMissing: Bool
     let title: String
     let secondary: Text
     let secondaryLeadingMetadata: Text?
@@ -245,6 +246,7 @@ struct InventoryDetailIdentityHeader: View {
     init(
         iconSystemName: String,
         contentRole: InventoryDesign.ContentRole,
+        isMissing: Bool = false,
         title: String,
         secondary: Text,
         secondaryLeadingMetadata: Text? = nil,
@@ -257,6 +259,7 @@ struct InventoryDetailIdentityHeader: View {
     ) {
         systemName = iconSystemName
         self.contentRole = contentRole
+        self.isMissing = isMissing
         self.title = title
         self.secondary = secondary
         self.secondaryLeadingMetadata = secondaryLeadingMetadata
@@ -291,13 +294,15 @@ struct InventoryDetailIdentityHeader: View {
     private var icon: some View {
         InventoryContentGlyph(
             systemName: systemName,
-            role: contentRole.accentRole,
-            presentation: .identity
+            role: isMissing ? .muted : contentRole.accentRole,
+            presentation: contentRole == .location ? .locationIdentity : .identity,
+            domain: .init(contentRole: contentRole)
         )
         .padding(InventoryDesign.rowSpacing)
         .background {
             RoundedRectangle(cornerRadius: InventoryDesign.heroCornerRadius, style: .continuous)
-                .fill(contentRole.color.opacity(InventoryDesign.Opacity.identityHeaderIconFill))
+                .fill((isMissing ? InventoryDesign.AccentRole.muted.color : contentRole.color)
+                    .opacity(InventoryDesign.Opacity.identityHeaderIconFill))
         }
         .accessibilityHidden(true)
     }

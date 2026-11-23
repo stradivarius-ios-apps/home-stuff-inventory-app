@@ -1,8 +1,10 @@
 import Foundation
 
 enum InventoryPlaceIconPresentation {
+    static let missingPlaceSymbolName = "minus.circle"
+
     static func symbolName(placeID: UUID?, isMissingPlace: Bool, places: [InventoryPlace]) -> String {
-        guard !isMissingPlace else { return "shippingbox.circle" }
+        guard !isMissingPlace else { return missingPlaceSymbolName }
         return PlaceIconCatalog.symbolName(for: places.first(where: { $0.id == placeID })?.iconID)
     }
 }

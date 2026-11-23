@@ -117,6 +117,20 @@ final class InventorySettingsUITests: InventoryUITestCase {
         XCTAssertTrue(element(identifier: "premium.upgrade").waitForExistence(timeout: 3))
         XCTAssertTrue(app.navigationBars["Home Stuff Pro"].exists)
         XCTAssertTrue(app.staticTexts["Створіть вкладене місце зберігання"].exists)
+        app.buttons["premium.dismiss"].tap()
+
+        let leafID = "B1F0A001-EE01-4E10-9000-000000000505"
+        let leafRow = element(identifier: "settings.places.hierarchy.row.\(leafID)")
+        let viewItems = leafRow.buttons["inventory.lists.viewItems"]
+        let leafActions = element(identifier: "settings.places.hierarchy.actions.\(leafID)")
+        scrollToElement(viewItems)
+        XCTAssertTrue(leafActions.isHittable)
+        for action in [viewItems, leafActions] {
+            XCTAssertGreaterThanOrEqual(action.frame.width, 44 - 0.001)
+            XCTAssertGreaterThanOrEqual(action.frame.height, 44 - 0.001)
+            XCTAssertTrue(app.frame.contains(action.frame))
+        }
+        add(attachment(named: "nested-place-actions-uk-dark-accessibility"))
     }
 
     func testPlaceDirectoryGroupsPlaceRowsUnderQuietLocationContextAndSupportsScopedEditor() {
@@ -353,8 +367,25 @@ final class InventorySettingsUITests: InventoryUITestCase {
     }
 
     func testLocationIconPickerSavesLocationFromSettings() {
-        launchApp(); openManagedLocations(); let managedLocationName = "Icon Location \(uniqueTestSuffix())"; tapVisibleButton(identifier: "inventory.lists.addLocationButton")
-        let valueField = app.textFields["inventory.lists.valueField"]; XCTAssertTrue(valueField.waitForExistence(timeout: 3)); valueField.tap(); valueField.typeText(managedLocationName); app.buttons["inventory.lists.locationIconPicker"].tap(); app.buttons["locationIcons.option.kitchen"].tap(); XCTAssertTrue(app.textFields["inventory.lists.valueField"].waitForExistence(timeout: 3)); app.buttons["inventory.lists.saveButton"].tap(); XCTAssertTrue(app.staticTexts[managedLocationName].waitForExistence(timeout: 3))
+        launchApp()
+        openManagedLocations()
+        let managedLocationName = "Icon Location \(uniqueTestSuffix())"
+        tapVisibleButton(identifier: "inventory.lists.addLocationButton")
+
+        let nameField = app.textFields["inventory.lists.valueField"]
+        XCTAssertTrue(nameField.waitForExistence(timeout: 3))
+        nameField.tap()
+        nameField.typeText(managedLocationName)
+        app.buttons["inventory.lists.locationIconPicker"].tap()
+
+        let pantry = app.buttons["locationIcons.option.pantry"]
+        scrollToElement(pantry)
+        pantry.tap()
+
+        XCTAssertTrue(nameField.waitForExistence(timeout: 3))
+        XCTAssertTrue(app.buttons["inventory.lists.locationIconPicker"].label.contains("Pantry"))
+        app.buttons["inventory.lists.saveButton"].tap()
+        XCTAssertTrue(app.staticTexts[managedLocationName].waitForExistence(timeout: 3))
     }
 
     func testLocationManagementKeepsLocationEditorAndPickerSeparateFromCategories() {

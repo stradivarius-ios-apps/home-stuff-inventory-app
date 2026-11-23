@@ -44,6 +44,7 @@ enum LocationIconCatalog {
         LocationIconOption(id: "coffee-station", symbolName: "cup.and.saucer", nameKey: "locationIcons.option.coffeeStation", category: .kitchenAndDining),
         LocationIconOption(id: "refrigerator", symbolName: "refrigerator", nameKey: "locationIcons.option.refrigerator", category: .kitchenAndDining),
 
+        LocationIconOption(id: "pantry", symbolName: "square.split.2x2", nameKey: "locationIcons.option.pantry", category: .storage),
         LocationIconOption(id: "box", symbolName: "shippingbox", nameKey: "locationIcons.option.box", category: .storage),
         LocationIconOption(id: "archive", symbolName: "archivebox", nameKey: "locationIcons.option.archive", category: .storage),
         LocationIconOption(id: "cabinet", symbolName: "cabinet", nameKey: "locationIcons.option.cabinet", category: .storage),
